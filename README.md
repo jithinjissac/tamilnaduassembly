@@ -8,11 +8,13 @@ This system automates the extraction of voter list data from the Kerala SEC webs
 
 - **Cascading Dropdown System**: District → Local Body → Ward → Polling Station
 - **Headless Browser Automation**: Uses Playwright (Chromium) for reliable extraction
-- **Captcha Handling**: Manual captcha input with image display
-- **Data Parsing**: Converts HTML tables to structured JSON
+- **Session-Based Captcha Handling**: Persistent browser sessions with screenshot capture
+- **Data Parsing**: Converts HTML tables to structured JSON with section filtering
 - **Export Options**: Download results as JSON or CSV
+- **Voter Slip Generator**: Create print-ready voter slips (5 per A4 page) with party branding
 - **RESTful API**: Clean API endpoints for integration
 - **Modern UI**: Responsive web interface with real-time feedback
+- **Malayalam Support**: Default Malayalam language with proper font rendering
 
 ## 📋 Prerequisites
 
@@ -63,10 +65,24 @@ The server will start on `http://localhost:3000`
 3. Select **Local Body** (auto-populated after district selection)
 4. Select **Ward** (auto-populated after local body selection)
 5. Select **Polling Station** (auto-populated after ward selection)
-6. Select **Language** (English or Malayalam)
-7. View the **Captcha** image and enter the code
-8. Click **Extract Voters**
-9. View results and export as JSON or CSV
+6. Wait for **Captcha** to load automatically and enter the code
+7. Click **Extract Voters**
+8. View results in the table
+9. **Export** as JSON or CSV, or **Generate Voter Slips** for printing
+
+### Using the Voter Slip Generator
+
+After extracting voter data:
+
+1. Click **"🎫 Generate Voter Slips"** button in the results section
+2. Review the generated slips (5 per A4 page) with:
+   - Party logo and branding
+   - Voter details (name, SEC ID, address, guardian)
+   - Polling station information
+3. Click **"🖨️ Print Slips"** to print on A4 paper
+4. Distribute slips to voters during election campaigns
+
+See [VOTER_SLIPS_GUIDE.md](./VOTER_SLIPS_GUIDE.md) for detailed documentation.
 
 ## 📡 API Endpoints
 
@@ -197,18 +213,28 @@ project/
 ├── server.js                      # Express server entry point
 ├── controllers/
 │   ├── dropdownController.js      # Dropdown API endpoints
-│   └── voterController.js         # Voter extraction endpoint
+│   ├── voterController.js         # Voter extraction endpoint (deprecated)
+│   └── captchaController.js       # Session-based captcha management
 ├── utils/
 │   ├── playwright.js              # Browser automation logic
 │   └── parser.js                  # HTML table parser
 ├── frontend/
-│   ├── index.html                 # Web interface
-│   ├── styles.css                 # Styling
-│   └── app.js                     # Frontend JavaScript
+│   ├── index.html                 # Main extraction interface
+│   ├── styles.css                 # Main page styling
+│   ├── app.js                     # Frontend JavaScript
+│   ├── slips.html                 # Voter slip generator page
+│   ├── slips.css                  # Print-ready slip styling
+│   └── slips.js                   # Slip generation logic
+├── public/
+│   └── captcha-cache/             # Temporary captcha screenshots
 ├── package.json
 ├── .env
 ├── .gitignore
-└── README.md
+├── README.md
+├── API_EXAMPLES.md
+├── QUICKSTART.md
+├── SETUP_COMPLETE.md
+└── VOTER_SLIPS_GUIDE.md          # Voter slip feature documentation
 ```
 
 ## 🔧 Technology Stack

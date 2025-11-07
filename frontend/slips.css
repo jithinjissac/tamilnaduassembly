@@ -1,0 +1,211 @@
+/* Print-ready A4 voter slips - 5 per page */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+/* Controls (hide when printing) */
+.no-print {
+    background: white;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1e40af;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+/* A4 Page Container */
+.page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    margin: 20px auto;
+    padding: 10mm;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 8mm;
+}
+
+/* Single Voter Slip */
+.voter-slip {
+    width: 100%;
+    height: 55mm;
+    border: 2px solid #000;
+    display: flex;
+    padding: 3mm;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+    position: relative;
+}
+
+.voter-slip::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4mm;
+    border-bottom: 2px dashed #666;
+}
+
+.voter-slip:last-child::after {
+    display: none;
+}
+
+/* Left side - Logo and Party Name */
+.slip-left {
+    width: 25mm;
+    border-right: 2px dotted #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2mm;
+    text-align: center;
+}
+
+.symbol-text {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 2mm;
+    color: #000;
+}
+
+.party-logo {
+    width: 20mm;
+    height: 20mm;
+    margin-bottom: 2mm;
+}
+
+.party-name-ml {
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* Right side - Voter Details */
+.slip-right {
+    flex: 1;
+    padding: 2mm 3mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.slip-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2mm;
+    font-size: 11pt;
+}
+
+.slip-number {
+    font-weight: bold;
+}
+
+.sec-id {
+    font-weight: bold;
+}
+
+.voter-info {
+    flex: 1;
+}
+
+.info-row {
+    margin-bottom: 1.5mm;
+    font-size: 12pt;
+    display: flex;
+}
+
+.info-label {
+    font-weight: bold;
+    min-width: 20mm;
+}
+
+.info-value {
+    flex: 1;
+}
+
+.polling-station-info {
+    font-size: 10pt;
+    border-top: 1px solid #ccc;
+    padding-top: 1mm;
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .page {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 10mm;
+        box-shadow: none;
+        page-break-after: always;
+    }
+
+    .page:last-child {
+        page-break-after: auto;
+    }
+
+    .voter-slip {
+        page-break-inside: avoid;
+    }
+}
+
+@page {
+    size: A4;
+    margin: 0;
+}

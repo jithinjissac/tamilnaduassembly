@@ -22,6 +22,7 @@ const resultsSummary = document.getElementById('resultsSummary');
 const resultsTable = document.getElementById('resultsTable');
 const exportJsonBtn = document.getElementById('exportJson');
 const exportCsvBtn = document.getElementById('exportCsv');
+const generateSlipsBtn = document.getElementById('generateSlips');
 
 // State
 let voterData = null;
@@ -44,6 +45,7 @@ function setupEventListeners() {
     resetBtn.addEventListener('click', resetForm);
     exportJsonBtn.addEventListener('click', exportToJson);
     exportCsvBtn.addEventListener('click', exportToCsv);
+    generateSlipsBtn.addEventListener('click', generateSlips);
 }
 
 // Load Districts
@@ -412,6 +414,40 @@ function exportToCsv() {
     link.download = `voters_${Date.now()}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+}
+
+// Generate Voter Slips
+function generateSlips() {
+    if (!voterData || !voterData.voters || voterData.voters.length === 0) {
+        showError('No voter data available to generate slips');
+        return;
+    }
+
+    // Prepare voter data with gender_age field for slips
+    const slipData = voterData.voters.map(voter => ({
+        sl_no: voter.sl_no,
+        name: voter.name,
+        guardian_name: voter.guardian_name,
+        house_no: voter.house_no,
+        house_name: voter.house_name,
+        gender_age: `${voter.gender}/${voter.age}`,
+        sec_id: voter.sec_id
+    }));
+
+    // Store data in sessionStorage
+    sessionStorage.setItem('voterSlipData', JSON.stringify(slipData));
+    
+    // Store polling station info
+    const pollingStationInfo = {
+        district: districtSelect.options[districtSelect.selectedIndex].text,
+        localBody: localBodySelect.options[localBodySelect.selectedIndex].text,
+        ward: wardSelect.options[wardSelect.selectedIndex].text,
+        station: pollingStationSelect.options[pollingStationSelect.selectedIndex].text
+    };
+    sessionStorage.setItem('pollingStationInfo', JSON.stringify(pollingStationInfo));
+
+    // Navigate to slips page
+    window.location.href = 'slips.html';
 }
 
 // Utility Functions
