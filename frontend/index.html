@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerala SEC Voter List Extraction</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗳️ Kerala SEC Voter List Extraction</h1>
+            <p class="subtitle">Extract voter data from State Election Commission, Kerala</p>
+        </header>
+
+        <div class="card">
+            <form id="voterForm">
+                <div class="form-group">
+                    <label for="district">District *</label>
+                    <select id="district" name="district" required>
+                        <option value="">Select District</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="localBody">Local Body *</label>
+                    <select id="localBody" name="local_body" required disabled>
+                        <option value="">Select District First</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ward">Ward *</label>
+                    <select id="ward" name="ward" required disabled>
+                        <option value="">Select Local Body First</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pollingStation">Polling Station *</label>
+                    <select id="pollingStation" name="polling_station" required disabled>
+                        <option value="">Select Ward First</option>
+                    </select>
+                </div>
+
+                <input type="hidden" id="language" name="language" value="M" />
+
+                <div class="form-group">
+                    <label for="captcha">Captcha *</label>
+                    <div class="captcha-container">
+                        <div class="captcha-wrapper">
+                            <div id="captchaLoader" class="captcha-loader">
+                                <div class="spinner-small"></div>
+                            </div>
+                            <img id="captchaImage" src="" style="display: none;" />
+                        </div>
+                    </div>
+                    <input type="text" id="captcha" name="captcha" required placeholder="Enter captcha">
+                    <small class="help-text">Note: Captcha will sometimes take a moment to load</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        Extract Voters
+                    </button>
+                    <button type="button" id="resetBtn" class="btn-secondary">
+                        Reset Form
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Extracting voter data... This may take a moment.</p>
+        </div>
+
+        <div id="errorMessage" class="alert alert-error hidden"></div>
+        <div id="successMessage" class="alert alert-success hidden"></div>
+
+        <div id="resultsContainer" class="card hidden">
+            <h2>📊 Extraction Results</h2>
+            <div id="resultsSummary" class="results-summary"></div>
+            <div class="table-actions">
+                <button id="exportJson" class="btn-secondary">📥 Export JSON</button>
+                <button id="exportCsv" class="btn-secondary">📥 Export CSV</button>
+            </div>
+            <div id="resultsTable" class="table-container"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Kerala SEC Voter List Extraction API | Powered by Playwright Automation</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
