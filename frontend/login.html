@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Voter Slip Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+            padding: 3rem;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section h1 {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section p {
+            color: #718096;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #718096;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #718096;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .back-link a {
+            color: #718096;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            color: #2d3748;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo-section h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .logo-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn-login {
+                padding: 0.875rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <h1>🗳️ Voter Slips</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="emailOrPhone">Email or Phone Number</label>
+                <input 
+                    type="text" 
+                    id="emailOrPhone" 
+                    name="emailOrPhone" 
+                    placeholder="example@gmail.com or 9876543210"
+                    required
+                >
+                <div class="error-message" id="emailOrPhoneError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <div class="error-message" id="generalError"></div>
+
+            <button type="submit" class="btn" id="loginBtn">Sign In</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Signing in...</p>
+        </div>
+
+        <div class="register-link">
+            Don't have an account? <a href="register.html">Sign Up</a>
+        </div>
+
+        <div class="back-link">
+            <a href="landing.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Check if user is already logged in
+        const existingToken = localStorage.getItem('token');
+        if (existingToken) {
+            // Verify token is valid by checking profile
+            fetch('/api/auth/profile', {
+                headers: {
+                    'Authorization': `Bearer ${existingToken}`
+                }
+            }).then(async response => {
+                if (response.ok) {
+                    const profileData = await response.json();
+                    // Token is valid, redirect based on role
+                    if (profileData.user.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    // Token is invalid, clear it
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }).catch(() => {
+                // Error checking token, clear it
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            
+            const emailOrPhone = document.getElementById('emailOrPhone').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // Basic validation
+            if (!emailOrPhone) {
+                showError('emailOrPhoneError', 'Please enter email or phone number');
+                return;
+            }
+            
+            if (!password) {
+                showError('passwordError', 'Please enter password');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loginBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ emailOrPhone, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token and user info
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirect based on user role
+                    if (data.user.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    // Show error message
+                    showError('generalError', data.message || 'Login failed. Please try again.');
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('loginBtn').disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('generalError', 'Server error. Please try again.');
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loginBtn').disabled = false;
+            }
+        });
+        
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+    </script>
+</body>
+</html>

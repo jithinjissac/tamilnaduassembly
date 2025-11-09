@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Kerala SEC Voter Slips</title>
+    
+    <!-- Indic Transliteration Library -->
+    <script src="https://cdn.jsdelivr.net/npm/indic-transliteration@2.3.39/build/indicTransliterate.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input,
+        .filter-select select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            min-width: 150px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .symbol-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .symbol-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.1);
+        }
+
+        .symbol-card.inactive {
+            opacity: 0.5;
+        }
+
+        .symbol-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        .symbol-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .symbol-category {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .symbol-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 1rem auto;
+            display: none;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #9ca3af;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        #modalBody {
+            padding: 1.5rem;
+        }
+
+        .modal-content form {
+            padding: 1.5rem;
+        }
+
+        /* Table wrapper for responsive scroll */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-wrapper table {
+            min-width: 800px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-box,
+            .filter-select {
+                width: 100%;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.4rem;
+            }
+
+            .btn-small {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .card-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🎛️ Admin Dashboard</h1>
+            <div class="header-actions">
+                <span class="user-info" id="adminName">Loading...</span>
+                <button class="btn btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Alert Messages -->
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('analytics')"><i class="fas fa-chart-line"></i> Analytics</button>
+            <button class="tab" onclick="switchTab('users')"><i class="fas fa-users"></i> Users</button>
+            <button class="tab" onclick="switchTab('orders')"><i class="fas fa-shopping-cart"></i> Orders</button>
+            <button class="tab" onclick="switchTab('reports')"><i class="fas fa-chart-bar"></i> Reports</button>
+            <button class="tab" onclick="switchTab('symbols')"><i class="fas fa-flag"></i> Symbols</button>
+            <button class="tab" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload Symbol</button>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content active">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Admin Dashboard</h2>
+                    <p style="margin: 0; opacity: 0.9;">You can create orders without payment using the same user flow</p>
+                </div>
+                <a href="create-slip.html" class="btn" style="background: white; color: #667eea; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                    <i class="fas fa-plus-circle"></i> Create New Order
+                </a>
+            </div>
+
+            <div class="loading" id="analyticsLoading">
+                <div class="spinner"></div>
+                <p>Loading analytics...</p>
+            </div>
+
+            <div id="analyticsContent" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Users</h3>
+                        <div class="value" id="statTotalUsers">0</div>
+                        <div class="subtitle"><span id="statActiveUsers">0</span> active</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Orders</h3>
+                        <div class="value" id="statTotalOrders">0</div>
+                        <div class="subtitle"><span id="statPaidOrders">0</span> paid</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Revenue</h3>
+                        <div class="value" id="statRevenue">₹0</div>
+                        <div class="subtitle">From completed orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Symbols</h3>
+                        <div class="value" id="statTotalSymbols">0</div>
+                        <div class="subtitle"><span id="statActiveSymbols">0</span> active</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Orders</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>User</th>
+                                    <th>Location</th>
+                                    <th>Voters</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        <div class="empty-state-icon">📦</div>
+                                        <p>No orders yet</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>User Management</h2>
+                    <button class="btn btn-primary" onclick="loadUsers()">🔄 Refresh</button>
+                </div>
+
+                <div class="loading" id="usersLoading">
+                    <div class="spinner"></div>
+                    <p>Loading users...</p>
+                </div>
+
+                <div id="usersContent" style="display: none;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Price/Voter</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr>
+                                    <td colspan="8" class="empty-state">
+                                        <div class="empty-state-icon">👥</div>
+                                        <p>No users found</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>All Orders</h2>
+                    <button class="btn btn-primary" onclick="loadAllOrders()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="orderSearch" placeholder="Search by Order ID, User..." oninput="loadAllOrders()">
+                    </div>
+                    <div class="filter-select">
+                        <select id="orderStatusFilter" onchange="loadAllOrders()">
+                            <option value="">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="orderSortBy" onchange="loadAllOrders()">
+                            <option value="createdAt">Sort by Date</option>
+                            <option value="amount">Sort by Amount</option>
+                            <option value="totalVoters">Sort by Voters</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="orderSortOrder" onchange="loadAllOrders()">
+                            <option value="desc">Newest First</option>
+                            <option value="asc">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="loading" id="ordersLoading">
+                    <div class="spinner"></div>
+                    <p>Loading orders...</p>
+                </div>
+
+                <div id="ordersContent" style="display: none;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>User</th>
+                                    <th>Location</th>
+                                    <th>Voters</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <tr>
+                                    <td colspan="8" class="empty-state">
+                                        <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
+                                        <p>No orders found</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Order Reports</h2>
+                    <button class="btn btn-primary" onclick="loadReports()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+
+                <div class="loading" id="reportsLoading">
+                    <div class="spinner"></div>
+                    <p>Loading reports...</p>
+                </div>
+
+                <div id="reportsContent" style="display: none;">
+                    <!-- Report by District -->
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.2rem; margin: 0;">Orders by District</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>District</th>
+                                        <th>Total Orders</th>
+                                        <th>Completed</th>
+                                        <th>Pending</th>
+                                        <th>Total Voters</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="districtReportTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            <div class="empty-state-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                            <p>No data available</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Report by Symbol -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.2rem; margin: 0;">Orders by Symbol</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Total Orders</th>
+                                        <th>Completed</th>
+                                        <th>Pending</th>
+                                        <th>Total Voters</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="symbolReportTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            <div class="empty-state-icon"><i class="fas fa-flag"></i></div>
+                                            <p>No data available</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symbols Tab -->
+        <div id="symbols-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Symbol Library</h2>
+                    <button class="btn btn-primary" onclick="loadSymbols()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="symbolSearch" placeholder="Search symbols..." oninput="loadSymbols()">
+                    </div>
+                    <div class="filter-select">
+                        <select id="categoryFilter" onchange="loadSymbols()">
+                            <option value="">All Categories</option>
+                            <option value="political-party">Political Party</option>
+                            <option value="independent">Independent</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="statusFilter" onchange="loadSymbols()">
+                            <option value="">All Status</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="loading" id="symbolsLoading">
+                    <div class="spinner"></div>
+                    <p>Loading symbols...</p>
+                </div>
+
+                <div id="symbolsContent" style="display: none;">
+                    <div class="symbol-grid" id="symbolsGrid">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>No symbols found</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Symbol Tab -->
+        <div id="upload-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Upload New Symbol</h2>
+                </div>
+
+                <form id="uploadForm" onsubmit="uploadSymbol(event)">
+                    <div class="form-group">
+                        <label for="symbolName">Symbol Name (English) *</label>
+                        <input type="text" id="symbolName" required placeholder="e.g., Lotus, Hand, Cricket Bat">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="symbolNameMalayalam">Symbol Name (Malayalam)</label>
+                        <input type="text" id="symbolNameMalayalam" placeholder="Type in Manglish - converts as you type!" style="font-size: 1.1rem; text-align: left; direction: ltr;">
+                        <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
+                            💡 <strong>Real-time conversion:</strong> Type "bharathiya janatha party" → automatically converts to Malayalam<br>
+                            📝 Examples: "ka" → "ക", "cha" → "ച", "aana" → "ആന", "thamara" → "താമര", "congress" → "കോൺഗ്രസ്"<br>
+                            ⌨️ Press <kbd style="padding: 2px 6px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 3px;">Ctrl+G</kbd> to toggle on/off
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="symbolCategory">Category *</label>
+                        <select id="symbolCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="political-party">Political Party</option>
+                            <option value="independent">Independent</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Symbol Image *</label>
+                        <div class="upload-area" id="uploadArea" onclick="document.getElementById('symbolFile').click()">
+                            <p>📁 Click to select image or drag & drop</p>
+                            <small>PNG, JPG, GIF, WEBP (Max 5MB)</small>
+                        </div>
+                        <input type="file" id="symbolFile" accept="image/*" style="display: none;" onchange="previewImage(event)" required>
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        📤 Upload Symbol
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Symbol Modal -->
+    <div id="editSymbolModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Edit Symbol</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editSymbolForm" onsubmit="updateSymbol(event)">
+                <input type="hidden" id="editSymbolId">
+                
+                <div class="form-group">
+                    <label for="editSymbolName">Symbol Name (English) *</label>
+                    <input type="text" id="editSymbolName" required placeholder="e.g., Lotus, Hand, Cricket Bat">
+                </div>
+
+                <div class="form-group">
+                    <label for="editSymbolNameMalayalam">Symbol Name (Malayalam)</label>
+                    <input type="text" id="editSymbolNameMalayalam" placeholder="Type in Manglish - converts as you type!" style="font-size: 1.1rem; text-align: left; direction: ltr;">
+                    <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
+                        💡 Real-time Malayalam conversion enabled
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="editSymbolCategory">Category *</label>
+                    <select id="editSymbolCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="political-party">Political Party</option>
+                        <option value="independent">Independent</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Image</label>
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <img id="editCurrentImage" src="" alt="Current Symbol" style="max-width: 150px; max-height: 150px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Change Image (optional)</label>
+                    <div class="upload-area" onclick="document.getElementById('editSymbolFile').click()">
+                        <p>📁 Click to select new image</p>
+                        <small>PNG, JPG, GIF, WEBP (Max 5MB)</small>
+                    </div>
+                    <input type="file" id="editSymbolFile" accept="image/*" style="display: none;" onchange="previewEditImage(event)">
+                    <div class="image-preview" id="editImagePreview" style="display: none;">
+                        <img id="editPreviewImg" src="" alt="Preview">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="updateBtn">
+                        <i class="fas fa-save"></i> Update Symbol
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin';
+        let token = localStorage.getItem('token');
+
+        // Check admin authentication on load
+        async function checkAuth() {
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Unauthorized');
+
+                const data = await response.json();
+                
+                if (data.user.role !== 'admin') {
+                    showError('Access denied. Admin privileges required.');
+                    setTimeout(() => window.location.href = '/dashboard.html', 2000);
+                    return;
+                }
+
+                document.getElementById('adminName').textContent = data.user.name;
+                loadAnalytics();
+
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Load analytics data
+        async function loadAnalytics() {
+            const loading = document.getElementById('analyticsLoading');
+            const content = document.getElementById('analyticsContent');
+            
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/analytics`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load analytics');
+
+                const data = await response.json();
+                console.log('Analytics data:', data);
+
+                // Extract analytics data from response
+                const analytics = data.analytics || data;
+
+                // Update stats with fallback for undefined values
+                document.getElementById('statTotalUsers').textContent = analytics.users?.total || 0;
+                document.getElementById('statActiveUsers').textContent = analytics.users?.active || 0;
+                document.getElementById('statTotalOrders').textContent = analytics.orders?.total || 0;
+                document.getElementById('statPaidOrders').textContent = analytics.orders?.paid || 0;
+                document.getElementById('statRevenue').textContent = `₹${(analytics.revenue?.total || 0).toFixed(2)}`;
+                document.getElementById('statTotalSymbols').textContent = analytics.symbols?.total || 0;
+                document.getElementById('statActiveSymbols').textContent = analytics.symbols?.active || 0;
+
+                // Populate recent orders
+                const tbody = document.getElementById('recentOrdersTable');
+                const recentOrders = analytics.recentOrders || [];
+                if (!recentOrders || recentOrders.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-state-icon">📦</div>
+                                <p>No orders yet</p>
+                            </td>
+                        </tr>`;
+                } else {
+                    tbody.innerHTML = recentOrders.map(order => `
+                        <tr>
+                            <td>${order.orderId}</td>
+                            <td>${order.userId?.name || 'N/A'}<br><small>${order.userId?.email || 'N/A'}</small></td>
+                            <td>${order.location?.localBody || 'N/A'}<br><small>${order.location?.district || 'N/A'}</small></td>
+                            <td>${order.totalVoters || 0}</td>
+                            <td>₹${(order.amount || 0).toFixed(2)}</td>
+                            <td><span class="badge badge-${order.paymentStatus === 'completed' ? 'success' : order.paymentStatus === 'pending' ? 'warning' : 'danger'}">${order.paymentStatus}</span></td>
+                            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                showError('Failed to load analytics data');
+                loading.classList.remove('active');
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            const loading = document.getElementById('usersLoading');
+            const content = document.getElementById('usersContent');
+            
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load users');
+
+                const data = await response.json();
+                console.log('Users data:', data);
+
+                const tbody = document.getElementById('usersTable');
+                if (!data.users || data.users.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <p>No users found</p>
+                            </td>
+                        </tr>`;
+                } else {
+                    tbody.innerHTML = data.users.map(user => `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone || 'N/A'}</td>
+                            <td><span class="badge badge-${user.role === 'admin' ? 'info' : 'success'}">${user.role || 'user'}</span></td>
+                            <td>
+                                <select onchange="updateUserPricing('${user._id}', this.value)" style="padding: 0.25rem 0.5rem; border: 1px solid #e5e7eb; border-radius: 4px;">
+                                    ${[0.25, 0.30, 0.35, 0.40, 0.45, 0.50].map(price => 
+                                        `<option value="${price}" ${user.pricePerVoter === price ? 'selected' : ''}>₹${price.toFixed(2)}</option>`
+                                    ).join('')}
+                                </select>
+                            </td>
+                            <td><span class="badge badge-${user.isActive ? 'success' : 'danger'}">${user.isActive ? 'Active' : 'Inactive'}</span></td>
+                            <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-${user.isActive ? 'danger' : 'success'} btn-small" onclick="toggleUserStatus('${user._id}', ${user.isActive})">
+                                    ${user.isActive ? 'Deactivate' : 'Activate'}
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Failed to load users');
+                loading.classList.remove('active');
+            }
+        }
+
+        // Update user pricing
+        async function updateUserPricing(userId, price) {
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}/pricing`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pricePerVoter: parseFloat(price) })
+                });
+
+                if (!response.ok) throw new Error('Failed to update pricing');
+
+                const data = await response.json();
+                showSuccess(`Pricing updated to ₹${price} per voter`);
+
+            } catch (error) {
+                console.error('Error updating pricing:', error);
+                showError('Failed to update pricing');
+                loadUsers(); // Reload to reset dropdown
+            }
+        }
+
+        // Toggle user status
+        async function toggleUserStatus(userId, currentStatus) {
+            if (!confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/users/${userId}/toggle-status`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to toggle status');
+
+                const data = await response.json();
+                showSuccess(`User ${currentStatus ? 'deactivated' : 'activated'} successfully`);
+                loadUsers();
+
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                showError('Failed to toggle user status');
+            }
+        }
+
+        // Load all orders (admin)
+        async function loadAllOrders() {
+            const loading = document.getElementById('ordersLoading');
+            const content = document.getElementById('ordersContent');
+            
+            console.log('Loading all orders...');
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            const search = document.getElementById('orderSearch').value;
+            const status = document.getElementById('orderStatusFilter').value;
+            const sortBy = document.getElementById('orderSortBy').value;
+            const order = document.getElementById('orderSortOrder').value;
+
+            try {
+                let url = `${API_BASE}/orders?`;
+                if (search) url += `search=${encodeURIComponent(search)}&`;
+                if (status) url += `status=${status}&`;
+                if (sortBy) url += `sortBy=${sortBy}&`;
+                if (order) url += `order=${order}&`;
+
+                console.log('Fetching orders from:', url);
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`Failed to load orders: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Orders data:', data);
+
+                const tbody = document.getElementById('ordersTable');
+                if (!data.orders || data.orders.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
+                                <p>No orders found</p>
+                            </td>
+                        </tr>`;
+                } else {
+                    tbody.innerHTML = data.orders.map(order => `
+                        <tr>
+                            <td><strong>${order.orderId}</strong></td>
+                            <td>
+                                <div style="font-size: 0.9rem;">
+                                    <div><strong>${order.userId?.name || 'N/A'}</strong></div>
+                                    <div style="color: #666; font-size: 0.85rem;">${order.userId?.email || 'N/A'}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.85rem; line-height: 1.4;">
+                                    <div><strong>${order.location?.wardName || order.location?.ward || '-'}</strong></div>
+                                    <div style="color: #666;">${order.location?.localBodyName || order.location?.localBody || '-'}</div>
+                                </div>
+                            </td>
+                            <td>${order.voterCount || order.totalVoters || 0}</td>
+                            <td>₹${(order.amount || 0).toFixed(2)}</td>
+                            <td>
+                                <span class="badge badge-${
+                                    order.paymentStatus === 'completed' ? 'success' : 
+                                    order.paymentStatus === 'pending' ? 'warning' : 'danger'
+                                }">
+                                    ${order.paymentStatus === 'completed' ? 'Completed' : 
+                                      order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
+                                </span>
+                            </td>
+                            <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button class="btn btn-primary btn-small" onclick="viewOrderDetails('${order._id}')" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    ${order.paymentStatus === 'completed' ? `
+                                        <button class="btn btn-success btn-small" onclick="downloadOrderPDF('${order.orderId}')" title="Download PDF">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    ` : `
+                                        <button class="btn btn-success btn-small" onclick="generateSlipWithoutPayment('${order.orderId}')" title="Generate Slip">
+                                            <i class="fas fa-file-pdf"></i> Generate
+                                        </button>
+                                    `}
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showError('Failed to load orders');
+                loading.classList.remove('active');
+            }
+        }
+
+        // View order details (admin)
+        async function viewOrderDetails(orderId) {
+            try {
+                const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load order details');
+
+                const data = await response.json();
+                const order = data.order;
+
+                // Create detailed view modal
+                const detailsHTML = `
+                    <div style="max-height: 70vh; overflow-y: auto;">
+                        <h3 style="margin-bottom: 1rem; color: #667eea;">Order Details</h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <strong>Order ID:</strong><br>${order.orderId}
+                            </div>
+                            <div>
+                                <strong>Status:</strong><br>
+                                <span class="badge badge-${order.paymentStatus === 'completed' ? 'success' : order.paymentStatus === 'pending' ? 'warning' : 'danger'}">
+                                    ${order.paymentStatus}
+                                </span>
+                            </div>
+                            <div>
+                                <strong>User:</strong><br>${order.userId?.name || 'N/A'}<br>
+                                <small>${order.userId?.email || ''}</small>
+                            </div>
+                            <div>
+                                <strong>Phone:</strong><br>${order.userId?.phone || 'N/A'}
+                            </div>
+                            <div>
+                                <strong>Total Voters:</strong><br>${order.totalVoters || 0}
+                            </div>
+                            <div>
+                                <strong>Amount:</strong><br>₹${(order.amount || 0).toFixed(2)}
+                            </div>
+                            <div>
+                                <strong>Symbol:</strong><br>${order.customization?.symbolName || 'N/A'}
+                            </div>
+                            <div>
+                                <strong>Created:</strong><br>${new Date(order.createdAt).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+
+                        <h4 style="margin-bottom: 0.5rem;">Location Details</h4>
+                        <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <div><strong>District:</strong> ${order.location?.districtName || order.location?.district || 'N/A'}</div>
+                            <div><strong>Local Body:</strong> ${order.location?.localBodyName || order.location?.localBody || 'N/A'}</div>
+                            <div><strong>Ward:</strong> ${order.location?.wardName || order.location?.ward || 'N/A'}</div>
+                            <div><strong>Polling Station:</strong> ${order.location?.pollingStationName || order.location?.pollingStation || 'N/A'}</div>
+                        </div>
+
+                        ${order.paymentStatus === 'completed' && order.razorpayPaymentId ? `
+                            <h4 style="margin-bottom: 0.5rem;">Payment Details</h4>
+                            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                                <div><strong>Payment ID:</strong> ${order.razorpayPaymentId}</div>
+                                <div><strong>Paid At:</strong> ${order.paidAt ? new Date(order.paidAt).toLocaleString('en-IN') : 'N/A'}</div>
+                                ${order.downloadCount ? `<div><strong>Downloads:</strong> ${order.downloadCount}</div>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                            ${order.paymentStatus === 'completed' ? `
+                                <button class="btn btn-success" onclick="downloadOrderPDF('${order.orderId}'); closeModal();">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </button>
+                            ` : `
+                                <button class="btn btn-success" onclick="generateSlipWithoutPayment('${order.orderId}'); closeModal();">
+                                    <i class="fas fa-file-pdf"></i> Generate Slip Without Payment
+                                </button>
+                            `}
+                            <button class="btn btn-primary" onclick="closeModal()">Close</button>
+                        </div>
+                    </div>
+                `;
+
+                showModal('Order Details', detailsHTML);
+
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                showError('Failed to load order details');
+            }
+        }
+
+        // Generate slip without payment (admin only)
+        async function generateSlipWithoutPayment(orderId) {
+            if (!confirm('Generate slip without payment? This will mark the order as completed and allow PDF generation.')) {
+                return;
+            }
+
+            try {
+                showSuccess('Marking order as completed...');
+                
+                // Mark order as completed
+                const markResponse = await fetch(`${API_BASE}/orders/${orderId}/complete`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!markResponse.ok) throw new Error('Failed to mark order as completed');
+
+                const markData = await markResponse.json();
+                showSuccess('Order marked as completed. Generating PDF...');
+
+                // Now download the PDF
+                const response = await fetch(`${API_BASE}/orders/${orderId}/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to download PDF');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showSuccess('PDF generated and downloaded successfully!');
+                
+                // Reload orders to reflect the status change
+                loadAllOrders();
+
+            } catch (error) {
+                console.error('Error generating slip:', error);
+                showError('Failed to generate slip: ' + error.message);
+            }
+        }
+
+        // Download order PDF (admin)
+        async function downloadOrderPDF(orderId) {
+            try {
+                showSuccess('Generating PDF... Please wait.');
+                
+                const response = await fetch(`${API_BASE}/orders/${orderId}/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to download PDF');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showSuccess('PDF downloaded successfully!');
+
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                showError('Failed to download PDF');
+            }
+        }
+
+        // Helper function to show modal
+        function showModal(title, content) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('detailsModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'detailsModal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h2 id="modalTitle">${title}</h2>
+                            <button class="modal-close" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div id="modalBody"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detailsModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Load reports
+        async function loadReports() {
+            const loading = document.getElementById('reportsLoading');
+            const content = document.getElementById('reportsContent');
+            
+            console.log('Loading reports...');
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            try {
+                // Fetch all orders
+                const response = await fetch(`${API_BASE}/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load orders for reports');
+
+                const data = await response.json();
+                console.log('Orders for reports:', data);
+
+                const orders = data.orders || [];
+
+                // Process data for district report
+                const districtStats = {};
+                const symbolStats = {};
+
+                orders.forEach(order => {
+                    const district = order.location?.districtName || order.location?.district || 'Unknown';
+                    const symbol = order.customization?.symbolName || 'Unknown';
+                    const voters = order.totalVoters || 0;
+                    const amount = order.paymentStatus === 'completed' ? (order.amount || 0) : 0;
+                    const isCompleted = order.paymentStatus === 'completed';
+                    const isPending = order.paymentStatus === 'pending';
+
+                    // District stats
+                    if (!districtStats[district]) {
+                        districtStats[district] = {
+                            total: 0,
+                            completed: 0,
+                            pending: 0,
+                            voters: 0,
+                            revenue: 0
+                        };
+                    }
+                    districtStats[district].total++;
+                    if (isCompleted) districtStats[district].completed++;
+                    if (isPending) districtStats[district].pending++;
+                    districtStats[district].voters += voters;
+                    districtStats[district].revenue += amount;
+
+                    // Symbol stats
+                    if (!symbolStats[symbol]) {
+                        symbolStats[symbol] = {
+                            total: 0,
+                            completed: 0,
+                            pending: 0,
+                            voters: 0,
+                            revenue: 0
+                        };
+                    }
+                    symbolStats[symbol].total++;
+                    if (isCompleted) symbolStats[symbol].completed++;
+                    if (isPending) symbolStats[symbol].pending++;
+                    symbolStats[symbol].voters += voters;
+                    symbolStats[symbol].revenue += amount;
+                });
+
+                // Render district report
+                const districtTable = document.getElementById('districtReportTable');
+                const districtEntries = Object.entries(districtStats).sort((a, b) => b[1].total - a[1].total);
+                
+                if (districtEntries.length === 0) {
+                    districtTable.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-state-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                <p>No data available</p>
+                            </td>
+                        </tr>`;
+                } else {
+                    districtTable.innerHTML = districtEntries.map(([district, stats]) => `
+                        <tr>
+                            <td><strong>${district}</strong></td>
+                            <td>${stats.total}</td>
+                            <td><span class="badge badge-success">${stats.completed}</span></td>
+                            <td><span class="badge badge-warning">${stats.pending}</span></td>
+                            <td>${stats.voters.toLocaleString()}</td>
+                            <td><strong>₹${stats.revenue.toFixed(2)}</strong></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Render symbol report
+                const symbolTable = document.getElementById('symbolReportTable');
+                const symbolEntries = Object.entries(symbolStats).sort((a, b) => b[1].total - a[1].total);
+                
+                if (symbolEntries.length === 0) {
+                    symbolTable.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-state-icon"><i class="fas fa-flag"></i></div>
+                                <p>No data available</p>
+                            </td>
+                        </tr>`;
+                } else {
+                    symbolTable.innerHTML = symbolEntries.map(([symbol, stats]) => `
+                        <tr>
+                            <td><strong>${symbol}</strong></td>
+                            <td>${stats.total}</td>
+                            <td><span class="badge badge-success">${stats.completed}</span></td>
+                            <td><span class="badge badge-warning">${stats.pending}</span></td>
+                            <td>${stats.voters.toLocaleString()}</td>
+                            <td><strong>₹${stats.revenue.toFixed(2)}</strong></td>
+                        </tr>
+                    `).join('');
+                }
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                showError('Failed to load reports');
+                loading.classList.remove('active');
+            }
+        }
+
+        // Load symbols
+        async function loadSymbols() {
+            const loading = document.getElementById('symbolsLoading');
+            const content = document.getElementById('symbolsContent');
+            
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            const search = document.getElementById('symbolSearch').value;
+            const category = document.getElementById('categoryFilter').value;
+            const isActive = document.getElementById('statusFilter').value;
+
+            try {
+                let url = `${API_BASE}/symbols?`;
+                if (search) url += `search=${encodeURIComponent(search)}&`;
+                if (category) url += `category=${category}&`;
+                if (isActive) url += `isActive=${isActive}&`;
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load symbols');
+
+                const data = await response.json();
+                console.log('Symbols data:', data);
+
+                const grid = document.getElementById('symbolsGrid');
+                if (data.symbols.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>No symbols found</p>
+                        </div>`;
+                } else {
+                    grid.innerHTML = data.symbols.map(symbol => `
+                        <div class="symbol-card ${!symbol.isActive ? 'inactive' : ''}">
+                            <img src="${symbol.imageUrl}" alt="${symbol.name}" class="symbol-image">
+                            <div class="symbol-name">${symbol.name}</div>
+                            ${symbol.nameMalayalam ? `<div class="symbol-name-ml" style="font-size: 0.95rem; color: #059669; margin-top: 0.25rem; direction: rtl;">${symbol.nameMalayalam}</div>` : ''}
+                            <div class="symbol-category">${symbol.category.replace('-', ' ')}</div>
+                            <div class="symbol-actions">
+                                <button class="btn btn-info btn-small" onclick='editSymbol(${JSON.stringify(symbol).replace(/'/g, "&apos;")})' title="Edit">
+                                    ✏️
+                                </button>
+                                <button class="btn btn-${symbol.isActive ? 'warning' : 'success'} btn-small" onclick="toggleSymbolStatus('${symbol._id}', ${symbol.isActive})" title="${symbol.isActive ? 'Deactivate' : 'Activate'}">
+                                    ${symbol.isActive ? '⏸' : '▶'}
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="deleteSymbol('${symbol._id}', '${symbol.name}')" title="Delete">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading symbols:', error);
+                showError('Failed to load symbols');
+                loading.classList.remove('active');
+            }
+        }
+
+        // Toggle symbol status
+        async function toggleSymbolStatus(symbolId, currentStatus) {
+            try {
+                const response = await fetch(`${API_BASE}/symbols/${symbolId}/toggle-status`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to toggle symbol status');
+
+                const data = await response.json();
+                showSuccess(`Symbol ${currentStatus ? 'deactivated' : 'activated'} successfully`);
+                loadSymbols();
+
+            } catch (error) {
+                console.error('Error toggling symbol status:', error);
+                showError('Failed to toggle symbol status');
+            }
+        }
+
+        // Delete symbol
+        async function deleteSymbol(symbolId, symbolName) {
+            if (!confirm(`Are you sure you want to permanently delete "${symbolName}"?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/symbols/${symbolId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete symbol');
+
+                const data = await response.json();
+                showSuccess('Symbol deleted successfully');
+                loadSymbols();
+
+            } catch (error) {
+                console.error('Error deleting symbol:', error);
+                showError('Failed to delete symbol');
+            }
+        }
+
+        // Edit symbol - open modal
+        function editSymbol(symbol) {
+            console.log('Editing symbol:', symbol);
+            
+            // Populate form fields
+            document.getElementById('editSymbolId').value = symbol._id;
+            document.getElementById('editSymbolName').value = symbol.name;
+            document.getElementById('editSymbolNameMalayalam').value = symbol.nameMalayalam || '';
+            document.getElementById('editSymbolCategory').value = symbol.category;
+            document.getElementById('editCurrentImage').src = symbol.imageUrl;
+            
+            // Reset file input and preview
+            document.getElementById('editSymbolFile').value = '';
+            document.getElementById('editImagePreview').style.display = 'none';
+            
+            // Show modal
+            document.getElementById('editSymbolModal').style.display = 'flex';
+            
+            // Setup Malayalam transliteration for edit field
+            setupMalayalamInput('editSymbolNameMalayalam');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editSymbolModal').style.display = 'none';
+            document.getElementById('editSymbolForm').reset();
+        }
+
+        // Preview edit image
+        function previewEditImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showError('File size must be less than 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('editPreviewImg').src = e.target.result;
+                document.getElementById('editImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Update symbol
+        async function updateSymbol(event) {
+            event.preventDefault();
+
+            const symbolId = document.getElementById('editSymbolId').value;
+            const updateBtn = document.getElementById('updateBtn');
+            const originalText = updateBtn.innerHTML;
+
+            try {
+                updateBtn.disabled = true;
+                updateBtn.innerHTML = '⏳ Updating...';
+
+                const formData = new FormData();
+                formData.append('name', document.getElementById('editSymbolName').value);
+                formData.append('nameMalayalam', document.getElementById('editSymbolNameMalayalam').value);
+                formData.append('category', document.getElementById('editSymbolCategory').value);
+
+                const imageFile = document.getElementById('editSymbolFile').files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                const response = await fetch(`${API_BASE}/symbols/${symbolId}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update symbol');
+                }
+
+                const data = await response.json();
+                showSuccess('Symbol updated successfully!');
+                closeEditModal();
+                loadSymbols();
+
+            } catch (error) {
+                console.error('Error updating symbol:', error);
+                showError(error.message || 'Failed to update symbol');
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = originalText;
+            }
+        }
+
+        // Preview image before upload
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showError('File size must be less than 5MB');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Drag and drop for upload area
+        const uploadArea = document.getElementById('uploadArea');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('symbolFile').files = files;
+            previewImage({ target: { files: files } });
+        });
+
+        // Upload symbol
+        async function uploadSymbol(event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Uploading...';
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('symbolName').value);
+            formData.append('nameMalayalam', document.getElementById('symbolNameMalayalam').value || '');
+            formData.append('category', document.getElementById('symbolCategory').value);
+            formData.append('image', document.getElementById('symbolFile').files[0]);
+
+            try {
+                const response = await fetch(`${API_BASE}/symbols`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to upload symbol');
+                }
+
+                const data = await response.json();
+                showSuccess('Symbol uploaded successfully!');
+                
+                // Reset form
+                document.getElementById('uploadForm').reset();
+                document.getElementById('imagePreview').style.display = 'none';
+                
+                // Switch to symbols tab
+                setTimeout(() => {
+                    switchTab('symbols');
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error uploading symbol:', error);
+                showError(error.message || 'Failed to upload symbol');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📤 Upload Symbol';
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab contents
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Load data for the active tab
+            if (tabName === 'analytics') {
+                loadAnalytics();
+            } else if (tabName === 'users') {
+                loadUsers();
+            } else if (tabName === 'orders') {
+                loadAllOrders();
+            } else if (tabName === 'reports') {
+                loadReports();
+            } else if (tabName === 'symbols') {
+                loadSymbols();
+            }
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const alert = document.getElementById('alertSuccess');
+            alert.textContent = message;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const alert = document.getElementById('alertError');
+            alert.textContent = message;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // Enhanced Manglish to Malayalam Character-by-Character Mapping
+        const manglishMap = {
+            // Vowels
+            'a': 'അ', 'A': 'ആ', 'aa': 'ആ', 'i': 'ഇ', 'I': 'ഈ', 'ii': 'ഈ', 'ee': 'ഈ',
+            'u': 'ഉ', 'U': 'ഊ', 'uu': 'ഊ', 'oo': 'ഊ',
+            'R': 'ഋ', 'e': 'എ', 'E': 'ഏ', 'ai': 'ഐ', 'o': 'ഒ', 'O': 'ഓ', 'au': 'ഔ',
+            'aM': 'അം', 'aH': 'അഃ',
+            
+            // Consonants - Velar
+            'k': 'ക്', 'ka': 'ക', 'kaa': 'കാ', 'ki': 'കി', 'kee': 'കീ', 'ku': 'കു', 'koo': 'കൂ',
+            'ke': 'കെ', 'kE': 'കേ', 'kai': 'കൈ', 'ko': 'കൊ', 'kO': 'കോ', 'kau': 'കൗ',
+            'kh': 'ഖ്', 'kha': 'ഖ', 'khaa': 'ഖാ', 'khi': 'ഖി', 'khee': 'ഖീ',
+            'g': 'ഗ്', 'ga': 'ഗ', 'gaa': 'ഗാ', 'gi': 'ഗി', 'gee': 'ഗീ', 'gu': 'ഗു', 'goo': 'ഗൂ',
+            'gh': 'ഘ്', 'gha': 'ഘ', 'ghaa': 'ഘാ',
+            'ng': 'ങ്', 'nga': 'ങ', 'ngaa': 'ങാ',
+            
+            // Palatal
+            'ch': 'ച്', 'cha': 'ച', 'chaa': 'ചാ', 'chi': 'ചി', 'chee': 'ചീ', 'chu': 'ചു', 'choo': 'ചൂ',
+            'che': 'ചെ', 'chE': 'ചേ', 'chai': 'ചൈ', 'cho': 'ചൊ', 'chO': 'ചോ',
+            'chh': 'ഛ്', 'chha': 'ഛ', 'chhaa': 'ഛാ',
+            'j': 'ജ്', 'ja': 'ജ', 'jaa': 'ജാ', 'ji': 'ജി', 'jee': 'ജീ', 'ju': 'ജു', 'joo': 'ജൂ',
+            'je': 'ജെ', 'jE': 'ജേ', 'jai': 'ജൈ', 'jo': 'ജൊ', 'jO': 'ജോ',
+            'jh': 'ഝ്', 'jha': 'ഝ', 'jhaa': 'ഝാ',
+            'nj': 'ഞ്', 'nja': 'ഞ', 'njaa': 'ഞാ', 'nji': 'ഞി', 'njee': 'ഞീ',
+            
+            // Retroflex
+            'T': 'ട്', 'Ta': 'ട', 'Taa': 'ടാ', 'Ti': 'ടി', 'Tee': 'ടീ', 'Tu': 'ടു', 'Too': 'ടൂ',
+            'Te': 'ടെ', 'TE': 'ടേ', 'Tai': 'ടൈ', 'To': 'ടൊ', 'TO': 'ടോ',
+            'Th': 'ഠ്', 'Tha': 'ഠ', 'Thaa': 'ഠാ',
+            'D': 'ഡ്', 'Da': 'ഡ', 'Daa': 'ഡാ', 'Di': 'ഡി', 'Dee': 'ഡീ',
+            'Dh': 'ഢ്', 'Dha': 'ഢ', 'Dhaa': 'ഢാ',
+            'N': 'ണ്', 'Na': 'ണ', 'Naa': 'ണാ', 'Ni': 'ണി', 'Nee': 'ണീ', 'Nu': 'ണു', 'Noo': 'ണൂ',
+            'Ne': 'ണെ', 'NE': 'ണേ',
+            
+            // Dental
+            'th': 'ത്', 'tha': 'ത', 'thaa': 'താ', 'thi': 'തി', 'thee': 'തീ', 'thu': 'തു', 'thoo': 'തൂ',
+            'the': 'തെ', 'thE': 'തേ', 'thai': 'തൈ', 'tho': 'തൊ', 'thO': 'തോ',
+            'thh': 'ഥ്', 'thha': 'ഥ', 'thhaa': 'ഥാ',
+            'd': 'ദ്', 'da': 'ദ', 'daa': 'ദാ', 'di': 'ദി', 'dee': 'ദീ', 'du': 'ദു', 'doo': 'ദൂ',
+            'de': 'ദെ', 'dE': 'ദേ', 'dai': 'ദൈ', 'do': 'ദൊ', 'dO': 'ദോ',
+            'dh': 'ധ്', 'dha': 'ധ', 'dhaa': 'ധാ', 'dhi': 'ധി', 'dhee': 'ധീ',
+            'n': 'ന്', 'na': 'ന', 'naa': 'നാ', 'ni': 'നി', 'nee': 'നീ', 'nu': 'നു', 'noo': 'നൂ',
+            'ne': 'നെ', 'nE': 'നേ', 'nai': 'നൈ', 'no': 'നൊ', 'nO': 'നോ',
+            
+            // Labial
+            'p': 'പ്', 'pa': 'പ', 'paa': 'പാ', 'pi': 'പി', 'pee': 'പീ', 'pu': 'പു', 'poo': 'പൂ',
+            'pe': 'പെ', 'pE': 'പേ', 'pai': 'പൈ', 'po': 'പൊ', 'pO': 'പോ',
+            'ph': 'ഫ്', 'pha': 'ഫ', 'phaa': 'ഫാ', 'phi': 'ഫി', 'phee': 'ഫീ',
+            'f': 'ഫ്', 'fa': 'ഫ', 'faa': 'ഫാ', 'fi': 'ഫി', 'fee': 'ഫീ',
+            'b': 'ബ്', 'ba': 'ബ', 'baa': 'ബാ', 'bi': 'ബി', 'bee': 'ബീ', 'bu': 'ബു', 'boo': 'ബൂ',
+            'be': 'ബെ', 'bE': 'ബേ', 'bai': 'ബൈ', 'bo': 'ബൊ', 'bO': 'ബോ',
+            'bh': 'ഭ്', 'bha': 'ഭ', 'bhaa': 'ഭാ', 'bhi': 'ഭി', 'bhee': 'ഭീ',
+            'm': 'മ്', 'ma': 'മ', 'maa': 'മാ', 'mi': 'മി', 'mee': 'മീ', 'mu': 'മു', 'moo': 'മൂ',
+            'me': 'മെ', 'mE': 'മേ', 'mai': 'മൈ', 'mo': 'മൊ', 'mO': 'മോ',
+            
+            // Semivowels and Sibilants
+            'y': 'യ്', 'ya': 'യ', 'yaa': 'യാ', 'yi': 'യി', 'yee': 'യീ', 'yu': 'യു', 'yoo': 'യൂ',
+            'ye': 'യെ', 'yE': 'യേ', 'yai': 'യൈ', 'yo': 'യൊ', 'yO': 'യോ',
+            'r': 'ര്', 'ra': 'ര', 'raa': 'രാ', 'ri': 'രി', 'ree': 'രീ', 'ru': 'രു', 'roo': 'രൂ',
+            're': 'രെ', 'rE': 'രേ', 'rai': 'രൈ', 'ro': 'രൊ', 'rO': 'രോ',
+            'l': 'ല്', 'la': 'ല', 'laa': 'ലാ', 'li': 'ലി', 'lee': 'ലീ', 'lu': 'ലു', 'loo': 'ലൂ',
+            'le': 'ലെ', 'lE': 'ലേ', 'lai': 'ലൈ', 'lo': 'ലൊ', 'lO': 'ലോ',
+            'v': 'വ്', 'va': 'വ', 'vaa': 'വാ', 'vi': 'വി', 'vee': 'വീ', 'vu': 'വു', 'voo': 'വൂ',
+            've': 'വെ', 'vE': 'വേ', 'vai': 'വൈ', 'vo': 'വൊ', 'vO': 'വോ',
+            'w': 'വ്', 'wa': 'വ', 'waa': 'വാ',
+            
+            // Special consonants
+            'sh': 'ശ്', 'sha': 'ശ', 'shaa': 'ശാ', 'shi': 'ശി', 'shee': 'ശീ', 'shu': 'ശു', 'shoo': 'ശൂ',
+            'she': 'ശെ', 'shE': 'ശേ', 'shai': 'ശൈ', 'sho': 'ശൊ', 'shO': 'ശോ',
+            'Sh': 'ഷ്', 'Sha': 'ഷ', 'Shaa': 'ഷാ', 'Shi': 'ഷി', 'Shee': 'ഷീ',
+            's': 'സ്', 'sa': 'സ', 'saa': 'സാ', 'si': 'സി', 'see': 'സീ', 'su': 'സു', 'soo': 'സൂ',
+            'se': 'സെ', 'sE': 'സേ', 'sai': 'സൈ', 'so': 'സൊ', 'sO': 'സോ',
+            'h': 'ഹ്', 'ha': 'ഹ', 'haa': 'ഹാ', 'hi': 'ഹി', 'hee': 'ഹീ', 'hu': 'ഹു', 'hoo': 'ഹൂ',
+            'he': 'ഹെ', 'hE': 'ഹേ', 'hai': 'ഹൈ', 'ho': 'ഹൊ', 'hO': 'ഹോ',
+            
+            // Malayalam specific
+            'L': 'ള്', 'La': 'ള', 'Laa': 'ളാ', 'Li': 'ളി', 'Lee': 'ളീ', 'Lu': 'ളു', 'Loo': 'ളൂ',
+            'Le': 'ളെ', 'LE': 'ളേ', 'Lai': 'ളൈ', 'Lo': 'ളൊ', 'LO': 'ളോ',
+            'zh': 'ഴ്', 'zha': 'ഴ', 'zhaa': 'ഴാ', 'zhi': 'ഴി', 'zhee': 'ഴീ', 'zhu': 'ഴു', 'zhoo': 'ഴൂ',
+            'zhe': 'ഴെ', 'zhE': 'ഴേ',
+            'R': 'റ്', 'Ra': 'റ', 'Raa': 'റാ', 'Ri': 'റി', 'Ree': 'റീ', 'Ru': 'റു', 'Roo': 'റൂ',
+            'Re': 'റെ', 'RE': 'റേ', 'Rai': 'റൈ', 'Ro': 'റൊ', 'RO': 'റോ',
+            
+            // Common words and symbols
+            'lotus': 'താമര', 'thamara': 'താമര', 'pookkula': 'പൂക്കുല', 'poov': 'പൂവ്',
+            'hand': 'കൈ', 'kai': 'കൈ', 'kayyinaal': 'കൈയിനാൽ',
+            'elephant': 'ആന', 'aana': 'ആന', 'aanakku': 'ആനക്ക്',
+            'cycle': 'സൈക്കിൾ', 'bicycle': 'സൈക്കിൾ', 'bike': 'ബൈക്ക്',
+            'lion': 'സിംഹം', 'simham': 'സിംഹം', 'singh': 'സിംഗ്',
+            'tree': 'മരം', 'maram': 'മരം', 'marangal': 'മരങ്ങൾ',
+            'flower': 'പൂവ്', 'poovu': 'പൂവ്', 'pushpam': 'പുഷ്പം',
+            'lamp': 'വിളക്ക്', 'vilakku': 'വിളക്ക്', 'deepam': 'ദീപം',
+            'sun': 'സൂര്യൻ', 'sooryan': 'സൂര്യൻ', 'surya': 'സൂര്യ',
+            'moon': 'ചന്ദ്രൻ', 'chandran': 'ചന്ദ്രൻ', 'chandra': 'ചന്ദ്ര',
+            'star': 'നക്ഷത്രം', 'nakshathram': 'നക്ഷത്രം', 'thara': 'താര',
+            'bird': 'പക്ഷി', 'pakshi': 'പക്ഷി', 'kuruvi': 'കുരുവി',
+            'fish': 'മീൻ', 'meen': 'മീൻ', 'matsyam': 'മത്സ്യം',
+            'book': 'പുസ്തകം', 'pusthakam': 'പുസ്തകം', 'book': 'ബുക്ക്',
+            'pen': 'പേന', 'pena': 'പേന', 'lekhini': 'ലേഖിനി',
+            'umbrella': 'കുട', 'kuda': 'കുട', 'umbrella': 'കുട',
+            'bow': 'വില്ല്', 'villu': 'വില്ല്', 'arrow': 'അമ്പ്', 'ampu': 'അമ്പ്',
+            'boat': 'വള്ളം', 'vallam': 'വള്ളം', 'odikalam': 'ഓടിക്കലം',
+            'fan': 'ഫാൻ', 'fan': 'ഫാൻ', 'veeshan': 'വീശാൻ',
+            'bat': 'ബാറ്റ്', 'bat': 'ബാറ്റ്', 'cricket': 'ക്രിക്കറ്റ്',
+            'ball': 'പന്ത്', 'panthu': 'പന്ത്', 'ball': 'ബോൾ',
+            'chair': 'കസേര', 'kasera': 'കസേര', 'chair': 'ചെയർ',
+            'table': 'മേശ', 'mesha': 'മേശ', 'table': 'ടേബിൾ',
+            'house': 'വീട്', 'veedu': 'വീട്', 'house': 'ഹൗസ്',
+            'car': 'കാർ', 'car': 'കാർ', 'vandi': 'വണ്ടി',
+            'bus': 'ബസ്', 'bus': 'ബസ്', 'basu': 'ബസ്',
+            'train': 'തീവണ്ടി', 'theevandi': 'തീവണ്ടി', 'train': 'ട്രെയിൻ',
+            'flag': 'പതാക', 'pathaka': 'പതാക', 'kodi': 'കൊടി',
+            'torch': 'ടോർച്ച്', 'torch': 'ടോർച്ച്', 'thaalam': 'താളം',
+            // Political parties and terms
+            'bharathiya': 'ഭാരതീയ', 'bharatiya': 'ഭാരതീയ', 'indian': 'ഇന്ത്യൻ',
+            'janatha': 'ജനതാ', 'janata': 'ജനതാ', 'people': 'ജനം',
+            'party': 'പാർട്ടി', 'partee': 'പാർട്ടി', 'paksha': 'പക്ഷ',
+            'congress': 'കോൺഗ്രസ്', 'congrass': 'കോൺഗ്രസ്',
+            'communist': 'കമ്മ്യൂണിസ്റ്റ്', 'communist': 'കമ്മ്യൂണിസ്റ്റ്',
+            'socialist': 'സോഷ്യലിസ്റ്റ്', 'socialist': 'സോഷ്യലിസ്റ്റ്',
+            'democratic': 'ജനാധിപത്യ', 'democratic': 'ജനാധിപത്യ',
+            'national': 'നാഷണൽ', 'rashtriya': 'രാഷ്ട്രീയ',
+            'front': 'ഫ്രണ്ട്', 'front': 'ഫ്രണ്ട്', 'alliance': 'സഖ്യം',
+            'league': 'ലീഗ്', 'league': 'ലീഗ്', 'union': 'യൂണിയൻ',
+            'independent': 'സ്വതന്ത്ര', 'swathantra': 'സ്വതന്ത്ര'
+        };
+
+        // Smart Malayalam Transliteration - Proper word formation like Google
+        function transliterateWord(word) {
+            if (!word || word.trim() === '') return word;
+            
+            word = word.toLowerCase().trim();
+            
+            // First check if entire word has a direct mapping
+            if (manglishMap[word]) {
+                return manglishMap[word];
+            }
+            
+            let result = '';
+            let i = 0;
+            
+            while (i < word.length) {
+                let matched = false;
+                
+                // Try longest matches first (up to 8 characters for compound words)
+                for (let len = Math.min(8, word.length - i); len > 0; len--) {
+                    const substring = word.substring(i, i + len);
+                    
+                    if (manglishMap[substring]) {
+                        result += manglishMap[substring];
+                        i += len;
+                        matched = true;
+                        break;
+                    }
+                }
+                
+                // If no match found, keep the character as is
+                if (!matched) {
+                    result += word[i];
+                    i++;
+                }
+            }
+            
+            return result;
+        }
+
+        // Transliterate text maintaining spaces and punctuation
+        function transliterateText(text) {
+            if (!text) return '';
+            
+            // Split by spaces and punctuation but keep them
+            const parts = text.split(/(\s+|[,.!?;:])/);
+            
+            return parts.map(part => {
+                // If it's whitespace or punctuation, keep as is
+                if (/^\s+$/.test(part) || /^[,.!?;:]$/.test(part)) {
+                    return part;
+                }
+                // Otherwise transliterate the word
+                return transliterateWord(part);
+            }).join('');
+        }
+
+        // Setup Malayalam transliteration for any input field
+        function setupMalayalamInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.warn(`Input element with id "${inputId}" not found`);
+                return;
+            }
+
+            let translitEnabled = true;
+            let isComposing = false;
+            
+            input.addEventListener('keydown', (e) => {
+                // Toggle transliteration with Ctrl+G
+                if (e.ctrlKey && e.key === 'g') {
+                    e.preventDefault();
+                    translitEnabled = !translitEnabled;
+                    input.placeholder = translitEnabled ? 
+                        'Type in Manglish - converts as you type!' : 
+                        'Direct Malayalam input (Ctrl+G to enable transliteration)';
+                    
+                    const message = `Transliteration ${translitEnabled ? 'ENABLED ✅' : 'DISABLED ❌'}`;
+                    console.log(message);
+                    
+                    if (typeof showSuccess === 'function') {
+                        showSuccess(message);
+                    }
+                }
+            });
+
+            // Handle composition events (for IME)
+            input.addEventListener('compositionstart', () => {
+                isComposing = true;
+            });
+
+            input.addEventListener('compositionend', () => {
+                isComposing = false;
+            });
+
+            // Real-time word-based transliteration on space or punctuation
+            let currentManglish = '';
+            
+            input.addEventListener('keydown', (e) => {
+                if (!translitEnabled || isComposing) return;
+                
+                // Trigger conversion on space, enter, or punctuation
+                if (e.key === ' ' || e.key === 'Enter' || [',', '.', '!', '?', ';', ':'].includes(e.key)) {
+                    e.preventDefault();
+                    
+                    const cursorPos = input.selectionStart;
+                    const currentValue = input.value;
+                    
+                    // Find the current word being typed
+                    let wordStart = cursorPos - 1;
+                    while (wordStart >= 0 && !/[\s,.\!?;:]/.test(currentValue[wordStart])) {
+                        wordStart--;
+                    }
+                    wordStart++;
+                    
+                    const beforeWord = currentValue.substring(0, wordStart);
+                    const word = currentValue.substring(wordStart, cursorPos);
+                    const afterCursor = currentValue.substring(cursorPos);
+                    
+                    // Transliterate the word
+                    const malayalam = transliterateWord(word);
+                    
+                    // Reconstruct the text
+                    const separator = e.key === 'Enter' ? '\n' : e.key === ' ' ? ' ' : e.key;
+                    const newText = beforeWord + malayalam + separator + afterCursor;
+                    
+                    input.value = newText;
+                    const newCursorPos = beforeWord.length + malayalam.length + separator.length;
+                    input.setSelectionRange(newCursorPos, newCursorPos);
+                }
+            });
+
+            // Show live preview as user types (optional - shows what will be converted)
+            let previewTimeout = null;
+            input.addEventListener('input', (e) => {
+                if (!translitEnabled || isComposing) return;
+                
+                if (previewTimeout) clearTimeout(previewTimeout);
+                
+                // Optional: Add visual feedback here if needed
+            });
+        }
+
+        // Initialize Manglish transliteration with proper word formation
+        function initTransliteration() {
+            setupMalayalamInput('symbolNameMalayalam');
+            console.log('✅ Malayalam transliteration initialized!');
+            console.log('💡 Type a word in Manglish and press SPACE to convert');
+            console.log('� Example: "bharathiya" + SPACE → "ഭാരതീയ"');
+            console.log('⌨️ Press Ctrl+G to toggle transliteration on/off');
+            console.log('📝 Library:', typeof indicTransliterate !== 'undefined' ? 'Loaded ✅' : 'Using fallback');
+        }
+
+        // Initialize transliteration when DOM is ready
+        setTimeout(initTransliteration, 500);
+
+        // Initialize on page load
+        checkAuth();
+    </script>
+</body>
+</html>

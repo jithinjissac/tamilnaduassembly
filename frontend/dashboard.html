@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Voter Slip Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: inherit;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Action Section */
+        .action-section {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .action-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .btn-create {
+            background: white;
+            color: #FF6B35;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Orders Section */
+        .orders-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #718096;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Orders Table */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .orders-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .orders-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .orders-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-download {
+            background: #48bb78;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .btn-download:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .btn-download:hover:disabled {
+            transform: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 968px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-section {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-table {
+                font-size: 0.85rem;
+                min-width: 700px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .btn-download {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .action-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">🗳️ Voter Slips</div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+                <button class="btn btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="totalOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed</div>
+                <div class="stat-value" id="completedOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Voters</div>
+                <div class="stat-value" id="totalVoters">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value" id="totalAmount">₹0</div>
+            </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+            <h2>Create New Voter Slips</h2>
+            <p>Generate customized voter slips for your election campaign</p>
+            <br>
+            <a href="create-slip.html" class="btn btn-create">+ Create New Slip</a>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="orders-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Orders</h2>
+                <div class="filter-tabs">
+                    <button class="tab active" data-filter="all">All</button>
+                    <button class="tab" data-filter="completed">Completed</button>
+                    <button class="tab" data-filter="pending">Pending</button>
+                </div>
+            </div>
+
+            <div id="ordersContainer">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>ഓർഡറുകൾ ലോഡ് ചെയ്യുന്നു...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Check if user is admin and redirect
+                    if (data.user.role === 'admin') {
+                        console.log('Admin user detected, redirecting to admin dashboard...');
+                        window.location.href = 'admin.html';
+                        return;
+                    }
+                    
+                    document.getElementById('userName').textContent = data.user.name;
+                    document.getElementById('userEmail').textContent = data.user.email;
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/orders/stats/summary', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalOrders').textContent = data.totalOrders;
+                    document.getElementById('completedOrders').textContent = data.completedOrders;
+                    document.getElementById('totalVoters').textContent = data.totalVoters;
+                    document.getElementById('totalAmount').textContent = `₹${data.totalAmount.toFixed(2)}`;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    allOrders = await response.json();
+                    displayOrders();
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3>ഓർഡറുകൾ ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല</h3>
+                        <p>വീണ്ടും ശ്രമിക്കുക</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display orders
+        function displayOrders() {
+            const container = document.getElementById('ordersContainer');
+            
+            let filteredOrders = allOrders;
+            if (currentFilter === 'completed') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'completed');
+            } else if (currentFilter === 'pending') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'pending');
+            }
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <h3>No Orders Found</h3>
+                        <p>Create your first voter slip</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHTML = `
+                <div class="table-wrapper">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Voters</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        ${filteredOrders.map(order => `
+                            <tr>
+                                <td><strong>${order.orderId}</strong></td>
+                                <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                                <td>
+                                    <div style="font-size: 0.9rem; line-height: 1.4;">
+                                        <div><strong>${order.location.wardName || order.location.ward || '-'}</strong></div>
+                                        <div style="color: #666; font-size: 0.85rem;">${order.location.localBodyName || order.location.localBody || '-'}</div>
+                                    </div>
+                                </td>
+                                <td>${order.voterCount}</td>
+                                <td>₹${order.amount.toFixed(2)}</td>
+                                <td>
+                                    <span class="status-badge status-${order.paymentStatus}">
+                                        ${order.paymentStatus === 'completed' ? 'Completed' : 
+                                          order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: #667eea; text-decoration: none; display: inline-block;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        ${order.paymentStatus === 'completed' 
+                                            ? `<button class="btn btn-download" onclick="downloadSlip('${order._id}')"><i class="fas fa-download"></i> Download</button>`
+                                            : `<button class="btn btn-download" style="background: #f59e0b;" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        // Filter tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                displayOrders();
+            });
+        });
+
+        // Download slip
+        async function downloadSlip(orderId) {
+            try {
+                const response = await fetch(`/api/slips/download/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `voter-slips-${orderId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Download failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Download failed. Please try again.');
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Load data on page load
+        loadUserData();
+        loadStats();
+        loadOrders();
+    </script>
+</body>
+</html>

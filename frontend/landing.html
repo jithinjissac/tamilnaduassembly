@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Slip Generator - Kerala Election</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #FF6B35;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #FF6B35;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            background: rgba(255,255,255,0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2d3748;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .step {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .step p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Features */
+        .features {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature {
+            padding: 1.5rem;
+            border-left: 4px solid #FF6B35;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .feature h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .feature p {
+            color: #718096;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pricing-table {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            color: #333;
+        }
+
+        .pricing-row {
+            display: flex;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .pricing-row:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-row:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .pricing-label {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .pricing-value {
+            flex: 1;
+            text-align: right;
+            color: #FF6B35;
+            font-weight: 700;
+        }
+
+        /* CTA */
+        .cta {
+            padding: 4rem 2rem;
+            background: #2d3748;
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-large {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            background: #FF6B35;
+            color: white;
+        }
+
+        .btn-large:hover {
+            background: #F7931E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: #1a202c;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 968px) {
+            header {
+                padding: 1rem;
+            }
+
+            .nav-buttons {
+                gap: 0.5rem;
+            }
+
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 3rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-buttons .btn {
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-price {
+                font-size: 1.75rem;
+            }
+
+            .btn-large {
+                font-size: 1rem;
+                padding: 0.875rem 1.75rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .step h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">🗳️ Voter Slip</div>
+            <div class="nav-buttons" id="navButtons">
+                <!-- Will be populated by JavaScript based on login status -->
+                <a href="login.html" class="btn btn-secondary">Login</a>
+                <a href="register.html" class="btn btn-primary">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Create Professional Customized<br>Voter Slips in Minutes</h1>
+            <p>Generate print-ready voter slips with your symbol <br>for your election campaign</p>
+            <div class="hero-price">
+                Only ₹0.50 per voter
+            </div>
+            <br><br>
+            <a href="register.html" class="btn btn-primary btn-large">Get Started Now →</a>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Register</h3>
+                    <p>Create a free account in less than a minute.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Customize</h3>
+                    <p>Choose your symbol and branding.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Extract Voter Data</h3>
+                    <p>Select district, ward, and polling station.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Preview</h3>
+                    <p>View first 2 pages (10 slips) for free.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>Make Payment</h3>
+                    <p>Secure payment via Razorpay.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <h3>Download</h3>
+                    <p>Download complete PDF and print. 5 slips per A4 page.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Features</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h3><i class="fas fa-palette"></i> Full Customization</h3>
+                    <p>Use your symbol, name, and colors</p>
+                </div>
+                <div class="feature">
+                    <h3><i class="fas fa-bolt"></i> Fast Generation</h3>
+                    <p>Generate slips in seconds</p>
+                </div>
+                <div class="feature">
+                    <h3><i class="fas fa-print"></i> Print Ready</h3>
+                    <p>Print directly on A4 paper. 5 slips per page.</p>
+                </div>
+                <div class="feature">
+                    <h3><i class="fas fa-tachometer-alt"></i> Dashboard Access</h3>
+                    <p>All orders in one place. Download anytime.</p>
+                </div>
+                <div class="feature">
+                    <h3><i class="fas fa-lock"></i> Secure Payment</h3>
+                    <p>Safe payment via Razorpay. UPI, Card, Net Banking</p>
+                </div>
+                <div class="feature">
+                    <h3><i class="fas fa-mobile-alt"></i> Mobile Friendly</h3>
+                    <p>Works on all devices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Pricing</h2>
+            <div class="pricing-table">
+                <div class="pricing-row">
+                    <div class="pricing-label">1-100 Voters</div>
+                    <div class="pricing-value">₹0.50/voter</div>
+                </div>
+                <div class="pricing-row">
+                    <div class="pricing-label">101-500 Voters</div>
+                    <div class="pricing-value">₹0.45/voter (10% discount)</div>
+                </div>
+                <div class="pricing-row">
+                    <div class="pricing-label">501-1000 Voters</div>
+                    <div class="pricing-value">₹0.40/voter (20% discount)</div>
+                </div>
+                <div class="pricing-row">
+                    <div class="pricing-label">1000+ Voters</div>
+                    <div class="pricing-value">₹0.35/voter (30% discount)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p>Create professional voter slips for your election campaign</p>
+            <a href="register.html" class="btn btn-large">Start Free</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Kerala Voter Slip Generator | Powered by Techius Solutions</p>
+            <p>State Election Commission, Kerala</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check if user is logged in and update navigation
+        const token = localStorage.getItem('token');
+        if (token) {
+            // User is logged in, verify token and show dashboard link
+            fetch('/api/auth/profile', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Token is valid, show dashboard link
+                    document.getElementById('navButtons').innerHTML = `
+                        <a href="dashboard.html" class="btn btn-primary">Dashboard</a>
+                    `;
+                    // Update CTA button
+                    document.querySelector('.cta .btn').href = 'dashboard.html';
+                    document.querySelector('.cta .btn').textContent = 'Go to Dashboard →';
+                    document.querySelector('.hero .btn-large').href = 'dashboard.html';
+                    document.querySelector('.hero .btn-large').textContent = 'Go to Dashboard →';
+                } else {
+                    // Token invalid, clear it
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }).catch(() => {
+                // Error, clear token
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            });
+        }
+    </script>
+</body>
+</html>

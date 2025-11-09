@@ -64,89 +64,124 @@ async function loadDistricts() {
 
 // Handle District Change
 async function handleDistrictChange() {
-    const districtId = districtSelect.value;
-
-    // Reset dependent fields
-    resetSelect(localBodySelect, 'Loading...');
-    resetSelect(wardSelect, 'Select Local Body First');
-    resetSelect(pollingStationSelect, 'Select Ward First');
-    captchaImage.src = '';
-
-    if (!districtId) return;
-
-    try {
-        const response = await fetch(`${API_BASE}/getLocalBodies`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ district_id: districtId })
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            populateSelect(localBodySelect, data.local_bodies, 'Select Local Body');
-            localBodySelect.disabled = false;
-        } else {
-            showError('Failed to load local bodies');
-        }
-    } catch (error) {
-        showError('Error loading local bodies: ' + error.message);
-    }
-}
-
-// Handle Local Body Change
-async function handleLocalBodyChange() {
-    const localBodyId = localBodySelect.value;
-
-    // Reset dependent fields
-    resetSelect(wardSelect, 'Loading...');
-    resetSelect(pollingStationSelect, 'Select Ward First');
-    captchaImage.src = '';
-
-    if (!localBodyId) return;
-
-    try {
-        const response = await fetch(`${API_BASE}/getWards`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ local_body_id: localBodyId })
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            populateSelect(wardSelect, data.wards, 'Select Ward');
-            wardSelect.disabled = false;
-        } else {
-            showError('Failed to load wards');
-        }
-    } catch (error) {
-        showError('Error loading wards: ' + error.message);
-    }
-}
-
-// Handle Ward Change
 async function handleWardChange() {
     const wardId = wardSelect.value;
 
-    // Reset dependent fields
+    // Reset polling station select
     resetSelect(pollingStationSelect, 'Loading...');
     captchaImage.src = '';
 
     if (!wardId) return;
 
+    // Ensure status element exists
+    let mlStatusEl = document.getElementById('mlStatus');
+    if (!mlStatusEl) {
+        mlStatusEl = document.createElement('div');
+        mlStatusEl.id = 'mlStatus';
+        mlStatusEl.style.fontSize = '0.85rem';
+        mlStatusEl.style.marginTop = '4px';
+        mlStatusEl.style.color = '#555';
+        pollingStationSelect.parentElement.appendChild(mlStatusEl);
+    }
+    mlStatusEl.textContent = '';
+
     try {
-        const response = await fetch(`${API_BASE}/getPollingStations`, {
+        const baseResp = await fetch(`${API_BASE}/getPollingStations`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ward_id: wardId })
         });
+        const baseData = await baseResp.json();
 
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            populateSelect(pollingStationSelect, data.polling_stations, 'Select Polling Station');
+        if (baseData.status === 'success' && Array.isArray(baseData.polling_stations)) {
+            populateSelect(pollingStationSelect, baseData.polling_stations, 'Select Polling Station');
             pollingStationSelect.disabled = false;
+            const hasMalayalam = baseData.polling_stations.some(ps => /[\u0D00-\u0D7F]/.test(ps.text));
+            if (!hasMalayalam) {
+                mlStatusEl.textContent = 'Fetching Malayalam names…';
+                console.log('[WARD CHANGE] English-only list, triggering Malayalam Playwright fetch');
+                try {
+                    const mlResp = await fetch(`${API_BASE}/getPollingStationsMl`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            district_id: districtSelect.value,
+                            local_body_id: localBodySelect.value,
+                            ward_id: wardId
+                        })
+                    });
+                    const mlData = await mlResp.json();
+                    if (mlData.status === 'success' && Array.isArray(mlData.polling_stations)) {
+                        const mlHasMalayalam = mlData.polling_stations.some(ps => /[\u0D00-\u0D7F]/.test(ps.text));
+                        if (mlHasMalayalam) {
+                            populateSelect(pollingStationSelect, mlData.polling_stations, 'Select Polling Station');
+                            mlStatusEl.textContent = 'Malayalam names loaded';
+                        } else {
+                            mlStatusEl.textContent = 'Malayalam not available';
+                        }
+                    } else {
+                        mlStatusEl.textContent = 'Malayalam fetch failed';
+                    }
+                } catch (err) {
+                    console.warn('[WARD CHANGE] Malayalam fetch error:', err.message);
+                    mlStatusEl.textContent = 'Malayalam fetch error';
+                }
+            } else {
+                mlStatusEl.textContent = 'Malayalam detected';
+            }
+        } else {
+            showError('Failed to load polling stations');
+            mlStatusEl.textContent = '';
+        }
+    } catch (err) {
+        showError('Error loading polling stations: ' + err.message);
+        mlStatusEl.textContent = '';
+    }
+}
+            mlStatusEl.style.color = '#555';
+            // Append just below polling station select
+            pollingStationSelect.insertAdjacentElement('afterend', mlStatusEl);
+        }
+            // If no Malayalam detected in polling station texts, attempt Playwright fallback
+            const hasMalayalam = data.polling_stations.some(ps => /[\u0D00-\u0D7F]/.test(ps.text));
+            if (!hasMalayalam) {
+                console.log('[WARD CHANGE] Polling stations lack Malayalam, invoking Playwright Malayalam endpoint...');
+                try {
+                    const mlResp = await fetch(`${API_BASE}/getPollingStationsMl`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                mlStatusEl.textContent = 'Fetching Malayalam names…';
+                            district_id: districtSelect.value,
+                            local_body_id: localBodySelect.value,
+                // Add a lightweight status element for Malayalam fallback feedback
+                let mlStatusEl = document.getElementById('mlStatus');
+                if (!mlStatusEl) {
+                    mlStatusEl = document.createElement('div');
+                    mlStatusEl.id = 'mlStatus';
+                    mlStatusEl.style.fontSize = '0.85rem';
+                    mlStatusEl.style.marginTop = '4px';
+                    mlStatusEl.style.color = '#555';
+                    pollingStationSelect.parentElement.appendChild(mlStatusEl);
+                }
+                            ward_id: wardId
+                        })
+                    });
+                    const mlData = await mlResp.json();
+                    if (mlData.status === 'success') {
+                        const mlHasMalayalam = mlData.polling_stations.some(ps => /[\u0D00-\u0D7F]/.test(ps.text));
+                        if (mlHasMalayalam) {
+                            console.log('[WARD CHANGE] Replacing polling stations with Malayalam list from Playwright');
+                            populateSelect(pollingStationSelect, mlData.polling_stations, 'Select Polling Station');
+                        } else {
+                            console.log('[WARD CHANGE] Playwright list still no Malayalam; keeping original list');
+                        }
+                    } else {
+                        console.warn('[WARD CHANGE] Malayalam endpoint error:', mlData.message);
+                    }
+                } catch (mlErr) {
+                    console.warn('[WARD CHANGE] Malayalam endpoint fetch failed:', mlErr.message);
+                }
+            }
         } else {
             showError('Failed to load polling stations');
         }

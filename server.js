@@ -6,6 +6,15 @@ import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
+import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
+
+// ES Module imports for new modules
+import connectDB from './config/database.js';
+import authRoutes from './routes/auth.js';
+import orderRoutes from './routes/orders.js';
+import paymentRoutes from './routes/payment.js';
+import slipRoutes from './routes/slips.js';
+import { closeBrowser } from './controllers/slipController.js';
 
 // Initialize environment variables
 dotenv.config();
@@ -17,10 +26,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Connect to database
+connectDB();
+
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files (frontend)
 app.use(express.static(path.join(__dirname, 'frontend')));
@@ -28,19 +40,43 @@ app.use(express.static(path.join(__dirname, 'frontend')));
 // Serve captcha cache directory
 app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache')));
 
-// API Routes
+// REMOVED: temp-pdfs is now protected through API routes only
+// Access PDFs through /api/slips/preview-pdf/:filename with authentication
+
+// API Routes - Authentication & SaaS
+app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/slips', slipRoutes);
+
+// Admin Routes
+import adminRoutes from './routes/admin.js';
+app.use('/api/admin', adminRoutes);
+
+// Public Symbols Routes (for users)
+import symbolRoutes from './routes/symbols.js';
+app.use('/api', symbolRoutes);
+
+// Serve symbols directory
+app.use('/symbols', express.static(path.join(__dirname, 'public', 'symbols')));
+
+// Serve lottie animations directory
+app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
+
+// API Routes - Existing voter extraction
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
+app.use('/api', playwrightStationsRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend', 'landing.html'));
 });
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Kerala SEC Voter API is running' });
+  res.json({ status: 'OK', message: 'Kerala SEC Voter Slip SaaS is running' });
 });
 
 // Error handling middleware
@@ -56,5 +92,21 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📝 Frontend available at http://localhost:${PORT}`);
-  console.log(`🔍 API endpoints: /api/getDistricts, /api/getLocalBodies, /api/getWards, /api/getPollingStations, /api/extractVoters`);
+  console.log(`� Auth API: /api/auth/*`);
+  console.log(`📦 Orders API: /api/orders/*`);
+  console.log(`💳 Payment API: /api/payment/*`);
+  console.log(`📄 Slips API: /api/slips/*`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  await closeBrowser();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  await closeBrowser();
+  process.exit(0);
 });
