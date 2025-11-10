@@ -1,6 +1,6 @@
 # Dockerfile for Kerala SEC Voter API with Playwright
 
-FROM node:18-bullseye
+FROM node:20-bullseye
 
 # Install Playwright dependencies
 RUN apt-get update && apt-get install -y \
