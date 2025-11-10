@@ -2,8 +2,9 @@
 
 FROM node:20-bullseye
 
-# Install Playwright dependencies
+# Install Playwright dependencies AND Noto Sans fonts for Malayalam support
 RUN apt-get update && apt-get install -y \
+    # Playwright/Chromium dependencies
     libnss3 \
     libnspr4 \
     libatk1.0-0 \
@@ -21,6 +22,13 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libasound2 \
     libatspi2.0-0 \
+    # Noto Sans fonts for Malayalam/Indic languages
+    fonts-noto-core \
+    fonts-noto-ui-core \
+    fonts-noto-cjk \
+    fonts-liberation \
+    fontconfig \
+    && fc-cache -fv \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory

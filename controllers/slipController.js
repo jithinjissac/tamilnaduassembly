@@ -204,9 +204,12 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voter Slips - ${order.orderId}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #fff; }
+        body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
         
         :root { --symbol-image: url('${symbolUrl}'); }
         
@@ -667,10 +670,12 @@ export const viewPreview = async (req, res) => {
                 <html>
                 <head>
                     <title>Order Not Found</title>
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                     <style>
                         body {
-                            font-family: Arial, sans-serif;
+                            font-family: 'Noto Sans', Arial, sans-serif;
                             display: flex;
                             justify-content: center;
                             align-items: center;
@@ -739,8 +744,12 @@ export const viewPreview = async (req, res) => {
             console.error('❌ NO VOTERS IN ORDER');
             return res.status(400).send(`
                 <!DOCTYPE html>
-                <html><head><title>No Voter Data</title></head>
-                <body style="font-family: Arial; text-align: center; padding: 50px;">
+                <html>
+                <head>
+                    <title>No Voter Data</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+                </head>
+                <body style="font-family: 'Noto Sans', Arial, sans-serif; text-align: center; padding: 50px;">
                     <h2>❌ No Voter Data</h2>
                     <p>This order has no voter data to preview.</p>
                     <a href="/dashboard.html">Return to Dashboard</a>
@@ -772,8 +781,12 @@ export const viewPreview = async (req, res) => {
         console.error('========================================');
         res.status(500).send(`
             <!DOCTYPE html>
-            <html><head><title>Error</title></head>
-            <body style="font-family: Arial; text-align: center; padding: 50px;">
+            <html>
+            <head>
+                <title>Error</title>
+                <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+            </head>
+            <body style="font-family: 'Noto Sans', Arial, sans-serif; text-align: center; padding: 50px;">
                 <h2>❌ Error Generating Preview</h2>
                 <p>${error.message}</p>
                 <a href="/dashboard.html">Return to Dashboard</a>
@@ -791,8 +804,9 @@ export const testPuppeteer = async (req, res) => {
 <html>
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial; margin: 0; padding: 20mm; }
+        body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; margin: 0; padding: 20mm; }
         .slip { border: 2px solid black; padding: 10px; margin-bottom: 10px; }
         h3 { margin: 0 0 10px 0; }
         p { margin: 5px 0; }
