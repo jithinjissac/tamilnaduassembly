@@ -5,44 +5,6 @@ const router = express.Router();
 
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 
-// Simple in-memory cache for polling stations per ward
-const POLLING_STATION_CACHE_TTL_MS = parseInt(process.env.POLLING_STATION_CACHE_TTL_MS || '300000', 10); // 5 minutes default
-const POLLING_STATION_CACHE_MAX = parseInt(process.env.POLLING_STATION_CACHE_MAX || '500', 10);
-
-const pollingStationCache = new Map(); // ward_id -> { data, expiresAt, lastUsed }
-const pendingWardRequests = new Map(); // ward_id -> Promise
-
-function getFromPollingStationCache(wardId) {
-  const entry = pollingStationCache.get(wardId);
-  if (!entry) return null;
-  if (Date.now() > entry.expiresAt) {
-    pollingStationCache.delete(wardId);
-    return null;
-  }
-  entry.lastUsed = Date.now();
-  return entry.data;
-}
-
-function setPollingStationCache(wardId, data) {
-  if (pollingStationCache.size >= POLLING_STATION_CACHE_MAX) {
-    // naive LRU: remove oldest lastUsed
-    let oldestKey = null;
-    let oldestVal = null;
-    for (const [k, v] of pollingStationCache.entries()) {
-      if (!oldestVal || v.lastUsed < oldestVal.lastUsed) {
-        oldestKey = k;
-        oldestVal = v;
-      }
-    }
-    if (oldestKey) pollingStationCache.delete(oldestKey);
-  }
-  pollingStationCache.set(wardId, {
-    data,
-    expiresAt: Date.now() + POLLING_STATION_CACHE_TTL_MS,
-    lastUsed: Date.now(),
-  });
-}
-
 // District data (static - matches SEC Kerala exactly)
 const DISTRICTS = [
   { value: '1', text: 'Kasaragod / കാസറഗോഡ്' },
@@ -183,10 +145,8 @@ router.post('/getWards', async (req, res) => {
  * Body: { ward_id: "MOZ4EKJBAD" }
  */
 router.post('/getPollingStations', async (req, res) => {
-  let wardIdForFinally;
   try {
-    const { ward_id, force_refresh } = req.body;
-    wardIdForFinally = ward_id;
+    const { ward_id } = req.body;
 
     if (!ward_id) {
       return res.status(400).json({ 
@@ -195,64 +155,28 @@ router.post('/getPollingStations', async (req, res) => {
       });
     }
 
-    const allowCache = !force_refresh;
-
-    if (allowCache) {
-      const cached = getFromPollingStationCache(ward_id);
-      if (cached) {
-        console.log(`[PollingStations] cache HIT for ward ${ward_id} (items=${cached.length})`);
-        return res.json({ 
-          status: 'success',
-          polling_stations: cached,
-          cached: true
-        });
-      }
-    }
-
-    // If another request is already fetching this ward, dedupe
-    if (pendingWardRequests.has(ward_id)) {
-      console.log(`[PollingStations] pending fetch dedup for ward ${ward_id}`);
-      const data = await pendingWardRequests.get(ward_id);
-      return res.json({
-        status: 'success',
-        polling_stations: data,
-        cached: true,
-        deduped: true
-      });
-    }
-
     // SEC Kerala expects form-urlencoded with parameter name "objid"
     const formData = new URLSearchParams();
     formData.append('objid', ward_id);
 
-    const fetchPromise = (async () => {
-      const response = await axios.post(
-        `${SEC_BASE_URL}/public/getps/byward`,
-        formData.toString(),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-            'Referer': `${SEC_BASE_URL}/public/voters/list`,
-            'Cookie': 'set_locale=ml; device_view=full'
-          }
+    const response = await axios.post(
+      `${SEC_BASE_URL}/public/getps/byward`,
+      formData.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'X-Requested-With': 'XMLHttpRequest',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+          'Referer': `${SEC_BASE_URL}/public/voters/list`,
+          'Cookie': 'set_locale=ml; device_view=full'
         }
-      );
-      return response?.data?.ops1 || [];
-    })();
-
-    pendingWardRequests.set(ward_id, fetchPromise);
-
-    const stations = await fetchPromise;
-    console.log(`[PollingStations] cache MISS for ward ${ward_id} (fetched items=${stations.length})`);
-    setPollingStationCache(ward_id, stations);
+      }
+    );
 
     res.json({ 
       status: 'success',
-      polling_stations: stations,
-      cached: false
+      polling_stations: response.data.ops1 || []
     });
   } catch (error) {
     console.error('Error fetching polling stations:', error.message);
@@ -261,8 +185,6 @@ router.post('/getPollingStations', async (req, res) => {
       message: 'Failed to fetch polling stations',
       error: error.message 
     });
-  } finally {
-    if (wardIdForFinally) pendingWardRequests.delete(wardIdForFinally);
   }
 });
 

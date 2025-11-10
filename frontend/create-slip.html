@@ -149,6 +149,7 @@
             padding: 3rem;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .form-title {
@@ -399,27 +400,74 @@
 
         .loading {
             display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 245, 242, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 2rem;
+            border-radius: 16px;
+            backdrop-filter: blur(2px);
         }
 
         .loading.show {
-            display: block;
+            display: flex;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .loading > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .loading > div:not(.spinner) {
+            background: #f5f5f2;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid rgba(102, 126, 234, 0.1);
             border-top: 4px solid #667eea;
+            border-right: 4px solid #667eea;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            flex-shrink: 0;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        #loadingProgress {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         /* Step 2 - Voter Extraction */
@@ -594,7 +642,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Location →</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body</button>
                 </div>
             </div>
 
@@ -603,11 +651,7 @@
                 <h2 class="form-title">🎫 Create Voter Slip</h2>
                 <p class="form-subtitle">Select location and generate your customized voter slips</p>
 
-                <div class="extraction-info">
-                    <p><strong>Note:</strong> Voter data will be extracted directly from SEC Kerala portal and your slip will be generated automatically.</p>
-                </div>
-
-                <div class="voter-extraction-container">
+                            <div class="voter-extraction-container">
                     <div class="form-group">
                         <label for="district">District</label>
                         <select id="district" required>
@@ -662,9 +706,7 @@
                             </div>
                         </div>
                         
-                        <small style="color: #718096; margin-top: 0.5rem; display: block;">
-                            <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> You'll solve captcha for each selected station
-                        </small>
+                     
                     </div>
 
                     <div class="form-group">
@@ -686,9 +728,19 @@
                 </div>
 
                 <div class="loading" id="extractionLoading">
-                    <div class="spinner"></div>
-                    <p id="loadingMainText">Creating voter slip... Please wait</p>
-                    <small id="loadingSubText">Extracting data and generating order...</small>
+                    <div>
+                        <div class="spinner"></div>
+                        <div>
+                            <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
+                            <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.4;">Please wait while we fetch the voter list from SEC portal</small>
+                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0, 0, 0, 0.08);">
+                                <small style="color: #999; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="loadingProgress">Step 1 of 2: Extracting data</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -739,7 +791,7 @@
             updateSelectedStations();
         }
 
-        // Update selected stations array and button text
+        // Update selected polling stations array and button text
         function updateSelectedStations() {
             const checkboxes = document.querySelectorAll('.ps-checkbox:checked');
             selectedStations = Array.from(checkboxes).map(cb => {
@@ -750,13 +802,8 @@
             const btnText = document.getElementById('extractBtnText');
             const count = selectedStations.length;
             
-            if (count === 0) {
-                btnText.textContent = '🎫 Create Voter Slip';
-            } else if (count === 1) {
-                btnText.textContent = '🎫 Extract 1 Station';
-            } else {
-                btnText.textContent = `🎫 Extract ${count} Stations`;
-            }
+            // Keep button text constant
+            btnText.textContent = 'Create Voter Slip';
             
             // Show selected count badge
             const existingBadge = document.querySelector('.selected-count');
@@ -1008,7 +1055,7 @@
                 const data = await response.json();
                 
                 if (data.status === 'success' && data.polling_stations && data.polling_stations.length > 0) {
-                    // Store all polling stations
+        // Store all polling stations
                     allPollingStations = data.polling_stations;
                     
                     // Populate checkbox list
@@ -1203,10 +1250,11 @@
             const ward = document.getElementById('ward').value;
             const language = 'M'; // Default to Malayalam
 
-            // Check if multiple stations selected
+            // Check if multiple polling stations selected
             if (selectedStations.length > 1) {
-                // Start multi-station extraction
-                await extractAllPollingStations();
+                // For multiple polling stations, start with first station extraction
+                // Then allow adding more polling stations one by one
+                await extractStationsSequentially();
                 return;
             }
 
@@ -1216,12 +1264,12 @@
 
             // Validation
             if (!district || !localBody || !ward || !pollingStation || !captcha) {
-                showError('Please select at least one polling station and fill all fields');
+                showError('captchaError', 'Please select at least one polling station and fill all fields');
                 return;
             }
 
             if (!sessionId) {
-                showError('Captcha session expired. Please refresh the page.');
+                showError('captchaError', 'Captcha session expired. Please refresh the page.');
                 return;
             }
 
@@ -1235,7 +1283,7 @@
             document.getElementById('extractionLoading').classList.add('show');
             
             // Update loader text
-            document.getElementById('loadingMainText').textContent = 'Extracting voter data...';
+            document.getElementById('loadingMainText').textContent = 'Fetching voter data...';
             document.getElementById('loadingSubText').textContent = 'Please wait while we fetch the voter list';
 
             try {
@@ -1330,8 +1378,8 @@
             }
         }
 
-        // Bulk extraction function for all polling stations
-        async function extractAllPollingStations() {
+        // Sequential extraction for multiple polling stations - one at a time
+        async function extractStationsSequentially() {
             if (!selectedSymbol) {
                 showError('captchaError', 'Please select a symbol before extracting');
                 return;
@@ -1353,35 +1401,67 @@
             let allVoters = [];
             let successCount = 0;
             let failedStations = [];
+            let stationIndex = 0;
 
-            console.log(`Starting extraction for ${selectedStations.length} selected polling stations`);
+            console.log(`🚀 Starting sequential extraction for ${selectedStations.length} Polling Stations`);
 
-            for (let i = 0; i < selectedStations.length; i++) {
-                const station = selectedStations[i];
+            // Helper function to extract one station
+            const extractOneStation = async (index) => {
+                if (index >= selectedStations.length) {
+                    // All stations extracted
+                    return finializeExtraction(allVoters, successCount, failedStations);
+                }
+
+                const station = selectedStations[index];
                 
                 // Update progress
-                document.getElementById('loadingMainText').textContent = `Extracting station ${i + 1} of ${selectedStations.length}`;
+                document.getElementById('loadingMainText').textContent = `Station ${index + 1} of ${selectedStations.length}`;
                 document.getElementById('loadingSubText').textContent = station.text;
 
                 try {
-                    // Load new captcha for this station
-                    await loadCaptchaForBulk();
-                    
-                    // Show captcha dialog
-                    const captchaInput = await showCaptchaDialog(station.text, i + 1, selectedStations.length);
-                    
-                    if (!captchaInput) {
-                        // User cancelled
-                        failedStations.push({ station: station.text, reason: 'Cancelled by user' });
-                        continue;
+                    let captchaInput;
+                    let stationSessionId;
+
+                    if (index === 0) {
+                        // First station: Use the captcha from the main form
+                        console.log('🚀 Extracting first station with main page captcha...');
+                        const captchaValue = document.getElementById('captcha').value.trim();
+                        
+                        if (!captchaValue) {
+                            failedStations.push({ station: station.text, reason: 'Captcha not entered' });
+                            return extractOneStation(index + 1);
+                        }
+                        
+                        captchaInput = captchaValue;
+                        stationSessionId = sessionId;
+                    } else {
+                        // Additional stations: Load new captcha and get user input
+                        console.log(`📋 Station ${index + 1}: Loading new captcha session...`);
+                        const captchaLoaded = await loadCaptchaForBulk();
+                        
+                        if (!captchaLoaded) {
+                            failedStations.push({ station: station.text, reason: 'Failed to load captcha' });
+                            return extractOneStation(index + 1);
+                        }
+                        
+                        stationSessionId = window.currentSessionId;
+                        
+                        // Show modal for captcha input
+                        captchaInput = await showCaptchaDialog(station.text, index + 1, selectedStations.length);
+                        
+                        if (!captchaInput) {
+                            failedStations.push({ station: station.text, reason: 'Cancelled by user' });
+                            return extractOneStation(index + 1);
+                        }
                     }
 
                     // Extract voters for this station
+                    console.log(`🔄 Submitting captcha for station ${index + 1}...`);
                     const extractResponse = await fetch('/api/submitWithCaptcha', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            sessionId,
+                            sessionId: stationSessionId,
                             district,
                             local_body: localBody,
                             ward,
@@ -1399,7 +1479,7 @@
                         const voters = parseVotersFromHTML(doc);
                         
                         if (voters.length > 0) {
-                            // Add polling station metadata to each voter (preserving original sl_no)
+                            // Add polling station metadata to each voter
                             const votersWithStation = voters.map(voter => ({
                                 ...voter,
                                 polling_station_name: station.text,
@@ -1408,7 +1488,7 @@
                             
                             allVoters = allVoters.concat(votersWithStation);
                             successCount++;
-                            console.log(`✅ Station ${i + 1} (${station.text}): ${voters.length} voters extracted with original serial numbers`);
+                            console.log(`✅ Station ${index + 1} (${station.text}): ${voters.length} voters extracted`);
                         } else {
                             failedStations.push({ station: station.text, reason: 'No voters found' });
                         }
@@ -1417,11 +1497,20 @@
                     }
 
                 } catch (error) {
-                    console.error(`Error extracting station ${i + 1}:`, error);
+                    console.error(`❌ Error extracting station ${index + 1}:`, error);
                     failedStations.push({ station: station.text, reason: error.message });
                 }
-            }
 
+                // Move to next station
+                return extractOneStation(index + 1);
+            };
+
+            // Start extraction from first station
+            await extractOneStation(0);
+        }
+
+        // Finalize extraction and create order
+        async function finializeExtraction(allVoters, successCount, failedStations) {
             // Show summary
             document.getElementById('loadingMainText').textContent = `Extraction Complete!`;
             document.getElementById('loadingSubText').textContent = `${successCount}/${selectedStations.length} stations successful, ${allVoters.length} total voters`;
@@ -1436,24 +1525,20 @@
             // Store extracted voters
             extractedVoters = allVoters;
 
-            // Show failed stations if any
             if (failedStations.length > 0) {
-                console.warn('Failed stations:', failedStations);
+                console.warn('⚠️ Failed stations:', failedStations);
             }
 
-            // Wait 2 seconds to show summary, then create order
+            // Wait 2 seconds then create order
             setTimeout(async () => {
                 document.getElementById('loadingMainText').textContent = 'Creating order...';
                 document.getElementById('loadingSubText').textContent = `${allVoters.length} voters from ${successCount} polling stations`;
 
                 try {
-                    // For multi-station orders, use a neutral label
-                    // Each voter has their specific station in voter.polling_station_name
                     const pollingStationLabel = selectedStations.length > 1 
                         ? `${selectedStations.length} Polling Stations` 
                         : selectedStations[0].text;
                     
-                    // Create order with all voters
                     const orderData = {
                         customization: {
                             symbolId: selectedSymbol._id,
@@ -1467,8 +1552,8 @@
                             ward: document.getElementById('ward').options[document.getElementById('ward').selectedIndex].text,
                             pollingStation: pollingStationLabel
                         },
-                        voters: extractedVoters,
-                        voterCount: extractedVoters.length
+                        voters: allVoters,
+                        voterCount: allVoters.length
                     };
 
                     const orderResponse = await fetch('/api/orders/create', {
@@ -1513,9 +1598,12 @@
                 const data = await response.json();
                 
                 if (data.status === 'success') {
+                    // Store both globally and in window for access by other functions
                     sessionId = data.sessionId;
+                    window.currentSessionId = data.sessionId;
                     // Store captcha image URL for dialog
                     window.currentCaptchaImage = data.captchaUrl;
+                    console.log(`✅ New captcha session loaded: ${data.sessionId}`);
                     return true;
                 }
                 return false;

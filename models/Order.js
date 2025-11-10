@@ -108,6 +108,16 @@ const OrderSchema = new mongoose.Schema({
         default: 0
     },
     lastDownloadAt: Date
+    ,
+    // Filenames for generated PDFs
+    previewPdfFilename: {
+        type: String,
+        default: null
+    },
+    permanentPdfFilename: {
+        type: String,
+        default: null
+    }
 });
 
 // Index for order uniqueness check (symbol + location combination)

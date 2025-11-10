@@ -376,6 +376,15 @@
             <p>Downloading PDF...</p>
         </div>
 
+        <div class="loading" id="pdfGeneratingStatus" style="background: #fef3c7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <div class="spinner" style="border-top-color: #f59e0b;"></div>
+            <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">Preparing your PDF...</p>
+            <p style="color: #78350f; font-size: 0.9rem;" id="generationMessage">This will take 20-50 seconds</p>
+            <div style="background: #fde68a; border-radius: 4px; height: 8px; margin-top: 0.5rem; overflow: hidden;">
+                <div id="progressBar" style="background: #f59e0b; height: 100%; width: 10%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
                 <i class="fas fa-download"></i> Download PDF
@@ -633,6 +642,9 @@
                 // Display order details
                 displayOrderDetails(orderData);
 
+                // Start checking PDF generation status
+                checkPDFStatus();
+
             } catch (error) {
                 console.error('Error loading order:', error);
                 showMessage(
@@ -642,6 +654,86 @@
                     'dashboard.html',
                     5000
                 );
+            }
+        }
+
+        let statusCheckInterval = null;
+
+        async function checkPDFStatus() {
+            try {
+                console.log('[PDF STATUS] Checking PDF generation status...');
+                
+                const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('[PDF STATUS] Failed to check status:', response.status);
+                    return;
+                }
+
+                const status = await response.json();
+                console.log('[PDF STATUS] Status:', status);
+
+                const generatingStatus = document.getElementById('pdfGeneratingStatus');
+                const downloadBtn = document.getElementById('downloadBtn');
+                const progressBar = document.getElementById('progressBar');
+                const generationMessage = document.getElementById('generationMessage');
+
+                if (status.pdfReady) {
+                    // PDF is ready - hide progress, show download button
+                    console.log('[PDF STATUS] PDF is ready!');
+                    generatingStatus.classList.remove('show');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    
+                    // Stop checking
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                } else if (status.status === 'generating' || status.status === 'pending') {
+                    // PDF is being generated - show progress
+                    console.log('[PDF STATUS] PDF is being generated...', status.progress);
+                    generatingStatus.classList.add('show');
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing PDF...';
+                    
+                    // Update progress bar
+                    if (status.progress) {
+                        progressBar.style.width = `${status.progress}%`;
+                    }
+                    
+                    // Update message
+                    if (status.estimatedTime) {
+                        generationMessage.textContent = `Estimated time: ${status.estimatedTime}`;
+                    }
+                    
+                    // Continue checking every 2 seconds
+                    if (!statusCheckInterval) {
+                        statusCheckInterval = setInterval(checkPDFStatus, 2000);
+                    }
+                } else if (status.status === 'failed') {
+                    // Generation failed - allow download (will generate on-demand)
+                    console.log('[PDF STATUS] Generation failed, will generate on-demand');
+                    generatingStatus.classList.remove('show');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    
+                    // Stop checking
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                }
+
+            } catch (error) {
+                console.error('[PDF STATUS] Error checking status:', error);
+                // On error, just enable download button (fallback to on-demand generation)
+                document.getElementById('pdfGeneratingStatus').classList.remove('show');
+                document.getElementById('downloadBtn').disabled = false;
             }
         }
 
@@ -797,6 +889,13 @@
         window.addEventListener('load', () => {
             // You can add confetti library here if desired
             console.log('Payment successful!');
+        });
+
+        // Cleanup interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
         });
     </script>
 </body>

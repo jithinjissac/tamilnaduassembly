@@ -25,6 +25,11 @@ router.get('/preview/:orderId', authHTML, slipController.viewPreview);
 // @access  Private
 router.get('/download/:orderId', auth, slipController.downloadSlip);
 
+// @route   GET /api/slips/pdf-status/:orderId
+// @desc    Check PDF generation status and download eligibility
+// @access  Private
+router.get('/pdf-status/:orderId', auth, slipController.getPDFStatus);
+
 // @route   DELETE /api/slips/cleanup/:filename
 // @desc    Cleanup temporary PDF file
 // @access  Public

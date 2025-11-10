@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getPDFFilePath, getPDFJobStatus, clearPDFCache, createFreshBrowser, registerPDFJob } from '../utils/pdfGenerator.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -14,31 +15,98 @@ let browserInstance = null;
 // Store temporary PDF files with timestamps
 const tempPDFs = new Map(); // Map<filename, { path, createdAt, timeout }>
 
+// Browser launch queue to prevent concurrent launches
+let browserLaunchPromise = null;
+
 // Get or create browser instance with optimizations - Export for admin use
 export const getBrowser = async () => {
+    // If browser launch is in progress, wait for it
+    if (browserLaunchPromise) {
+        console.log('⏳ Browser launch already in progress, waiting...');
+        try {
+            await browserLaunchPromise;
+        } catch (e) {
+            console.log('⚠️ Previous browser launch failed, will retry');
+        }
+    }
+
     if (!browserInstance || !browserInstance.isConnected()) {
-        console.log('🚀 Launching new Puppeteer browser instance...');
-        browserInstance = await puppeteer.launch({
-            headless: true,
-            args: [
-                // Keep args minimal for Windows stability
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage'
-            ]
-        });
-        console.log('✅ Browser instance ready with optimized memory settings');
+        // Create a promise for this launch to queue subsequent requests
+        browserLaunchPromise = (async () => {
+            console.log('🚀 Launching new Puppeteer browser instance with performance optimizations...');
+            
+            // Retry with exponential backoff
+            let lastError;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    const browser = await puppeteer.launch({
+                        headless: true,
+                        args: [
+                            // Memory and stability
+                            '--no-sandbox',
+                            '--disable-setuid-sandbox',
+                            '--disable-dev-shm-usage',
+                            '--single-process=false',
+                            
+                            // Performance optimizations
+                            '--disable-blink-features=AutomationControlled',
+                            '--disable-background-networking',
+                            '--disable-breakpad',
+                            '--disable-default-apps',
+                            '--disable-extensions',
+                            '--disable-features=TranslateUI',
+                            '--disable-popup-blocking',
+                            '--disable-prompt-on-repost',
+                            '--disable-sync',
+                            '--disable-web-resources',
+                            '--enable-automation',
+                            '--no-first-run',
+                            '--no-pings',
+                            '--print-to-pdf-without-header'
+                        ],
+                        timeout: 30000 // 30 second timeout
+                    });
+                    
+                    console.log('✅ Browser instance ready with PDF performance optimizations');
+                    
+                    // Handle browser disconnection
+                    browser.on('disconnected', () => {
+                        console.log('⚠️ Browser disconnected, will create new instance on next request');
+                        browserInstance = null;
+                    });
+                    
+                    browserInstance = browser;
+                    return browser;
+                    
+                } catch (launchError) {
+                    lastError = launchError;
+                    console.error(`❌ Browser launch attempt ${attempt}/3 failed:`, launchError.message);
+                    
+                    if (attempt < 3) {
+                        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
+                        console.log(`⏳ Waiting ${delay/1000}s before retry...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                }
+            }
+            
+            throw lastError;
+        })();
         
-        // Handle browser disconnection
-        browserInstance.on('disconnected', () => {
-            console.log('⚠️ Browser disconnected, will create new instance on next request');
-            browserInstance = null;
-        });
+        try {
+            await browserLaunchPromise;
+        } finally {
+            browserLaunchPromise = null;
+        }
     } else {
         console.log('♻️ Reusing existing browser instance');
     }
     return browserInstance;
 };
+
+// Create a new browser instance for large PDF operations (to avoid memory issues)
+// NOTE: This is now imported from pdfGenerator.js to avoid circular dependency
+// export const createFreshBrowser = async () => { ... }
 
 // Cleanup function for temporary PDFs
 const cleanupPDF = (filename) => {
@@ -137,238 +205,46 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voter Slips - ${order.orderId}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #fff; }
         
-        body {
-            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-            background: white;
-        }
+        :root { --symbol-image: url('${symbolUrl}'); }
         
-        .page {
-            width: 210mm;
-            height: 297mm;
-            padding: 8mm 10mm;
-            display: flex;
-            flex-direction: column;
-            page-break-after: always;
-            box-sizing: border-box;
-        }
+        .page { width: 210mm; height: 297mm; padding: 8mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
+        .page:last-child { page-break-after: auto; }
         
-        .page:last-child {
-            page-break-after: auto;
-        }
+        .voter-slip { width: 100%; height: 52mm; border: 2px solid; display: flex; padding: 2.5mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
+        .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2.5mm; height: 0; border-bottom: 2px dashed #999; }
+        .voter-slip:last-child { margin-bottom: 0; }
+        .voter-slip:last-child::after { display: none; }
+        .voter-slip > * { overflow: hidden; }
         
-        .voter-slip {
-            width: 100%;
-            height: 52mm;
-            border: 2px solid #000;
-            display: flex;
-            padding: 2.5mm;
-            position: relative;
-            flex-shrink: 0;
-            box-sizing: border-box;
-            margin-bottom: 5mm;
-        }
+        .slip-left { width: 40mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2mm; margin-right: 3mm; text-align: center; flex-shrink: 0; }
+        .symbol-header { font-size: 9pt; font-weight: bold; margin-bottom: 1mm; line-height: 1.1; }
+        .symbol-image { width: 26mm; height: 26mm; margin-bottom: 1mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .symbol-name { font-size: 11pt; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 38mm; }
         
-        .voter-slip::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -2.5mm;
-            height: 0;
-            border-bottom: 2px dashed #999;
-            z-index: 10;
-        }
+        .slip-right { flex: 1; padding: 2mm 3mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
+        .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
+        .slip-number { font-weight: bold; font-size: 14pt; }
+        .sec-id { font-weight: bold; font-size: 12pt; }
         
-        .voter-slip:last-child {
-            margin-bottom: 0;
-        }
+        .voter-info { flex: 1; overflow: hidden; min-height: 0; }
+        .info-row { margin-bottom: 1mm; font-size: 11pt; display: flex; line-height: 1.3; overflow: hidden; }
+        .info-row.voter-name { font-size: 13pt; font-weight: bold; margin-bottom: 1.5mm; }
+        .info-label { font-weight: bold; min-width: 18mm; flex-shrink: 0; }
+        .info-value { flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .polling-station-info { font-size: 12pt; border-top: 1px solid; padding-top: 1mm; line-height: 1.3; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
         
-        .voter-slip:last-child::after {
-            display: none;
-        }
+        .cover-page { width: 210mm; height: 297mm; padding: 18mm; page-break-after: always; display: flex; flex-direction: column; justify-content: flex-start; }
+        .cover-title { font-size: 22pt; font-weight: bold; margin-bottom: 6mm; }
+        .cover-meta { font-size: 12pt; margin-bottom: 10mm; line-height: 1.6; }
+        .station-list { margin-top: 6mm; }
+        .station-item { font-size: 12pt; padding: 5px 0; border-bottom: 1px dashed; display: flex; justify-content: space-between; gap: 8mm; }
+        .station-name { font-weight: bold; flex: 1; }
+        .station-count { min-width: 35mm; text-align: right; font-weight: 600; }
         
-        .voter-slip > * {
-            overflow: hidden;
-        }
-        
-        .slip-left {
-            width: 40mm;
-            border-right: 2px dotted #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2mm 2mm 3mm 2mm;
-            margin-right: 3mm;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .symbol-header {
-            font-size: 9pt;
-            font-weight: bold;
-            margin-bottom: 1mm;
-            text-align: center;
-            color: #333;
-            line-height: 1.1;
-        }
-        
-        .symbol-image {
-            width: 26mm;
-            height: 26mm;
-            margin-bottom: 1mm;
-            object-fit: contain;
-            flex-shrink: 0;
-        }
-        
-        .symbol-name {
-            font-size: 11pt;
-            font-weight: bold;
-            line-height: 1.15;
-            text-align: center;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            max-width: 38mm;
-            hyphens: auto;
-        }
-        
-        .slip-right {
-            flex: 1;
-            padding: 2mm 3mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            min-width: 0;
-        }
-        
-        .slip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5mm;
-            font-size: 10pt;
-            flex-wrap: wrap;
-            gap: 1mm;
-            overflow: hidden;
-        }
-        
-        .slip-number {
-            font-weight: bold;
-            font-size: 14pt;
-            color: #000;
-        }
-        
-        .sec-id {
-            font-weight: bold;
-            font-size: 12pt;
-        }
-        
-        .voter-info {
-            flex: 1;
-            overflow: hidden;
-            min-height: 0;
-        }
-        
-        .info-row {
-            margin-bottom: 1mm;
-            font-size: 11pt;
-            display: flex;
-            line-height: 1.3;
-            overflow: hidden;
-        }
-        
-        .info-row.voter-name {
-            font-size: 13pt;
-            font-weight: bold;
-            margin-bottom: 1.5mm;
-            overflow: hidden;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            min-width: 18mm;
-            flex-shrink: 0;
-        }
-        
-        .info-value {
-            flex: 1;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-        }
-        
-        .polling-station-info {
-            font-size: 12pt;
-            border-top: 1px solid #ccc;
-            padding-top: 1mm;
-            line-height: 1.3;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            font-weight: 600;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Cover page for multi-station summary */
-        .cover-page {
-            width: 210mm;
-            height: 297mm;
-            padding: 18mm 18mm;
-            page-break-after: always;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            box-sizing: border-box;
-        }
-        .cover-title {
-            font-size: 22pt;
-            font-weight: 800;
-            margin-bottom: 6mm;
-        }
-        .cover-meta {
-            font-size: 12pt;
-            margin-bottom: 10mm;
-            line-height: 1.6;
-        }
-        .station-list {
-            margin-top: 6mm;
-        }
-        .station-item {
-            font-size: 12pt;
-            padding: 5px 0;
-            border-bottom: 1px dashed #ccc;
-            display: flex;
-            justify-content: space-between;
-            gap: 8mm;
-        }
-        .station-name {
-            font-weight: 700;
-            flex: 1;
-        }
-        .station-count {
-            min-width: 35mm;
-            text-align: right;
-            font-weight: 600;
-        }
-        
-        @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
-        }
+        @media print { @page { size: A4; margin: 0; } }
     </style>
 </head>
 <body>`;
@@ -411,9 +287,11 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
 
     // Generate pages - symbol already converted to base64 above
     // If multiple stations, render grouped by station to keep slips distinguishable
+    const htmlParts = [];
+    
     const renderVoters = (arr) => {
         for (let i = 0; i < arr.length; i += slipsPerPage) {
-            html += '<div class="page">';
+            htmlParts.push('<div class="page">');
             const pageVoters = arr.slice(i, i + slipsPerPage);
             pageVoters.forEach((voter, index) => {
             // Use original serial number from SEC data, NOT recalculated
@@ -426,11 +304,11 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
             const gender = genderAge[0]?.trim() || '';
             const age = genderAge[1]?.trim() || '';
             
-            html += `
+            htmlParts.push(`
             <div class="voter-slip">
                 <div class="slip-left">
                     <div class="symbol-header">നമ്മുടെ ചിഹ്നം</div>
-                    <img src="${symbolUrl}" alt="Symbol" class="symbol-image">
+                    <div class="symbol-image" role="img" aria-label="Symbol"></div>
                     <div class="symbol-name">${displaySymbolName}</div>
                 </div>
                 <div class="slip-right">
@@ -458,9 +336,9 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
                         <strong>പോളിംഗ് സ്റ്റേഷൻ: </strong> ${voterPollingStation}
                     </div>
                 </div>
-            </div>`;
+            </div>`);
             });
-            html += '</div>';
+            htmlParts.push('</div>');
         }
     };
 
@@ -476,10 +354,12 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
         renderVoters(voters);
     }
 
-    html += `
+    htmlParts.push(`
 </body>
-</html>`;
+</html>`);
 
+    html += htmlParts.join('');
+    
     return html;
 };
 
@@ -527,6 +407,25 @@ export const generatePreview = async (req, res) => {
             });
         }
 
+        // ✅ CHECK IF PREVIEW PDF ALREADY EXISTS (avoid re-generation)
+        if (order.previewPdfFilename) {
+            const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
+            const existingPath = path.join(tempDir, order.previewPdfFilename);
+            if (fs.existsSync(existingPath)) {
+                console.log('✅ Preview PDF already exists, serving cached version:', order.previewPdfFilename);
+                const pdfUrl = `/api/slips/preview-pdf/${order.previewPdfFilename}`;
+                return res.json({
+                    status: 'success',
+                    message: 'Preview already generated (cached).',
+                    pdfUrl: pdfUrl,
+                    filename: order.previewPdfFilename,
+                    cleanup: `/api/slips/cleanup/${order.previewPdfFilename}`
+                });
+            } else {
+                console.log('⚠️ Preview filename in DB but file missing, regenerating...');
+            }
+        }
+
         // If Malayalam name is not in order, fetch it from Symbol model
         if (!order.customization.symbolNameMalayalam && order.customization.symbolId) {
             try {
@@ -560,68 +459,123 @@ export const generatePreview = async (req, res) => {
             throw htmlError;
         }
 
-        // Generate PDF using persistent browser with speed optimizations
-        console.log('Getting browser instance...');
-        const browserStartTime = Date.now();
-        const browser = await getBrowser();
-        console.log('✅ Browser ready in', Date.now() - browserStartTime, 'ms');
+        // Generate PDF using FRESH browser for true concurrency (each user gets their own browser)
+        let pdf;
+        let browser;
+        let page;
+        const maxAttempts = 2;
         
-        console.log('Creating new page...');
-        const page = await browser.newPage();
-        
-        // Disable unnecessary features for faster PDF generation
-        await page.setBypassCSP(true);
-        await page.setJavaScriptEnabled(false); // No JS needed for PDF
-        await page.setCacheEnabled(true);
-        
-        console.log('✅ New page created');
-        
-        // Set content - symbols are base64 embedded, no network wait needed
-        console.log('Setting HTML content...');
-        const contentStartTime = Date.now();
-        await page.setContent(html, { 
-            waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
-            timeout: 15000  // 15 seconds (preview is small)
-        });
-        console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
-        
-        // Skip image wait - symbols are base64 embedded, renders immediately
-        
-        console.log('Generating PDF from HTML...');
-        const pdfStartTime = Date.now();
-        const pdf = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: { top: 0, bottom: 0, left: 0, right: 0 },
-            timeout: 15000  // 15 seconds (reduced)
-        });
-        console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
-        console.log('PDF size:', pdf.length, 'bytes (', (pdf.length / 1024).toFixed(2), 'KB)');
-        
-        // Verify PDF starts with correct header
-        const pdfHeader = String.fromCharCode(...pdf.slice(0, 8));
-        console.log('Validating PDF header:', pdfHeader);
-        if (!pdfHeader.startsWith('%PDF')) {
-            console.error('❌ INVALID PDF HEADER');
-            console.error('First 20 bytes:', pdf.slice(0, 20));
-            throw new Error('Generated PDF is invalid - missing PDF header');
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                console.log(`\n📄 PDF Generation Attempt ${attempt}/${maxAttempts}`);
+                console.log('Creating fresh browser for this user (concurrent-safe)...');
+                const browserStartTime = Date.now();
+                
+                // ✅ USE FRESH BROWSER - allows multiple users to generate previews simultaneously
+                browser = await createFreshBrowser();
+                console.log('✅ Fresh browser ready in', Date.now() - browserStartTime, 'ms');
+                
+                console.log('Creating new page...');
+                page = await browser.newPage();
+                
+                // Disable unnecessary features for faster PDF generation
+                await page.setBypassCSP(true);
+                await page.setJavaScriptEnabled(false); // No JS needed for PDF
+                await page.setCacheEnabled(true);
+                
+                console.log('✅ New page created');
+                
+                // Set content - symbols are base64 embedded, no network wait needed
+                console.log('Setting HTML content...');
+                const contentStartTime = Date.now();
+                await page.setContent(html, { 
+                    waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
+                    timeout: 15000  // 15 seconds (preview is small)
+                });
+                console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
+                
+                // Skip image wait - symbols are base64 embedded, renders immediately
+                
+                console.log('Generating PDF from HTML...');
+                const pdfStartTime = Date.now();
+                pdf = await page.pdf({
+                    format: 'A4',
+                    printBackground: true,
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                    timeout: 15000  // 15 seconds (reduced)
+                });
+                console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
+                console.log('PDF size:', pdf.length, 'bytes (', (pdf.length / 1024).toFixed(2), 'KB)');
+                
+                // Verify PDF starts with correct header
+                const pdfHeader = String.fromCharCode(...pdf.slice(0, 8));
+                console.log('Validating PDF header:', pdfHeader);
+                if (!pdfHeader.startsWith('%PDF')) {
+                    console.error('❌ INVALID PDF HEADER');
+                    console.error('First 20 bytes:', pdf.slice(0, 20));
+                    throw new Error('Generated PDF is invalid - missing PDF header');
+                }
+                console.log('✅ PDF validation successful');
+                
+                // ✅ Close fresh browser (not shared, safe to close)
+                await page.close();
+                await browser.close();
+                console.log('✅ Fresh browser closed');
+                console.log('Total processing time:', Date.now() - browserStartTime, 'ms');
+                
+                // Success! Break out of retry loop
+                break;
+                
+            } catch (pdfError) {
+                console.error(`❌ Preview PDF generation attempt ${attempt} failed:`, pdfError.message);
+                
+                // Clean up page and browser if they exist
+                try { if (page) await page.close(); } catch (e) {}
+                try { if (browser) await browser.close(); } catch (e) {}
+                
+                // Check if this is a transient error that we should retry
+                const isTransient = pdfError && (
+                    pdfError.code === 'ECONNRESET' || 
+                    (pdfError.message && (
+                        pdfError.message.includes('ECONNRESET') ||
+                        pdfError.message.includes('Target closed') ||
+                        pdfError.message.includes('Connection closed')
+                    ))
+                );
+                
+                if (isTransient && attempt < maxAttempts) {
+                    console.log('⚠️ Transient error detected, will create new fresh browser');
+                    console.log(`⏳ Retrying in 2 seconds... (attempt ${attempt + 1}/${maxAttempts})`);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    continue; // Retry
+                }
+                
+                // Non-transient error or max attempts reached
+                if (attempt === maxAttempts) {
+                    console.error('❌ All retry attempts exhausted');
+                }
+                throw pdfError; // Re-throw to outer catch
+            }
         }
-        console.log('✅ PDF validation successful');
-        
-        // Close only the page, keep browser alive for reuse
-        await page.close();
-        console.log('Page closed (browser kept alive for reuse)');
-        console.log('Total processing time:', Date.now() - browserStartTime, 'ms');
 
-        // Save PDF to temporary directory
+        // Save PDF to temporary directory with STABLE filename
         const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
         
-        const filename = `preview-${orderId}-${Date.now()}.pdf`;
+        // ✅ STABLE FILENAME - same filename per order (no timestamp)
+        const filename = `preview-${orderId}.pdf`;
         const filepath = path.join(tempDir, filename);
         fs.writeFileSync(filepath, pdf);
+        
+        // ✅ PERSIST preview filename to database
+        try {
+            await Order.findOneAndUpdate({ orderId }, { previewPdfFilename: filename });
+            console.log(`✅ Saved previewPdfFilename to DB: ${filename}`);
+        } catch (dbErr) {
+            console.warn('⚠️ Could not update Order with previewPdfFilename:', dbErr.message);
+        }
         
         // Store in map for cleanup
         tempPDFs.set(filename, {
@@ -636,11 +590,32 @@ export const generatePreview = async (req, res) => {
         console.log('✅ PDF saved to:', filepath);
         console.log('✅ Scheduled for auto-cleanup in 5 minutes');
         
+        // ✅ TRIGGER PERMANENT PDF GENERATION immediately after extraction
+        // This generates the full PDF while user views preview
+        // By the time they complete payment, PDF is ready for instant download
+        console.log(`\n🔔 TRIGGERING PERMANENT PDF GENERATION (${order.voters.length} voters)...`);
+        console.log(`📝 Order ID: ${orderId}`);
+        
+        try {
+            const { generatePDFBackground } = await import('../utils/pdfGenerator.js');
+            console.log('✅ Dynamic import successful');
+            
+            // Generate permanent PDF in background (saves to permanent-pdfs/)
+            generatePDFBackground(order, orderId).catch(err => {
+                console.error('⚠️ Background permanent PDF generation error (non-blocking):', err.message);
+                console.error('⚠️ Stack:', err.stack);
+                // Don't let background PDF errors fail the preview response
+            });
+            console.log(`✅ Permanent PDF generation started in background for: ${orderId}\n`);
+        } catch (importErr) {
+            console.error('❌ Failed to import generatePDFBackground:', importErr.message);
+        }
+        
         // Send PROTECTED PDF file URL (requires authentication)
         const pdfUrl = `/api/slips/preview-pdf/${filename}`;
         res.json({
             status: 'success',
-            message: 'Preview generated successfully',
+            message: 'Preview generated. Full PDF is being prepared for download.',
             pdfUrl: pdfUrl,
             filename: filename,
             cleanup: `/api/slips/cleanup/${filename}`
@@ -868,22 +843,111 @@ export const downloadSlip = async (req, res) => {
         const { orderId } = req.params;
         const userId = req.userId;
 
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`📥 DOWNLOAD REQUEST RECEIVED`);
+        console.log(`${'='.repeat(60)}`);
+        console.log(`   orderId from URL: "${orderId}"`);
+        console.log(`   userId from auth: ${userId}`);
+        console.log(`   userId type: ${typeof userId}`);
+        console.log(`   userId constructor: ${userId?.constructor?.name}`);
+        console.log(`${'='.repeat(60)}\n`);
+
         const order = await Order.findOne({ orderId, userId });
 
         if (!order) {
+            console.log(`❌ ORDER NOT FOUND!`);
+            console.log(`   Query: { orderId: "${orderId}", userId: ${userId} }`);
+            console.log(`   This usually means:`);
+            console.log(`     1. Wrong orderId (check if it's MongoDB _id instead)`);
+            console.log(`     2. Wrong userId (user doesn't own this order)`);
+            console.log(`     3. Order doesn't exist in database\n`);
+            
             return res.status(404).json({ 
                 status: 'error',
                 message: 'Order not found' 
             });
         }
+        
+        console.log(`✅ ORDER FOUND!`);
+        console.log(`   orderId: ${order.orderId}`);
+        console.log(`   paymentStatus: ${order.paymentStatus}`);
+        console.log(`   totalVoters: ${order.totalVoters}\n`);
 
+        // Check payment status
         if (order.paymentStatus !== 'completed') {
             return res.status(403).json({ 
                 status: 'error',
-                message: 'Payment not completed. Please complete payment to download.' 
+                message: 'Payment not completed. Please complete payment to download.',
+                isPaid: false
             });
         }
 
+        // Try to get cached PDF first
+        console.log(`🔍 Checking for cached PDF...`);
+        let pdfPath = getPDFFilePath(orderId);
+
+        if (pdfPath) {
+            // Serve cached PDF (much faster!)
+            console.log(`⚡ SERVING CACHED PDF from: ${pdfPath}`);
+            console.log(`   File size: ${fs.statSync(pdfPath).size} bytes\n`);
+            
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="voter-slips-${orderId}.pdf"`);
+            res.setHeader('Cache-Control', 'private, max-age=31536000'); // 1 year
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            
+            const pdf = fs.readFileSync(pdfPath);
+            
+            // Update download count
+            order.downloadCount += 1;
+            order.lastDownloadAt = new Date();
+            await order.save();
+
+            console.log(`✅ Cached PDF sent successfully!\n`);
+            return res.end(pdf);
+        }
+
+        // ✅ DOUBLE-CHECK: Verify permanent PDF doesn't exist on disk before generating
+        // (getPDFFilePath might return null if pdfJobs cache was cleared but file still exists)
+        const permanentPdfDir = path.join(process.cwd(), 'public', 'permanent-pdfs');
+        const permanentPdfPath = path.join(permanentPdfDir, `${orderId}.pdf`);
+        
+        if (fs.existsSync(permanentPdfPath)) {
+            console.log(`✅ FOUND PERMANENT PDF ON DISK (bypassing cache check)!`);
+            console.log(`   Path: ${permanentPdfPath}`);
+            console.log(`   Size: ${(fs.statSync(permanentPdfPath).size / 1024 / 1024).toFixed(2)} MB\n`);
+            
+            // Register it in cache for next time
+            registerPDFJob(orderId, {
+                orderId,
+                path: permanentPdfPath,
+                status: 'ready',
+                createdAt: new Date()
+            });
+            
+            // Serve the existing permanent PDF
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="voter-slips-${orderId}.pdf"`);
+            res.setHeader('Cache-Control', 'private, max-age=31536000');
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            
+            const pdf = fs.readFileSync(permanentPdfPath);
+            
+            // Update download count
+            order.downloadCount += 1;
+            order.lastDownloadAt = new Date();
+            await order.save();
+
+            console.log(`✅ Served existing permanent PDF successfully!\n`);
+            return res.end(pdf);
+        }
+        
+        // If PDF not cached yet, generate on-demand (slower but still works)
+        console.log(`📄 PDF NOT CACHED - Generating new PDF...`);
+        console.log(`   Order: ${orderId}`);
+        console.log(`   Voters: ${order.totalVoters}`);
+        console.log(`   This will take 20-50 seconds...\n`);
+        
         // If Malayalam name is not in order, fetch it from Symbol model
         if (!order.customization.symbolNameMalayalam && order.customization.symbolId) {
             try {
@@ -901,106 +965,150 @@ export const downloadSlip = async (req, res) => {
         // Generate HTML for all slips
         const html = generateSlipHTML(order);
 
-        // Generate PDF using persistent browser with speed optimizations
-        console.log('Getting browser instance...');
-        const browserStartTime = Date.now();
-        const browser = await getBrowser();
-        console.log('✅ Browser ready in', Date.now() - browserStartTime, 'ms');
+        // ✅ ALWAYS use fresh browser for on-demand generation to prevent browser crashes
+        // This ensures the persistent browser stays stable for preview generation
+        const useFreshBrowser = true; // Changed from: order.totalVoters > 1000
+        console.log(`📄 Generating PDF on-demand for ${orderId} (${order.totalVoters} voters, fresh browser for stability)`);
         
-        console.log('Creating new page...');
-        const page = await browser.newPage();
+        let browser;
+        let browserStartTime = Date.now();
         
-        // Disable unnecessary features for faster PDF generation
-        await page.setBypassCSP(true);
-        await page.setJavaScriptEnabled(false); // No JS needed for PDF
-        await page.setCacheEnabled(true);
-        
-        console.log('✅ New page created with optimizations');
-        
-        // Set content - symbols are base64 embedded, no network wait needed
-        console.log('Setting HTML content...');
-        const contentStartTime = Date.now();
-        await page.setContent(html, { 
-            waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
-            timeout: 120000  // 2 minutes (reduced from 3)
-        });
-        console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
-        
-        // Skip image wait - symbols are base64 embedded, no need to wait
-        // This saves significant time especially for large orders
-        
-        console.log('Generating PDF from HTML...');
-        const pdfStartTime = Date.now();
-        const pdf = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: { top: 0, bottom: 0, left: 0, right: 0 },
-            timeout: 120000  // 2 minutes (reduced from 3)
-        });
-        console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
-        console.log('PDF size:', pdf.length, 'bytes (', (pdf.length / 1024).toFixed(2), 'KB)');
-        
-        // Verify PDF starts with correct header
-        const pdfHeader = String.fromCharCode(...pdf.slice(0, 8));
-        console.log('Validating PDF header:', pdfHeader);
-        if (!pdfHeader.startsWith('%PDF')) {
-            console.error('❌ INVALID PDF HEADER');
-            console.error('First 20 bytes:', pdf.slice(0, 20));
-            throw new Error('Generated PDF is invalid - missing PDF header');
+        if (useFreshBrowser) {
+            browser = await createFreshBrowser();
+            console.log('✅ Fresh browser created in', Date.now() - browserStartTime, 'ms');
+        } else {
+            console.log('Getting persistent browser instance...');
+            browser = await getBrowser();
+            console.log('✅ Browser ready in', Date.now() - browserStartTime, 'ms');
         }
-        console.log('✅ PDF validation successful');
         
-        // Close only the page, keep browser alive
-        await page.close();
-        console.log('Page closed (browser kept alive for reuse)');
+        let page;
+        let pdf;
+        
+        try {
+            console.log('Creating new page...');
+            page = await browser.newPage();
+            
+            // Disable unnecessary features for faster PDF generation
+            await page.setBypassCSP(true);
+            await page.setJavaScriptEnabled(false); // No JS needed for PDF
+            await page.setCacheEnabled(true);
+            
+            console.log('✅ New page created with optimizations');
+            
+            // Set content - symbols are base64 embedded, no network wait needed
+            console.log('Setting HTML content...');
+            const contentStartTime = Date.now();
+            await page.setContent(html, { 
+                waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
+                timeout: 120000  // 2 minutes
+            });
+            console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
+            
+            console.log('Generating PDF from HTML...');
+            const pdfStartTime = Date.now();
+            pdf = await page.pdf({
+                format: 'A4',
+                printBackground: true,
+                margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                timeout: 120000
+            });
+            console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
+            console.log('PDF size:', (pdf.length / 1024 / 1024).toFixed(2), 'MB');
+            
+            // Verify PDF header
+            if (String.fromCharCode(...pdf.slice(0, 4)) !== '%PDF') {
+                throw new Error('Invalid PDF generated');
+            }
+            
+            // Close page
+            await page.close();
+            
+            // Close fresh browser if we created one
+            if (useFreshBrowser) {
+                console.log('Closing fresh browser instance...');
+                await browser.close();
+                console.log('✅ Fresh browser closed');
+            } else {
+                console.log('Keeping persistent browser alive for reuse');
+            }
 
+        } catch (error) {
+            // Make sure to close page and fresh browser on error
+            if (page) {
+                try {
+                    await page.close();
+                } catch (e) {
+                    console.error('Error closing page:', e.message);
+                }
+            }
+            
+            if (useFreshBrowser && browser) {
+                try {
+                    console.log('⚠️ Error occurred, force-closing fresh browser...');
+                    await browser.close();
+                    console.log('✅ Fresh browser force-closed');
+                } catch (e) {
+                    console.error('Error closing fresh browser:', e.message);
+                }
+            } else if (browser) {
+                // ✅ NEW: If using persistent browser and error occurs, mark it as disconnected
+                // so a new instance is created on next request
+                console.log('⚠️ Error occurred with persistent browser, marking as disconnected');
+                browserInstance = null;
+            }
+            
+            throw error;
+        }
+
+        // ✅ SAVE PDF PERMANENTLY to disk for future downloads
+        // (permanentPdfDir already declared above for double-check)
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(permanentPdfDir)) {
+            fs.mkdirSync(permanentPdfDir, { recursive: true });
+            console.log('✅ Created permanent PDFs directory');
+        }
+        
+        const permanentPdfPath2 = path.join(permanentPdfDir, `${orderId}.pdf`);
+        
+        // Save PDF to permanent storage
+        console.log(`💾 Saving PDF permanently: ${permanentPdfPath2}`);
+        fs.writeFileSync(permanentPdfPath2, pdf);
+        console.log('✅ PDF saved permanently to disk');
+        
+        // Register in pdfJobs cache for instant retrieval next time
+        registerPDFJob(orderId, {
+            orderId,
+            path: permanentPdfPath2,
+            status: 'ready',
+            createdAt: new Date()
+            // NO deletionScheduled - permanent storage!
+        });
+        
+        // ✅ PERSIST permanent filename to database
+        try {
+            await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
+            console.log(`✅ Saved permanentPdfFilename to DB: ${orderId}.pdf`);
+        } catch (dbErr) {
+            console.warn('⚠️ Could not update Order with permanentPdfFilename:', dbErr.message);
+        }
+        
         // Update download count
         order.downloadCount += 1;
         order.lastDownloadAt = new Date();
         await order.save();
 
-        console.log(`✅ PDF generated successfully for ${orderId}: ${(pdf.length / 1024 / 1024).toFixed(2)} MB`);
-
-        // Save to temporary file first (same as preview approach)
-        const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
-        if (!fs.existsSync(tempDir)) {
-            fs.mkdirSync(tempDir, { recursive: true });
-        }
-        
-        const filename = `download-${orderId}-${Date.now()}.pdf`;
-        const filePath = path.join(tempDir, filename);
-        
-        console.log('Saving PDF to temporary file:', filePath);
-        fs.writeFileSync(filePath, pdf);
-        console.log('✅ PDF saved to file successfully');
-        
-        // Set optimized response headers for better performance
+        // Stream PDF directly to response
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Length', pdf.length);
         res.setHeader('Content-Disposition', `attachment; filename="voter-slips-${orderId}.pdf"`);
-        res.setHeader('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
+        res.setHeader('Cache-Control', 'private, max-age=31536000'); // Cache for 1 year
         res.setHeader('X-Content-Type-Options', 'nosniff');
         
-        // Send the file (not the buffer) - more efficient for large files
-        res.download(filePath, `voter-slips-${orderId}.pdf`, (err) => {
-            if (err) {
-                console.error('❌ Error sending file:', err);
-            } else {
-                console.log('✅ File sent successfully');
-            }
-            
-            // Delete the temporary file after sending
-            setTimeout(() => {
-                try {
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                        console.log('🗑️ Temporary file deleted:', filename);
-                    }
-                } catch (cleanupErr) {
-                    console.error('⚠️ Failed to delete temp file:', cleanupErr.message);
-                }
-            }, 5000); // Delete after 5 seconds
-        });
+        console.log('⚡ Streaming PDF to client...');
+        res.end(pdf);
+        console.log('✅ PDF sent successfully (saved permanently for future downloads)');
 
     } catch (error) {
         console.error('❌ Download slip error:', error);
@@ -1047,8 +1155,10 @@ export const servePreviewPDF = async (req, res) => {
 
         console.log('📄 Preview PDF request:', filename, 'by user:', userId);
 
-        // Extract order ID from filename (format: preview-ORD-xxx-timestamp.pdf)
-        const orderIdMatch = filename.match(/preview-(ORD-[^-]+-[^-]+)/);
+        // Extract order ID from filename (format: preview-ORD-YYYYMMDD-XXXXXX.pdf)
+        // Remove .pdf extension first, then extract orderId
+        const filenameWithoutExt = filename.replace('.pdf', '');
+        const orderIdMatch = filenameWithoutExt.match(/preview-(ORD-.+)/);
         if (!orderIdMatch) {
             console.error('❌ Invalid filename format:', filename);
             return res.status(400).json({
@@ -1092,6 +1202,97 @@ export const servePreviewPDF = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to serve preview PDF',
+            error: error.message
+        });
+    }
+};
+
+// Get PDF generation status for order success page
+export const getPDFStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.userId;
+
+        console.log(`\n[PDF STATUS CHECK] Order: ${orderId}, User: ${userId}`);
+
+        // Verify user owns this order
+        const order = await Order.findOne({ orderId, userId });
+        if (!order) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized access to this order'
+            });
+        }
+
+        // Check if payment is completed
+        if (order.paymentStatus !== 'completed') {
+            return res.json({
+                status: 'pending',
+                message: 'Payment not completed',
+                isPaid: false,
+                pdfReady: false
+            });
+        }
+
+        // Check PDF generation status using getPDFJobStatus
+        const jobStatus = getPDFJobStatus(orderId);
+        console.log(`[PDF STATUS] Job status:`, jobStatus);
+
+        // Check if permanent PDF exists on disk
+        const permanentPdfPath = path.join(process.cwd(), 'public', 'permanent-pdfs', `${orderId}.pdf`);
+        const pdfExists = fs.existsSync(permanentPdfPath);
+        console.log(`[PDF STATUS] PDF exists on disk: ${pdfExists}`);
+
+        if (pdfExists) {
+            // PDF is ready for download
+            return res.json({
+                status: 'ready',
+                message: 'PDF is ready for download',
+                isPaid: true,
+                pdfReady: true,
+                progress: 100,
+                downloadCount: order.downloadCount || 0
+            });
+        }
+
+        // Check job status
+        if (jobStatus.status === 'generating') {
+            return res.json({
+                status: 'generating',
+                message: 'PDF is being generated in background',
+                isPaid: true,
+                pdfReady: false,
+                progress: jobStatus.progress || 50,
+                estimatedTime: '20-50 seconds'
+            });
+        }
+
+        if (jobStatus.status === 'failed') {
+            return res.json({
+                status: 'failed',
+                message: 'PDF generation failed, will generate on download',
+                isPaid: true,
+                pdfReady: false,
+                progress: 0,
+                error: jobStatus.error
+            });
+        }
+
+        // No job status and no PDF = not started yet or still in queue
+        return res.json({
+            status: 'pending',
+            message: 'PDF generation will start shortly',
+            isPaid: true,
+            pdfReady: false,
+            progress: 10,
+            estimatedTime: '20-50 seconds'
+        });
+
+    } catch (error) {
+        console.error('❌ Get PDF status error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to check PDF status',
             error: error.message
         });
     }

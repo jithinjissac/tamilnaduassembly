@@ -3,8 +3,6 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { extractPollingStationName } from '../utils/parser.js';
-import * as cheerio from 'cheerio';
 
 const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
@@ -271,20 +269,6 @@ router.post('/submitWithCaptcha', async (req, res) => {
     console.log('[CAPTCHA] Selecting language...');
     await page.selectOption('#view_voters_list_language', language);
     await page.waitForTimeout(500);
-    // Verify language selection
-    const selectedLang = await page.$eval('#view_voters_list_language', el => el.value).catch(() => 'UNKNOWN');
-    console.log('[CAPTCHA] Language select current value:', selectedLang);
-    if (selectedLang !== language) {
-      console.warn('[CAPTCHA] Language value mismatch, attempting re-select');
-      await page.selectOption('#view_voters_list_language', language);
-      await page.waitForTimeout(300);
-      const recheckLang = await page.$eval('#view_voters_list_language', el => el.value).catch(() => 'UNKNOWN');
-      console.log('[CAPTCHA] Language recheck value:', recheckLang);
-    }
-
-    // Dump language select outerHTML for diagnostics
-    const langOuter = await page.$eval('#view_voters_list_language', el => el.outerHTML).catch(() => 'NO_LANG_ELEMENT');
-    console.log('[CAPTCHA] Language select outerHTML snippet:', langOuter.substring(0, 300));
 
     // Fill captcha
     console.log('[CAPTCHA] Filling captcha...');
@@ -336,22 +320,6 @@ router.post('/submitWithCaptcha', async (req, res) => {
 
     console.log('[CAPTCHA] Form submission result:', submitResult.status);
     console.log('[CAPTCHA] Response HTML length:', submitResult.html.length);
-
-    // Diagnostics: Check for Malayalam script presence in raw HTML
-    const hasMalayalamChars = /[\u0D00-\u0D7F]/.test(submitResult.html);
-    console.log('[CAPTCHA] Raw HTML contains Malayalam characters:', hasMalayalamChars);
-
-    // Try to locate polling station code region heuristically (first occurrence of pattern like 001- or 001 - )
-    const stationPattern = /(\d{3}\s*-\s*[^<\n]{3,120})/;
-    const stationMatch = submitResult.html.match(stationPattern);
-    if (stationMatch) {
-      const idx = submitResult.html.indexOf(stationMatch[0]);
-      const snippetStart = Math.max(0, idx - 300);
-      const snippetEnd = Math.min(submitResult.html.length, idx + 300);
-      console.log('[CAPTCHA] Station pattern snippet:\n---SNIP START---\n' + submitResult.html.substring(snippetStart, snippetEnd) + '\n---SNIP END---');
-    } else {
-      console.warn('[CAPTCHA] No station pattern match in raw HTML (\"001 -\" etc).');
-    }
     
     // Check if response is JSON with error
     if (submitResult.json) {
@@ -405,83 +373,10 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     console.log('[CAPTCHA] Has voter table indicators:', hasVoterTable);
 
-    // Extract polling station name from the SEC response HTML (in Malayalam if language=M)
-  let pollingStationName = extractPollingStationName(submitResult.html);
-  console.log('[CAPTCHA] Extracted polling station name:', pollingStationName);
-
-    // Fallback attempt: If we failed to get Malayalam AND requested language was M, try direct POST using context.request
-    const hasMalayalamInExtracted = /[\u0D00-\u0D7F]/.test(pollingStationName || '');
-    if (language === 'M' && !hasMalayalamInExtracted) {
-      console.warn('[CAPTCHA] Extracted station name lacks Malayalam. Trying direct request fallback...');
-      try {
-        const directParams = new URLSearchParams({
-          'view_voters_list[district]': district,
-          'view_voters_list[localBody]': local_body,
-          'view_voters_list[ward]': ward,
-          'view_voters_list[pollingStation]': polling_station,
-          'view_voters_list[language]': language,
-          'view_voters_list[captcha]': captcha,
-          'view_voters_list[_token]': csrfToken
-        });
-        const directResp = await page.request.post(`${SEC_BASE_URL}/public/voters/list`, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept-Language': 'ml-IN,ml;q=0.9,en;q=0.8'
-          },
-          data: directParams.toString()
-        });
-        const directText = await directResp.text();
-        console.log('[CAPTCHA][FALLBACK] Direct POST status:', directResp.status());
-        console.log('[CAPTCHA][FALLBACK] Direct HTML length:', directText.length);
-        const fallbackHasMalayalam = /[\u0D00-\u0D7F]/.test(directText);
-        console.log('[CAPTCHA][FALLBACK] Raw HTML contains Malayalam:', fallbackHasMalayalam);
-        if (fallbackHasMalayalam) {
-          const fallbackName = extractPollingStationName(directText);
-          if (fallbackName && /[\u0D00-\u0D7F]/.test(fallbackName)) {
-            console.log('[CAPTCHA][FALLBACK] Using Malayalam station name from direct request:', fallbackName);
-            submitResult.html = directText; // Replace html so voter parsing gets full context
-            pollingStationName = fallbackName; // Override extracted name
-          }
-        }
-      } catch (fbErr) {
-        console.warn('[CAPTCHA][FALLBACK] Direct request failed:', fbErr.message);
-      }
-    }
-
-    // Fallback 2: The SEC response often includes the search form with the selected polling station option
-    // If we still don't have Malayalam, try to read the selected option text from the form HTML
-    if (!/[\u0D00-\u0D7F]/.test(pollingStationName || '')) {
-      try {
-        const $ = cheerio.load(submitResult.html);
-        const selectedOpt = $('#view_voters_list_pollingStation option[selected], #view_voters_list_pollingStation option:checked').first();
-        const selectedText = selectedOpt.text().trim();
-        if (selectedText && /^\d{3}[\s-]/.test(selectedText)) {
-          console.log('[CAPTCHA][FALLBACK] Using selected option text for station:', selectedText);
-          pollingStationName = selectedText;
-        } else {
-          // Try any option if only one exists beyond placeholder
-          const options = $('#view_voters_list_pollingStation option');
-          if (options.length > 1) {
-            const optText = $(options.get(1)).text().trim();
-            if (optText && /^\d{3}[\s-]/.test(optText)) {
-              console.log('[CAPTCHA][FALLBACK] Using first station option text:', optText);
-              pollingStationName = optText;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('[CAPTCHA][FALLBACK] Failed to parse selected option text:', e.message);
-      }
-    }
-
-    // Return the HTML response to be parsed, along with the extracted polling station name
+    // Return the HTML response to be parsed
     res.json({
       status: 'success',
-      html: submitResult.html,
-      pollingStationName: pollingStationName || null,
-      pollingStationValue: polling_station,
-      hasMalayalam: /[\u0D00-\u0D7F]/.test(pollingStationName || '')
+      html: submitResult.html
     });
 
   } catch (error) {

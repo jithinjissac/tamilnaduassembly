@@ -7,3 +7,6 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 public/captcha-cache/
+public/temp-pdfs/
+# NOTE: permanent-pdfs/ is NOT ignored - these are permanently saved PDFs
+# public/permanent-pdfs/

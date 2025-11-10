@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import { body, validationResult } from 'express-validator';
+import { generatePDFBackground } from '../utils/pdfGenerator.js';
 
 // Generate unique order ID
 const generateOrderId = () => {
@@ -68,11 +69,6 @@ export const createOrder = [
             // Generate order ID
             const orderId = generateOrderId();
 
-            // Debug: Log what we're about to save
-            console.log(`📝 Creating order with polling station: "${location.pollingStation}"`);
-            console.log(`📝 Polling station contains Malayalam: ${/[\u0D00-\u0D7F]/.test(location.pollingStation || '')}`);
-            console.log(`📝 First voter polling_station_name: "${voters[0]?.polling_station_name || 'NOT SET'}"`);
-
             // Create order
             const order = new Order({
                 userId,
@@ -88,15 +84,34 @@ export const createOrder = [
 
             await order.save();
 
+            // ✅ Check if permanent PDF already exists (generated during preview)
+            // Most of the time, PDF is already generated while user was viewing preview
+            const { getPDFFilePath } = await import('../utils/pdfGenerator.js');
+            const existingPDF = getPDFFilePath(order.orderId);
+            
+            let pdfStatus = 'generating'; // Default: PDF still generating
+            if (existingPDF) {
+                console.log(`✅ [ORDER] Permanent PDF already exists for ${order.orderId}`);
+                pdfStatus = 'ready'; // PDF ready for instant download!
+            } else {
+                // Fallback: If PDF doesn't exist yet (rare), trigger background generation
+                // This handles edge cases where preview generation failed or was skipped
+                console.log(`⚠️ [ORDER] No permanent PDF found yet, triggering generation...`);
+                generatePDFBackground(order, order.orderId).catch(err => {
+                    console.error('Background PDF generation error:', err);
+                });
+            }
+
             res.status(201).json({
                 status: 'success',
-                message: 'Order created successfully',
+                message: 'Order created successfully. PDF ready for download.',
                 order: {
                     id: order._id,
                     orderId: order.orderId,
                     totalVoters: order.totalVoters,
                     amount: order.amount,
-                    paymentStatus: order.paymentStatus
+                    paymentStatus: order.paymentStatus,
+                    pdfStatus: pdfStatus
                 }
             });
 

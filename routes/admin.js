@@ -14,6 +14,8 @@ import {
     markOrderCompleted,
     downloadOrderPDF,
     getAnalytics,
+    deleteOrder,
+    deleteOrders,
     upload
 } from '../controllers/adminController.js';
 import auth from '../middleware/auth.js';
@@ -38,11 +40,14 @@ router.patch('/symbols/:symbolId/toggle-status', toggleSymbolStatus);
 router.delete('/symbols/:symbolId', deleteSymbol);
 
 // Order Management
+// ⚠️ IMPORTANT: Specific routes MUST come BEFORE parameterized routes!
 router.get('/orders', getAllOrders);
 router.post('/orders/create', createOrderWithoutPayment);
+router.post('/orders/delete-bulk', deleteOrders);  // ← Must be before :orderId routes
 router.get('/orders/:orderId', getOrderDetails);
 router.patch('/orders/:orderId/complete', markOrderCompleted);
 router.get('/orders/:orderId/download', downloadOrderPDF);
+router.delete('/orders/:orderId', deleteOrder);
 
 // Analytics
 router.get('/analytics', getAnalytics);

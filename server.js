@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
-import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
 
 // ES Module imports for new modules
 import connectDB from './config/database.js';
@@ -15,6 +14,7 @@ import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
 import slipRoutes from './routes/slips.js';
 import { closeBrowser } from './controllers/slipController.js';
+import { cleanupExpiredPDFs } from './utils/pdfGenerator.js';
 
 // Initialize environment variables
 dotenv.config();
@@ -67,7 +67,6 @@ app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
-app.use('/api', playwrightStationsRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -92,10 +91,19 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📝 Frontend available at http://localhost:${PORT}`);
-  console.log(`� Auth API: /api/auth/*`);
+  console.log(`💵 Auth API: /api/auth/*`);
   console.log(`📦 Orders API: /api/orders/*`);
   console.log(`💳 Payment API: /api/payment/*`);
   console.log(`📄 Slips API: /api/slips/*`);
+  
+  // Cleanup expired PDFs on startup
+  console.log('🧹 Running initial PDF cleanup...');
+  cleanupExpiredPDFs();
+  
+  // Periodic cleanup every 10 minutes
+  setInterval(() => {
+    cleanupExpiredPDFs();
+  }, 10 * 60 * 1000);
 });
 
 // Graceful shutdown

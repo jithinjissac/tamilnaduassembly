@@ -677,3 +677,68 @@ export const getAnalytics = async (req, res) => {
         });
     }
 };
+
+// Delete single order (admin only)
+export const deleteOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findByIdAndDelete(orderId);
+
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found'
+            });
+        }
+
+        console.log(`✅ Order deleted: ${order.orderId}`);
+
+        res.json({
+            status: 'success',
+            message: 'Order deleted successfully',
+            deletedOrder: order.orderId
+        });
+    } catch (error) {
+        console.error('Delete order error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to delete order',
+            error: error.message
+        });
+    }
+};
+
+// Delete multiple orders (admin only) - Bulk delete
+export const deleteOrders = async (req, res) => {
+    try {
+        const { orderIds } = req.body;
+
+        if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Please provide at least one order ID'
+            });
+        }
+
+        // Delete all specified orders
+        const result = await Order.deleteMany({ _id: { $in: orderIds } });
+
+        console.log(`✅ Deleted ${result.deletedCount} orders`);
+
+        res.json({
+            status: 'success',
+            message: `Successfully deleted ${result.deletedCount} order(s)`,
+            deletedCount: result.deletedCount,
+            requestedCount: orderIds.length
+        });
+    } catch (error) {
+        console.error('Bulk delete orders error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to delete orders',
+            error: error.message
+        });
+    }
+};
+
