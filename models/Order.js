@@ -133,4 +133,16 @@ OrderSchema.index({
 // Index for user orders listing
 OrderSchema.index({ userId: 1, createdAt: -1 });
 
+// CRITICAL: Explicit index for orderId lookups (most common query)
+OrderSchema.index({ orderId: 1 });  // Single field index for fast lookups
+
+// Compound index for orderId + userId queries (authentication check)
+OrderSchema.index({ orderId: 1, userId: 1 });
+
+// Index for payment status queries (admin dashboard)
+OrderSchema.index({ paymentStatus: 1, createdAt: -1 });
+
+// Index for PDF path lookups
+OrderSchema.index({ pdfPath: 1 }, { sparse: true });
+
 export default mongoose.model('Order', OrderSchema);
