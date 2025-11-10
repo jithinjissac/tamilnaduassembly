@@ -1,0 +1,61 @@
+# Railway Ignore File
+# Files and folders that Railway should NOT deploy
+
+# Documentation
+*.md
+!README.md
+
+# Git
+.git
+.gitignore
+
+# Environment files (use Railway variables instead)
+.env
+.env.local
+.env.*.local
+
+# Dependencies (Railway will install from package.json)
+node_modules
+
+# Logs
+*.log
+npm-debug.log*
+logs
+
+# Generated PDFs (Railway has persistent storage)
+generated-pdfs/*
+!generated-pdfs/.gitkeep
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testing
+test
+tests
+__tests__
+coverage
+
+# Development scripts
+create-admin.js
+create-test-user.js
+check-*.js
+debug-*.js
+decode-token.js
+ensure-admin.js
+migrate-*.js
+
+# Docker (not needed on Railway)
+Dockerfile
+docker-compose.yml
+.dockerignore

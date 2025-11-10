@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Settings - Kerala Voter Slip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5568d3;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-group h3 {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .setting-item small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .setting-item input[type="text"],
+        .setting-item input[type="number"],
+        .setting-item input[type="email"],
+        .setting-item input[type="password"],
+        .setting-item select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .setting-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .success-message, .error-message, .info-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .info-message {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .template-preview {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .template-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .template-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .template-btn:hover {
+            border-color: #667eea;
+        }
+
+        iframe {
+            width: 100%;
+            min-height: 500px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .test-email-section {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .test-email-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Email Settings</h1>
+            <a href="/admin.html" class="back-btn">← Back to Admin</a>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="info-message" id="infoMessage"></div>
+
+        <div class="main-content">
+            <!-- Left Panel: Settings Form -->
+            <div class="panel">
+                <h2>⚙️ Configuration</h2>
+
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-enableEmailNotifications">
+                            <label for="email-enableEmailNotifications">
+                                <strong>Enable Email Notifications</strong>
+                                <small>Turn on/off all automated emails</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>SMTP Configuration</h3>
+                    <div class="setting-item">
+                        <label>SMTP Host</label>
+                        <input type="text" id="email-smtpHost" placeholder="smtp.gmail.com">
+                        <small>Your email provider's SMTP server</small>
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Port</label>
+                        <input type="number" id="email-smtpPort" placeholder="587">
+                        <small>Usually 587 (TLS) or 465 (SSL)</small>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-smtpSecure">
+                            <label for="email-smtpSecure">Use SSL/TLS (Port 465)</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Username</label>
+                        <input type="text" id="email-smtpUser" placeholder="your-email@gmail.com">
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Password</label>
+                        <input type="password" id="email-smtpPassword" placeholder="App password (not regular password)">
+                        <small>For Gmail, use <a href="https://myaccount.google.com/apppasswords" target="_blank">App Password</a></small>
+                    </div>
+                    <div class="setting-item">
+                        <label>From Email</label>
+                        <input type="email" id="email-fromEmail" placeholder="noreply@yoursite.com">
+                    </div>
+                    <div class="setting-item">
+                        <label>From Name</label>
+                        <input type="text" id="email-fromName" placeholder="Kerala Voter Slip">
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Email Templates</h3>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-orderConfirmation">
+                            <label for="email-emailTemplates-orderConfirmation">Order Confirmation Email</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-paymentSuccess">
+                            <label for="email-emailTemplates-paymentSuccess">Payment Success Email</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-pdfReady">
+                            <label for="email-emailTemplates-pdfReady">PDF Ready Email</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+                    <button class="btn btn-secondary" onclick="resetSettings()">🔄 Reset to Defaults</button>
+                </div>
+
+                <!-- Test Email Section -->
+                <div class="test-email-section">
+                    <h3>🧪 Test Email Connection</h3>
+                    <div class="input-group">
+                        <input type="email" id="testEmailAddress" placeholder="Enter email to send test">
+                        <button class="btn btn-success" onclick="sendTestEmail()">Send Test Email</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Template Preview -->
+            <div class="panel">
+                <h2>📄 Email Template Preview</h2>
+                
+                <div class="template-selector">
+                    <button class="template-btn active" onclick="previewTemplate('orderConfirmation')">
+                        Order Confirmation
+                    </button>
+                    <button class="template-btn" onclick="previewTemplate('paymentSuccess')">
+                        Payment Success
+                    </button>
+                    <button class="template-btn" onclick="previewTemplate('pdfReady')">
+                        PDF Ready
+                    </button>
+                </div>
+
+                <div class="template-preview">
+                    <iframe id="templatePreview"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/settings';
+
+        // Load settings on page load
+        async function loadSettings() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/email`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load settings');
+                }
+
+                const data = await response.json();
+                populateSettings(data.settings);
+            } catch (error) {
+                showError('Failed to load settings: ' + error.message);
+            }
+        }
+
+        // Populate form with settings
+        function populateSettings(settings) {
+            Object.keys(settings).forEach(key => {
+                const elementId = `email-${key}`;
+                const element = document.getElementById(elementId);
+                
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = settings[key];
+                    } else if (typeof settings[key] === 'object' && settings[key] !== null) {
+                        // Handle nested objects like emailTemplates
+                        Object.keys(settings[key]).forEach(subKey => {
+                            const subElementId = `${elementId}-${subKey}`;
+                            const subElement = document.getElementById(subElementId);
+                            if (subElement && subElement.type === 'checkbox') {
+                                subElement.checked = settings[key][subKey];
+                            }
+                        });
+                    } else {
+                        element.value = settings[key];
+                    }
+                }
+            });
+        }
+
+        // Save settings
+        async function saveSettings() {
+            try {
+                const settings = {
+                    enableEmailNotifications: document.getElementById('email-enableEmailNotifications').checked,
+                    smtpHost: document.getElementById('email-smtpHost').value,
+                    smtpPort: parseInt(document.getElementById('email-smtpPort').value),
+                    smtpSecure: document.getElementById('email-smtpSecure').checked,
+                    smtpUser: document.getElementById('email-smtpUser').value,
+                    smtpPassword: document.getElementById('email-smtpPassword').value,
+                    fromEmail: document.getElementById('email-fromEmail').value,
+                    fromName: document.getElementById('email-fromName').value,
+                    emailTemplates: {
+                        orderConfirmation: document.getElementById('email-emailTemplates-orderConfirmation').checked,
+                        paymentSuccess: document.getElementById('email-emailTemplates-paymentSuccess').checked,
+                        pdfReady: document.getElementById('email-emailTemplates-pdfReady').checked
+                    }
+                };
+
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/email`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save settings');
+                }
+
+                showSuccess('Email settings saved successfully!');
+            } catch (error) {
+                showError('Failed to save settings: ' + error.message);
+            }
+        }
+
+        // Reset settings
+        async function resetSettings() {
+            if (!confirm('Reset email settings to defaults?')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/reset/email`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to reset settings');
+                }
+
+                const data = await response.json();
+                populateSettings(data.settings);
+                showSuccess('Email settings reset to defaults!');
+            } catch (error) {
+                showError('Failed to reset settings: ' + error.message);
+            }
+        }
+
+        // Send test email
+        async function sendTestEmail() {
+            const email = document.getElementById('testEmailAddress').value;
+            if (!email) {
+                showError('Please enter an email address');
+                return;
+            }
+
+            try {
+                showInfo('Sending test email...');
+                
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/test-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to send test email');
+                }
+
+                showSuccess(`Test email sent successfully to ${email}!`);
+            } catch (error) {
+                showError('Failed to send test email: ' + error.message);
+            }
+        }
+
+        // Preview template
+        function previewTemplate(templateType) {
+            // Update active button
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Load template preview
+            const iframe = document.getElementById('templatePreview');
+            iframe.src = `/api/settings/preview-template/${templateType}`;
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('successMessage');
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('errorMessage');
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showInfo(message) {
+            const el = document.getElementById('infoMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('infoMessage');
+        }
+
+        function hideOtherMessages(except) {
+            ['successMessage', 'errorMessage', 'infoMessage'].forEach(id => {
+                if (id !== except) {
+                    document.getElementById(id).style.display = 'none';
+                }
+            });
+        }
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // Load initial settings and preview
+        loadSettings();
+        previewTemplate('orderConfirmation');
+    </script>
+</body>
+</html>

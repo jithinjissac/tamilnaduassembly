@@ -184,6 +184,16 @@ export const generatePDFBackground = async (order, orderId) => {
         try {
             const Order = (await import('../models/Order.js')).default;
             await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
+            
+            // Send PDF ready email
+            const User = (await import('../models/User.js')).default;
+            const { sendPDFReadyEmail } = await import('./emailService.js');
+            const orderDoc = await Order.findOne({ orderId }).populate('userId');
+            if (orderDoc && orderDoc.userId) {
+                sendPDFReadyEmail(orderDoc.userId, orderDoc).catch(err => {
+                    console.error('❌ Failed to send PDF ready email:', err.message);
+                });
+            }
         } catch (e) {
             console.warn('Could not update Order with permanentPdfFilename', e.message);
         }

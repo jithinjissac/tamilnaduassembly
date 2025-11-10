@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import razorpay from '../config/razorpay.js';
 import Order from '../models/Order.js';
+import User from '../models/User.js';
+import { sendPaymentSuccessEmail } from '../utils/emailService.js';
 
 // Create Razorpay order
 export const createRazorpayOrder = async (req, res) => {
@@ -111,6 +113,14 @@ export const verifyPayment = async (req, res) => {
         order.razorpaySignature = razorpay_signature;
         order.paidAt = new Date();
         await order.save();
+
+        // Send payment success email
+        const user = await User.findById(order.userId);
+        if (user) {
+            sendPaymentSuccessEmail(user, order).catch(err => {
+                console.error('❌ Failed to send payment success email:', err.message);
+            });
+        }
 
         res.json({
             status: 'success',

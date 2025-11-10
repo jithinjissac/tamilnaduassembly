@@ -1,6 +1,8 @@
 import Order from '../models/Order.js';
+import User from '../models/User.js';
 import { body, validationResult } from 'express-validator';
 import { generatePDFBackground } from '../utils/pdfGenerator.js';
+import { sendOrderConfirmationEmail } from '../utils/emailService.js';
 
 // Generate unique order ID
 const generateOrderId = () => {
@@ -83,6 +85,14 @@ export const createOrder = [
             });
 
             await order.save();
+
+            // Send order confirmation email
+            const user = await User.findById(userId);
+            if (user) {
+                sendOrderConfirmationEmail(user, order).catch(err => {
+                    console.error('❌ Failed to send order confirmation email:', err.message);
+                });
+            }
 
             // ✅ Check if permanent PDF already exists (generated during preview)
             // Most of the time, PDF is already generated while user was viewing preview

@@ -53,6 +53,10 @@ app.use('/api/slips', slipRoutes);
 import adminRoutes from './routes/admin.js';
 app.use('/api/admin', adminRoutes);
 
+// Settings Routes (Admin only)
+import settingsRoutes from './routes/settings.js';
+app.use('/api/settings', settingsRoutes);
+
 // Public Symbols Routes (for users)
 import symbolRoutes from './routes/symbols.js';
 app.use('/api', symbolRoutes);
@@ -95,6 +99,7 @@ app.listen(PORT, () => {
   console.log(`📦 Orders API: /api/orders/*`);
   console.log(`💳 Payment API: /api/payment/*`);
   console.log(`📄 Slips API: /api/slips/*`);
+  console.log(`⚙️  Settings API: /api/settings/*`);
   
   // Cleanup expired PDFs on startup
   console.log('🧹 Running initial PDF cleanup...');

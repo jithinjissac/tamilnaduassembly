@@ -1,0 +1,31 @@
+// Test download with CORRECT orderId
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTBlNTc1YjVkNTQyYjU3ZjY4MmYzYmYiLCJpYXQiOjE3NjI3MTkxOTgsImV4cCI6MTc2NTMxMTE5OH0.PLuU54gG-Wg1VF_v1zNpBE5KyP36FAa3jloEpwJ1tJA';
+const orderId = 'ORD-20251109-VE4JG4'; // ✅ CORRECT orderId
+
+console.log('Testing download with CORRECT orderId...');
+console.log(`URL: /api/slips/download/${orderId}`);
+
+fetch(`http://localhost:3000/api/slips/download/${orderId}`, {
+  headers: { 'Authorization': `Bearer ${token}` }
+})
+.then(async response => {
+  console.log(`Status: ${response.status}`);
+  
+  if (response.ok) {
+    const blob = await response.blob();
+    console.log(`✅ SUCCESS! PDF size: ${blob.size} bytes`);
+    console.log('Check server console for save confirmation');
+    console.log('Check: public/permanent-pdfs/ORD-20251109-VE4JG4.pdf');
+    
+    // Download it
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `voter-slips-${orderId}.pdf`;
+    a.click();
+  } else {
+    const text = await response.text();
+    console.log(`❌ FAILED: ${text}`);
+  }
+})
+.catch(err => console.error('Error:', err));

@@ -440,8 +440,10 @@ export const generatePreview = async (req, res) => {
             }
         }
 
-        // Generate HTML for first 10 slips only
-        console.log('Generating HTML for preview (first 10 voters only)...');
+        // Generate HTML for preview (first 10 voters)
+        const previewVoterLimit = 10;
+
+        console.log(`Generating HTML for preview (first ${previewVoterLimit} voters only)...`);
         console.log('Total voters in order:', order.voters.length);
         console.log('First voter sample:', JSON.stringify(order.voters[0], null, 2));
         console.log('Customization details:', JSON.stringify(order.customization, null, 2).substring(0, 500) + '...');
@@ -450,8 +452,8 @@ export const generatePreview = async (req, res) => {
         let html;
         try {
             const htmlStartTime = Date.now();
-            html = generateSlipHTML(order, 0, 10);
-            console.log('✅ HTML generated for 10 voters in', Date.now() - htmlStartTime, 'ms');
+            html = generateSlipHTML(order, 0, previewVoterLimit);
+            console.log(`✅ HTML generated for ${previewVoterLimit} voters in`, Date.now() - htmlStartTime, 'ms');
             console.log('HTML length:', html.length, 'characters (', (html.length / 1024).toFixed(2), 'KB)');
         } catch (htmlError) {
             console.error('❌ ERROR GENERATING HTML:', htmlError.message);
