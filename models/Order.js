@@ -133,10 +133,8 @@ OrderSchema.index({
 // Index for user orders listing
 OrderSchema.index({ userId: 1, createdAt: -1 });
 
-// CRITICAL: Explicit index for orderId lookups (most common query)
-OrderSchema.index({ orderId: 1 });  // Single field index for fast lookups
-
 // Compound index for orderId + userId queries (authentication check)
+// Note: orderId already has unique index from schema, no need for single-field index
 OrderSchema.index({ orderId: 1, userId: 1 });
 
 // Index for payment status queries (admin dashboard)

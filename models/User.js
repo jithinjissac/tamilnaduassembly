@@ -51,6 +51,14 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
+// Indexes for faster admin queries
+UserSchema.index({ email: 1 });  // Unique constraint already creates index
+UserSchema.index({ phone: 1 });  // Unique constraint already creates index
+UserSchema.index({ createdAt: -1 });  // For sorting in admin panel
+UserSchema.index({ isActive: 1 });  // For filtering active/inactive users
+UserSchema.index({ role: 1 });  // For role-based queries
+UserSchema.index({ name: 'text', email: 'text' });  // Text search for admin search
+
 // Hash password before saving
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();

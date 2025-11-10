@@ -24,6 +24,10 @@ const settingsSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Index for faster queries
+settingsSchema.index({ category: 1 });  // Fast category lookups
+settingsSchema.index({ lastModified: -1 });  // Fast history sorting
+
 // Default settings for email only
 export const defaultSettings = {
     email: {

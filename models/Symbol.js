@@ -39,9 +39,11 @@ const symbolSchema = new mongoose.Schema({
     }
 });
 
-// Index for fast search (including Malayalam)
-symbolSchema.index({ name: 'text', nameMalayalam: 'text' });
-symbolSchema.index({ isActive: 1, category: 1 });
+// Indexes for fast queries
+symbolSchema.index({ name: 'text', nameMalayalam: 'text' });  // Text search
+symbolSchema.index({ isActive: 1, category: 1 });  // Filter by active status and category
+symbolSchema.index({ createdAt: -1 });  // Sort by creation date (admin listing)
+symbolSchema.index({ uploadedBy: 1 });  // Filter by uploader
 
 const Symbol = mongoose.model('Symbol', symbolSchema);
 
