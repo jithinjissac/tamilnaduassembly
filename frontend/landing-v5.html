@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasySlip - Kerala Voter Slip Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Original Kerala Color Scheme */
+            --kerala-green: #006D3B;
+            --kerala-gold: #FFB81C;
+            --kerala-red: #E03A3E;
+            --kerala-cream: #FFF8DC;
+            --kerala-brown: #8B4513;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-white: #ffffff;
+            --bg-light: #F8F9FA;
+            --border-light: #E9ECEF;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-white);
+            overflow-x: hidden;
+        }
+
+        .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            color: var(--kerala-gold);
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--kerala-green);
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 109, 59, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: var(--kerala-green);
+        }
+
+        .btn-nav {
+            padding: 0.7rem 1.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-login {
+            color: var(--kerala-green);
+            background: transparent;
+            border: 2px solid var(--kerala-green);
+        }
+
+        .btn-login:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 109, 59, 0.3);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 109, 59, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            background: linear-gradient(135deg, var(--kerala-cream) 0%, #ffffff 100%);
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 109, 59, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--kerala-green);
+        }
+
+        .hero-content h1 span {
+            background: linear-gradient(135deg, var(--kerala-gold) 0%, #E8A317 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            padding: 1.2rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--kerala-gold);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-feature i {
+            font-size: 1.8rem;
+            color: var(--kerala-green);
+        }
+
+        .hero-feature-text {
+            flex: 1;
+        }
+
+        .hero-feature-text strong {
+            display: block;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .hero-feature-text span {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .btn-primary {
+            padding: 1.2rem 2.8rem;
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(0, 109, 59, 0.3);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 1.2rem 2.8rem;
+            background: white;
+            color: var(--kerala-green);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid var(--kerala-green);
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        /* Symbol Showcase */
+        .symbol-showcase {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid var(--kerala-gold);
+        }
+
+        .showcase-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .showcase-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--kerala-gold);
+        }
+
+        .symbols-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .symbol-item {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .symbol-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--kerala-green);
+            box-shadow: var(--shadow-md);
+        }
+
+        .symbol-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 1rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .symbol-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            padding: 4rem 2rem;
+            color: white;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--kerala-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 6rem 2rem;
+            background: var(--bg-light);
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--kerala-green);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-top-color: var(--kerala-green);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 109, 59, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .pricing-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, var(--kerala-cream) 0%, #ffffff 100%);
+            border-radius: 24px;
+            padding: 4rem;
+            box-shadow: var(--shadow-lg);
+            border: 4px solid var(--kerala-gold);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                var(--kerala-green) 0%, 
+                var(--kerala-gold) 50%, 
+                var(--kerala-red) 100%);
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--kerala-gold) 0%, #E8A317 100%);
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(255, 184, 28, 0.4);
+        }
+
+        .price-display {
+            margin: 2rem 0;
+        }
+
+        .price-amount {
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: var(--kerala-green);
+            line-height: 1;
+        }
+
+        .price-label {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .pricing-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 3rem 0;
+            text-align: left;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pricing-feature i {
+            color: var(--kerala-green);
+            font-size: 1.3rem;
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 6rem 2rem;
+            background: var(--bg-light);
+        }
+
+        .process-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .process-step {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            position: relative;
+            border: 2px solid var(--border-light);
+            transition: all 0.3s;
+        }
+
+        .process-step:hover {
+            border-color: var(--kerala-green);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-number {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 109, 59, 0.3);
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border: 3px solid var(--kerala-gold);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .step-description {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .testimonials-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .testimonial-card {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border-left: 5px solid var(--kerala-gold);
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-left-color: var(--kerala-green);
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(0, 109, 59, 0.3);
+        }
+
+        .author-info h4 {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .author-info p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005030 100%);
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: var(--kerala-gold);
+            opacity: 0.1;
+            border-radius: 50%;
+        }
+
+        .cta-section::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: var(--kerala-gold);
+            opacity: 0.1;
+            border-radius: 50%;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-container h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .cta-container h2 .malayalam {
+            color: var(--kerala-gold);
+            display: block;
+            font-size: 0.7em;
+            margin-top: 0.5rem;
+        }
+
+        .cta-container p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-cta-white {
+            padding: 1.3rem 3.5rem;
+            background: white;
+            color: var(--kerala-green);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .btn-cta-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-cta-outline {
+            padding: 1.3rem 3.5rem;
+            background: transparent;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: 3px solid white;
+            transition: all 0.3s;
+        }
+
+        .btn-cta-outline:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--kerala-gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--kerala-gold);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Examples Section */
+        .examples-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .examples-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .example-card {
+            background: var(--bg-light);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: 2px solid var(--border-light);
+        }
+
+        .example-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--kerala-green);
+        }
+
+        .example-badge {
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .bjp-badge {
+            background: linear-gradient(135deg, #FF9933 0%, #FF6B00 100%);
+        }
+
+        .inc-badge {
+            background: linear-gradient(135deg, #0047AB 0%, #002366 100%);
+        }
+
+        .cpim-badge {
+            background: linear-gradient(135deg, #C41E3A 0%, #8B0000 100%);
+        }
+
+        .example-image-wrapper {
+            position: relative;
+            background: white;
+            padding: 2rem;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .example-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .example-card:hover .example-image {
+            transform: scale(1.05);
+        }
+
+        .example-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--kerala-cream) 0%, white 100%);
+            border-radius: 12px;
+            border: 2px dashed var(--kerala-gold);
+            width: 100%;
+        }
+
+        .placeholder-symbol {
+            font-size: 4rem;
+            filter: grayscale(30%);
+        }
+
+        .placeholder-text {
+            text-align: center;
+        }
+
+        .placeholder-text strong {
+            font-size: 1.2rem;
+            color: var(--kerala-green);
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .placeholder-text p {
+            color: var(--text-light);
+            margin: 0.3rem 0;
+            font-size: 0.95rem;
+        }
+
+        .example-details {
+            padding: 2rem;
+            background: white;
+        }
+
+        .example-details h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 0.8rem;
+        }
+
+        .example-details p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .examples-cta {
+            margin-top: 4rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--kerala-cream) 0%, white 100%);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .examples-note {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .examples-note i {
+            color: var(--kerala-gold);
+            font-size: 1.3rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+            }
+
+            .symbols-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+
+            .symbols-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-features {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .price-amount {
+                font-size: 4rem;
+            }
+
+            .cta-container h2 {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <span>EasySlip</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="login.html" class="btn-nav btn-login">Login</a>
+                <a href="register.html" class="btn-nav btn-register">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>
+                    Create Voter Slips <span>in Seconds</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Kerala's fastest and most affordable voter slip generation platform. 
+                    Professional quality, instant results.
+                    <span class="malayalam">കേരളത്തിലെ ഏറ്റവും വേഗത്തിലുള്ള സേവനം</span>
+                </p>
+
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <i class="fas fa-bolt"></i>
+                        <div class="hero-feature-text">
+                            <strong>20-50 Seconds</strong>
+                            <span>Lightning fast generation</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-rupee-sign"></i>
+                        <div class="hero-feature-text">
+                            <strong>₹0.50 Only</strong>
+                            <span>Per voter - Best price</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="hero-feature-text">
+                            <strong>100% Secure</strong>
+                            <span>Your data protected</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-print"></i>
+                        <div class="hero-feature-text">
+                            <strong>A4 Print Ready</strong>
+                            <span>5 slips per page</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="register.html" class="btn-primary">
+                        Start Creating Now <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#how-it-works" class="btn-secondary">
+                        How It Works
+                    </a>
+                </div>
+            </div>
+
+            <div class="symbol-showcase">
+                <h3 class="showcase-title">
+                    All Party Symbols Supported
+                    <span class="malayalam" style="display: block; font-size: 0.8em; margin-top: 0.5rem;">എല്ലാ പാർട്ടി ചിഹ്നങ്ങളും ലഭ്യം</span>
+                </h3>
+                <div class="symbols-grid">
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762568398492-88526082.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 1</div>
+                    </div>
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762608811026-969585275.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 2</div>
+                    </div>
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762608903470-418189181.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 3</div>
+                    </div>
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762609013630-686443357.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 4</div>
+                    </div>
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762609298703-772693039.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 5</div>
+                    </div>
+                    <div class="symbol-item">
+                        <img src="/symbols/symbol-1762609400161-555711376.png" alt="Party Symbol" class="symbol-image">
+                        <div class="symbol-label">Symbol 6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Political Leaders Trust Us</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">14</div>
+                <div class="stat-label">Districts Covered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">₹0.50</div>
+                <div class="stat-label">Per Voter Only</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Support Available</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Examples Section -->
+    <section class="examples-section">
+        <div class="examples-container">
+            <div class="section-header">
+                <h2 class="section-title">See Real Voter Slips</h2>
+                <p class="section-subtitle">
+                    Professional quality slips used by political parties across Kerala
+                    <span class="malayalam">യഥാർത്ഥ വോട്ടർ സ്ലിപ്പുകൾ കാണുക</span>
+                </p>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-badge bjp-badge">
+                        <i class="fas fa-dharmachakra"></i>
+                        BJP Example
+                    </div>
+                    <div class="example-image-wrapper">
+                        <img src="/voter-slip-examples/bjp-example.png" 
+                             alt="BJP Voter Slip Example - Lotus Symbol" 
+                             class="example-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="example-placeholder">
+                            <div class="placeholder-symbol">🪷</div>
+                            <div class="placeholder-text">
+                                <strong>BJP Voter Slip Sample</strong>
+                                <p>नमस्कार चिन्हम्</p>
+                                <p>Party Name: भारतीय जनता पार्टी</p>
+                                <p>Symbol: Kamal (Lotus - कमल)</p>
+                                <p>Contains: Voter Name, Age, Gender</p>
+                                <p>Polling Details: केन्द्र संख्या, कोठायेकोयिकल</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-details">
+                        <h4>BJP Kerala - Lotus Symbol</h4>
+                        <p>Professional slip with party branding, voter details including age (F/48), 
+                        polling station (002), and complete address in Malayalam. Clean layout with 
+                        prominent party symbol.</p>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-badge inc-badge">
+                        <i class="fas fa-hand-paper"></i>
+                        INC Example
+                    </div>
+                    <div class="example-image-wrapper">
+                        <img src="/voter-slip-examples/inc-example.png" 
+                             alt="Congress Voter Slip Example - Hand Symbol" 
+                             class="example-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="example-placeholder">
+                            <div class="placeholder-symbol">✋</div>
+                            <div class="placeholder-text">
+                                <strong>INC Voter Slip Sample</strong>
+                                <p>നമ്മുടെ ചിഹ്നം: കൈ</p>
+                                <p>Party Name: രണ്ടില</p>
+                                <p>Symbol: Hand (Kai - കൈ)</p>
+                                <p>Contains: Complete Voter Info</p>
+                                <p>Polling Details: CHALAD CENTRAL LP SCHOOL</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-details">
+                        <h4>INC Kerala - Hand Symbol</h4>
+                        <p>Clean layout with complete voter information including age (F/69), gender, 
+                        polling station (002/1), and house name (ബാലൻ്). Features the iconic hand symbol 
+                        with polling booth details.</p>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-badge cpim-badge">
+                        <i class="fas fa-star"></i>
+                        CPI(M) Example
+                    </div>
+                    <div class="example-image-wrapper">
+                        <img src="/voter-slip-examples/cpim-example.png" 
+                             alt="CPI(M) Voter Slip Example - Hand Symbol" 
+                             class="example-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="example-placeholder">
+                            <div class="placeholder-symbol">✋</div>
+                            <div class="placeholder-text">
+                                <strong>LDF Voter Slip Sample</strong>
+                                <p>കൈപ്പത്തി</p>
+                                <p>Alliance: കൈപ്പത്തി (Hand)</p>
+                                <p>Symbol: Open Hand</p>
+                                <p>Contains: SEC ID, Voter Name</p>
+                                <p>Polling Details: ST SEBASTIAN HIGH SCHOOL</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-details">
+                        <h4>LDF Kerala - Hand Symbol</h4>
+                        <p>Traditional design with party symbol, comprehensive voter data including SEC ID 
+                        (SEC045726207), voter name (മേരി ജോർജ്ജ് M/57), house number (009/364), and 
+                        polling booth (ST SEBASTIAN HIGH SCHOOL KANJOOR).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="examples-cta">
+                <p class="examples-note">
+                    <i class="fas fa-info-circle"></i>
+                    All examples show real format used in Kerala elections. Your slips will look exactly like these!
+                </p>
+                <a href="register.html" class="btn-primary">
+                    Create Your Own Slip Now <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="features-container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose EasySlip?</h2>
+                <p class="section-subtitle">
+                    Everything you need for a successful election campaign
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="feature-title">Super Fast Generation</h3>
+                    <p class="feature-description">
+                        Generate 5,000 voter slips in just 60 seconds. Our advanced system 
+                        processes your data instantly - no waiting, no delays.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3 class="feature-title">Most Affordable</h3>
+                    <p class="feature-description">
+                        At ₹0.50 per voter, we're the most affordable in Kerala. 
+                        Save thousands compared to traditional printing services.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">100% Secure</h3>
+                    <p class="feature-description">
+                        Bank-level encryption protects your voter data. We never share 
+                        your information. Completely confidential and secure.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3 class="feature-title">Perfect Print Quality</h3>
+                    <p class="feature-description">
+                        A4-ready PDFs with 5 slips per page. Cutting guides included. 
+                        Print on any standard printer with professional results.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Works Everywhere</h3>
+                    <p class="feature-description">
+                        Desktop, mobile, or tablet - create slips on any device. 
+                        Work from office, home, or on the campaign trail.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">24/7 Support</h3>
+                    <p class="feature-description">
+                        Malayalam and English support available. WhatsApp, phone, 
+                        and email - we're always here to help you succeed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section" id="pricing">
+        <div class="pricing-container">
+            <div class="section-header">
+                <h2 class="section-title">Simple Pricing</h2>
+                <p class="section-subtitle">
+                    No hidden charges. Pay only for what you use.
+                    <span class="malayalam">സത്യസന്ധമായ വില</span>
+                </p>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-badge">Kerala's Best Value</div>
+
+                <div class="price-display">
+                    <div class="price-amount">₹0.50</div>
+                    <div class="price-label">per voter only</div>
+                </div>
+
+                <div class="pricing-features">
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Your party symbol included</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Ready in 20-50 seconds</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>First 2 pages FREE preview</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Unlimited downloads</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>5 slips per A4 page</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Cutting guides included</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>All payment methods</span>
+                    </div>
+                    <div class="pricing-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>24/7 customer support</span>
+                    </div>
+                </div>
+
+                <a href="register.html" class="btn-primary">
+                    Start Creating Now <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="process-section" id="how-it-works">
+        <div class="process-container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">
+                    Create professional voter slips in 4 simple steps
+                    <span class="malayalam">വളരെ എളുപ്പം</span>
+                </p>
+            </div>
+
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Select Symbol</h3>
+                    <p class="step-description">
+                        Choose from EC-approved symbols or upload your own party symbol. 
+                        Supports all major formats.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Add Voter Data</h3>
+                    <p class="step-description">
+                        Copy-paste from Kerala SEC portal or upload Excel/CSV file. 
+                        Works with all polling stations.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Preview & Pay</h3>
+                    <p class="step-description">
+                        See first 2 pages FREE. Pay only ₹0.50 per voter via UPI, 
+                        card, or net banking.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Download & Print</h3>
+                    <p class="step-description">
+                        PDF ready in 20-50 seconds. Download unlimited times. 
+                        Print on any A4 printer!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="testimonials-container">
+            <div class="section-header">
+                <h2 class="section-title">Success Stories</h2>
+                <p class="section-subtitle">
+                    Real experiences from Kerala's political leaders
+                </p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Created 10,000 voter slips in just 3 minutes! The quality is outstanding 
+                        and our campaign team found it incredibly easy to use. Saved us ₹15,000 
+                        compared to our usual vendor. Highly recommended for all campaigns!"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RK</div>
+                        <div class="author-info">
+                            <h4>Rajesh Kumar</h4>
+                            <p>Campaign Manager, Thiruvananthapuram</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "The ₹0.50 per voter pricing is incredible! We were paying ₹2-3 elsewhere. 
+                        EasySlip helped us manage our campaign budget so much better. The support 
+                        team was helpful and responded quickly in Malayalam when needed."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SP</div>
+                        <div class="author-info">
+                            <h4>Sreelatha Pillai</h4>
+                            <p>Local Body Candidate, Kochi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Perfect solution for Kerala elections! The A4 format with 5 slips is so 
+                        practical. We printed at local shops and our office. The cutting guides 
+                        made separation super easy. Will use for all future campaigns!"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MN</div>
+                        <div class="author-info">
+                            <h4>Mohammed Nasir</h4>
+                            <p>Party Worker, Kozhikode</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2>
+                Ready to Start Your Campaign?
+                <span class="malayalam">ഇപ്പോൾ തന്നെ ആരംഭിക്കൂ!</span>
+            </h2>
+            <p>Join 500+ political leaders using EasySlip across Kerala</p>
+
+            <div class="cta-buttons">
+                <a href="register.html" class="btn-cta-white">
+                    Create Free Slip - Preview First
+                </a>
+                <a href="login.html" class="btn-cta-outline">
+                    Login to Dashboard
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>EasySlip</h3>
+                <p>Kerala's most trusted voter slip generation platform.</p>
+                <p class="malayalam" style="margin-top: 1rem;">
+                    കേരളത്തിലെ ഏറ്റവും വിശ്വസനീയം
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="register.html">Register</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">WhatsApp Support</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Refund Policy</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 EasySlip.in - All rights reserved. Made for Kerala.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .testimonial-card, .process-step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

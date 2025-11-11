@@ -67,6 +67,9 @@ app.use('/symbols', express.static(path.join(__dirname, 'public', 'symbols')));
 // Serve lottie animations directory
 app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
 
+// Serve voter slip examples
+app.use('/voter-slip-examples', express.static(path.join(__dirname, 'voter-slip-examples')));
+
 // API Routes - Existing voter extraction
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);

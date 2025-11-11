@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasySlip - വോട്ടർ സ്ലിപ്പുകൾ സൃഷ്ടിക്കുക | Kerala Voter Slip Generator</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --kerala-green: #006D3B;
+            --kerala-gold: #FFB81C;
+            --kerala-red: #E03A3E;
+            --kerala-cream: #FFF8DC;
+            --kerala-brown: #8B4513;
+            --kerala-dark: #1a202c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            color: var(--kerala-dark);
+            overflow-x: hidden;
+        }
+
+        /* Traditional Kerala Border Pattern */
+        .kerala-border {
+            height: 20px;
+            background: linear-gradient(90deg, 
+                var(--kerala-green) 0%, 
+                var(--kerala-green) 20%, 
+                var(--kerala-gold) 20%, 
+                var(--kerala-gold) 40%,
+                var(--kerala-red) 40%,
+                var(--kerala-red) 60%,
+                var(--kerala-gold) 60%,
+                var(--kerala-gold) 80%,
+                var(--kerala-green) 80%,
+                var(--kerala-green) 100%
+            );
+        }
+
+        /* Header with Kerala Kasavu Design */
+        .header {
+            background: linear-gradient(135deg, var(--kerala-cream), #ffffff);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--kerala-gold) 0px,
+                var(--kerala-gold) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--kerala-green), var(--kerala-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            border: 4px solid var(--kerala-gold);
+            box-shadow: 0 4px 15px rgba(0, 109, 59, 0.3);
+        }
+
+        .logo-text h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+            margin-bottom: 0.2rem;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--kerala-brown);
+            font-family: 'Noto Sans Malayalam', sans-serif;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-nav {
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: 2px solid var(--kerala-green);
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--kerala-green);
+        }
+
+        .btn-login:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-register {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-register:hover {
+            background: var(--kerala-gold);
+            border-color: var(--kerala-gold);
+            color: var(--kerala-dark);
+        }
+
+        /* Hero Section with Traditional Mural Style */
+        .hero {
+            background: linear-gradient(135deg, var(--kerala-cream) 0%, #ffffff 100%);
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Traditional Kerala Mural Pattern Background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 109, 59, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 184, 28, 0.03) 0%, transparent 50%);
+            background-size: 100px 100px;
+        }
+
+        /* Kerala Lamp/Nilavilakku Decoration */
+        .decorative-lamp {
+            position: absolute;
+            top: 2rem;
+            right: 5%;
+            width: 80px;
+            height: 120px;
+            opacity: 0.15;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            padding-right: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 109, 59, 0.1), rgba(255, 184, 28, 0.1));
+            border: 2px solid var(--kerala-gold);
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--kerala-green);
+            margin-bottom: 1.5rem;
+            font-family: 'Noto Sans Malayalam', sans-serif;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            color: var(--kerala-gold);
+            display: block;
+            font-size: 2.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--kerala-brown);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .hero-subtitle .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            display: block;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            color: #666;
+        }
+
+        .hero-features-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .hero-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid var(--kerala-green);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .hero-feature-item i {
+            color: var(--kerala-gold);
+            font-size: 1.5rem;
+        }
+
+        .hero-feature-item .text {
+            font-weight: 600;
+            color: var(--kerala-dark);
+        }
+
+        .hero-feature-item .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.85rem;
+            color: #666;
+            display: block;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .btn-primary {
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 8px 20px rgba(0, 109, 59, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 1.2rem 2.5rem;
+            background: white;
+            color: var(--kerala-green);
+            border: 2px solid var(--kerala-green);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        /* Hero Card with Traditional Kerala Design */
+        .hero-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 109, 59, 0.15);
+            border: 3px solid var(--kerala-gold);
+            position: relative;
+        }
+
+        /* Decorative Corner Design */
+        .hero-card::before,
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--kerala-green);
+        }
+
+        .hero-card::before {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .hero-card::after {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .hero-card h3 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-card .malayalam-title {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.3rem;
+            color: var(--kerala-gold);
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        .price-display {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-display::before {
+            content: '✦';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.2;
+        }
+
+        .price-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-family: 'Noto Sans Malayalam', sans-serif;
+        }
+
+        .price-amount {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .price-per {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-top: 0.5rem;
+        }
+
+        .price-per .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1rem;
+            display: block;
+        }
+
+        .card-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .card-feature i {
+            color: var(--kerala-green);
+            font-size: 1.2rem;
+        }
+
+        .card-feature .text {
+            font-weight: 600;
+            color: var(--kerala-dark);
+        }
+
+        .card-feature .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.85rem;
+            color: #666;
+            display: block;
+        }
+
+        /* Traditional Kerala Pattern Section */
+        .pattern-section {
+            background: white;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+
+        .pattern-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 50px,
+                    rgba(0, 109, 59, 0.02) 50px,
+                    rgba(0, 109, 59, 0.02) 100px
+                );
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            color: var(--kerala-gold);
+            display: block;
+            font-size: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--kerala-brown);
+        }
+
+        .section-subtitle .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1rem;
+            color: #666;
+            display: block;
+            margin-top: 0.3rem;
+        }
+
+        /* Features with Kathakali Mask Style Cards */
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--kerala-green), var(--kerala-gold), var(--kerala-red));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .feature-card:hover {
+            border-color: var(--kerala-gold);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 109, 59, 0.2);
+        }
+
+        .feature-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--kerala-green), var(--kerala-gold));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .feature-icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border: 2px solid var(--kerala-gold);
+            border-radius: 24px;
+            opacity: 0.3;
+        }
+
+        .feature-icon-wrapper i {
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card .malayalam-subtitle {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.1rem;
+            color: var(--kerala-gold);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .feature-card .malayalam-desc {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* Process Section with Traditional Scroll Design */
+        .process-section {
+            background: linear-gradient(135deg, var(--kerala-cream), #ffffff);
+            padding: 5rem 2rem;
+        }
+
+        .process-steps {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            position: relative;
+        }
+
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--kerala-gold) 0px,
+                var(--kerala-gold) 20px,
+                transparent 20px,
+                transparent 40px
+            );
+            z-index: 0;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--kerala-green), var(--kerala-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0, 109, 59, 0.3);
+            position: relative;
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border: 2px solid var(--kerala-gold);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .process-step h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .process-step .malayalam-title {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.1rem;
+            color: var(--kerala-gold);
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .process-step p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Testimonials with Traditional Kerala Architecture */
+        .testimonials-section {
+            background: white;
+            padding: 5rem 2rem;
+        }
+
+        .testimonials-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: linear-gradient(135deg, #f0fdf4, #fffbeb);
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .testimonial-card::before {
+            content: '❝';
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+            font-size: 5rem;
+            color: var(--kerala-gold);
+            opacity: 0.2;
+            font-family: Georgia, serif;
+        }
+
+        .testimonial-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1.05rem;
+            color: var(--kerala-dark);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .testimonial-text .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.95rem;
+            color: #666;
+            display: block;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--kerala-green), var(--kerala-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .author-info h4 {
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .author-info .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        /* CTA Section with Traditional Onam Pookalam Design */
+        .cta-section {
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 184, 28, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .cta-content h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .cta-content .malayalam-title {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 2.5rem;
+            color: var(--kerala-gold);
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .cta-content p {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.95;
+        }
+
+        .cta-content .malayalam-subtitle {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-cta-white {
+            padding: 1.5rem 3rem;
+            background: white;
+            color: var(--kerala-green);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-cta-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-cta-outline {
+            padding: 1.5rem 3rem;
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-cta-outline:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Footer with Traditional Kerala Temple Design */
+        .footer {
+            background: #1a202c;
+            color: white;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, 
+                var(--kerala-green) 0%, 
+                var(--kerala-gold) 50%, 
+                var(--kerala-red) 100%
+            );
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--kerala-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-brand .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.2rem;
+            color: white;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: #a0aec0;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--kerala-gold);
+        }
+
+        .footer-section .malayalam-heading {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1rem;
+            color: #a0aec0;
+            display: block;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--kerala-gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+        }
+
+        .footer-bottom .malayalam {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .process-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .process-steps::before {
+                display: none;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-title .malayalam {
+                font-size: 1.8rem;
+            }
+
+            .hero-features-list {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .section-title .malayalam {
+                font-size: 1.5rem;
+            }
+
+            .cta-content h2 {
+                font-size: 2.5rem;
+            }
+
+            .cta-content .malayalam-title {
+                font-size: 1.8rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn-cta-white,
+            .btn-cta-outline {
+                width: 100%;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Traditional Kerala Border -->
+    <div class="kerala-border"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>EasySlip</h1>
+                    <p>കേരള തെരഞ്ഞെടുപ്പ്</p>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn-nav btn-login">Login</a>
+                <a href="register.html" class="btn-nav btn-register">ഇപ്പോൾ ആരംഭിക്കൂ</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="decorative-lamp">
+            <svg viewBox="0 0 100 150" fill="currentColor" style="color: var(--kerala-gold);">
+                <ellipse cx="50" cy="20" rx="8" ry="15" fill="var(--kerala-red)"/>
+                <path d="M 42 35 Q 50 30 58 35 L 58 60 Q 50 65 42 60 Z"/>
+                <rect x="45" y="60" width="10" height="60" rx="2"/>
+                <ellipse cx="50" cy="120" rx="20" ry="8"/>
+            </svg>
+        </div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    ✦ കേരളത്തിലെ 500+ രാഷ്ട്രീയ നേതാക്കൾ ഉപയോഗിക്കുന്നു
+                </div>
+
+                <h1 class="hero-title">
+                    Create Voter Slips in Seconds
+                    <span class="malayalam">ഏറ്റവും വേഗത്തിലുള്ള വോട്ടർ സ്ലിപ്പ് സേവനം</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Professional voter slips for your campaign
+                    <span class="malayalam">നിങ്ങളുടെ പ്രചാരണത്തിന് പ്രൊഫഷണൽ നിലവാരമുള്ള സ്ലിപ്പുകൾ</span>
+                </p>
+
+                <div class="hero-features-list">
+                    <div class="hero-feature-item">
+                        <i class="fas fa-bolt"></i>
+                        <div>
+                            <div class="text">20-50 Seconds</div>
+                            <span class="malayalam">അതിവേഗ ജനറേഷൻ</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature-item">
+                        <i class="fas fa-rupee-sign"></i>
+                        <div>
+                            <div class="text">₹0.50 only</div>
+                            <span class="malayalam">ഓരോ വോട്ടറിനും</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature-item">
+                        <i class="fas fa-download"></i>
+                        <div>
+                            <div class="text">Download Forever</div>
+                            <span class="malayalam">എന്നെന്നേക്കുമായി സൂക്ഷിക്കാം</span>
+                        </div>
+                    </div>
+                    <div class="hero-feature-item">
+                        <i class="fas fa-print"></i>
+                        <div>
+                            <div class="text">5 Slips per Page</div>
+                            <span class="malayalam">A4 പേപ്പറിൽ പ്രിന്റ് ചെയ്യാം</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="register.html" class="btn-primary">
+                        സൗജന്യമായി ആരംഭിക്കുക <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#how-it-works" class="btn-secondary">
+                        എങ്ങനെ പ്രവർത്തിക്കുന്നു?
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-card">
+                <h3>Kerala Special Price</h3>
+                <span class="malayalam-title">കേരളത്തിൽ ഏറ്റവും കുറഞ്ഞ നിരക്ക്</span>
+
+                <div class="price-display">
+                    <div class="price-label">ഓരോ വോട്ടറിനും മാത്രം</div>
+                    <div class="price-amount">₹0.50</div>
+                    <div class="price-per">
+                        Cheapest in Kerala
+                        <span class="malayalam">മറ്റെവിടെയും ഇത്ര കുറവല്ല</span>
+                    </div>
+                </div>
+
+                <div class="card-features">
+                    <div class="card-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <div class="text">Your Party Symbol</div>
+                            <span class="malayalam">നിങ്ങളുടെ പാർട്ടി ചിഹ്നം</span>
+                        </div>
+                    </div>
+                    <div class="card-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <div class="text">Ready in Minutes</div>
+                            <span class="malayalam">മിനിറ്റുകൾക്കുള്ളിൽ തയ്യാർ</span>
+                        </div>
+                    </div>
+                    <div class="card-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <div class="text">First 2 Pages Free</div>
+                            <span class="malayalam">ആദ്യ 2 പേജ് സൗജന്യം കാണാം</span>
+                        </div>
+                    </div>
+                    <div class="card-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <div class="text">Always Available</div>
+                            <span class="malayalam">എപ്പോഴും ലഭ്യമാണ്</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="pattern-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                Why Choose EasySlip?
+                <span class="malayalam">എന്തുകൊണ്ട് EasySlip തിരഞ്ഞെടുക്കണം?</span>
+            </h2>
+            <p class="section-subtitle">
+                The complete solution for political campaigns
+                <span class="malayalam">തെരഞ്ഞെടുപ്പ് പ്രചാരണത്തിനുള്ള സമ്പൂർണ്ണ പരിഹാരം</span>
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Super Fast Generation</h3>
+                <span class="malayalam-subtitle">അതിവേഗം തയ്യാറാക്കാം</span>
+                <p>5,000 voter slips ready in just 60 seconds. Save precious campaign time!</p>
+                <span class="malayalam-desc">നിങ്ങളുടെ വിലയേറിയ സമയം ലാഭിക്കൂ</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Works Everywhere</h3>
+                <span class="malayalam-subtitle">എവിടെ നിന്നും ഉപയോഗിക്കാം</span>
+                <p>Desktop, mobile, or tablet - create slips on any device, anywhere in Kerala.</p>
+                <span class="malayalam-desc">കേരളത്തിലെവിടെയായാലും ഉപയോഗിക്കാം</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>100% Secure</h3>
+                <span class="malayalam-subtitle">തികച്ചും സുരക്ഷിതം</span>
+                <p>Your voter data is encrypted and protected. We never share your information.</p>
+                <span class="malayalam-desc">നിങ്ങളുടെ വിവരങ്ങൾ ആരോടും പങ്കിടില്ല</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-print"></i>
+                </div>
+                <h3>Perfect Print Quality</h3>
+                <span class="malayalam-subtitle">മികച്ച പ്രിന്റ് നിലവാരം</span>
+                <p>5 professional slips per A4 page. Cutting guides included for easy separation.</p>
+                <span class="malayalam-desc">എളുപ്പത്തിൽ മുറിച്ചെടുക്കാൻ ഗൈഡ് ലൈനുകൾ</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3>Download Anytime</h3>
+                <span class="malayalam-subtitle">എപ്പോൾ വേണമെങ്കിലും</span>
+                <p>No limits on downloads. Access your PDFs forever from your dashboard.</p>
+                <span class="malayalam-desc">ഡാഷ്‌ബോർഡിൽ നിന്ന് എപ്പോഴും ലഭ്യം</span>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Dedicated Support</h3>
+                <span class="malayalam-subtitle">സമർപ്പിത സഹായം</span>
+                <p>Malayalam and English support available 24/7 via WhatsApp and phone.</p>
+                <span class="malayalam-desc">മലയാളത്തിൽ സഹായം ലഭ്യമാണ്</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section" id="how-it-works">
+        <div class="section-header">
+            <h2 class="section-title">
+                Simple 4-Step Process
+                <span class="malayalam">വെറും 4 ഘട്ടങ്ങൾ മാത്രം</span>
+            </h2>
+            <p class="section-subtitle">
+                Anyone can create professional voter slips
+                <span class="malayalam">ആർക്കും എളുപ്പത്തിൽ ചെയ്യാൻ സാധിക്കും</span>
+            </p>
+        </div>
+
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <h3>Select Your Symbol</h3>
+                <span class="malayalam-title">നിങ്ങളുടെ ചിഹ്നം തിരഞ്ഞെടുക്കുക</span>
+                <p>EC-approved symbols available, or upload your own party symbol image</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <h3>Enter Voter Details</h3>
+                <span class="malayalam-title">വോട്ടർ വിവരങ്ങൾ നൽകുക</span>
+                <p>Copy-paste from Kerala SEC website or upload Excel/CSV file directly</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <h3>Preview First</h3>
+                <span class="malayalam-title">ആദ്യം പരിശോധിക്കൂ</span>
+                <p>See first 2 pages free before paying. Pay only ₹0.50 per voter via UPI</p>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <h3>Download & Print</h3>
+                <span class="malayalam-title">ഡൗൺലോഡ് ചെയ്ത് പ്രിന്റ് എടുക്കൂ</span>
+                <p>PDF ready in 20-50 seconds. Print directly on any A4 printer!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                Success Stories
+                <span class="malayalam">വിജയകഥകൾ</span>
+            </h2>
+            <p class="section-subtitle">
+                Real experiences from Kerala politicians
+                <span class="malayalam">കേരളത്തിലെ രാഷ്ട്രീയ പ്രവർത്തകരുടെ അനുഭവങ്ങൾ</span>
+            </p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    "10,000 സ്ലിപ്പുകൾ വെറും മിനിറ്റുകൾക്കുള്ളിൽ തയ്യാറാക്കി! ഞങ്ങളുടെ പ്രചാരണം വളരെ എളുപ്പമായി. പ്രിന്റ് നിലവാരം മികച്ചതാണ്."
+                    <span class="malayalam">
+                        EasySlip saved us so much time and money during the campaign!
+                    </span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">RK</div>
+                    <div class="author-info">
+                        <h4>രാജേഷ് കുമാർ</h4>
+                        <p class="malayalam">Campaign Manager, Thiruvananthapuram</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    "വോട്ടറൊന്നിന് ₹0.50 എന്നത് അവിശ്വസനീയമാം വിധം കുറവാണ്! ആയിരക്കണക്കിന് രൂപ ലാഭിച്ചു. മികച്ച നിക്ഷേപം!"
+                    <span class="malayalam">
+                        Saved thousands compared to hiring designers. Worth every paisa!
+                    </span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SP</div>
+                    <div class="author-info">
+                        <h4>ശ്രീലത പിള്ള</h4>
+                        <p class="malayalam">Local Body Candidate, Kochi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    "A4 പേപ്പറിൽ 5 സ്ലിപ്പുകൾ എന്ന ഫോർമാറ്റ് വളരെ പ്രായോഗികമാണ്. അതിവേഗവും പ്രൊഫഷണൽ നിലവാരവും. എല്ലാവർക്കും ശുപാർശ ചെയ്യുന്നു!"
+                    <span class="malayalam">
+                        Professional quality, incredibly fast. Highly recommended for all campaigns!
+                    </span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MN</div>
+                    <div class="author-info">
+                        <h4>മുഹമ്മദ് നസീർ</h4>
+                        <p class="malayalam">Party Worker, Kozhikode</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>
+                സൗജന്യമായി ആരംഭിക്കൂ!
+                <span class="malayalam-title">Start Creating Now - It's Free!</span>
+            </h2>
+            <p>500+ കേരള രാഷ്ട്രീയ നേതാക്കൾ ഉപയോഗിക്കുന്നു</p>
+            <p class="malayalam-subtitle">Join the most trusted platform for political campaigns</p>
+
+            <div class="cta-buttons">
+                <a href="register.html" class="btn-cta-white">
+                    ഇപ്പോൾ സൃഷ്ടിക്കൂ →
+                </a>
+                <a href="login.html" class="btn-cta-outline">
+                    നിലവിലുള്ള അക്കൗണ്ട്
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>EasySlip</h3>
+                <span class="malayalam">കേരള വോട്ടർ സ്ലിപ്പ് പ്ലാറ്റ്ഫോം</span>
+                <p>Kerala's #1 voter slip generation platform. Fast, affordable, and trusted by 500+ political leaders across all 14 districts.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Product</h4>
+                <span class="malayalam-heading">ഉൽപ്പന്നം</span>
+                <div class="footer-links">
+                    <a href="#features">Features / സവിശേഷതകൾ</a>
+                    <a href="#pricing">Pricing / വില</a>
+                    <a href="#how-it-works">How It Works / എങ്ങനെ</a>
+                    <a href="register.html">Get Started / ആരംഭിക്കുക</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <span class="malayalam-heading">സഹായം</span>
+                <div class="footer-links">
+                    <a href="#">Help Center / സഹായ കേന്ദ്രം</a>
+                    <a href="#">Contact / ബന്ധപ്പെടുക</a>
+                    <a href="#">FAQs / ചോദ്യങ്ങൾ</a>
+                    <a href="#">WhatsApp Support</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <span class="malayalam-heading">നിയമപരം</span>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Refund Policy</a>
+                    <a href="#">Data Security</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EasySlip. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--kerala-gold);"></i> in Kerala</p>
+            <p class="malayalam">© 2025 ഈസിസ്ലിപ്പ്. എല്ലാ അവകാശങ്ങളും സംരക്ഷിതം. കേരളത്തിൽ നിന്ന് സ്നേഹപൂർവ്വം നിർമ്മിച്ചത്</p>
+        </div>
+    </footer>
+
+    <!-- Traditional Kerala Border -->
+    <div class="kerala-border"></div>
+</body>
+</html>
