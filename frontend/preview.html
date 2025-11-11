@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>പ്രിവ്യൂ & പേയ്മെന്റ് - Voter Slip Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Preview & Payment - EasySlip | Kerala Voter Slip Generator</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -19,17 +20,18 @@
         }
 
         body {
-            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-            background: #f8f9fa;
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
             color: #333;
         }
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
         }
 
         .header-container {
@@ -41,8 +43,16 @@
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
 
         .btn-back {
@@ -58,7 +68,7 @@
 
         .btn-back:hover {
             background: white;
-            color: #667eea;
+            color: var(--kerala-green);
         }
 
         /* Container */
@@ -72,7 +82,8 @@
             text-align: center;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
-            color: #2d3748;
+            color: var(--kerala-green);
+            font-weight: 800;
         }
 
         .page-subtitle {
@@ -93,7 +104,8 @@
             background: white;
             padding: 2rem;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
         }
 
         .preview-header {
@@ -105,11 +117,12 @@
 
         .preview-title {
             font-size: 1.5rem;
-            color: #2d3748;
+            color: var(--kerala-green);
+            font-weight: 700;
         }
 
         .preview-badge {
-            background: #48bb78;
+            background: var(--kerala-green);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -153,7 +166,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid var(--kerala-green);
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -185,13 +198,15 @@
             background: white;
             padding: 2rem;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
         }
 
         .payment-title {
             font-size: 1.3rem;
             margin-bottom: 1.5rem;
-            color: #2d3748;
+            color: var(--kerala-green);
+            font-weight: 700;
         }
 
         .order-summary {
@@ -209,7 +224,7 @@
             border-bottom: none;
             font-weight: 700;
             font-size: 1.2rem;
-            color: #2d3748;
+            color: var(--kerala-green);
         }
 
         .summary-label {
@@ -222,7 +237,7 @@
         }
 
         .discount-badge {
-            background: #48bb78;
+            background: var(--kerala-gold);
             color: white;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
@@ -290,7 +305,7 @@
             justify-content: center;
             gap: 0.5rem;
             margin-top: 1rem;
-            color: #48bb78;
+            color: var(--kerala-green);
             font-size: 0.875rem;
         }
 
@@ -395,15 +410,18 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <div class="logo">🗳️ Voter Slips</div>
-            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+            <div class="logo">
+                EasySlip
+                <small>KERALA ELECTIONS</small>
+            </div>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard / ഡാഷ്‌ബോർഡിലേക്ക്</a>
         </div>
     </header>
 
     <!-- Main Container -->
     <div class="container">
-        <h1 class="page-title">Preview & Payment</h1>
-        <p class="page-subtitle">Preview your voter slips before payment</p>
+        <h1 class="page-title">Preview & Payment / പ്രിവ്യൂ & പേയ്‌മെന്റ്</h1>
+        <p class="page-subtitle">Preview your voter slips before payment / പണമടയ്ക്കുന്നതിന് മുമ്പ് നിങ്ങളുടെ സ്ലിപ്പുകൾ കാണുക</p>
 
         <!-- Error/Warning Message Display -->
         <div id="messageBox" style="display: none; margin: 2rem auto; padding: 1.5rem; border-radius: 12px; max-width: 500px; text-align: center;">
@@ -417,12 +435,12 @@
             <!-- Preview Section -->
             <div class="preview-section">
                 <div class="preview-header">
-                    <h2 class="preview-title">Preview (First 2 Pages)</h2>
-                    <span class="preview-badge">Free</span>
+                    <h2 class="preview-title">Preview (First 2 Pages) / പ്രിവ്യൂ (ആദ്യ 2 പേജുകൾ)</h2>
+                    <span class="preview-badge">Free / സൗജന്യം</span>
                 </div>
 
                 <div class="preview-info" id="orderInfo">
-                    <p><strong>Order ID:</strong> <span id="displayOrderId">-</span></p>
+                    <p><strong>Order ID / ഓർഡർ ഐഡി:</strong> <span id="displayOrderId">-</span></p>
                     <p><strong>Symbol:</strong> <span id="displayPartyName">-</span></p>
                     <p><strong>District:</strong> <span id="displayDistrict">-</span></p>
                     <p><strong>Local Body:</strong> <span id="displayLocalBody">-</span></p>
@@ -724,7 +742,7 @@
                         const downloadBtn = document.createElement('button');
                         downloadBtn.className = 'btn btn-payment';
                         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
-                        downloadBtn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                        downloadBtn.style.background = 'var(--kerala-green)';
                         downloadBtn.onclick = downloadFullPDF;
                         document.getElementById('paymentBtn').parentNode.insertBefore(downloadBtn, document.getElementById('paymentBtn'));
                         
@@ -752,7 +770,7 @@
                             // Replace payment button with admin bypass button
                             const paymentBtn = document.getElementById('paymentBtn');
                             paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Without Payment';
-                            paymentBtn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                            paymentBtn.style.background = 'var(--kerala-green)';
                             paymentBtn.onclick = completeOrderAsAdmin;
                             paymentBtn.disabled = false;
                             
@@ -835,7 +853,7 @@
                         email: orderData.user?.email || ''
                     },
                     theme: {
-                        color: '#667eea'
+                        color: '#006D3B'
                     },
                     modal: {
                         ondismiss: function() {

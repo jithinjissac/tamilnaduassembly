@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Slip - Voter Slip Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Create New Slip - EasySlip | Kerala Voter Slip Generator</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="symbol-picker.js"></script>
     <style>
@@ -20,17 +21,18 @@
         }
 
         body {
-            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-            background: #f8f9fa;
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
             color: #333;
         }
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
         }
 
         .header-container {
@@ -42,8 +44,16 @@
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
 
         .btn-back {
@@ -59,7 +69,7 @@
 
         .btn-back:hover {
             background: white;
-            color: #667eea;
+            color: var(--kerala-green);
         }
 
         /* Main Container */
@@ -93,7 +103,7 @@
             top: 25px;
             left: 0;
             height: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             z-index: 1;
             transition: width 0.3s;
         }
@@ -122,14 +132,14 @@
         }
 
         .step.active .step-circle {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--kerala-green);
+            background: var(--kerala-green);
             color: white;
         }
 
         .step.completed .step-circle {
-            border-color: #48bb78;
-            background: #48bb78;
+            border-color: var(--kerala-gold);
+            background: var(--kerala-gold);
             color: white;
         }
 
@@ -140,7 +150,7 @@
         }
 
         .step.active .step-label {
-            color: #667eea;
+            color: var(--kerala-green);
         }
 
         /* Form Container */
@@ -148,14 +158,16 @@
             background: white;
             padding: 3rem;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
             position: relative;
         }
 
         .form-title {
             font-size: 2rem;
             margin-bottom: 0.5rem;
-            color: #2d3748;
+            color: var(--kerala-green);
+            font-weight: 700;
         }
 
         .form-subtitle {
@@ -211,8 +223,8 @@
         input:focus,
         select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
         }
 
         .file-upload-area {
@@ -226,13 +238,13 @@
         }
 
         .file-upload-area:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
         }
 
         .file-upload-area.has-file {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.05);
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
         }
 
         .file-upload-icon {
@@ -275,7 +287,7 @@
         .symbol-preview {
             padding: 1rem;
             background: white;
-            border-radius: 8px;
+                                                                                                                                                                                                                                                                                                border-radius: 8px;
             border: 2px solid #48bb78;
         }
 
@@ -289,7 +301,7 @@
         .btn-link {
             background: none;
             border: none;
-            color: #667eea;
+            color: var(--kerala-green);
             cursor: pointer;
             font-weight: 600;
             text-decoration: none;
@@ -298,7 +310,7 @@
         }
 
         .btn-link:hover {
-            color: #764ba2;
+            color: var(--kerala-gold);
             text-decoration: underline;
         }
 
@@ -315,7 +327,7 @@
         }
 
         .polling-station-checkbox:hover {
-            border-color: #667eea;
+            border-color: var(--kerala-green);
             background: #f7fafc;
         }
 
@@ -336,12 +348,12 @@
         }
 
         .polling-station-checkbox.checked {
-            border-color: #48bb78;
-            background: #f0fff4;
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
         }
 
         .selected-count {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -356,7 +368,7 @@
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
@@ -364,13 +376,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             color: white;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
         }
 
         .btn-secondary {
@@ -446,9 +458,9 @@
         }
 
         .spinner {
-            border: 4px solid rgba(102, 126, 234, 0.1);
-            border-top: 4px solid #667eea;
-            border-right: 4px solid #667eea;
+            border: 4px solid rgba(0, 109, 59, 0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-right: 4px solid var(--kerala-green);
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -592,8 +604,11 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <div class="logo">🗳️ Voter Slips</div>
-            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+            <div class="logo">
+                EasySlip
+                <small>KERALA ELECTIONS</small>
+            </div>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard / ഡാഷ്‌ബോർഡിലേക്ക്</a>
         </div>
     </header>
 
@@ -604,15 +619,15 @@
             <div class="progress-line" id="progressLine"></div>
             <div class="step active" data-step="1">
                 <div class="step-circle">1</div>
-                <div class="step-label">Customization</div>
+                <div class="step-label">Customization / ഇഷ്‌ടാനുസൃതം</div>
             </div>
             <div class="step" data-step="2">
                 <div class="step-circle">2</div>
-                <div class="step-label">Voter Data</div>
+                <div class="step-label">Voter Data / വോട്ടർ ഡാറ്റ</div>
             </div>
             <div class="step" data-step="3">
                 <div class="step-circle">3</div>
-                <div class="step-label">Preview & Payment</div>
+                <div class="step-label">Preview & Payment / പ്രിവ്യൂ</div>
             </div>
         </div>
 
@@ -620,29 +635,29 @@
         <div class="form-container">
             <!-- Step 1: Customization -->
             <div class="form-section active" id="step1">
-                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
-                <p class="form-subtitle">Upload your symbol and details (Required for slip generation)</p>
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip / നിങ്ങളുടെ സ്ലിപ്പ് ഇഷ്‌ടാനുസൃതമാക്കുക</h2>
+                <p class="form-subtitle">Upload your symbol and details (Required for slip generation) / നിങ്ങളുടെ ചിഹ്നവും വിശദാംശങ്ങളും അപ്‌ലോഡ് ചെയ്യുക</p>
 
                 <div class="form-group">
                     <label>
-                        Select Symbol
-                        <span class="label-description">Choose your symbol</span>
+                        Select Symbol / ചിഹ്നം തിരഞ്ഞെടുക്കുക
+                        <span class="label-description">Choose your EC-approved symbol / തെരഞ്ഞെടുപ്പ് കമ്മീഷൻ അംഗീകൃത ചിഹ്നം തിരഞ്ഞെടുക്കുക</span>
                     </label>
                     <div class="symbol-selection-area" id="symbolSelectionArea">
                         <div class="symbol-preview" id="symbolPreview" style="display: none;">
                             <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.5rem;">
                             <div id="selectedSymbolName" style="font-weight: 600; color: #2d3748;"></div>
-                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="margin-top: 1rem; padding: 0.5rem 1rem;">🔄 Change Symbol</button>
+                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="margin-top: 1rem; padding: 0.5rem 1rem;">🔄 Change Symbol / മാറ്റുക</button>
                         </div>
                         <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block;">
-                            🎯 Select Symbol
+                            🎯 Select Symbol / ചിഹ്നം തിരഞ്ഞെടുക്കുക
                         </button>
                     </div>
                     <div class="error-message" id="symbolError"></div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body / അടുത്തത്: പ്രാദേശിക സ്വയംഭരണ സ്ഥാപനം</button>
                 </div>
             </div>
 

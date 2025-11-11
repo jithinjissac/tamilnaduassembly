@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Voter Slip Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Dashboard - EasySlip | Kerala Voter Slip Generator</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -19,17 +20,18 @@
         }
 
         body {
-            font-family: 'Noto Sans Malayalam', Arial, sans-serif;
-            background: #f8f9fa;
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
             color: #333;
         }
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--kerala-gradient);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
         }
 
         .header-container {
@@ -41,8 +43,16 @@
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
 
         .user-section {
@@ -86,7 +96,7 @@
 
         .btn-logout:hover {
             background: white;
-            color: #667eea;
+            color: var(--kerala-green);
         }
 
         /* Main Container */
@@ -107,8 +117,15 @@
         .stat-card {
             background: white;
             padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
         }
 
         .stat-label {
@@ -120,17 +137,19 @@
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #2d3748;
+            color: var(--kerala-green);
         }
 
         /* Action Section */
         .action-section {
-            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            background: var(--kerala-gradient);
             padding: 2rem;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
             margin-bottom: 2rem;
             color: white;
+            border-top: 4px solid var(--kerala-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .action-section h2 {
@@ -139,22 +158,26 @@
 
         .btn-create {
             background: white;
-            color: #FF6B35;
+            color: var(--kerala-green);
             padding: 1rem 2.5rem;
             font-size: 1.1rem;
+            font-weight: 700;
         }
 
         .btn-create:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: var(--kerala-gold);
+            color: white;
         }
 
         /* Orders Section */
         .orders-section {
             background: white;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
         }
 
         .section-header {
@@ -166,7 +189,8 @@
 
         .section-title {
             font-size: 1.5rem;
-            color: #2d3748;
+            color: var(--kerala-green);
+            font-weight: 700;
         }
 
         .filter-tabs {
@@ -185,9 +209,9 @@
         }
 
         .tab.active {
-            background: #667eea;
+            background: var(--kerala-green);
             color: white;
-            border-color: #667eea;
+            border-color: var(--kerala-green);
         }
 
         /* Orders Table */
@@ -283,7 +307,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid var(--kerala-green);
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -360,13 +384,16 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <div class="logo">🗳️ Voter Slips</div>
+            <div class="logo">
+                EasySlip
+                <small>KERALA ELECTIONS</small>
+            </div>
             <div class="user-section">
                 <div class="user-info">
                     <div class="user-name" id="userName">Loading...</div>
                     <div class="user-email" id="userEmail"></div>
                 </div>
-                <button class="btn btn-logout" onclick="logout()">Logout</button>
+                <button class="btn btn-logout" onclick="logout()">Logout / പുറത്ത് കടക്കുക</button>
             </div>
         </div>
     </header>
@@ -376,46 +403,46 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Orders</div>
+                <div class="stat-label">Total Orders / മൊത്തം ഓർഡറുകൾ</div>
                 <div class="stat-value" id="totalOrders">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Completed</div>
+                <div class="stat-label">Completed / പൂർത്തിയായത്</div>
                 <div class="stat-value" id="completedOrders">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Voters</div>
+                <div class="stat-label">Total Voters / മൊത്തം വോട്ടർമാർ</div>
                 <div class="stat-value" id="totalVoters">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Spent</div>
+                <div class="stat-label">Total Spent / മൊത്തം ചെലവ്</div>
                 <div class="stat-value" id="totalAmount">₹0</div>
             </div>
         </div>
 
         <!-- Action Section -->
         <div class="action-section">
-            <h2>Create New Voter Slips</h2>
-            <p>Generate customized voter slips for your election campaign</p>
+            <h2>Create New Voter Slips / പുതിയ വോട്ടർ സ്ലിപ്പുകൾ സൃഷ്ടിക്കുക</h2>
+            <p>Generate customized voter slips for your election campaign / നിങ്ങളുടെ തെരഞ്ഞെടുപ്പ് പ്രചാരണത്തിനായി വോട്ടർ സ്ലിപ്പുകൾ സൃഷ്ടിക്കുക</p>
             <br>
-            <a href="create-slip.html" class="btn btn-create">+ Create New Slip</a>
+            <a href="create-slip.html" class="btn btn-create">+ Create New Slip / പുതിയ സ്ലിപ്പ് സൃഷ്ടിക്കുക</a>
         </div>
 
         <!-- Orders Section -->
         <div class="orders-section">
             <div class="section-header">
-                <h2 class="section-title">Your Orders</h2>
+                <h2 class="section-title">Your Orders / നിങ്ങളുടെ ഓർഡറുകൾ</h2>
                 <div class="filter-tabs">
-                    <button class="tab active" data-filter="all">All</button>
-                    <button class="tab" data-filter="completed">Completed</button>
-                    <button class="tab" data-filter="pending">Pending</button>
+                    <button class="tab active" data-filter="all">All / എല്ലാം</button>
+                    <button class="tab" data-filter="completed">Completed / പൂർത്തിയായത്</button>
+                    <button class="tab" data-filter="pending">Pending / തീർപ്പാക്കാത്തത്</button>
                 </div>
             </div>
 
             <div id="ordersContainer">
                 <div class="loading-state">
                     <div class="spinner"></div>
-                    <p>ഓർഡറുകൾ ലോഡ് ചെയ്യുന്നു...</p>
+                    <p>Loading orders... / ഓർഡറുകൾ ലോഡ് ചെയ്യുന്നു...</p>
                 </div>
             </div>
         </div>
@@ -563,12 +590,12 @@
                                 </td>
                                 <td>
                                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: #667eea; text-decoration: none; display: inline-block;">
+                                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: var(--kerala-green); text-decoration: none; display: inline-block;">
                                             <i class="fas fa-eye"></i> View
                                         </a>
                                         ${order.paymentStatus === 'completed' 
                                             ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> Download</button>`
-                                            : `<button class="btn btn-download" style="background: #f59e0b;" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
+                                            : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
                                         }
                                     </div>
                                 </td>
