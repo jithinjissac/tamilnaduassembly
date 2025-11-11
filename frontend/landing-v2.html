@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasySlip - Kerala's #1 Voter Slip Generation Platform</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 109, 59, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--kerala-green);
+        }
+
+        .nav-cta {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-login {
+            padding: 0.6rem 1.5rem;
+            border: 2px solid var(--kerala-green);
+            background: transparent;
+            color: var(--kerala-green);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-login:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-signup {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 109, 59, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            min-height: 90vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #fff8dc 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: radial-gradient(circle, var(--kerala-green) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--kerala-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content .gradient-text {
+            background: linear-gradient(135deg, var(--kerala-gold), var(--kerala-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 109, 59, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--kerala-green);
+            border: 2px solid var(--kerala-green);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-mockup {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 109, 59, 0.2);
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: transform 0.3s;
+        }
+
+        .hero-mockup:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        .floating-card {
+            position: absolute;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-card-1 {
+            top: 10%;
+            right: -10%;
+        }
+
+        .floating-card-2 {
+            bottom: 20%;
+            left: -10%;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, rgba(0, 109, 59, 0.1), rgba(255, 184, 28, 0.1));
+            border-radius: 50px;
+            color: var(--kerala-green);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: #718096;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f0fdf4, #fffbeb);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: var(--kerala-gold);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 109, 59, 0.15);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #f0fdf4, #fff8dc);
+        }
+
+        .pricing-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 30px;
+            padding: 4rem;
+            box-shadow: 0 20px 60px rgba(0, 109, 59, 0.15);
+            text-align: center;
+        }
+
+        .price-highlight {
+            font-size: 1.2rem;
+            color: var(--kerala-green);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .price-display {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .price-unit {
+            font-size: 1.5rem;
+            color: #718096;
+        }
+
+        .price-description {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 3rem;
+        }
+
+        .price-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .price-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .price-feature i {
+            color: var(--kerala-green);
+            font-size: 1.5rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .steps-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            position: relative;
+        }
+
+        .step-card {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-card::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--kerala-gold), transparent);
+            z-index: 0;
+        }
+
+        .step-card:last-child::after {
+            display: none;
+        }
+
+        .step-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .step-card p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #f0fdf4, #fff8dc);
+        }
+
+        .testimonials-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .quote-icon {
+            font-size: 3rem;
+            color: var(--kerala-gold);
+            opacity: 0.3;
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--kerala-green), var(--kerala-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .author-info h4 {
+            font-weight: 700;
+            color: var(--kerala-green);
+        }
+
+        .author-info p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00a651);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-content h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-content p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .btn-white {
+            padding: 1.2rem 3rem;
+            background: white;
+            color: var(--kerala-green);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a202c;
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: #a0aec0;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            background: var(--kerala-green);
+            transform: translateY(-3px);
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--kerala-gold);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-image {
+                order: -1;
+            }
+
+            .hero-stats,
+            .hero-cta {
+                justify-content: center;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+
+            .step-card::after {
+                display: none;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .price-features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .pricing-card {
+                padding: 2rem;
+            }
+
+            .price-display {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <span>EasySlip</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#testimonials">Reviews</a>
+            </div>
+            <div class="nav-cta">
+                <a href="login.html" class="btn-login">Login</a>
+                <a href="register.html" class="btn-signup">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-pattern"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>
+                    Create Voter Slips in <span class="gradient-text">Minutes</span>
+                </h1>
+                <p>
+                    Kerala's most trusted platform for generating professional voter slips. 
+                    Trusted by 500+ political parties and candidates across all 14 districts.
+                </p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Slips Generated</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Happy Clients</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">14</div>
+                        <div class="stat-label">Districts</div>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="register.html" class="btn-primary">
+                        Start Creating Free <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#how-it-works" class="btn-secondary">
+                        See How It Works
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img src="/api/placeholder/600/500" alt="Voter Slip Preview" class="hero-mockup">
+                
+                <div class="floating-card floating-card-1">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-check-circle" style="color: var(--kerala-green); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600;">PDF Ready</div>
+                            <div style="font-size: 0.85rem; color: #718096;">Print on A4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floating-card floating-card-2">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-bolt" style="color: var(--kerala-gold); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600;">Instant Download</div>
+                            <div style="font-size: 0.85rem; color: #718096;">20-50 seconds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <div class="section-badge">Why Choose EasySlip</div>
+            <h2>Everything You Need, Nothing You Don't</h2>
+            <p>Powerful features designed specifically for Kerala elections</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Generate professional voter slips in just 20-50 seconds. No waiting, no hassle.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>100% Mobile Friendly</h3>
+                <p>Create slips from anywhere - desktop, tablet, or mobile. Works perfectly on all devices.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure & Private</h3>
+                <p>Your data is encrypted and stored securely. We never share your information.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3>Unlimited Downloads</h3>
+                <p>Download your PDF anytime from your dashboard. No limits, no expiry.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-print"></i>
+                </div>
+                <h3>Print Ready</h3>
+                <p>Optimized for A4 printing with 5 slips per page. Includes cutting guide lines.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>24/7 Support</h3>
+                <p>Our support team is always ready to help you with any questions or issues.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="section-header">
+            <div class="section-badge">Simple Pricing</div>
+            <h2>Pay Only for What You Use</h2>
+            <p>No hidden fees. No subscriptions. Just honest pricing.</p>
+        </div>
+
+        <div class="pricing-container">
+            <div class="pricing-card">
+                <div class="price-highlight">Kerala's Most Affordable</div>
+                <div class="price-display">
+                    ₹0.50
+                    <span class="price-unit">per voter</span>
+                </div>
+                <div class="price-description">
+                    No minimum order. No setup fees. No monthly charges.
+                </div>
+
+                <div class="price-features">
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Custom party symbol</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Unlimited downloads</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>A4 print ready PDF</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>5 slips per page</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Cutting guide lines</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>24/7 access</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Free preview</span>
+                    </div>
+                    <div class="price-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Instant generation</span>
+                    </div>
+                </div>
+
+                <a href="register.html" class="btn-primary" style="width: 100%; justify-content: center;">
+                    Get Started Now <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header">
+            <div class="section-badge">Simple Process</div>
+            <h2>Create Voter Slips in 4 Easy Steps</h2>
+            <p>No technical knowledge required. Anyone can do it!</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Upload Symbol</h3>
+                <p>Upload your party symbol or choose from EC-approved symbols</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Enter Voter Data</h3>
+                <p>Paste voter list from Kerala SEC portal or upload CSV file</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Preview & Pay</h3>
+                <p>Preview first 2 pages free. Pay ₹0.50 per voter via UPI/Card</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Download PDF</h3>
+                <p>Get your print-ready PDF in 20-50 seconds. Print on A4!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-header">
+            <div class="section-badge">Client Reviews</div>
+            <h2>Trusted by Political Leaders Across Kerala</h2>
+            <p>See what our clients say about EasySlip</p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                <div class="testimonial-text">
+                    "EasySlip saved us so much time during the election campaign. We generated 5,000 voter slips in less than an hour. Incredible!"
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">RK</div>
+                    <div class="author-info">
+                        <h4>Rajesh Kumar</h4>
+                        <p>Campaign Manager, Thiruvananthapuram</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                <div class="testimonial-text">
+                    "The print quality is excellent and the A4 format makes it so easy to distribute. Highly recommend for any political campaign!"
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SP</div>
+                    <div class="author-info">
+                        <h4>Sreelatha Pillai</h4>
+                        <p>Local Body Candidate, Kochi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="quote-icon"><i class="fas fa-quote-right"></i></div>
+                <div class="testimonial-text">
+                    "Best value for money! ₹0.50 per voter is unbeatable. The customer support is also very responsive and helpful."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MN</div>
+                    <div class="author-info">
+                        <h4>Mohammed Nasir</h4>
+                        <p>Party Worker, Kozhikode</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Create Your Voter Slips?</h2>
+            <p>Join 500+ satisfied clients. Start creating professional voter slips in minutes!</p>
+            <a href="register.html" class="btn-white">
+                Get Started - It's Free!
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>EasySlip</h3>
+                <p>Kerala's #1 voter slip generation platform. Fast, affordable, and reliable.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Product</h4>
+                <div class="footer-links">
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="register.html">Get Started</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">FAQs</a>
+                    <a href="#">WhatsApp Support</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Refund Policy</a>
+                    <a href="#">Data Security</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 EasySlip. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--kerala-red);"></i> in Kerala</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 30px rgba(0, 109, 59, 0.15)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 109, 59, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>

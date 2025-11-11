@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasySlip - Generate Voter Slips in Seconds | Kerala Elections</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #006D3B;
+            --light-green: #00a651;
+            --gold: #FFB81C;
+            --cream: #FFF8DC;
+            --dark: #1a202c;
+            --gray: #718096;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section with Split Design */
+        .hero-split {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .hero-left {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: white;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: drift 20s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 184, 28, 0.2);
+            border: 1px solid rgba(255, 184, 28, 0.4);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .hero-feature i {
+            color: var(--gold);
+            font-size: 1.3rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-primary {
+            padding: 1.2rem 2.5rem;
+            background: white;
+            color: var(--primary-green);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-hero-secondary {
+            padding: 1.2rem 2.5rem;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-hero-secondary:hover {
+            background: white;
+            color: var(--primary-green);
+        }
+
+        .hero-right {
+            background: var(--cream);
+            padding: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-header h3 {
+            font-size: 1.8rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-header p {
+            color: var(--gray);
+        }
+
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .demo-stat {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0fdf4, #fffbeb);
+            border-radius: 16px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .demo-stat:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .demo-stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 0.3rem;
+        }
+
+        .demo-stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .price-showcase {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .price-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-amount {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-per {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .demo-cta {
+            text-align: center;
+        }
+
+        .btn-demo {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-demo:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 184, 28, 0.4);
+        }
+
+        /* Floating Badge */
+        .floating-badge {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: var(--gold);
+            color: var(--dark);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(255, 184, 28, 0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Bento Grid Section */
+        .bento-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 4rem;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            grid-auto-rows: 280px;
+        }
+
+        .bento-item {
+            background: linear-gradient(135deg, #f0fdf4, #fffbeb);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-item:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 109, 59, 0.15);
+        }
+
+        .bento-item.large {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .bento-item.wide {
+            grid-column: span 2;
+        }
+
+        .bento-item.tall {
+            grid-row: span 2;
+        }
+
+        .bento-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bento-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .bento-description {
+            color: var(--gray);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .bento-large-number {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--primary-green);
+            opacity: 0.1;
+            position: absolute;
+            bottom: -1rem;
+            right: -1rem;
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--cream), #ffffff);
+        }
+
+        .comparison-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-card.winner {
+            border: 3px solid var(--gold);
+            position: relative;
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: -15px;
+            right: 2rem;
+            background: var(--gold);
+            color: var(--dark);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-header h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-card.loser h3 {
+            color: var(--gray);
+        }
+
+        .comparison-card.winner h3 {
+            color: var(--primary-green);
+        }
+
+        .comparison-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .comparison-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .comparison-item i {
+            font-size: 1.3rem;
+            margin-top: 0.2rem;
+        }
+
+        .comparison-card.loser .comparison-item i {
+            color: #ef4444;
+        }
+
+        .comparison-card.winner .comparison-item i {
+            color: var(--primary-green);
+        }
+
+        /* Process Timeline */
+        .timeline-section {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary-green), var(--light-green));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .timeline-content:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+
+        .timeline-number {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 900;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0, 109, 59, 0.3);
+        }
+
+        .timeline-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .timeline-content p {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .final-cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .final-cta h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .final-cta p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            margin-bottom: 3rem;
+        }
+
+        .final-cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-final-primary {
+            padding: 1.5rem 3rem;
+            background: white;
+            color: var(--primary-green);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-final-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-final-secondary {
+            padding: 1.5rem 3rem;
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-final-secondary:hover {
+            background: white;
+            color: var(--primary-green);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f1419;
+            color: white;
+            padding: 3rem 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .footer-text {
+            color: #a0aec0;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #718096;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-split {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-right {
+                padding: 3rem 2rem;
+            }
+
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .bento-item.large,
+            .bento-item.wide {
+                grid-column: span 1;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                flex-direction: row;
+                padding-left: 80px;
+            }
+
+            .timeline-content {
+                width: 100%;
+            }
+
+            .timeline-number {
+                left: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: auto;
+            }
+
+            .final-cta h2 {
+                font-size: 2.5rem;
+            }
+
+            .final-cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn-final-primary,
+            .btn-final-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Split Section -->
+    <section class="hero-split">
+        <div class="hero-left">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-bolt"></i> Trusted by 500+ Political Leaders
+                </div>
+                
+                <h1 class="hero-title">
+                    Create Professional Voter Slips in Under 60 Seconds
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Kerala's fastest and most affordable voter slip generation platform. 
+                    No design skills needed. No software to install. Just upload and download!
+                </p>
+
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Generate 5,000+ slips in minutes</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>A4 print-ready PDF with cutting guides</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Unlimited downloads forever</span>
+                    </div>
+                    <div class="hero-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <span>24/7 access from any device</span>
+                    </div>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="register.html" class="btn-hero-primary">
+                        Start Creating Free <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="login.html" class="btn-hero-secondary">
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div class="floating-badge">
+                🔥 Most Popular
+            </div>
+            
+            <div class="demo-container">
+                <div class="demo-header">
+                    <h3>Why EasySlip?</h3>
+                    <p>The numbers speak for themselves</p>
+                </div>
+
+                <div class="demo-stats">
+                    <div class="demo-stat">
+                        <div class="demo-stat-number">50K+</div>
+                        <div class="demo-stat-label">Slips Made</div>
+                    </div>
+                    <div class="demo-stat">
+                        <div class="demo-stat-number">500+</div>
+                        <div class="demo-stat-label">Happy Users</div>
+                    </div>
+                    <div class="demo-stat">
+                        <div class="demo-stat-number">14</div>
+                        <div class="demo-stat-label">Districts</div>
+                    </div>
+                </div>
+
+                <div class="price-showcase">
+                    <div class="price-label">Simple, Transparent Pricing</div>
+                    <div class="price-amount">₹0.50</div>
+                    <div class="price-per">per voter</div>
+                </div>
+
+                <div class="demo-cta">
+                    <a href="register.html" class="btn-demo">
+                        Get Started Now →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bento Grid Features -->
+    <section class="bento-section">
+        <div class="container">
+            <h2 class="section-title">Everything You Need in One Platform</h2>
+            <p class="section-subtitle">Powerful features designed for political campaigns</p>
+
+            <div class="bento-grid">
+                <div class="bento-item large">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="bento-title">Lightning Fast Generation</h3>
+                        <p class="bento-description">
+                            Upload your voter data and get a complete PDF in 20-50 seconds. 
+                            No waiting. No delays. Just instant results every single time.
+                        </p>
+                    </div>
+                    <div class="bento-large-number">01</div>
+                </div>
+
+                <div class="bento-item tall">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="bento-title">Works Everywhere</h3>
+                        <p class="bento-description">
+                            Create slips from your phone, tablet, or computer. Fully responsive and mobile-optimized.
+                        </p>
+                    </div>
+                    <div class="bento-large-number">02</div>
+                </div>
+
+                <div class="bento-item">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="bento-title">100% Secure</h3>
+                        <p class="bento-description">Bank-level encryption</p>
+                    </div>
+                </div>
+
+                <div class="bento-item wide">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-print"></i>
+                        </div>
+                        <h3 class="bento-title">Print-Perfect Quality</h3>
+                        <p class="bento-description">
+                            5 slips per A4 page with cutting guide lines. Professional quality that looks great every time.
+                        </p>
+                    </div>
+                    <div class="bento-large-number">03</div>
+                </div>
+
+                <div class="bento-item">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <h3 class="bento-title">Unlimited Downloads</h3>
+                        <p class="bento-description">Download anytime, forever</p>
+                    </div>
+                </div>
+
+                <div class="bento-item">
+                    <div>
+                        <div class="bento-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3 class="bento-title">24/7 Support</h3>
+                        <p class="bento-description">Always here to help you</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison-section">
+        <div class="container">
+            <h2 class="section-title">Why Choose EasySlip?</h2>
+            <p class="section-subtitle">See the difference yourself</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-card loser">
+                    <div class="comparison-header">
+                        <h3>Traditional Method</h3>
+                        <p style="color: var(--gray);">The old, painful way</p>
+                    </div>
+                    <div class="comparison-list">
+                        <div class="comparison-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Hire expensive designers (₹5,000-₹10,000)</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Wait 3-5 days for completion</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Manual data entry errors</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Limited revisions</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Pay every time you need changes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-card winner">
+                    <div class="winner-badge">⭐ Best Choice</div>
+                    <div class="comparison-header">
+                        <h3>With EasySlip</h3>
+                        <p style="color: var(--primary-green);">The smart, modern way</p>
+                    </div>
+                    <div class="comparison-list">
+                        <div class="comparison-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Only ₹0.50 per voter (100x cheaper!)</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ready in 20-50 seconds</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>100% accurate, automated process</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Unlimited downloads and revisions</span>
+                        </div>
+                        <div class="comparison-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>One-time payment, lifetime access</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Process -->
+    <section class="timeline-section">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">4 simple steps to get your voter slips</p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Upload Your Symbol</h3>
+                        <p>Choose from EC-approved symbols or upload your own party symbol. Supports JPG, PNG formats.</p>
+                    </div>
+                    <div class="timeline-number">1</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Add Voter Data</h3>
+                        <p>Simply paste voter list from Kerala SEC portal or upload CSV file. Our system automatically formats everything.</p>
+                    </div>
+                    <div class="timeline-number">2</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Preview & Pay</h3>
+                        <p>See first 2 pages free! Pay only ₹0.50 per voter using UPI, cards, or net banking via Razorpay.</p>
+                    </div>
+                    <div class="timeline-number">3</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Download & Print</h3>
+                        <p>Get your print-ready PDF in 20-50 seconds. Download unlimited times. Print directly on A4 paper!</p>
+                    </div>
+                    <div class="timeline-number">4</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="final-cta-content">
+            <h2>Ready to Save Time & Money?</h2>
+            <p>Join 500+ political leaders who trust EasySlip for their election campaigns</p>
+            <div class="final-cta-buttons">
+                <a href="register.html" class="btn-final-primary">
+                    Create Your First Slip Free →
+                </a>
+                <a href="login.html" class="btn-final-secondary">
+                    I Already Have an Account
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">EasySlip</div>
+            <p class="footer-text">Kerala's #1 voter slip generation platform</p>
+            
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Sign Up</a>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 EasySlip. Made with <i class="fas fa-heart" style="color: var(--gold);"></i> in Kerala</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
