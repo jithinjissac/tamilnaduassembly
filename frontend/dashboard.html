@@ -393,7 +393,7 @@
                     <div class="user-name" id="userName">Loading...</div>
                     <div class="user-email" id="userEmail"></div>
                 </div>
-                <button class="btn btn-logout" onclick="logout()">Logout / പുറത്ത് കടക്കുക</button>
+                <button class="btn btn-logout" onclick="logout()">Logout</button>
             </div>
         </div>
     </header>
@@ -403,46 +403,46 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Orders / മൊത്തം ഓർഡറുകൾ</div>
+                <div class="stat-label">Total Orders</div>
                 <div class="stat-value" id="totalOrders">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Completed / പൂർത്തിയായത്</div>
+                <div class="stat-label">Completed</div>
                 <div class="stat-value" id="completedOrders">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Voters / മൊത്തം വോട്ടർമാർ</div>
+                <div class="stat-label">Total Voters</div>
                 <div class="stat-value" id="totalVoters">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Spent / മൊത്തം ചെലവ്</div>
+                <div class="stat-label">Total Spent</div>
                 <div class="stat-value" id="totalAmount">₹0</div>
             </div>
         </div>
 
         <!-- Action Section -->
         <div class="action-section">
-            <h2>Create New Voter Slips / പുതിയ വോട്ടർ സ്ലിപ്പുകൾ സൃഷ്ടിക്കുക</h2>
-            <p>Generate customized voter slips for your election campaign / നിങ്ങളുടെ തെരഞ്ഞെടുപ്പ് പ്രചാരണത്തിനായി വോട്ടർ സ്ലിപ്പുകൾ സൃഷ്ടിക്കുക</p>
+            <h2>Create New Voter Slips</h2>
+            <p>Generate customized voter slips for your election campaign</p>
             <br>
-            <a href="create-slip.html" class="btn btn-create">+ Create New Slip / പുതിയ സ്ലിപ്പ് സൃഷ്ടിക്കുക</a>
+            <a href="create-slip.html" class="btn btn-create">+ Create New Slip</a>
         </div>
 
         <!-- Orders Section -->
         <div class="orders-section">
             <div class="section-header">
-                <h2 class="section-title">Your Orders / നിങ്ങളുടെ ഓർഡറുകൾ</h2>
+                <h2 class="section-title">Your Orders</h2>
                 <div class="filter-tabs">
-                    <button class="tab active" data-filter="all">All / എല്ലാം</button>
-                    <button class="tab" data-filter="completed">Completed / പൂർത്തിയായത്</button>
-                    <button class="tab" data-filter="pending">Pending / തീർപ്പാക്കാത്തത്</button>
+                    <button class="tab active" data-filter="all">All</button>
+                    <button class="tab" data-filter="completed">Completed</button>
+                    <button class="tab" data-filter="pending">Pending</button>
                 </div>
             </div>
 
             <div id="ordersContainer">
                 <div class="loading-state">
                     <div class="spinner"></div>
-                    <p>Loading orders... / ഓർഡറുകൾ ലോഡ് ചെയ്യുന്നു...</p>
+                    <p>Loading orders...</p>
                 </div>
             </div>
         </div>
@@ -526,8 +526,8 @@
                 document.getElementById('ordersContainer').innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                        <h3>ഓർഡറുകൾ ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല</h3>
-                        <p>വീണ്ടും ശ്രമിക്കുക</p>
+                        <h3>Failed to load orders</h3>
+                        <p>Please try again</p>
                     </div>
                 `;
             }

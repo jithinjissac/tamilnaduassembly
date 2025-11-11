@@ -608,7 +608,7 @@
                 EasySlip
                 <small>KERALA ELECTIONS</small>
             </div>
-            <a href="dashboard.html" class="btn-back">← Back to Dashboard / ഡാഷ്‌ബോർഡിലേക്ക്</a>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
         </div>
     </header>
 
@@ -619,15 +619,15 @@
             <div class="progress-line" id="progressLine"></div>
             <div class="step active" data-step="1">
                 <div class="step-circle">1</div>
-                <div class="step-label">Customization / ഇഷ്‌ടാനുസൃതം</div>
+                <div class="step-label">Customization</div>
             </div>
             <div class="step" data-step="2">
                 <div class="step-circle">2</div>
-                <div class="step-label">Voter Data / വോട്ടർ ഡാറ്റ</div>
+                <div class="step-label">Voter Data</div>
             </div>
             <div class="step" data-step="3">
                 <div class="step-circle">3</div>
-                <div class="step-label">Preview & Payment / പ്രിവ്യൂ</div>
+                <div class="step-label">Preview & Payment</div>
             </div>
         </div>
 
@@ -635,29 +635,29 @@
         <div class="form-container">
             <!-- Step 1: Customization -->
             <div class="form-section active" id="step1">
-                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip / നിങ്ങളുടെ സ്ലിപ്പ് ഇഷ്‌ടാനുസൃതമാക്കുക</h2>
-                <p class="form-subtitle">Upload your symbol and details (Required for slip generation) / നിങ്ങളുടെ ചിഹ്നവും വിശദാംശങ്ങളും അപ്‌ലോഡ് ചെയ്യുക</p>
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
+                <p class="form-subtitle">Upload your symbol and details (Required for slip generation)</p>
 
                 <div class="form-group">
                     <label>
-                        Select Symbol / ചിഹ്നം തിരഞ്ഞെടുക്കുക
-                        <span class="label-description">Choose your EC-approved symbol / തെരഞ്ഞെടുപ്പ് കമ്മീഷൻ അംഗീകൃത ചിഹ്നം തിരഞ്ഞെടുക്കുക</span>
+                        Select Symbol
+                        <span class="label-description">Choose your EC-approved symbol</span>
                     </label>
                     <div class="symbol-selection-area" id="symbolSelectionArea">
                         <div class="symbol-preview" id="symbolPreview" style="display: none;">
                             <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.5rem;">
                             <div id="selectedSymbolName" style="font-weight: 600; color: #2d3748;"></div>
-                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="margin-top: 1rem; padding: 0.5rem 1rem;">🔄 Change Symbol / മാറ്റുക</button>
+                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="margin-top: 1rem; padding: 0.5rem 1rem;">🔄 Change Symbol</button>
                         </div>
                         <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block;">
-                            🎯 Select Symbol / ചിഹ്നം തിരഞ്ഞെടുക്കുക
+                            🎯 Select Symbol
                         </button>
                     </div>
                     <div class="error-message" id="symbolError"></div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body / അടുത്തത്: പ്രാദേശിക സ്വയംഭരണ സ്ഥാപനം</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body</button>
                 </div>
             </div>
 

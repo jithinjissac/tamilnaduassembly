@@ -52,8 +52,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Indexes for faster admin queries
-UserSchema.index({ email: 1 });  // Unique constraint already creates index
-UserSchema.index({ phone: 1 });  // Unique constraint already creates index
+// Note: email and phone already have unique indexes from schema definition
 UserSchema.index({ createdAt: -1 });  // For sorting in admin panel
 UserSchema.index({ isActive: 1 });  // For filtering active/inactive users
 UserSchema.index({ role: 1 });  // For role-based queries

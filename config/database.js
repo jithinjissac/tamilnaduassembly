@@ -20,11 +20,7 @@ const connectDB = async () => {
             compressors: ['snappy', 'zlib'],
             
             // Read preference for better load balancing
-            readPreference: 'primaryPreferred',
-            
-            // Use new URL parser
-            useNewUrlParser: true,
-            useUnifiedTopology: true
+            readPreference: 'primaryPreferred'
         });
         
         console.log('✅ MongoDB Connected Successfully');

@@ -25,7 +25,7 @@ const settingsSchema = new mongoose.Schema({
 });
 
 // Index for faster queries
-settingsSchema.index({ category: 1 });  // Fast category lookups
+// Note: category already has unique index from schema definition
 settingsSchema.index({ lastModified: -1 });  // Fast history sorting
 
 // Default settings for email only
