@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slip Font Settings - Kerala Voter Slip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5568d3;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-group h3 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+        }
+
+        .setting-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .setting-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .setting-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .unit-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .success-message, .error-message, .info-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .info-message {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .preview-area {
+            margin-top: 20px;
+        }
+
+        .slip-preview {
+            border: 2px solid #333;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .preview-slip-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .preview-info-row {
+            margin-bottom: 8px;
+            display: flex;
+        }
+
+        .preview-label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-alt"></i> Slip Font Settings</h1>
+            <a href="/admin.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="info-message" id="infoMessage"></div>
+
+        <div class="main-content">
+            <!-- Left Panel: 5 Slips Settings -->
+            <div class="panel">
+                <h2>📄 5 Slips Per Page (52mm height)</h2>
+
+                <div class="setting-group">
+                    <h3>Symbol Section</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Header</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-symbolHeader" class="setting-input" placeholder="8pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Image Size</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-symbolImage" class="setting-input" placeholder="24mm">
+                            <span class="unit-badge">mm</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Name</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-symbolName" class="setting-input" placeholder="9.5pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Voter Information</h3>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Slip Number</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-slipNumber" class="setting-input" placeholder="11pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Card Number (SEC ID)</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-secId" class="setting-input" placeholder="10pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Voter Name</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-voterName" class="setting-input" placeholder="11pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Info Rows</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-infoRow" class="setting-input" placeholder="10pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Info Label Width</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-infoLabel" class="setting-input" placeholder="17mm">
+                            <span class="unit-badge">mm</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Polling Station</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="five-pollingStation" class="setting-input" placeholder="10pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: 6 Slips Settings -->
+            <div class="panel">
+                <h2>📄 6 Slips Per Page (43mm height)</h2>
+
+                <div class="setting-group">
+                    <h3>Symbol Section</h3>
+                    
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Header</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-symbolHeader" class="setting-input" placeholder="7pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Image Size</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-symbolImage" class="setting-input" placeholder="20mm">
+                            <span class="unit-badge">mm</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Symbol Name</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-symbolName" class="setting-input" placeholder="8.5pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Voter Information</h3>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Slip Number</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-slipNumber" class="setting-input" placeholder="10pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Card Number (SEC ID)</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-secId" class="setting-input" placeholder="9pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Voter Name</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-voterName" class="setting-input" placeholder="11pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Info Rows</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-infoRow" class="setting-input" placeholder="9pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Info Label Width</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-infoLabel" class="setting-input" placeholder="16mm">
+                            <span class="unit-badge">mm</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-label">Polling Station</div>
+                        <div class="setting-input-group">
+                            <input type="text" id="six-pollingStation" class="setting-input" placeholder="9pt">
+                            <span class="unit-badge">pt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button class="btn btn-secondary" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> Reset to Defaults
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/settings';
+
+        // Load settings on page load
+        async function loadSettings() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/slip`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load settings');
+                }
+
+                const data = await response.json();
+                populateSettings(data.settings);
+            } catch (error) {
+                showError('Failed to load settings: ' + error.message);
+            }
+        }
+
+        // Populate form with settings
+        function populateSettings(settings) {
+            // Five slips settings
+            if (settings.fiveSlips) {
+                Object.keys(settings.fiveSlips).forEach(key => {
+                    const element = document.getElementById(`five-${key}`);
+                    if (element) {
+                        element.value = settings.fiveSlips[key];
+                    }
+                });
+            }
+
+            // Six slips settings
+            if (settings.sixSlips) {
+                Object.keys(settings.sixSlips).forEach(key => {
+                    const element = document.getElementById(`six-${key}`);
+                    if (element) {
+                        element.value = settings.sixSlips[key];
+                    }
+                });
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            try {
+                const settings = {
+                    fiveSlips: {
+                        symbolHeader: document.getElementById('five-symbolHeader').value,
+                        symbolImage: document.getElementById('five-symbolImage').value,
+                        symbolName: document.getElementById('five-symbolName').value,
+                        slipNumber: document.getElementById('five-slipNumber').value,
+                        secId: document.getElementById('five-secId').value,
+                        voterName: document.getElementById('five-voterName').value,
+                        infoRow: document.getElementById('five-infoRow').value,
+                        infoLabel: document.getElementById('five-infoLabel').value,
+                        pollingStation: document.getElementById('five-pollingStation').value
+                    },
+                    sixSlips: {
+                        symbolHeader: document.getElementById('six-symbolHeader').value,
+                        symbolImage: document.getElementById('six-symbolImage').value,
+                        symbolName: document.getElementById('six-symbolName').value,
+                        slipNumber: document.getElementById('six-slipNumber').value,
+                        secId: document.getElementById('six-secId').value,
+                        voterName: document.getElementById('six-voterName').value,
+                        infoRow: document.getElementById('six-infoRow').value,
+                        infoLabel: document.getElementById('six-infoLabel').value,
+                        pollingStation: document.getElementById('six-pollingStation').value
+                    }
+                };
+
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/slip`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save settings');
+                }
+
+                showSuccess('Slip font settings saved successfully! New slips will use these settings.');
+            } catch (error) {
+                showError('Failed to save settings: ' + error.message);
+            }
+        }
+
+        // Reset settings
+        async function resetSettings() {
+            if (!confirm('Reset slip font settings to defaults? This will restore the original font sizes.')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/reset/slip`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to reset settings');
+                }
+
+                const data = await response.json();
+                populateSettings(data.settings);
+                showSuccess('Slip font settings reset to defaults!');
+            } catch (error) {
+                showError('Failed to reset settings: ' + error.message);
+            }
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('successMessage');
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('errorMessage');
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function showInfo(message) {
+            const el = document.getElementById('infoMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            hideOtherMessages('infoMessage');
+        }
+
+        function hideOtherMessages(except) {
+            ['successMessage', 'errorMessage', 'infoMessage'].forEach(id => {
+                if (id !== except) {
+                    document.getElementById(id).style.display = 'none';
+                }
+            });
+        }
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+            window.location.href = '/login.html';
+        }
+
+        // Load initial settings
+        loadSettings();
+    </script>
+</body>
+</html>

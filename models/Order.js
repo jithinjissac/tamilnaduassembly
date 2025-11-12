@@ -25,14 +25,6 @@ const OrderSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        symbolNameMalayalam: {
-            type: String
-        },
-        slipsPerPage: {
-            type: Number,
-            default: 5,
-            enum: [5, 6] // Only allow 5 or 6 slips per page
-        },
         // Legacy fields for backward compatibility
         partyLogo: {
             type: String

@@ -9,7 +9,7 @@ Your Kerala Voter Slip Generator SaaS platform is **fully functional**!
 ## 🎯 What's Been Created
 
 ### Frontend Pages (7/7 Complete)
-1. ✅ **landing.html** - Malayalam landing page
+1. ✅ **index.html** - Malayalam landing page
 2. ✅ **login.html** - User login
 3. ✅ **register.html** - User registration  
 4. ✅ **dashboard.html** - Order management

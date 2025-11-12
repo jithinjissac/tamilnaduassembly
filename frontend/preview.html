@@ -610,6 +610,8 @@
         let isAdmin = false;
 
         if (!token) {
+            // Save the intended destination with query params before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
             window.location.href = 'login.html';
         }
 

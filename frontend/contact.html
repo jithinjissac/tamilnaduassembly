@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Kerala SEC Voter List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --kerala-green: #006D3B;
+            --kerala-gold: #FFB81C;
+            --kerala-red: #E03A3E;
+            --kerala-cream: #FFF8DC;
+            --kerala-brown: #8B4513;
+            --kerala-dark: #1a202c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            background: linear-gradient(135deg, var(--kerala-cream), #ffffff);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* Traditional Kerala Border Pattern */
+        .kerala-border-top {
+            height: 15px;
+            background: linear-gradient(90deg, 
+                var(--kerala-green) 0%, 
+                var(--kerala-green) 20%, 
+                var(--kerala-gold) 20%, 
+                var(--kerala-gold) 40%,
+                var(--kerala-red) 40%,
+                var(--kerala-red) 60%,
+                var(--kerala-gold) 60%,
+                var(--kerala-gold) 80%,
+                var(--kerala-green) 80%,
+                var(--kerala-green) 100%
+            );
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 109, 59, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 3rem 3rem 2rem 3rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00A550);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 3rem;
+            color: var(--kerala-dark);
+            line-height: 1.8;
+        }
+
+        .content h2 {
+            font-size: 1.75rem;
+            color: var(--kerala-green);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--kerala-gold);
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, #FFF8DC, #ffffff);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 184, 28, 0.3);
+            border-color: var(--kerala-green);
+        }
+
+        .contact-card .icon {
+            font-size: 3rem;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        .contact-card h3 {
+            font-size: 1.25rem;
+            color: var(--kerala-dark);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .contact-card p {
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-card a {
+            color: var(--kerala-green);
+            text-decoration: none;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .contact-card a:hover {
+            text-decoration: underline;
+            color: var(--kerala-gold);
+        }
+
+        .form-section {
+            background: linear-gradient(135deg, #FFF8DC, #ffffff);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--kerala-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--kerala-gold);
+            border-radius: 8px;
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--kerala-green), #00A550);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--kerala-gold);
+            color: var(--kerala-dark);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s, background 0.3s;
+            margin-top: 2rem;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid var(--kerala-green);
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+
+        .faq-section {
+            margin: 2rem 0;
+        }
+
+        .faq-item {
+            background: linear-gradient(135deg, #FFF8DC, #ffffff);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--kerala-green);
+            border: 2px solid var(--kerala-gold);
+            border-left-width: 4px;
+            border-left-color: var(--kerala-green);
+        }
+
+        .faq-item h3 {
+            color: var(--kerala-dark);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .faq-item p {
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .faq-item a {
+            color: var(--kerala-green);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="kerala-border-top"></div>
+        <div class="header">
+            <h1><i class="fas fa-envelope"></i> Contact Us</h1>
+            <p>We're here to help! Get in touch with us.</p>
+        </div>
+
+        <div class="content">
+            <div class="alert alert-success" id="successAlert">
+                <i class="fas fa-check-circle"></i> <strong>Message sent successfully!</strong> We'll get back to you within 24-48 hours.
+            </div>
+
+            <div class="alert alert-error" id="errorAlert">
+                <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> <span id="errorMessage"></span>
+            </div>
+
+            <h2>Get In Touch</h2>
+            <p>Have questions about our service? Need technical support? Want to report an issue? We're here to help!</p>
+
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="icon"><i class="fas fa-envelope"></i></div>
+                    <h3>Email Support</h3>
+                    <p>For all inquiries</p>
+                    <a href="mailto:support@easyslip.in">support@easyslip.in</a>
+                </div>
+
+                <div class="contact-card">
+                    <div class="icon"><i class="fas fa-phone"></i></div>
+                    <h3>Phone Support</h3>
+                    <p>Mon-Sat: 9 AM - 6 PM IST</p>
+                    <a href="tel:+917907638842">+91 7907638842</a>
+                </div>
+
+                <div class="contact-card">
+                    <div class="icon"><i class="fas fa-clock"></i></div>
+                    <h3>Response Time</h3>
+                    <p>We aim to respond within</p>
+                    <strong style="color: #667eea; font-size: 1.1rem;">24-48 Hours</strong>
+                </div>
+            </div>
+
+            <h2>Send Us a Message</h2>
+            <div class="form-section">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-user"></i> Full Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email Address *</label>
+                        <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fas fa-phone"></i> Phone Number (Optional)</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject"><i class="fas fa-tag"></i> Subject *</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">-- Select a subject --</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="billing">Billing & Payment</option>
+                            <option value="download">Download Issues</option>
+                            <option value="data">Data Accuracy</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="orderId"><i class="fas fa-receipt"></i> Order ID (If applicable)</label>
+                        <input type="text" id="orderId" name="orderId" placeholder="ORD-20251112-XXXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message"><i class="fas fa-comment"></i> Message *</label>
+                        <textarea id="message" name="message" required placeholder="Please describe your issue or inquiry in detail..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-section">
+                <div class="faq-item">
+                    <h3><i class="fas fa-question-circle"></i> How long does it take to get a response?</h3>
+                    <p>We typically respond to all inquiries within 24-48 hours during business days (Monday-Saturday). For urgent issues, please mention "URGENT" in your subject line.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3><i class="fas fa-question-circle"></i> What information should I include for technical support?</h3>
+                    <p>Please include your Order ID, a detailed description of the issue, browser/device information, and any error messages you received. Screenshots are also helpful.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3><i class="fas fa-question-circle"></i> Can I get a refund if I'm not satisfied?</h3>
+                    <p>Please refer to our <a href="refund-policy.html">Cancellation and Refunds Policy</a> for detailed information about our refund process.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3><i class="fas fa-question-circle"></i> Do you offer phone support?</h3>
+                    <p>Phone support is available Monday to Saturday, 9 AM - 6 PM IST. For after-hours support, please send us an email and we'll respond as soon as possible.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h3><i class="fas fa-question-circle"></i> How can I report a data accuracy issue?</h3>
+                    <p>Select "Data Accuracy" as the subject and include your Order ID and specific details about the inaccurate data. Please note that we extract data directly from the Kerala SEC portal.</p>
+                </div>
+            </div>
+
+            <h2>Office Information</h2>
+            <div class="contact-card" style="text-align: left;">
+                <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+                <p>Kerala SEC Voter List Service<br>
+                   123 MG Road, Kochi<br>
+                   Kerala - 682016<br>
+                   India</p>
+                <p style="margin-top: 1rem;"><strong>Note:</strong> This is a digital service. We do not accept walk-in visits. Please contact us via email or phone.</p>
+            </div>
+
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Hide alerts
+            successAlert.style.display = 'none';
+            errorAlert.style.display = 'none';
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    subject: document.getElementById('subject').value,
+                    orderId: document.getElementById('orderId').value,
+                    message: document.getElementById('message').value
+                };
+                
+                // Simulate sending (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Show success
+                successAlert.style.display = 'block';
+                document.getElementById('contactForm').reset();
+                
+                // Scroll to success message
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+            } catch (error) {
+                // Show error
+                errorMessage.textContent = error.message || 'Failed to send message. Please try again.';
+                errorAlert.style.display = 'block';
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+            }
+        });
+    </script>
+</body>
+</html>

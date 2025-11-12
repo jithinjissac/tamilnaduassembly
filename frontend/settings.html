@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Kerala Voter Slip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5568d3;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .tab-btn i {
+            margin-right: 8px;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Settings Layout */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 1fr 500px;
+            gap: 30px;
+        }
+
+        @media (max-width: 1400px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .settings-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .setting-group h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+        }
+
+        .setting-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+
+        .setting-row label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .setting-row input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .setting-row input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-panel h3 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .preview-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            overflow: auto;
+            max-height: 800px;
+        }
+
+        /* Voter Slip Preview Styles */
+        .voter-slip-preview {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            border: 2px solid #000;
+            display: flex;
+            padding: 8px;
+            background: white;
+        }
+
+        .slip-left {
+            width: 140px;
+            border-right: 2px dotted #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        .symbol-header {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .symbol-image {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 4px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .symbol-name {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: bold;
+            word-wrap: break-word;
+        }
+
+        .slip-right {
+            flex: 1;
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .ward-info {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: bold;
+            margin-bottom: 4px;
+            padding: 4px 0;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .slip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            gap: 4px;
+        }
+
+        .slip-number, .sec-id {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .voter-info {
+            flex: 1;
+        }
+
+        .info-row {
+            margin-bottom: 3px;
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            display: flex;
+        }
+
+        .info-row.voter-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            min-width: 60px;
+        }
+
+        .info-value {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .polling-station-info {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            border-top: 1px solid #000;
+            padding-top: 3px;
+            margin-top: 2px;
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+
+        /* Email Preview */
+        .email-preview {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .email-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .email-body {
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cog"></i> Settings</h1>
+            <a href="admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Admin
+            </a>
+        </div>
+
+        <div class="tabs">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('slip-settings')">
+                    <i class="fas fa-file-alt"></i> Slip Font Settings
+                </button>
+                <button class="tab-btn" onclick="switchTab('email-settings')">
+                    <i class="fas fa-envelope"></i> Email Settings
+                </button>
+            </div>
+
+            <!-- Slip Settings Tab -->
+            <div id="slip-settings" class="tab-content active">
+                <div id="slip-alert" class="alert"></div>
+                <div id="slip-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Saving settings...</p>
+                </div>
+
+                <div class="settings-layout">
+                    <div class="settings-form">
+                        <form id="slipSettingsForm">
+                            <!-- 5 Slips Per Page Settings -->
+                            <div class="setting-group">
+                                <h3>5 Slips Per Page (Default)</h3>
+                                <div class="setting-row">
+                                    <label>Symbol Header:</label>
+                                    <input type="text" name="fiveSlips.symbolHeader" value="8pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Symbol Image:</label>
+                                    <input type="text" name="fiveSlips.symbolImage" value="24mm" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Symbol Name:</label>
+                                    <input type="text" name="fiveSlips.symbolName" value="9.5pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Slip Number:</label>
+                                    <input type="text" name="fiveSlips.slipNumber" value="11pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>SEC ID:</label>
+                                    <input type="text" name="fiveSlips.secId" value="10pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Voter Name:</label>
+                                    <input type="text" name="fiveSlips.voterName" value="11pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Info Row:</label>
+                                    <input type="text" name="fiveSlips.infoRow" value="10pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Info Label:</label>
+                                    <input type="text" name="fiveSlips.infoLabel" value="17mm" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Polling Station:</label>
+                                    <input type="text" name="fiveSlips.pollingStation" value="10pt" class="slip-input">
+                                </div>
+                            </div>
+
+                            <!-- 6 Slips Per Page Settings -->
+                            <div class="setting-group">
+                                <h3>6 Slips Per Page (Compact)</h3>
+                                <div class="setting-row">
+                                    <label>Symbol Header:</label>
+                                    <input type="text" name="sixSlips.symbolHeader" value="7pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Symbol Image:</label>
+                                    <input type="text" name="sixSlips.symbolImage" value="20mm" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Symbol Name:</label>
+                                    <input type="text" name="sixSlips.symbolName" value="8.5pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Slip Number:</label>
+                                    <input type="text" name="sixSlips.slipNumber" value="10pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>SEC ID:</label>
+                                    <input type="text" name="sixSlips.secId" value="9pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Voter Name:</label>
+                                    <input type="text" name="sixSlips.voterName" value="11pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Info Row:</label>
+                                    <input type="text" name="sixSlips.infoRow" value="9pt" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Info Label:</label>
+                                    <input type="text" name="sixSlips.infoLabel" value="16mm" class="slip-input">
+                                </div>
+                                <div class="setting-row">
+                                    <label>Polling Station:</label>
+                                    <input type="text" name="sixSlips.pollingStation" value="9pt" class="slip-input">
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Settings
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="resetSlipSettings()">
+                                    <i class="fas fa-undo"></i> Reset to Defaults
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="preview-panel">
+                        <h3><i class="fas fa-eye"></i> Live Preview</h3>
+                        <div class="preview-container">
+                            <div id="slipPreview" class="voter-slip-preview">
+                                <!-- Preview will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Settings Tab -->
+            <div id="email-settings" class="tab-content">
+                <div id="email-alert" class="alert"></div>
+                <div id="email-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Saving settings...</p>
+                </div>
+
+                <div class="settings-layout">
+                    <div class="settings-form">
+                        <form id="emailSettingsForm">
+                            <div class="setting-group">
+                                <h3>Order Confirmation Email</h3>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Subject:</label>
+                                    <input type="text" name="orderConfirmation.subject" value="Order Confirmed - {{orderId}}" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Heading:</label>
+                                    <input type="text" name="orderConfirmation.heading" value="Order Confirmed!" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Message:</label>
+                                    <textarea name="orderConfirmation.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Thank you for your order! We have received your order {{orderId}} with {{voterCount}} voters.</textarea>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <h3>Payment Success Email</h3>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Subject:</label>
+                                    <input type="text" name="paymentSuccess.subject" value="Payment Successful - {{orderId}}" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Heading:</label>
+                                    <input type="text" name="paymentSuccess.heading" value="Payment Successful!" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Message:</label>
+                                    <textarea name="paymentSuccess.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Your payment of ₹{{amount}} has been received successfully. Your voter slips are ready for download!</textarea>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <h3>PDF Ready Email</h3>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Subject:</label>
+                                    <input type="text" name="pdfReady.subject" value="Your Voter Slips are Ready - {{orderId}}" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Heading:</label>
+                                    <input type="text" name="pdfReady.heading" value="Your PDF is Ready!" style="width: 100%;">
+                                </div>
+                                <div class="setting-row" style="grid-template-columns: 1fr;">
+                                    <label>Message:</label>
+                                    <textarea name="pdfReady.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Great news! Your voter slips PDF for {{orderId}} with {{voterCount}} voters is now ready for download.</textarea>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Settings
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="resetEmailSettings()">
+                                    <i class="fas fa-undo"></i> Reset to Defaults
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="preview-panel">
+                        <h3><i class="fas fa-eye"></i> Email Preview</h3>
+                        <div class="preview-container">
+                            <div id="emailPreview" class="email-preview">
+                                <!-- Email preview will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+            window.location.href = '/login.html';
+        }
+
+        // Tab Switching
+        function switchTab(tabId) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            // Update preview
+            if (tabId === 'slip-settings') {
+                updateSlipPreview();
+            } else if (tabId === 'email-settings') {
+                updateEmailPreview('orderConfirmation');
+            }
+        }
+
+        // Sample data for previews
+        const sampleVoter = {
+            sl_no: '123',
+            name: 'രമേഷ് കുമാർ',
+            guardian_name: 'സുരേഷ് കുമാർ',
+            house_no: '12/345',
+            house_name: 'ശ്രീ നിലയം',
+            gender_age: 'M / 45',
+            sec_id: 'SEC123456789'
+        };
+
+        const sampleOrder = {
+            orderId: 'ORD-20251112-ABCD12',
+            voterCount: 1250,
+            amount: 2500
+        };
+
+        // Load slip settings
+        async function loadSlipSettings() {
+            try {
+                const response = await fetch('/api/settings/slip', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.fiveSlips && data.sixSlips) {
+                        // Populate form
+                        populateSlipForm(data);
+                    }
+                }
+                updateSlipPreview();
+            } catch (error) {
+                console.error('Error loading slip settings:', error);
+            }
+        }
+
+        function populateSlipForm(data) {
+            const form = document.getElementById('slipSettingsForm');
+            Object.keys(data.fiveSlips).forEach(key => {
+                const input = form.querySelector(`[name="fiveSlips.${key}"]`);
+                if (input) input.value = data.fiveSlips[key];
+            });
+            Object.keys(data.sixSlips).forEach(key => {
+                const input = form.querySelector(`[name="sixSlips.${key}"]`);
+                if (input) input.value = data.sixSlips[key];
+            });
+        }
+
+        // Update slip preview in real-time
+        function updateSlipPreview() {
+            const form = document.getElementById('slipSettingsForm');
+            const formData = new FormData(form);
+            
+            // Get current settings
+            const settings = {
+                symbolHeader: formData.get('fiveSlips.symbolHeader'),
+                symbolImage: formData.get('fiveSlips.symbolImage'),
+                symbolName: formData.get('fiveSlips.symbolName'),
+                slipNumber: formData.get('fiveSlips.slipNumber'),
+                secId: formData.get('fiveSlips.secId'),
+                voterName: formData.get('fiveSlips.voterName'),
+                infoRow: formData.get('fiveSlips.infoRow'),
+                infoLabel: formData.get('fiveSlips.infoLabel'),
+                pollingStation: formData.get('fiveSlips.pollingStation')
+            };
+
+            document.getElementById('slipPreview').innerHTML = `
+                <div class="slip-left">
+                    <div class="symbol-header" style="font-size: ${settings.symbolHeader};">നമ്മുടെ ചിഹ്നം</div>
+                    <div class="symbol-image" style="width: ${settings.symbolImage}; height: ${settings.symbolImage};">Symbol</div>
+                    <div class="symbol-name" style="font-size: ${settings.symbolName};">രണ്ടില</div>
+                </div>
+                <div class="slip-right">
+                    <div class="ward-info" style="font-size: 10pt;">വാര്‍ഡ്: 012 - കോട്ടയ്ക്കൽ</div>
+                    <div class="slip-header">
+                        <div class="slip-number" style="font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
+                        <div class="sec-id" style="font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                    </div>
+                    <div class="voter-info">
+                        <div class="info-row voter-name" style="font-size: ${settings.voterName};">
+                            <span class="info-label" style="min-width: ${settings.infoLabel};">പേര്:</span>
+                            <span class="info-value">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                        </div>
+                        <div class="info-row" style="font-size: ${settings.infoRow};">
+                            <span class="info-label" style="min-width: ${settings.infoLabel};">വീട്ടുപേര്:</span>
+                            <span class="info-value">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                        </div>
+                        <div class="info-row" style="font-size: ${settings.infoRow};">
+                            <span class="info-label" style="min-width: ${settings.infoLabel};">രക്ഷിതാവ്:</span>
+                            <span class="info-value">${sampleVoter.guardian_name}</span>
+                        </div>
+                    </div>
+                    <div class="polling-station-info" style="font-size: ${settings.pollingStation};">പോളിംഗ് സ്റ്റേഷൻ: 001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ</div>
+                </div>
+            `;
+        }
+
+        // Listen for input changes to update preview
+        document.addEventListener('DOMContentLoaded', () => {
+            const slipInputs = document.querySelectorAll('.slip-input');
+            slipInputs.forEach(input => {
+                input.addEventListener('input', updateSlipPreview);
+            });
+        });
+
+        // Save slip settings
+        document.getElementById('slipSettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            const settings = {
+                fiveSlips: {},
+                sixSlips: {}
+            };
+
+            for (let [key, value] of formData.entries()) {
+                const [category, field] = key.split('.');
+                settings[category][field] = value;
+            }
+
+            document.getElementById('slip-loading').style.display = 'block';
+            document.getElementById('slip-alert').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/settings/slip', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert('slip-alert', 'Settings saved successfully!', 'success');
+                } else {
+                    showAlert('slip-alert', data.message || 'Failed to save settings', 'error');
+                }
+            } catch (error) {
+                showAlert('slip-alert', 'Error saving settings: ' + error.message, 'error');
+            } finally {
+                document.getElementById('slip-loading').style.display = 'none';
+            }
+        });
+
+        // Load email settings
+        async function loadEmailSettings() {
+            try {
+                const response = await fetch('/api/settings/email', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    populateEmailForm(data);
+                }
+                updateEmailPreview('orderConfirmation');
+            } catch (error) {
+                console.error('Error loading email settings:', error);
+            }
+        }
+
+        function populateEmailForm(data) {
+            const form = document.getElementById('emailSettingsForm');
+            ['orderConfirmation', 'paymentSuccess', 'pdfReady'].forEach(template => {
+                if (data[template]) {
+                    Object.keys(data[template]).forEach(key => {
+                        const input = form.querySelector(`[name="${template}.${key}"]`);
+                        if (input) input.value = data[template][key];
+                    });
+                }
+            });
+        }
+
+        // Update email preview
+        function updateEmailPreview(templateType) {
+            const form = document.getElementById('emailSettingsForm');
+            const formData = new FormData(form);
+            
+            const heading = formData.get(`${templateType}.heading`);
+            const message = formData.get(`${templateType}.message`);
+            
+            // Replace placeholders
+            const processedMessage = message
+                .replace(/{{orderId}}/g, sampleOrder.orderId)
+                .replace(/{{voterCount}}/g, sampleOrder.voterCount)
+                .replace(/{{amount}}/g, sampleOrder.amount);
+
+            document.getElementById('emailPreview').innerHTML = `
+                <div class="email-header">
+                    <h2>${heading}</h2>
+                </div>
+                <div class="email-body">
+                    <p>${processedMessage}</p>
+                    <p style="margin-top: 20px;">
+                        <a href="#" style="display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 6px;">
+                            View Order
+                        </a>
+                    </p>
+                </div>
+                <div class="email-footer">
+                    <p>Kerala SEC Voter List Extraction Service</p>
+                    <p>&copy; 2025 All rights reserved</p>
+                </div>
+            `;
+        }
+
+        // Save email settings
+        document.getElementById('emailSettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            const settings = {
+                orderConfirmation: {},
+                paymentSuccess: {},
+                pdfReady: {}
+            };
+
+            for (let [key, value] of formData.entries()) {
+                const [template, field] = key.split('.');
+                settings[template][field] = value;
+            }
+
+            document.getElementById('email-loading').style.display = 'block';
+            document.getElementById('email-alert').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/settings/email', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert('email-alert', 'Email settings saved successfully!', 'success');
+                } else {
+                    showAlert('email-alert', data.message || 'Failed to save settings', 'error');
+                }
+            } catch (error) {
+                showAlert('email-alert', 'Error saving settings: ' + error.message, 'error');
+            } finally {
+                document.getElementById('email-loading').style.display = 'none';
+            }
+        });
+
+        function showAlert(id, message, type) {
+            const alert = document.getElementById(id);
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        function resetSlipSettings() {
+            if (confirm('Reset to default settings?')) {
+                loadSlipSettings();
+            }
+        }
+
+        function resetEmailSettings() {
+            if (confirm('Reset email templates to defaults?')) {
+                loadEmailSettings();
+            }
+        }
+
+        // Initialize
+        loadSlipSettings();
+        loadEmailSettings();
+    </script>
+</body>
+</html>

@@ -159,7 +159,7 @@ electionnew/
 │   └── slips.js             # Slip generation routes
 │
 ├── frontend/
-│   ├── landing.html         # Landing page (Malayalam)
+│   ├── index.html           # Landing page (Malayalam)
 │   ├── login.html           # Login page
 │   ├── register.html        # Registration page
 │   ├── dashboard.html       # User dashboard
@@ -281,7 +281,7 @@ Error: Failed to launch browser
 
 ## 📱 Frontend Pages
 
-### Landing Page (`landing.html`)
+### Landing Page (`index.html`)
 - Malayalam content
 - Pricing table
 - How it works section

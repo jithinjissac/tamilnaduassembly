@@ -160,7 +160,7 @@ export const closeBrowser = async () => {
 };
 
 // Generate slip HTML - Export for admin use
-export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
+export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) => {
     const voters = endIndex ? order.voters.slice(startIndex, endIndex) : order.voters.slice(startIndex);
     console.log(`generateSlipHTML: Processing ${voters.length} voters (from index ${startIndex} to ${endIndex || 'end'})`);
     
@@ -179,6 +179,7 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
     // Use Malayalam name if available, otherwise English
     const displaySymbolName = order.customization.symbolNameMalayalam || order.customization.symbolName;
     const pollingStation = order.location.pollingStationName || order.location.pollingStation;
+    const wardName = order.location.wardName || order.location.ward;
     
     // Convert symbol to base64 ONCE (not per slip)
     let symbolUrl = '';
@@ -201,32 +202,49 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
         symbolUrl = symbolPath;
     }
     
+    // Load font settings from database
+    let fontSize;
+    try {
+        const Settings = (await import('../models/Settings.js')).default;
+        const slipSettings = await Settings.getSettings('slip');
+        
+        if (slipSettings && slipSettings.fiveSlips && slipSettings.sixSlips) {
+            fontSize = slipsPerPage === 6 ? slipSettings.sixSlips : slipSettings.fiveSlips;
+            console.log('✅ Loaded font settings from database');
+        } else {
+            throw new Error('Settings not found, using defaults');
+        }
+    } catch (err) {
+        console.warn('⚠️ Could not load slip settings, using defaults:', err.message);
+        // Fallback to default settings
+        fontSize = slipsPerPage === 6 ? {
+            symbolHeader: '7pt',
+            symbolImage: '20mm',
+            symbolName: '8.5pt',
+            slipNumber: '10pt',
+            secId: '9pt',
+            voterName: '11pt',
+            infoRow: '9pt',
+            infoLabel: '16mm',
+            pollingStation: '9pt'
+        } : {
+            symbolHeader: '8pt',
+            symbolImage: '24mm',
+            symbolName: '9.5pt',
+            slipNumber: '11pt',
+            secId: '10pt',
+            voterName: '11pt',
+            infoRow: '10pt',
+            infoLabel: '17mm',
+            pollingStation: '10pt'
+        };
+    }
+    
     // Calculate slip height based on slipsPerPage
     // A4 height: 297mm, with 8mm top/bottom padding = 281mm usable
     // For 5 slips: 52mm each (with 5mm gap = 280mm total)
     // For 6 slips: 43mm each (with 5mm gap = 283mm total)
     const slipHeight = slipsPerPage === 6 ? '43mm' : '52mm';
-    const fontSize = slipsPerPage === 6 ? {
-        symbolHeader: '8pt',
-        symbolImage: '22mm',
-        symbolName: '9.5pt',
-        slipNumber: '12pt',
-        secId: '10pt',
-        voterName: '11pt',
-        infoRow: '9.5pt',
-        infoLabel: '16mm',
-        pollingStation: '10pt'
-    } : {
-        symbolHeader: '9pt',
-        symbolImage: '26mm',
-        symbolName: '11pt',
-        slipNumber: '14pt',
-        secId: '12pt',
-        voterName: '13pt',
-        infoRow: '11pt',
-        infoLabel: '18mm',
-        pollingStation: '12pt'
-    };
     
     let html = `
 <!DOCTYPE html>
@@ -247,28 +265,29 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
         .page { width: 210mm; height: 297mm; padding: 8mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
         
-        .voter-slip { width: 100%; height: ${slipHeight}; border: 2px solid; display: flex; padding: 2.5mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 2px solid; display: flex; padding: 2mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
         .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2.5mm; height: 0; border-bottom: 2px dashed #999; }
         .voter-slip:last-child { margin-bottom: 0; }
         .voter-slip:last-child::after { display: none; }
         .voter-slip > * { overflow: hidden; }
         
-        .slip-left { width: 40mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2mm; margin-right: 3mm; text-align: center; flex-shrink: 0; }
-        .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 1mm; line-height: 1.1; }
-        .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 1mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 38mm; }
+        .slip-left { width: 38mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0; }
+        .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1; }
+        .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
-        .slip-right { flex: 1; padding: 2mm 3mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
-        .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
-        .slip-number { font-weight: bold; font-size: ${fontSize.slipNumber}; }
-        .sec-id { font-weight: bold; font-size: ${fontSize.secId}; }
+        .slip-right { flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
+        .ward-info { font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center; }
+        .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
+        .slip-number { font-weight: bold; font-size: ${fontSize.slipNumber}; white-space: nowrap; }
+        .sec-id { font-weight: bold; font-size: ${fontSize.secId}; white-space: nowrap; }
         
         .voter-info { flex: 1; overflow: hidden; min-height: 0; }
-        .info-row { margin-bottom: 1mm; font-size: ${fontSize.infoRow}; display: flex; line-height: 1.3; overflow: hidden; }
-        .info-row.voter-name { font-size: ${fontSize.voterName}; font-weight: bold; margin-bottom: 1.5mm; }
+        .info-row { margin-bottom: 0.8mm; font-size: ${fontSize.infoRow}; display: flex; line-height: 1.25; overflow: hidden; }
+        .info-row.voter-name { font-size: ${fontSize.voterName}; font-weight: bold; margin-bottom: 1mm; }
         .info-label { font-weight: bold; min-width: ${fontSize.infoLabel}; flex-shrink: 0; }
         .info-value { flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-        .polling-station-info { font-size: ${fontSize.pollingStation}; border-top: 1px solid; padding-top: 1mm; line-height: 1.3; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+        .polling-station-info { font-size: ${fontSize.pollingStation}; border-top: 1px solid; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; }
         
         .cover-page { width: 210mm; height: 297mm; padding: 18mm; page-break-after: always; display: flex; flex-direction: column; justify-content: flex-start; }
         .cover-title { font-size: 22pt; font-weight: bold; margin-bottom: 6mm; }
@@ -346,29 +365,28 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
                     <div class="symbol-name">${displaySymbolName}</div>
                 </div>
                 <div class="slip-right">
+                    <div class="ward-info">വാര്‍ഡ്: ${wardName}</div>
                     <div class="slip-header">
-                        <div class="slip-number">ക്രമ നമ്പർ:  ${serialNo}</div>
-                        <div class="sec-id">കാർഡ് നമ്പർ:  ${voter.sec_id || 'N/A'}</div>
+                        <div class="slip-number">ക്രമ നമ്പർ: ${serialNo}</div>
+                        <div class="sec-id">കാർഡ് നമ്പർ: ${voter.sec_id || 'N/A'}</div>
                     </div>
                     <div class="voter-info">
                         <div class="info-row voter-name">
-                            <span class="info-label">പേര്:  </span>
+                            <span class="info-label">പേര്:</span>
                             <span class="info-value">${voter.name || 'N/A'}${(gender || age) ? ` (${gender}${gender && age ? '/' : ''}${age})` : ''}</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">വീട്ടുപേര്: </span>
+                            <span class="info-label">വീട്ടുപേര്:</span>
                             <span class="info-value">${voter.house_name || ''} ${voter.house_no ? `(${voter.house_no})` : ''}</span>
                         </div>
                         ${voter.guardian_name && voter.guardian_name.trim() ? `
                         <div class="info-row">
-                            <span class="info-label">രക്ഷിതാവ്: </span>
+                            <span class="info-label">രക്ഷിതാവ്:</span>
                             <span class="info-value">${voter.guardian_name}</span>
                         </div>
                         ` : ''}
                     </div>
-                    <div class="polling-station-info">
-                        <strong>പോളിംഗ് സ്റ്റേഷൻ: </strong> ${voterPollingStation}
-                    </div>
+                    <div class="polling-station-info">പോളിംഗ് സ്റ്റേഷൻ: ${voterPollingStation}</div>
                 </div>
             </div>`);
             });
@@ -488,7 +506,7 @@ export const generatePreview = async (req, res) => {
         let html;
         try {
             const htmlStartTime = Date.now();
-            html = generateSlipHTML(order, 0, previewVoterLimit);
+            html = await generateSlipHTML(order, 0, previewVoterLimit);
             console.log(`✅ HTML generated for ${previewVoterLimit} voters in`, Date.now() - htmlStartTime, 'ms');
             console.log('HTML length:', html.length, 'characters (', (html.length / 1024).toFixed(2), 'KB)');
         } catch (htmlError) {
@@ -794,7 +812,7 @@ export const viewPreview = async (req, res) => {
         // Return clean HTML with A4 pages, 5 slips per page
         console.log('Generating HTML for first 10 voters...');
         const startTime = Date.now();
-        const html = generateSlipHTML(order, 0, 10);
+        const html = await generateSlipHTML(order, 0, 10);
         console.log('✅ HTML generated in', Date.now() - startTime, 'ms');
         console.log('HTML size:', html.length, 'characters', '(', (html.length / 1024).toFixed(2), 'KB)');
 
@@ -1012,7 +1030,7 @@ export const downloadSlip = async (req, res) => {
         }
 
         // Generate HTML for all slips
-        const html = generateSlipHTML(order);
+        const html = await generateSlipHTML(order);
 
         // ✅ ALWAYS use fresh browser for on-demand generation to prevent browser crashes
         // This ensures the persistent browser stays stable for preview generation

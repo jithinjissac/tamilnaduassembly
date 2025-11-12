@@ -34,7 +34,7 @@
 ## ✅ Frontend Pages (100% Complete)
 
 ### User-Facing Pages
-- ✅ `frontend/landing.html` - **Malayalam landing page** with:
+- ✅ `frontend/index.html` - **Malayalam landing page** with:
   - Hero section with pricing
   - How it works (6 steps)
   - Features showcase
@@ -232,7 +232,7 @@ electionnew/
 │   └── slips.js                 ← ✅ Created
 │
 ├── frontend/
-│   ├── landing.html             ← ✅ Created (Malayalam)
+│   ├── index.html               ← ✅ Created (Malayalam landing page)
 │   ├── login.html               ← ✅ Created
 │   ├── register.html            ← ✅ Created
 │   ├── dashboard.html           ← ✅ Created

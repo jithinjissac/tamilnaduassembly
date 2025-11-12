@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email', 'payment']
+        enum: ['email', 'slip']
     },
     settings: {
         type: Map,
@@ -48,19 +48,30 @@ export const defaultSettings = {
         smsNotifications: false,
         webhookURL: ''
     },
-    payment: {
-        activeGateway: 'razorpay', // 'razorpay' or 'cashfree'
-        razorpay: {
-            enabled: true,
-            keyId: process.env.RAZORPAY_KEY_ID || '',
-            keySecret: process.env.RAZORPAY_KEY_SECRET || '',
-            webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || ''
+    slip: {
+        // Font sizes for 5 slips per page
+        fiveSlips: {
+            symbolHeader: '8pt',
+            symbolImage: '24mm',
+            symbolName: '9.5pt',
+            slipNumber: '11pt',
+            secId: '10pt',
+            voterName: '11pt',
+            infoRow: '10pt',
+            infoLabel: '17mm',
+            pollingStation: '10pt'
         },
-        cashfree: {
-            enabled: false,
-            appId: process.env.CASHFREE_APP_ID || '',
-            secretKey: process.env.CASHFREE_SECRET_KEY || '',
-            environment: 'TEST' // 'TEST' or 'PROD'
+        // Font sizes for 6 slips per page
+        sixSlips: {
+            symbolHeader: '7pt',
+            symbolImage: '20mm',
+            symbolName: '8.5pt',
+            slipNumber: '10pt',
+            secId: '9pt',
+            voterName: '11pt',
+            infoRow: '9pt',
+            infoLabel: '16mm',
+            pollingStation: '9pt'
         }
     }
 };

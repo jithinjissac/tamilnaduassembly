@@ -611,8 +611,8 @@
             <button class="tab" onclick="switchTab('reports')"><i class="fas fa-chart-bar"></i> Reports</button>
             <button class="tab" onclick="switchTab('symbols')"><i class="fas fa-flag"></i> Symbols</button>
             <button class="tab" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload Symbol</button>
-            <button class="tab" onclick="window.location.href='payment-settings.html'"><i class="fas fa-credit-card"></i> Payment Gateway</button>
-            <button class="tab" onclick="window.location.href='email-settings.html'"><i class="fas fa-envelope"></i> Email Settings</button>
+            <button class="tab" onclick="switchTab('slip-settings')"><i class="fas fa-file-alt"></i> Slip Settings</button>
+            <button class="tab" onclick="switchTab('email-settings')"><i class="fas fa-envelope"></i> Email Settings</button>
         </div>
 
         <!-- Analytics Tab -->
@@ -1056,6 +1056,357 @@
         </div>
     </div>
 
+    <!-- Slip Settings Tab -->
+    <div id="slip-settings-tab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt"></i> Slip Font Settings</h2>
+            </div>
+
+            <div id="slip-alert" class="alert" style="display: none;"></div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 500px; gap: 2rem; margin-top: 1.5rem;">
+                <!-- Settings Form -->
+                <div>
+                    <form id="slipSettingsForm">
+                        <!-- 5 Slips Per Page Settings -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-file"></i> 5 Slips Per Page (Default)
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Header:</label>
+                                    <input type="text" name="fiveSlips.symbolHeader" value="8pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Image:</label>
+                                    <input type="text" name="fiveSlips.symbolImage" value="24mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Name:</label>
+                                    <input type="text" name="fiveSlips.symbolName" value="9.5pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Slip Number:</label>
+                                    <input type="text" name="fiveSlips.slipNumber" value="11pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">SEC ID:</label>
+                                    <input type="text" name="fiveSlips.secId" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Voter Name:</label>
+                                    <input type="text" name="fiveSlips.voterName" value="11pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Row:</label>
+                                    <input type="text" name="fiveSlips.infoRow" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Label:</label>
+                                    <input type="text" name="fiveSlips.infoLabel" value="17mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Polling Station:</label>
+                                    <input type="text" name="fiveSlips.pollingStation" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6 Slips Per Page Settings -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-file"></i> 6 Slips Per Page (Compact)
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Header:</label>
+                                    <input type="text" name="sixSlips.symbolHeader" value="7pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Image:</label>
+                                    <input type="text" name="sixSlips.symbolImage" value="20mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Name:</label>
+                                    <input type="text" name="sixSlips.symbolName" value="8.5pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Slip Number:</label>
+                                    <input type="text" name="sixSlips.slipNumber" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">SEC ID:</label>
+                                    <input type="text" name="sixSlips.secId" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Voter Name:</label>
+                                    <input type="text" name="sixSlips.voterName" value="11pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Row:</label>
+                                    <input type="text" name="sixSlips.infoRow" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Label:</label>
+                                    <input type="text" name="sixSlips.infoLabel" value="16mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Polling Station:</label>
+                                    <input type="text" name="sixSlips.pollingStation" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetSlipSettings()">
+                                <i class="fas fa-undo"></i> Reset to Defaults
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Live Preview -->
+                <div style="position: sticky; top: 20px; align-self: start;">
+                    <h3 style="background: #f8f9fa; padding: 0.75rem 1rem; border-radius: 8px 8px 0 0; margin: 0; border: 1px solid #ddd; border-bottom: none;">
+                        <i class="fas fa-eye"></i> Live Preview (Exact PDF Size)
+                    </h3>
+                    <div style="background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px; padding: 1rem; max-height: 800px; overflow: auto;">
+                        <!-- A4 Page Container (210mm x 297mm scaled to fit) -->
+                        <div id="slipPreviewContainer" style="width: 100%; background: #f0f0f0; padding: 10px; border-radius: 4px;">
+                            <div id="slipPreview" style="width: 100%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                        </div>
+                        <div style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; color: #666;">
+                            Scaled to fit (actual: 210mm × 52mm slip)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Settings Tab -->
+    <div id="email-settings-tab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-envelope"></i> Email Template Settings</h2>
+            </div>
+
+            <div id="email-alert" class="alert" style="display: none;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 600px; gap: 2rem; margin-top: 1.5rem;">
+                <!-- Settings Form -->
+                <div>
+                    <form id="emailSettingsForm">
+                        <!-- SMTP Configuration -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-server"></i> SMTP Configuration
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">
+                                        <input type="checkbox" name="enableEmailNotifications" id="enableEmailNotifications" style="margin-right: 0.5rem;">
+                                        Enable Email Notifications
+                                    </label>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">SMTP Host:</label>
+                                        <input type="text" name="smtpHost" placeholder="smtp.gmail.com" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Port:</label>
+                                        <input type="number" name="smtpPort" placeholder="587" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">
+                                        <input type="checkbox" name="smtpSecure" id="smtpSecure" style="margin-right: 0.5rem;">
+                                        Use SSL/TLS (Port 465)
+                                    </label>
+                                    <small style="color: #666; display: block; margin-top: 0.25rem;">Check this if using port 465, uncheck for port 587</small>
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">SMTP Username:</label>
+                                    <input type="text" name="smtpUser" placeholder="your-email@gmail.com" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">SMTP Password:</label>
+                                    <input type="password" name="smtpPassword" placeholder="••••••••••••" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    <small style="color: #666; display: block; margin-top: 0.25rem;">For Gmail, use App Password (not regular password)</small>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">From Email:</label>
+                                        <input type="email" name="fromEmail" placeholder="noreply@easyslip.in" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">From Name:</label>
+                                        <input type="text" name="fromName" placeholder="EASYSLIP" class="smtp-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    </div>
+                                </div>
+                                <div style="background: #e7f3ff; border: 1px solid #2196F3; border-radius: 6px; padding: 0.75rem; margin-top: 0.5rem;">
+                                    <p style="margin: 0; color: #0d47a1; font-size: 0.9rem;">
+                                        <i class="fas fa-info-circle"></i> <strong>Gmail Setup:</strong> Enable 2-step verification and create an App Password at <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #1976d2;">myaccount.google.com/apppasswords</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Confirmation Email -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fas fa-check-circle"></i> Order Confirmation Email</span>
+                                <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" name="emailTemplates.orderConfirmation" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; font-weight: 500;">Enable</span>
+                                </label>
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Subject:</label>
+                                    <input type="text" name="orderConfirmation.subject" value="Order Confirmed - {{wardName}} - {{orderId}}" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Heading:</label>
+                                    <input type="text" name="orderConfirmation.heading" value="Order Confirmed Successfully!" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Message:</label>
+                                    <textarea name="orderConfirmation.message" rows="8" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">നമസ്കാരം {{userName}},
+
+Your order has been confirmed successfully!
+
+📋 Order Details:
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+• Polling Station: {{pollingStation}}
+• Symbol: {{symbolName}}
+• Total Voters: {{voterCount}}
+
+Your voter slips are being prepared and will be ready for download shortly.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Success Email -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fas fa-money-check-alt"></i> Payment Success Email</span>
+                                <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" name="emailTemplates.paymentSuccess" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; font-weight: 500;">Enable</span>
+                                </label>
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Subject:</label>
+                                    <input type="text" name="paymentSuccess.subject" value="Payment Successful - {{wardName}} - {{orderId}}" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Heading:</label>
+                                    <input type="text" name="paymentSuccess.heading" value="Payment Received Successfully!" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Message:</label>
+                                    <textarea name="paymentSuccess.message" rows="6" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">നമസ്കാരം {{userName}},
+
+Your payment has been received successfully!
+
+💰 Payment Details:
+• Amount Paid: ₹{{amount}}
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+
+Your voter slips PDF is being generated and will be ready for download shortly.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PDF Ready Email -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                                <span><i class="fas fa-file-pdf"></i> PDF Ready Email</span>
+                                <label style="margin: 0; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" name="emailTemplates.pdfReady" checked style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 14px; font-weight: 500;">Enable</span>
+                                </label>
+                            </h3>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Subject:</label>
+                                    <input type="text" name="pdfReady.subject" value="Your Voter Slips are Ready - {{wardName}} - {{orderId}}" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Heading:</label>
+                                    <input type="text" name="pdfReady.heading" value="Your PDF is Ready for Download!" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div>
+                                    <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Message:</label>
+                                    <textarea name="pdfReady.message" rows="8" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">നമസ്കാരം {{userName}},
+
+Great news! Your voter slips PDF is now ready for download.
+
+📄 PDF Details:
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+• Polling Station: {{pollingStation}}
+• Symbol: {{symbolName}}
+• Total Voters: {{voterCount}}
+
+Login to https://easyslip.in to download your PDF.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: #856404;"><i class="fas fa-info-circle"></i> Available Placeholders</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; color: #856404; line-height: 1.8;">
+                                <li><code>{{orderId}}</code> - Order ID (e.g., ORD-20251112-ABCD12)</li>
+                                <li><code>{{voterCount}}</code> - Number of voters (e.g., 1250)</li>
+                                <li><code>{{amount}}</code> - Payment amount (e.g., 2500)</li>
+                                <li><code>{{userName}}</code> - User's full name</li>
+                                <li><code>{{userEmail}}</code> - User's email address</li>
+                                <li><code>{{wardName}}</code> - Ward name (e.g., 012 - കോട്ടയ്ക്കൽ)</li>
+                                <li><code>{{pollingStation}}</code> - Polling station name</li>
+                                <li><code>{{symbolName}}</code> - Symbol name (e.g., രണ്ടില)</li>
+                                <li><code>{{district}}</code> - District name</li>
+                                <li><code>{{localBody}}</code> - Local body name</li>
+                            </ul>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetEmailSettings()">
+                                <i class="fas fa-undo"></i> Reset to Defaults
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Live Preview -->
+                <div style="position: sticky; top: 20px; align-self: start;">
+                    <h3 style="background: #f8f9fa; padding: 0.75rem 1rem; border-radius: 8px 8px 0 0; margin: 0; border: 1px solid #ddd; border-bottom: none;">
+                        <i class="fas fa-eye"></i> Email Preview
+                    </h3>
+                    <div style="background: white; border: 1px solid #ddd; border-radius: 0 0 8px 8px; padding: 1rem; max-height: 800px; overflow: auto;">
+                        <div id="emailPreview" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;"></div>
+                        <div style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; color: #666;">
+                            Live preview with sample data
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '/api/admin';
         let token = localStorage.getItem('token');
@@ -1063,6 +1414,8 @@
         // Check admin authentication on load
         async function checkAuth() {
             if (!token) {
+                // Save the intended destination before redirecting to login
+                sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
                 window.location.href = '/login.html';
                 return;
             }
@@ -2483,6 +2836,433 @@
                 showError(`Failed to delete orders: ${error.message}`);
             }
         }
+
+        // ============================================
+        // SLIP SETTINGS FUNCTIONS
+        // ============================================
+
+        // Sample voter data for slip preview
+        const sampleVoter = {
+            sl_no: '123',
+            name: 'രമേഷ് കുമാർ',
+            guardian_name: 'സുരേഷ് കുമാർ',
+            house_no: '12/345',
+            house_name: 'ശ്രീ നിലയം',
+            gender_age: 'M / 45',
+            sec_id: 'SEC123456789',
+            polling_station_name: '001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ',
+            ward: '012 - കോട്ടയ്ക്കൽ'
+        };
+
+        // Load slip settings from database
+        async function loadSlipSettings() {
+            try {
+                const response = await fetch('/api/settings/slip', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.fiveSlips && data.sixSlips) {
+                        populateSlipForm(data);
+                    }
+                }
+                updateSlipPreview();
+            } catch (error) {
+                console.error('Error loading slip settings:', error);
+            }
+        }
+
+        function populateSlipForm(data) {
+            const form = document.getElementById('slipSettingsForm');
+            Object.keys(data.fiveSlips).forEach(key => {
+                const input = form.querySelector(`[name="fiveSlips.${key}"]`);
+                if (input) input.value = data.fiveSlips[key];
+            });
+            Object.keys(data.sixSlips).forEach(key => {
+                const input = form.querySelector(`[name="sixSlips.${key}"]`);
+                if (input) input.value = data.sixSlips[key];
+            });
+        }
+
+        // Update slip preview in real-time
+        function updateSlipPreview() {
+            const form = document.getElementById('slipSettingsForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
+            
+            // Get current settings (use 5 slips layout for preview)
+            const settings = {
+                symbolHeader: formData.get('fiveSlips.symbolHeader'),
+                symbolImage: formData.get('fiveSlips.symbolImage'),
+                symbolName: formData.get('fiveSlips.symbolName'),
+                slipNumber: formData.get('fiveSlips.slipNumber'),
+                secId: formData.get('fiveSlips.secId'),
+                voterName: formData.get('fiveSlips.voterName'),
+                infoRow: formData.get('fiveSlips.infoRow'),
+                infoLabel: formData.get('fiveSlips.infoLabel'),
+                pollingStation: formData.get('fiveSlips.pollingStation')
+            };
+
+            // Render slip at EXACT PDF SIZE (210mm × 52mm for 5 slips/page)
+            // Scale to fit in preview container
+            const previewHTML = `
+                <div style="width: 210mm; height: 52mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; transform: scale(0.48); transform-origin: top left; margin-bottom: -27mm;">
+                    <div style="width: 38mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center;">
+                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm;">നമ്മുടെ ചിഹ്നം</div>
+                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #999;">Symbol</div>
+                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">രണ്ടില</div>
+                    </div>
+                    <div style="flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; gap: 1mm;">
+                            <div style="font-weight: bold; font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
+                            <div style="font-weight: bold; font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="margin-bottom: 0.8mm; font-size: ${settings.voterName}; display: flex; font-weight: bold;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">പേര്:</span>
+                                <span style="flex: 1;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                            </div>
+                            <div style="margin-bottom: 0.8mm; font-size: ${settings.infoRow}; display: flex;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">വീട്ടുപേര്:</span>
+                                <span style="flex: 1;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            </div>
+                            <div style="margin-bottom: 0.8mm; font-size: ${settings.infoRow}; display: flex;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1;">${sampleVoter.guardian_name}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; font-weight: 600;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('slipPreview').innerHTML = previewHTML;
+        }
+
+        // Save slip settings
+        document.addEventListener('DOMContentLoaded', () => {
+            const slipForm = document.getElementById('slipSettingsForm');
+            if (slipForm) {
+                // Listen for input changes to update preview
+                const slipInputs = slipForm.querySelectorAll('.slip-input');
+                slipInputs.forEach(input => {
+                    input.addEventListener('input', updateSlipPreview);
+                });
+
+                // Handle form submission
+                slipForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(slipForm);
+                    const settings = {
+                        fiveSlips: {},
+                        sixSlips: {}
+                    };
+
+                    for (let [key, value] of formData.entries()) {
+                        const [category, field] = key.split('.');
+                        settings[category][field] = value;
+                    }
+
+                    try {
+                        const response = await fetch('/api/settings/slip', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(settings)
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            const alert = document.getElementById('slip-alert');
+                            alert.textContent = '✅ Settings saved successfully!';
+                            alert.className = 'alert alert-success';
+                            alert.style.display = 'block';
+                            setTimeout(() => alert.style.display = 'none', 5000);
+                        } else {
+                            throw new Error(data.message || 'Failed to save settings');
+                        }
+                    } catch (error) {
+                        const alert = document.getElementById('slip-alert');
+                        alert.textContent = '❌ ' + error.message;
+                        alert.className = 'alert alert-error';
+                        alert.style.display = 'block';
+                    }
+                });
+            }
+        });
+
+        function resetSlipSettings() {
+            if (confirm('Reset to default settings?')) {
+                loadSlipSettings();
+            }
+        }
+
+        // ============================================
+        // EMAIL SETTINGS FUNCTIONS
+        // ============================================
+
+        // Sample data for email preview
+        const sampleOrder = {
+            orderId: 'ORD-20251112-ABCD12',
+            voterCount: 1250,
+            amount: 2500,
+            userName: 'രമേഷ് കുമാർ',
+            userEmail: 'ramesh@example.com',
+            wardName: '012 - കോട്ടയ്ക്കൽ',
+            pollingStation: '001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ',
+            symbolName: 'രണ്ടില (Two Leaves)',
+            district: 'Kottayam / കോട്ടയം',
+            localBody: 'G05006-ഉദയനാപുരം'
+        };
+
+        // Load email settings from database
+        async function loadEmailSettings() {
+            try {
+                const response = await fetch('/api/settings/email', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    populateEmailForm(data);
+                }
+                updateEmailPreview('orderConfirmation');
+            } catch (error) {
+                console.error('Error loading email settings:', error);
+            }
+        }
+
+        function populateEmailForm(data) {
+            const form = document.getElementById('emailSettingsForm');
+            
+            // Populate SMTP settings
+            if (data.enableEmailNotifications !== undefined) {
+                form.querySelector('[name="enableEmailNotifications"]').checked = data.enableEmailNotifications;
+            }
+            if (data.smtpHost) form.querySelector('[name="smtpHost"]').value = data.smtpHost;
+            if (data.smtpPort) form.querySelector('[name="smtpPort"]').value = data.smtpPort;
+            if (data.smtpSecure !== undefined) {
+                form.querySelector('[name="smtpSecure"]').checked = data.smtpSecure;
+            }
+            if (data.smtpUser) form.querySelector('[name="smtpUser"]').value = data.smtpUser;
+            if (data.smtpPassword) form.querySelector('[name="smtpPassword"]').value = data.smtpPassword;
+            if (data.fromEmail) form.querySelector('[name="fromEmail"]').value = data.fromEmail;
+            if (data.fromName) form.querySelector('[name="fromName"]').value = data.fromName;
+            
+            // Populate email template toggles
+            if (data.emailTemplates) {
+                if (data.emailTemplates.orderConfirmation !== undefined) {
+                    form.querySelector('[name="emailTemplates.orderConfirmation"]').checked = data.emailTemplates.orderConfirmation;
+                }
+                if (data.emailTemplates.paymentSuccess !== undefined) {
+                    form.querySelector('[name="emailTemplates.paymentSuccess"]').checked = data.emailTemplates.paymentSuccess;
+                }
+                if (data.emailTemplates.pdfReady !== undefined) {
+                    form.querySelector('[name="emailTemplates.pdfReady"]').checked = data.emailTemplates.pdfReady;
+                }
+            }
+            
+            // Populate email templates
+            ['orderConfirmation', 'paymentSuccess', 'pdfReady'].forEach(template => {
+                if (data[template]) {
+                    Object.keys(data[template]).forEach(key => {
+                        const input = form.querySelector(`[name="${template}.${key}"]`);
+                        if (input) input.value = data[template][key];
+                    });
+                }
+            });
+        }
+
+        // Update email preview
+        function updateEmailPreview(templateType = 'orderConfirmation') {
+            const form = document.getElementById('emailSettingsForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
+            
+            const subject = formData.get(`${templateType}.subject`);
+            const heading = formData.get(`${templateType}.heading`);
+            const message = formData.get(`${templateType}.message`);
+            
+            // Replace placeholders with sample data
+            const processedSubject = subject
+                .replace(/\{\{orderId\}\}/g, sampleOrder.orderId)
+                .replace(/\{\{voterCount\}\}/g, sampleOrder.voterCount)
+                .replace(/\{\{amount\}\}/g, sampleOrder.amount)
+                .replace(/\{\{userName\}\}/g, sampleOrder.userName)
+                .replace(/\{\{userEmail\}\}/g, sampleOrder.userEmail)
+                .replace(/\{\{wardName\}\}/g, sampleOrder.wardName)
+                .replace(/\{\{pollingStation\}\}/g, sampleOrder.pollingStation)
+                .replace(/\{\{symbolName\}\}/g, sampleOrder.symbolName)
+                .replace(/\{\{district\}\}/g, sampleOrder.district)
+                .replace(/\{\{localBody\}\}/g, sampleOrder.localBody);
+            
+            const processedMessage = message
+                .replace(/\{\{orderId\}\}/g, sampleOrder.orderId)
+                .replace(/\{\{voterCount\}\}/g, sampleOrder.voterCount)
+                .replace(/\{\{amount\}\}/g, sampleOrder.amount)
+                .replace(/\{\{userName\}\}/g, sampleOrder.userName)
+                .replace(/\{\{userEmail\}\}/g, sampleOrder.userEmail)
+                .replace(/\{\{wardName\}\}/g, sampleOrder.wardName)
+                .replace(/\{\{pollingStation\}\}/g, sampleOrder.pollingStation)
+                .replace(/\{\{symbolName\}\}/g, sampleOrder.symbolName)
+                .replace(/\{\{district\}\}/g, sampleOrder.district)
+                .replace(/\{\{localBody\}\}/g, sampleOrder.localBody);
+
+            // Kerala theme colors
+            const keralaGreen = '#006D3B';
+            const keralaGold = '#FFB81C';
+            const keralaRed = '#E03A3E';
+            const keralaCream = '#FFF8DC';
+
+            document.getElementById('emailPreview').innerHTML = `
+                <!-- Kerala Border Pattern -->
+                <div style="height: 8px; background: linear-gradient(to right, ${keralaGreen} 0%, ${keralaGreen} 33.33%, ${keralaGold} 33.33%, ${keralaGold} 66.66%, ${keralaRed} 66.66%, ${keralaRed} 100%);"></div>
+                
+                <!-- Header -->
+                <div style="background: ${keralaGreen}; color: white; padding: 30px 20px; text-align: center;">
+                    <h1 style="margin: 0 0 10px 0; font-size: 28px; font-family: 'Noto Sans Malayalam', Arial, sans-serif;">EASYSLIP</h1>
+                    <h2 style="margin: 0; font-size: 20px; font-weight: 600; font-family: 'Noto Sans Malayalam', Arial, sans-serif;">${heading}</h2>
+                </div>
+                
+                <!-- Body -->
+                <div style="padding: 40px 30px; line-height: 1.8; color: #333; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white;">
+                    <p style="margin: 0 0 20px 0; white-space: pre-wrap; font-size: 15px;">${processedMessage}</p>
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="https://easyslip.in/dashboard.html" style="display: inline-block; padding: 14px 35px; background: ${keralaGreen}; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid ${keralaGold};">View Dashboard</a>
+                    </div>
+                </div>
+                
+                <!-- Footer Border -->
+                <div style="height: 4px; background: linear-gradient(to right, ${keralaGreen} 0%, ${keralaGreen} 33.33%, ${keralaGold} 33.33%, ${keralaGold} 66.66%, ${keralaRed} 66.66%, ${keralaRed} 100%);"></div>
+                
+                <!-- Footer -->
+                <div style="background: ${keralaCream}; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; font-family: 'Noto Sans Malayalam', Arial, sans-serif;">
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: ${keralaGreen};">EASYSLIP - Kerala Election Voter Slip Service</p>
+                    <p style="margin: 0 0 8px 0;">🌐 <a href="https://easyslip.in" style="color: ${keralaGreen}; text-decoration: none;">https://easyslip.in</a></p>
+                    <p style="margin: 0; color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
+                </div>
+                
+                <!-- Bottom Border -->
+                <div style="height: 8px; background: linear-gradient(to right, ${keralaGreen} 0%, ${keralaGreen} 33.33%, ${keralaGold} 33.33%, ${keralaGold} 66.66%, ${keralaRed} 66.66%, ${keralaRed} 100%);"></div>
+            `;
+        }
+
+        // Save email settings
+        document.addEventListener('DOMContentLoaded', () => {
+            const emailForm = document.getElementById('emailSettingsForm');
+            if (emailForm) {
+                // Listen for input changes to update preview
+                const emailInputs = emailForm.querySelectorAll('.email-input');
+                emailInputs.forEach(input => {
+                    input.addEventListener('input', () => updateEmailPreview('orderConfirmation'));
+                });
+                
+                // Also listen to SMTP input changes (though they don't affect preview)
+                const smtpInputs = emailForm.querySelectorAll('.smtp-input');
+                smtpInputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        // Could add SMTP validation here in the future
+                    });
+                });
+
+                // Handle form submission
+                emailForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(emailForm);
+                    const settings = {
+                        // SMTP settings
+                        enableEmailNotifications: formData.get('enableEmailNotifications') === 'on',
+                        smtpHost: formData.get('smtpHost') || '',
+                        smtpPort: parseInt(formData.get('smtpPort')) || 587,
+                        smtpSecure: formData.get('smtpSecure') === 'on',
+                        smtpUser: formData.get('smtpUser') || '',
+                        smtpPassword: formData.get('smtpPassword') || '',
+                        fromEmail: formData.get('fromEmail') || '',
+                        fromName: formData.get('fromName') || '',
+                        // Email template toggles
+                        emailTemplates: {
+                            orderConfirmation: formData.get('emailTemplates.orderConfirmation') === 'on',
+                            paymentSuccess: formData.get('emailTemplates.paymentSuccess') === 'on',
+                            pdfReady: formData.get('emailTemplates.pdfReady') === 'on'
+                        },
+                        // Email templates
+                        orderConfirmation: {},
+                        paymentSuccess: {},
+                        pdfReady: {}
+                    };
+
+                    // Populate templates
+                    for (let [key, value] of formData.entries()) {
+                        if (key.includes('.') && !key.startsWith('emailTemplates.')) {
+                            const [template, field] = key.split('.');
+                            if (settings[template]) {
+                                settings[template][field] = value;
+                            }
+                        }
+                    }
+
+                    try {
+                        const response = await fetch('/api/settings/email', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(settings)
+                        });
+
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            const alert = document.getElementById('email-alert');
+                            alert.textContent = '✅ Email settings saved successfully!';
+                            alert.className = 'alert alert-success';
+                            alert.style.display = 'block';
+                            setTimeout(() => alert.style.display = 'none', 5000);
+                        } else {
+                            throw new Error(data.message || 'Failed to save settings');
+                        }
+                    } catch (error) {
+                        const alert = document.getElementById('email-alert');
+                        alert.textContent = '❌ ' + error.message;
+                        alert.className = 'alert alert-error';
+                        alert.style.display = 'block';
+                    }
+                });
+            }
+        });
+
+        function resetEmailSettings() {
+            if (confirm('Reset email templates to defaults?')) {
+                loadEmailSettings();
+            }
+        }
+
+        // Initialize settings when tabs are switched
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            originalSwitchTab(tabName);
+            
+            // Load settings when switching to settings tabs
+            if (tabName === 'slip-settings') {
+                setTimeout(() => {
+                    loadSlipSettings();
+                }, 100);
+            } else if (tabName === 'email-settings') {
+                setTimeout(() => {
+                    loadEmailSettings();
+                }, 100);
+            }
+        };
 
         // Initialize on page load
         checkAuth();

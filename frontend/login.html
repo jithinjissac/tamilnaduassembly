@@ -285,7 +285,7 @@
         </div>
 
         <div class="back-link">
-            <a href="landing.html">← Back to Home</a>
+            <a href="index.html">← Back to Home</a>
         </div>
     </div>
 
@@ -302,6 +302,15 @@
             }).then(async response => {
                 if (response.ok) {
                     const profileData = await response.json();
+                    
+                    // Check if there's a saved redirect URL
+                    const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+                    if (redirectUrl) {
+                        sessionStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+                    
                     // Token is valid, redirect based on role
                     if (profileData.user.role === 'admin') {
                         window.location.href = 'admin.html';
@@ -360,6 +369,14 @@
                     // Store token and user info
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Check if there's a saved redirect URL
+                    const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+                    if (redirectUrl) {
+                        sessionStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirectUrl;
+                        return;
+                    }
                     
                     // Redirect based on user role
                     if (data.user.role === 'admin') {

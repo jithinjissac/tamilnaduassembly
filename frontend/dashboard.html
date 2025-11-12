@@ -456,6 +456,8 @@
         // Check authentication
         const token = localStorage.getItem('token');
         if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
             window.location.href = 'login.html';
         }
 

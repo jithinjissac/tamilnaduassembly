@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancellation and Refunds - Kerala SEC Voter List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .content {
+            color: #2d3748;
+            line-height: 1.8;
+        }
+
+        .content h2 {
+            font-size: 1.75rem;
+            color: #667eea;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .content h2:first-child {
+            margin-top: 0;
+        }
+
+        .content h3 {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content strong {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.3s;
+            margin-top: 2rem;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .effective-date {
+            background: #f7fafc;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            margin-bottom: 2rem;
+            border-radius: 5px;
+        }
+
+        .highlight-box {
+            background: #edf2f7;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .success-box {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .refund-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .refund-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .refund-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .refund-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .refund-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+
+            .refund-table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-undo-alt"></i> Cancellation and Refunds</h1>
+            <p>Our refund and cancellation policy</p>
+        </div>
+
+        <div class="content">
+            <div class="effective-date">
+                <strong><i class="fas fa-calendar-alt"></i> Effective Date:</strong> November 12, 2025
+            </div>
+
+            <div class="highlight-box">
+                <strong><i class="fas fa-info-circle"></i> Digital Service Notice:</strong> As this is a digital service with instant delivery, our refund policy is different from physical product services. Please read this policy carefully before making a purchase.
+            </div>
+
+            <h2>1. Understanding Our Service</h2>
+            <p>The Kerala SEC Voter List Extraction Service provides digital voter slip PDFs. Once payment is completed:</p>
+            <ul>
+                <li>PDF generation begins immediately (often during preview)</li>
+                <li>The service extracts data from Kerala SEC portal</li>
+                <li>Voter slips are generated with your custom symbols</li>
+                <li>PDFs are made available for download within minutes to hours (depending on size)</li>
+            </ul>
+            <p><strong>Important:</strong> Because PDF generation is automated and begins immediately, cancellations after payment are subject to specific conditions outlined below.</p>
+
+            <h2>2. Cancellation Policy</h2>
+            
+            <h3>2.1 Pre-Payment Cancellation</h3>
+            <div class="success-box">
+                <strong><i class="fas fa-check-circle"></i> Full Freedom:</strong> You can cancel your order at any time before completing payment with no charges. Simply close the payment window or don't proceed with payment.
+            </div>
+
+            <h3>2.2 Post-Payment Cancellation</h3>
+            <p>Cancellation after payment completion depends on the order status:</p>
+
+            <table class="refund-table">
+                <thead>
+                    <tr>
+                        <th>Order Status</th>
+                        <th>Cancellation Allowed?</th>
+                        <th>Refund Amount</th>
+                        <th>Processing Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Payment completed, PDF generation not started</strong></td>
+                        <td>✅ Yes</td>
+                        <td>100% refund</td>
+                        <td>5-7 business days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PDF generation in progress</strong></td>
+                        <td>⚠️ Case-by-case</td>
+                        <td>50-100% refund</td>
+                        <td>7-10 business days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PDF generation completed</strong></td>
+                        <td>❌ No*</td>
+                        <td>No refund*</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PDF downloaded by user</strong></td>
+                        <td>❌ No</td>
+                        <td>No refund</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p style="font-size: 0.9rem; color: #718096; margin-top: 1rem;">* Exceptions may apply for technical issues, data accuracy problems, or service failures. See Section 3 below.</p>
+
+            <h3>2.3 How to Request Cancellation</h3>
+            <p>To request cancellation after payment:</p>
+            <ol>
+                <li>Contact us immediately through our <a href="contact.html" style="color: #667eea; text-decoration: underline;">Contact Page</a></li>
+                <li>Provide your Order ID (format: ORD-YYYYMMDD-XXXXXX)</li>
+                <li>Include your registered email address</li>
+                <li>State the reason for cancellation</li>
+                <li>Submit the request as soon as possible (ideally within 30 minutes of payment)</li>
+            </ol>
+
+            <div class="warning-box">
+                <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> Cancellation requests must be submitted <strong>before you download the PDF</strong>. Once you download the PDF, the service is considered fully delivered and no refunds will be issued.
+            </div>
+
+            <h2>3. Refund Policy</h2>
+            
+            <h3>3.1 Eligible Refund Scenarios</h3>
+            <p>You are eligible for a full or partial refund in the following cases:</p>
+
+            <h4>Full Refund (100%):</h4>
+            <ul>
+                <li><strong>Payment processed but order not created:</strong> Technical error on our end</li>
+                <li><strong>Duplicate payment:</strong> Charged twice for the same order</li>
+                <li><strong>Service unavailable:</strong> Kerala SEC portal down for extended period (>24 hours)</li>
+                <li><strong>Complete data extraction failure:</strong> No voter data could be extracted</li>
+                <li><strong>PDF generation failure:</strong> Technical error preventing PDF creation after 48 hours</li>
+                <li><strong>Cancellation before PDF generation:</strong> As per Section 2.2</li>
+            </ul>
+
+            <h4>Partial Refund (50%):</h4>
+            <ul>
+                <li><strong>Significant data inaccuracy:</strong> More than 20% of voter data is incorrect (must be verified)</li>
+                <li><strong>PDF generation in progress:</strong> Cancellation request during active generation</li>
+                <li><strong>Symbol upload issue:</strong> Your uploaded symbol not properly displayed due to our system error</li>
+            </ul>
+
+            <h3>3.2 Non-Refundable Scenarios</h3>
+            <div class="warning-box">
+                <strong><i class="fas fa-times-circle"></i> No Refund Will Be Issued For:</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li>User error in data extraction (wrong ward, wrong local body selected)</li>
+                    <li>Minor data inaccuracies sourced from Kerala SEC portal (we extract public data as-is)</li>
+                    <li>Change of mind after PDF download</li>
+                    <li>Dissatisfaction with the number of voters in selected area (data is from Kerala SEC)</li>
+                    <li>User's printing or formatting issues</li>
+                    <li>Delay in download due to user's internet connection</li>
+                    <li>Loss of access to downloaded PDF (user's device issue)</li>
+                    <li>Violation of our Terms and Conditions</li>
+                </ul>
+            </div>
+
+            <h3>3.3 Data Accuracy Disclaimer</h3>
+            <p>Please note:</p>
+            <ul>
+                <li>We extract voter data directly from the <strong>Kerala State Election Commission public portal</strong></li>
+                <li>We do not modify, edit, or verify the accuracy of voter data</li>
+                <li>Any inaccuracies in voter names, house names, serial numbers, etc. are sourced from the Kerala SEC database</li>
+                <li><strong>We are not responsible for inaccuracies in the source data</strong></li>
+                <li>Refunds will not be issued for inaccuracies that exist in the Kerala SEC portal itself</li>
+            </ul>
+
+            <h2>4. Refund Process</h2>
+            
+            <h3>4.1 How to Request a Refund</h3>
+            <ol>
+                <li><strong>Contact Us:</strong> Submit a refund request through our <a href="contact.html" style="color: #667eea; text-decoration: underline;">Contact Page</a></li>
+                <li><strong>Provide Details:</strong>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>Order ID</li>
+                        <li>Payment transaction ID (from Razorpay)</li>
+                        <li>Registered email address</li>
+                        <li>Detailed reason for refund request</li>
+                        <li>Supporting evidence (screenshots, error messages, etc.)</li>
+                    </ul>
+                </li>
+                <li><strong>Wait for Review:</strong> Our team will review your request within 2-3 business days</li>
+                <li><strong>Receive Decision:</strong> You will be notified via email about the refund decision</li>
+            </ol>
+
+            <h3>4.2 Refund Processing Timeline</h3>
+            <table class="refund-table">
+                <thead>
+                    <tr>
+                        <th>Refund Type</th>
+                        <th>Review Time</th>
+                        <th>Processing Time</th>
+                        <th>Total Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Duplicate Payment</td>
+                        <td>1-2 days</td>
+                        <td>3-5 days</td>
+                        <td>4-7 days</td>
+                    </tr>
+                    <tr>
+                        <td>Technical Failure</td>
+                        <td>2-3 days</td>
+                        <td>5-7 days</td>
+                        <td>7-10 days</td>
+                    </tr>
+                    <tr>
+                        <td>Pre-Generation Cancellation</td>
+                        <td>1-2 days</td>
+                        <td>5-7 days</td>
+                        <td>6-9 days</td>
+                    </tr>
+                    <tr>
+                        <td>Partial Refund Cases</td>
+                        <td>3-5 days</td>
+                        <td>7-10 days</td>
+                        <td>10-15 days</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.3 Refund Method</h3>
+            <p>Refunds will be processed back to the original payment method:</p>
+            <ul>
+                <li><strong>Credit/Debit Card:</strong> Refunded to the same card (5-10 business days)</li>
+                <li><strong>UPI:</strong> Refunded to the same UPI ID (3-7 business days)</li>
+                <li><strong>Net Banking:</strong> Refunded to the same bank account (5-10 business days)</li>
+            </ul>
+            <p><strong>Note:</strong> Refund processing time depends on your bank's policies. We process refunds on our end within the timelines mentioned above, but your bank may take additional time to credit your account.</p>
+
+            <h2>5. Special Cases</h2>
+            
+            <h3>5.1 Partial Data Extraction</h3>
+            <p>If voter data extraction is partially successful (e.g., only 50% of expected voters extracted due to Kerala SEC portal issues):</p>
+            <ul>
+                <li>You will be charged only for successfully extracted voters</li>
+                <li>Or offered a proportional refund if already paid</li>
+                <li>Or allowed to re-attempt extraction at no additional charge</li>
+            </ul>
+
+            <h3>5.2 Extended Service Downtime</h3>
+            <p>If the Kerala SEC portal is unavailable for more than 48 hours after payment:</p>
+            <ul>
+                <li>You may request a full refund, OR</li>
+                <li>Wait for service restoration and receive your order without additional charges</li>
+            </ul>
+
+            <h3>5.3 Payment Gateway Failures</h3>
+            <p>If payment is deducted but order is not created due to Razorpay gateway issues:</p>
+            <ul>
+                <li>Full refund will be automatically initiated within 24 hours</li>
+                <li>You will receive an email confirmation</li>
+                <li>Refund will be processed within 5-7 business days</li>
+            </ul>
+
+            <h2>6. Dispute Resolution</h2>
+            
+            <h3>6.1 Disputed Charges</h3>
+            <p>If you dispute a charge with your bank/card issuer:</p>
+            <ul>
+                <li>We encourage you to contact us first before initiating a chargeback</li>
+                <li>Most issues can be resolved quickly through direct communication</li>
+                <li>Chargebacks may result in account suspension pending investigation</li>
+            </ul>
+
+            <h3>6.2 Refund Disputes</h3>
+            <p>If you disagree with our refund decision:</p>
+            <ul>
+                <li>You may appeal the decision by providing additional evidence</li>
+                <li>Appeal requests will be reviewed by a senior team member</li>
+                <li>Final decisions will be communicated within 5 business days</li>
+            </ul>
+
+            <h2>7. Contact for Refunds and Cancellations</h2>
+            <p>For all refund and cancellation requests:</p>
+            <ul>
+                <li><strong>Email:</strong> Available on our <a href="contact.html" style="color: #667eea; text-decoration: underline;">Contact Page</a></li>
+                <li><strong>Subject Line:</strong> Include "REFUND REQUEST" or "CANCELLATION REQUEST"</li>
+                <li><strong>Required Info:</strong> Order ID, payment details, reason for request</li>
+                <li><strong>Response Time:</strong> 24-48 hours for initial response</li>
+            </ul>
+
+            <h2>8. Changes to This Policy</h2>
+            <p>We reserve the right to modify this Cancellation and Refunds Policy at any time. Changes will be reflected by updating the "Effective Date" at the top of this page. Continued use of the Service after changes constitutes acceptance of the updated policy.</p>
+
+            <h2>9. Legal Rights</h2>
+            <p>This policy does not affect your statutory rights under Indian consumer protection laws. If you believe your consumer rights have been violated, you may contact the appropriate consumer protection authorities.</p>
+
+            <div class="success-box" style="margin-top: 2rem;">
+                <strong><i class="fas fa-lightbulb"></i> Best Practice Tip:</strong>
+                <ul style="margin-top: 0.5rem;">
+                    <li><strong>Use the Preview Feature:</strong> Always preview your voter slips before payment to ensure data accuracy and formatting</li>
+                    <li><strong>Verify Your Selection:</strong> Double-check district, local body, and ward before extraction</li>
+                    <li><strong>Test Your Symbol:</strong> Upload and preview your symbol before creating the order</li>
+                    <li><strong>Download Immediately:</strong> Save your PDF as soon as it's ready (available for 30 days)</li>
+                </ul>
+            </div>
+
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</body>
+</html>
