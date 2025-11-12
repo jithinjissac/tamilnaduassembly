@@ -170,7 +170,11 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
     if (votersWithStation.length > 0) {
         console.log(`📍 Sample station name: "${votersWithStation[0].polling_station_name}"`);
     }
-    const slipsPerPage = 5;
+    
+    // Use slipsPerPage from order customization, default to 5
+    const slipsPerPage = order.customization?.slipsPerPage || 5;
+    console.log(`📄 Using ${slipsPerPage} slips per page (from order.customization.slipsPerPage: ${order.customization?.slipsPerPage})`);
+    console.log(`🔍 Full customization object:`, JSON.stringify(order.customization, null, 2));
     
     // Use Malayalam name if available, otherwise English
     const displaySymbolName = order.customization.symbolNameMalayalam || order.customization.symbolName;
@@ -197,6 +201,33 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
         symbolUrl = symbolPath;
     }
     
+    // Calculate slip height based on slipsPerPage
+    // A4 height: 297mm, with 8mm top/bottom padding = 281mm usable
+    // For 5 slips: 52mm each (with 5mm gap = 280mm total)
+    // For 6 slips: 43mm each (with 5mm gap = 283mm total)
+    const slipHeight = slipsPerPage === 6 ? '43mm' : '52mm';
+    const fontSize = slipsPerPage === 6 ? {
+        symbolHeader: '8pt',
+        symbolImage: '22mm',
+        symbolName: '9.5pt',
+        slipNumber: '12pt',
+        secId: '10pt',
+        voterName: '11pt',
+        infoRow: '9.5pt',
+        infoLabel: '16mm',
+        pollingStation: '10pt'
+    } : {
+        symbolHeader: '9pt',
+        symbolImage: '26mm',
+        symbolName: '11pt',
+        slipNumber: '14pt',
+        secId: '12pt',
+        voterName: '13pt',
+        infoRow: '11pt',
+        infoLabel: '18mm',
+        pollingStation: '12pt'
+    };
+    
     let html = `
 <!DOCTYPE html>
 <html lang="ml">
@@ -216,28 +247,28 @@ export const generateSlipHTML = (order, startIndex = 0, endIndex = null) => {
         .page { width: 210mm; height: 297mm; padding: 8mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
         
-        .voter-slip { width: 100%; height: 52mm; border: 2px solid; display: flex; padding: 2.5mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 2px solid; display: flex; padding: 2.5mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
         .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2.5mm; height: 0; border-bottom: 2px dashed #999; }
         .voter-slip:last-child { margin-bottom: 0; }
         .voter-slip:last-child::after { display: none; }
         .voter-slip > * { overflow: hidden; }
         
         .slip-left { width: 40mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2mm; margin-right: 3mm; text-align: center; flex-shrink: 0; }
-        .symbol-header { font-size: 9pt; font-weight: bold; margin-bottom: 1mm; line-height: 1.1; }
-        .symbol-image { width: 26mm; height: 26mm; margin-bottom: 1mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
-        .symbol-name { font-size: 11pt; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 38mm; }
+        .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 1mm; line-height: 1.1; }
+        .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 1mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 38mm; }
         
         .slip-right { flex: 1; padding: 2mm 3mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
         .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
-        .slip-number { font-weight: bold; font-size: 14pt; }
-        .sec-id { font-weight: bold; font-size: 12pt; }
+        .slip-number { font-weight: bold; font-size: ${fontSize.slipNumber}; }
+        .sec-id { font-weight: bold; font-size: ${fontSize.secId}; }
         
         .voter-info { flex: 1; overflow: hidden; min-height: 0; }
-        .info-row { margin-bottom: 1mm; font-size: 11pt; display: flex; line-height: 1.3; overflow: hidden; }
-        .info-row.voter-name { font-size: 13pt; font-weight: bold; margin-bottom: 1.5mm; }
-        .info-label { font-weight: bold; min-width: 18mm; flex-shrink: 0; }
+        .info-row { margin-bottom: 1mm; font-size: ${fontSize.infoRow}; display: flex; line-height: 1.3; overflow: hidden; }
+        .info-row.voter-name { font-size: ${fontSize.voterName}; font-weight: bold; margin-bottom: 1.5mm; }
+        .info-label { font-weight: bold; min-width: ${fontSize.infoLabel}; flex-shrink: 0; }
         .info-value { flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-        .polling-station-info { font-size: 12pt; border-top: 1px solid; padding-top: 1mm; line-height: 1.3; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+        .polling-station-info { font-size: ${fontSize.pollingStation}; border-top: 1px solid; padding-top: 1mm; line-height: 1.3; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
         
         .cover-page { width: 210mm; height: 297mm; padding: 18mm; page-break-after: always; display: flex; flex-direction: column; justify-content: flex-start; }
         .cover-title { font-size: 22pt; font-weight: bold; margin-bottom: 6mm; }
@@ -399,8 +430,10 @@ export const generatePreview = async (req, res) => {
             hasCustomization: !!order.customization,
             hasLocation: !!order.location,
             customizationKeys: order.customization ? Object.keys(order.customization) : [],
-            locationKeys: order.location ? Object.keys(order.location) : []
+            locationKeys: order.location ? Object.keys(order.location) : [],
+            slipsPerPage: order.customization?.slipsPerPage
         });
+        console.log('🎫 Customization.slipsPerPage:', order.customization?.slipsPerPage);
 
         if (!order.voters || order.voters.length === 0) {
             console.error('❌ NO VOTERS IN ORDER');

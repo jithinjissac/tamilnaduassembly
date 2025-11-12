@@ -25,6 +25,14 @@ const OrderSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        symbolNameMalayalam: {
+            type: String
+        },
+        slipsPerPage: {
+            type: Number,
+            default: 5,
+            enum: [5, 6] // Only allow 5 or 6 slips per page
+        },
         // Legacy fields for backward compatibility
         partyLogo: {
             type: String
@@ -95,9 +103,16 @@ const OrderSchema = new mongoose.Schema({
         enum: ['pending', 'completed', 'failed'],
         default: 'pending'
     },
+    paymentGateway: {
+        type: String,
+        enum: ['razorpay', 'cashfree'],
+        default: 'razorpay'
+    },
     razorpayOrderId: String,
     razorpayPaymentId: String,
     razorpaySignature: String,
+    cashfreeSessionId: String,
+    cashfreePaymentId: String,
     createdAt: {
         type: Date,
         default: Date.now

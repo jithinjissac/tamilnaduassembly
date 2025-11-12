@@ -355,7 +355,7 @@ class SymbolPicker {
                     }
 
                     .symbol-picker-grid {
-                        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                        grid-template-columns: repeat(2, 1fr);
                         gap: 0.75rem;
                         padding: 1rem;
                     }
@@ -421,10 +421,9 @@ class SymbolPicker {
 
         grid.innerHTML = symbols.map(symbol => `
             <div class="symbol-picker-item" data-symbol-id="${symbol._id}" onclick="symbolPicker.selectSymbol('${symbol._id}')">
-                <img src="${symbol.imageUrl}" alt="${symbol.name}">
-                <div class="symbol-picker-item-name">${symbol.name}</div>
-                ${symbol.nameMalayalam ? `<div class="symbol-picker-item-name-ml" style="font-size: 0.85rem; color: #059669; margin-top: 0.25rem; direction: rtl;">${symbol.nameMalayalam}</div>` : ''}
-                <div class="symbol-picker-item-category">${symbol.category.replace('-', ' ')}</div>
+                <img src="${symbol.imageUrl}" alt="${symbol.nameMalayalam || symbol.name}">
+                ${symbol.nameMalayalam ? `<div class="symbol-picker-item-name">${symbol.nameMalayalam}</div>` : `<div class="symbol-picker-item-name">${symbol.name}</div>`}
+                <div class="symbol-picker-item-category">${symbol.name}${symbol.category ? ` • ${symbol.category.replace('-', ' ')}` : ''}</div>
             </div>
         `).join('');
     }

@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email']
+        enum: ['email', 'payment']
     },
     settings: {
         type: Map,
@@ -47,6 +47,21 @@ export const defaultSettings = {
         },
         smsNotifications: false,
         webhookURL: ''
+    },
+    payment: {
+        activeGateway: 'razorpay', // 'razorpay' or 'cashfree'
+        razorpay: {
+            enabled: true,
+            keyId: process.env.RAZORPAY_KEY_ID || '',
+            keySecret: process.env.RAZORPAY_KEY_SECRET || '',
+            webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || ''
+        },
+        cashfree: {
+            enabled: false,
+            appId: process.env.CASHFREE_APP_ID || '',
+            secretKey: process.env.CASHFREE_SECRET_KEY || '',
+            environment: 'TEST' // 'TEST' or 'PROD'
+        }
     }
 };
 

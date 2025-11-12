@@ -512,9 +512,10 @@
                 successIcon.classList.add('emoji');
                 successIcon.style.background = 'linear-gradient(135deg, #fff4e5 0%, #ffe0b2 100%)';
                 document.querySelector('.success-title').textContent = 'Payment Not Completed';
-                document.querySelector('.success-subtitle').textContent = 'Order created, complete payment to proceed';
+                document.querySelector('.success-subtitle').textContent = 'Please complete payment to proceed';
                 
                 // Hide success container and show payment required message
+                document.getElementById('orderIdDisplay').style.display = 'none';
                 document.getElementById('orderDetails').style.display = 'none';
                 document.querySelector('.download-info').style.display = 'none';
                 document.querySelector('.action-buttons').style.display = 'none';
@@ -568,8 +569,8 @@
             // Display order details
             document.getElementById('orderIdDisplay').textContent = `Order #${data.orderId || 'N/A'}`;
             
-            // Try symbolName first, then partyName as fallback
-            const displayName = data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            // Use Malayalam symbol name first, then English as fallback
+            const displayName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
             document.getElementById('partyName').textContent = displayName;
             
             const voterCount = data.totalVoters || 0;

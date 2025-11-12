@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="kerala-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PDF.js for better PDF rendering on mobile -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -158,6 +162,50 @@
             height: 800px;
             border: none;
         }
+        
+        /* PDF.js canvas viewer */
+        #pdfCanvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        #pdfControls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        #pdfControls button {
+            padding: 0.5rem 1rem;
+            background: var(--kerala-green);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        #pdfControls button:hover {
+            background: #005230;
+        }
+        
+        #pdfControls button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        #pageInfo {
+            font-weight: 600;
+            color: #2d3748;
+        }
 
         .loading-preview {
             text-align: center;
@@ -186,6 +234,22 @@
             border-radius: 4px;
             font-size: 0.9rem;
             color: #856404;
+        }
+
+        /* Slips per page toggle */
+        .slip-count-toggle:hover {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4 !important;
+        }
+
+        .slip-count-toggle:has(input[type="radio"]:checked) {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4 !important;
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .slip-count-toggle input[type="radio"]:checked + span {
+            color: var(--kerala-green) !important;
         }
 
         /* Payment Section */
@@ -439,6 +503,29 @@
                     <span class="preview-badge">Free</span>
                 </div>
 
+                <!-- Slips per Page Toggle -->
+                <div style="background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-file-pdf" style="color: #006D3B;"></i>
+                            <span style="font-weight: 600; color: #2d3748;">Slips per Page:</span>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <label class="slip-count-toggle" style="position: relative; display: flex; align-items: center; padding: 0.5rem 1rem; border: 2px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.3s; background: white;">
+                                <input type="radio" name="previewSlipsPerPage" value="5" checked style="margin-right: 0.5rem; width: 16px; height: 16px; cursor: pointer;" onchange="updateSlipsPerPage(5)">
+                                <span style="font-weight: 600; color: #2d3748;">5 Slips</span>
+                            </label>
+                            <label class="slip-count-toggle" style="position: relative; display: flex; align-items: center; padding: 0.5rem 1rem; border: 2px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: all 0.3s; background: white;">
+                                <input type="radio" name="previewSlipsPerPage" value="6" style="margin-right: 0.5rem; width: 16px; height: 16px; cursor: pointer;" onchange="updateSlipsPerPage(6)">
+                                <span style="font-weight: 600; color: #2d3748;">6 Slips</span>
+                            </label>
+                        </div>
+                    </label>
+                    <small style="display: block; margin-top: 0.5rem; color: #718096; font-size: 0.85rem;">
+                        <i class="fas fa-info-circle"></i> Choose how many slips to print per page. Click to regenerate preview.
+                    </small>
+                </div>
+
                 <div class="preview-info" id="orderInfo">
                     <p><strong>Order ID:</strong> <span id="displayOrderId">-</span></p>
                     <p><strong>Symbol:</strong> <span id="displayPartyName">-</span></p>
@@ -490,7 +577,7 @@
 
                     <div class="secure-badge">
                         <span><i class="fas fa-lock"></i></span>
-                        <span>Secure Payment (Razorpay)</span>
+                        <span id="gatewayBadge">Secure Payment</span>
                     </div>
 
                     <div class="payment-icons">
@@ -503,7 +590,7 @@
                     <div class="features-list">
                         <h4>What You Get:</h4>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Complete voter slips as PDF</div>
-                        <div class="feature-item"><i class="fas fa-check-circle"></i> A4 print ready (5 slips/page)</div>
+                        <div class="feature-item" id="slipsPerPageFeature"><i class="fas fa-check-circle"></i> A4 print ready (<span id="featureSlipsCount">5</span> slips/page)</div>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Cutting guide lines</div>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Unlimited downloads</div>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Access anytime from dashboard</div>
@@ -513,17 +600,60 @@
         </div>
     </div>
 
+    <!-- Payment Gateway Scripts -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
         const token = localStorage.getItem('token');
         let orderData = null;
-        let razorpayKeyId = '';
+        let paymentGateway = {
+            active: 'razorpay',
+            razorpayKeyId: '',
+            cashfreeEnvironment: 'TEST'
+        };
+        let cashfree = null;
         let isAdmin = false;
 
         if (!token) {
             window.location.href = 'login.html';
+        }
+
+        // Load payment gateway settings
+        async function loadPaymentGateway() {
+            try {
+                const response = await fetch('/api/settings/active-gateway');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    paymentGateway.active = data.activeGateway || 'razorpay';
+                    paymentGateway.razorpayKeyId = data.razorpayKeyId || '';
+                    paymentGateway.cashfreeEnvironment = data.cashfreeEnvironment || 'TEST';
+                    
+                    console.log('💳 Active Payment Gateway:', paymentGateway.active);
+                    
+                    // Update gateway badge
+                    const badge = document.getElementById('gatewayBadge');
+                    if (badge) {
+                        const gatewayName = paymentGateway.active === 'cashfree' ? 'Cashfree' : 'Razorpay';
+                        badge.textContent = `Secure Payment (${gatewayName})`;
+                    }
+                    
+                    // Initialize Cashfree if needed
+                    if (paymentGateway.active === 'cashfree' && window.Cashfree) {
+                        cashfree = Cashfree({
+                            mode: paymentGateway.cashfreeEnvironment === 'PROD' ? 'production' : 'sandbox'
+                        });
+                        console.log('✅ Cashfree SDK initialized');
+                    }
+                } else {
+                    console.error('Failed to load payment gateway settings');
+                }
+            } catch (error) {
+                console.error('Error loading payment gateway:', error);
+            }
         }
 
         // Check if user is admin
@@ -616,8 +746,329 @@
             showMessage('error', 'Order ID Not Found', 'Redirecting back to dashboard...', 'dashboard.html', 3000);
         }
 
-        // Load order details and preview
-        loadOrderAndPreview();
+        // Update slips per page and regenerate preview
+        async function updateSlipsPerPage(slipsPerPage) {
+            console.log('🎫 Updating slips per page to:', slipsPerPage);
+            
+            if (!orderData || !orderData.orderId) {
+                console.error('No order data available');
+                return;
+            }
+
+            try {
+                // Show loading state immediately
+                const container = document.getElementById('previewContainer');
+                container.innerHTML = `
+                    <div class="loading-preview">
+                        <div class="spinner"></div>
+                        <p>Updating to ${slipsPerPage} slips per page...</p>
+                        <small style="color: #718096; margin-top: 0.5rem;">Deleting old PDFs and regenerating...</small>
+                    </div>
+                `;
+
+                // STEP 1: Immediately update the order and delete old PDFs on server
+                console.log('🗑️ Deleting old PDFs from server...');
+                const updateResponse = await fetch(`/api/orders/${orderData._id}/update-slips-per-page`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ slipsPerPage })
+                });
+
+                if (!updateResponse.ok) {
+                    const errorData = await updateResponse.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to update slips per page');
+                }
+
+                const updateResult = await updateResponse.json();
+                console.log('✅ Server response:', updateResult.message);
+
+                // STEP 2: Cleanup old preview if exists
+                if (window.cleanupUrl && window.pdfFilename) {
+                    try {
+                        console.log('🗑️ Cleaning up old preview from temp folder...');
+                        await fetch(window.cleanupUrl, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        console.log('✅ Old preview cleaned up');
+                    } catch (err) {
+                        console.warn('⚠️ Failed to cleanup old preview:', err);
+                    }
+                }
+
+                // STEP 3: Revoke old blob URL
+                if (window.pdfBlobUrl) {
+                    window.URL.revokeObjectURL(window.pdfBlobUrl);
+                    window.pdfBlobUrl = null;
+                }
+
+                // STEP 4: Generate new preview with updated slips per page
+                console.log('📄 Generating new preview...');
+                container.innerHTML = `
+                    <div class="loading-preview">
+                        <div class="spinner"></div>
+                        <p>Generating new preview with ${slipsPerPage} slips per page...</p>
+                    </div>
+                `;
+
+                const previewResponse = await fetch('/api/slips/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId: orderData.orderId })
+                });
+
+                if (!previewResponse.ok) {
+                    const errorData = await previewResponse.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to generate new preview');
+                }
+
+                const data = await previewResponse.json();
+                console.log('📄 New preview generated:', data.filename);
+                
+                // Store cleanup URL for later
+                window.cleanupUrl = data.cleanup;
+                window.pdfFilename = data.filename;
+                
+                // Fetch PDF with authentication and create blob URL
+                const pdfResponse = await fetch(data.pdfUrl, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!pdfResponse.ok) {
+                    throw new Error('Failed to load new preview PDF');
+                }
+                
+                const pdfBlob = await pdfResponse.blob();
+                const pdfBlobUrl = window.URL.createObjectURL(pdfBlob);
+                
+                // Store blob URL for cleanup
+                window.pdfBlobUrl = pdfBlobUrl;
+                
+                // Display new PDF using helper function
+                displayPDF(pdfBlobUrl, container);
+
+                console.log('✅ Preview regenerated successfully');
+                
+                // Update feature text
+                document.getElementById('featureSlipsCount').textContent = slipsPerPage;
+                
+                // Show success message
+                showMessage('success', 'Updated Successfully!', 
+                    `Preview regenerated with ${slipsPerPage} slips per page. Old PDFs have been deleted. Your final PDF will be regenerated when you download it.`, 
+                    null, 0);
+
+            } catch (error) {
+                console.error('Error updating slips per page:', error);
+                showMessage('error', 'Failed to Update', error.message || 'Could not regenerate preview. Please try again.');
+                
+                // Reload the page to reset state
+                setTimeout(() => location.reload(), 2000);
+            }
+        }
+
+        // Initialize page
+        (async function init() {
+            await loadPaymentGateway();
+            await checkUserRole();
+            await loadOrderAndPreview();
+            await checkPaymentStatus();
+        })();
+
+        // Helper function to display PDF with mobile-friendly fallback
+        async function displayPDF(pdfBlobUrl, container) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile && typeof pdfjsLib !== 'undefined') {
+                // Mobile with PDF.js support - render using canvas
+                try {
+                    await renderPDFWithPDFJS(pdfBlobUrl, container);
+                } catch (error) {
+                    console.error('PDF.js rendering failed:', error);
+                    // Fallback to iframe
+                    displayPDFWithIframe(pdfBlobUrl, container);
+                }
+            } else {
+                // Desktop or no PDF.js - use iframe
+                displayPDFWithIframe(pdfBlobUrl, container);
+            }
+        }
+        
+        // Display PDF using iframe (works on most desktop browsers)
+        function displayPDFWithIframe(pdfBlobUrl, container) {
+            container.innerHTML = `
+                <iframe 
+                    src="${pdfBlobUrl}" 
+                    type="application/pdf" 
+                    width="100%" 
+                    height="800" 
+                    style="border: 2px solid #667eea; border-radius: 8px; display: block; min-height: 600px;">
+                </iframe>
+            `;
+            
+            // Add buttons after the preview container
+            const existingButtons = container.nextElementSibling?.classList.contains('pdf-action-buttons');
+            if (existingButtons) {
+                container.nextElementSibling.remove();
+            }
+            
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'pdf-action-buttons';
+            buttonsDiv.style.cssText = 'text-align: center; margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px;';
+            buttonsDiv.innerHTML = `
+                <p style="margin: 0 0 1rem 0; color: #4a5568; font-size: 0.95rem; font-weight: 600;">
+                    <i class="fas fa-info-circle"></i> Alternative Options
+                </p>
+                <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="${pdfBlobUrl}" target="_blank" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
+                        <i class="fas fa-external-link-alt"></i> Open in New Tab
+                    </a>
+                    <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                </div>
+            `;
+            
+            container.parentNode.insertBefore(buttonsDiv, container.nextSibling);
+        }
+        
+        // Render PDF using PDF.js (better mobile support)
+        async function renderPDFWithPDFJS(pdfBlobUrl, container) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            
+            container.innerHTML = `
+                <div style="border: 2px solid #667eea; border-radius: 8px; overflow: hidden; background: #f8f9fa;">
+                    <div style="text-align: center; padding: 1rem; background: white; overflow-x: auto;">
+                        <canvas id="pdfCanvas"></canvas>
+                    </div>
+                    <div id="pdfControls">
+                        <button id="prevPage" onclick="changePage(-1)">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="pageInfo"></span>
+                        <button id="nextPage" onclick="changePage(1)">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Load PDF
+            const loadingTask = pdfjsLib.getDocument(pdfBlobUrl);
+            const pdf = await loadingTask.promise;
+            
+            window.currentPDF = pdf;
+            window.currentPage = 1;
+            window.totalPages = pdf.numPages;
+            window.currentPdfBlobUrl = pdfBlobUrl; // Store for download button
+            
+            // Render first page
+            await renderPage(1);
+            
+            // Add download button after the preview container
+            const existingButtons = container.nextElementSibling?.classList.contains('pdf-action-buttons');
+            if (existingButtons) {
+                container.nextElementSibling.remove();
+            }
+            
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'pdf-action-buttons';
+            buttonsDiv.style.cssText = 'text-align: center; margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px;';
+            buttonsDiv.innerHTML = `
+                <p style="margin: 0 0 1rem 0; color: #4a5568; font-size: 0.95rem; font-weight: 600;">
+                    <i class="fas fa-download"></i> Download Options
+                </p>
+                <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+                        <i class="fas fa-download"></i> Download Preview PDF
+                    </a>
+                </div>
+            `;
+            
+            container.parentNode.insertBefore(buttonsDiv, container.nextSibling);
+        }
+        
+        // Render specific page with high quality
+        async function renderPage(pageNum) {
+            const pdf = window.currentPDF;
+            const page = await pdf.getPage(pageNum);
+            
+            const canvas = document.getElementById('pdfCanvas');
+            const context = canvas.getContext('2d');
+            
+            // Use device pixel ratio for high-quality rendering on retina displays
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            
+            // Get viewport for mobile-friendly scaling
+            const containerWidth = document.querySelector('.preview-container').offsetWidth - 40;
+            const viewport = page.getViewport({ scale: 1 });
+            
+            // Calculate scale to fit container width, but use higher quality
+            let scale = containerWidth / viewport.width;
+            
+            // For high-quality rendering, use at least 2x scale
+            const renderScale = Math.max(scale * devicePixelRatio, 2);
+            
+            const scaledViewport = page.getViewport({ scale: renderScale });
+            
+            // Set canvas size with device pixel ratio for crisp rendering
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
+            
+            // Set display size to fit container
+            canvas.style.width = `${scaledViewport.width / devicePixelRatio}px`;
+            canvas.style.height = `${scaledViewport.height / devicePixelRatio}px`;
+            canvas.style.maxWidth = '100%';
+            canvas.style.height = 'auto';
+            
+            const renderContext = {
+                canvasContext: context,
+                viewport: scaledViewport
+            };
+            
+            await page.render(renderContext).promise;
+            
+            // Update controls
+            document.getElementById('pageInfo').textContent = `Page ${pageNum} of ${window.totalPages}`;
+            document.getElementById('prevPage').disabled = pageNum <= 1;
+            document.getElementById('nextPage').disabled = pageNum >= window.totalPages;
+        }
+        
+        // Change page
+        function changePage(delta) {
+            const newPage = window.currentPage + delta;
+            if (newPage >= 1 && newPage <= window.totalPages) {
+                window.currentPage = newPage;
+                renderPage(newPage);
+            }
+        }
+        
+        // Fallback: Show download-only option if PDF can't be displayed
+        function showPDFDownloadOnly(pdfBlobUrl, container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
+                    <i class="fas fa-file-pdf" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.9;"></i>
+                    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem;">Preview Generated!</h3>
+                    <p style="margin: 0 0 2rem 0; opacity: 0.9;">First 2 pages (10 slips) ready to view</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="${pdfBlobUrl}" target="_blank" class="btn" style="display: inline-block; background: white; color: #667eea; padding: 1rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <i class="fas fa-external-link-alt"></i> Open in New Tab
+                        </a>
+                        <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 1rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid white;">
+                            <i class="fas fa-download"></i> Download PDF
+                        </a>
+                    </div>
+                    <p style="margin: 2rem 0 0 0; font-size: 0.85rem; opacity: 0.8;">
+                        <i class="fas fa-info-circle"></i> Your browser may not support inline PDF viewing
+                    </p>
+                </div>
+            `;
+        }
 
         async function loadOrderAndPreview() {
             try {
@@ -665,6 +1116,17 @@
                 
                 document.getElementById('totalVoters').textContent = orderData.totalVoters || orderData.voterCount || '-';
                 document.getElementById('totalAmount').textContent = orderData.amount ? `₹${orderData.amount.toFixed(2)}` : '₹0.00';
+
+                // Set initial radio button based on order's slipsPerPage
+                const slipsPerPage = orderData.customization?.slipsPerPage || 5;
+                console.log('🎫 Order slipsPerPage:', slipsPerPage);
+                const radioButton = document.querySelector(`input[name="previewSlipsPerPage"][value="${slipsPerPage}"]`);
+                if (radioButton) {
+                    radioButton.checked = true;
+                }
+                
+                // Update feature text
+                document.getElementById('featureSlipsCount').textContent = slipsPerPage;
 
                 // Show flat pricing (no discount)
                 const voterCount = orderData.totalVoters || orderData.voterCount || 0;
@@ -714,20 +1176,9 @@
                     // Store blob URL for cleanup
                     window.pdfBlobUrl = pdfBlobUrl;
                     
-                    // Display PDF from blob URL
+                    // Display PDF from blob URL using helper function
                     const container = document.getElementById('previewContainer');
-                    container.innerHTML = `
-                        <object data="${pdfBlobUrl}" type="application/pdf" width="100%" height="100%" style="min-height: 800px; border: 2px solid #667eea; border-radius: 8px;">
-                            <div style="padding: 2rem; text-align: center;">
-                                <p style="color: #666; margin-bottom: 1rem;">
-                                    <i class="fas fa-exclamation-triangle"></i> Your browser cannot display the PDF inline.
-                                </p>
-                                <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-payment" style="display: inline-block; text-decoration: none;">
-                                    <i class="fas fa-file-pdf"></i> Download Preview PDF
-                                </a>
-                            </div>
-                        </object>
-                    `;
+                    displayPDF(pdfBlobUrl, container);
                     
                     // Check payment status and update UI accordingly
                     if (orderData.paymentStatus === 'completed') {
@@ -825,46 +1276,12 @@
                 document.getElementById('paymentBtn').disabled = true;
                 document.getElementById('payBtnText').textContent = 'Preparing payment...';
 
-                // Create Razorpay order
-                const response = await fetch('/api/payment/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId: orderData.orderId })
-                });
-
-                if (!response.ok) throw new Error('Order creation failed');
-
-                const result = await response.json();
-
-                const options = {
-                    key: result.key,
-                    amount: result.razorpayOrder.amount,
-                    currency: result.razorpayOrder.currency,
-                    name: 'Kerala SEC Voter Slips',
-                    description: `Order: ${orderData.orderId}`,
-                    order_id: result.razorpayOrder.id,
-                    handler: function(razorpayResponse) {
-                        verifyPayment(razorpayResponse);
-                    },
-                    prefill: {
-                        email: orderData.user?.email || ''
-                    },
-                    theme: {
-                        color: '#006D3B'
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            document.getElementById('paymentBtn').disabled = false;
-                            document.getElementById('payBtnText').textContent = 'Make Payment';
-                        }
-                    }
-                };
-
-                const rzp = new Razorpay(options);
-                rzp.open();
+                // Check which gateway to use
+                if (paymentGateway.active === 'cashfree') {
+                    await initiateCashfreePayment();
+                } else {
+                    await initiateRazorpayPayment();
+                }
 
             } catch (error) {
                 console.error('Payment initiation error:', error);
@@ -872,6 +1289,86 @@
                 document.getElementById('paymentBtn').disabled = false;
                 document.getElementById('payBtnText').textContent = 'Make Payment';
             }
+        }
+
+        async function initiateRazorpayPayment() {
+            // Create Razorpay order
+            const response = await fetch('/api/payment/razorpay/create-order', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId: orderData.orderId })
+            });
+
+            if (!response.ok) throw new Error('Order creation failed');
+
+            const result = await response.json();
+
+            const options = {
+                key: result.key,
+                amount: result.razorpayOrder.amount,
+                currency: result.razorpayOrder.currency,
+                name: 'Kerala SEC Voter Slips',
+                description: `Order: ${orderData.orderId}`,
+                order_id: result.razorpayOrder.id,
+                handler: function(razorpayResponse) {
+                    verifyRazorpayPayment(razorpayResponse);
+                },
+                prefill: {
+                    email: orderData.user?.email || ''
+                },
+                theme: {
+                    color: '#006D3B'
+                },
+                modal: {
+                    ondismiss: function() {
+                        document.getElementById('paymentBtn').disabled = false;
+                        document.getElementById('payBtnText').textContent = 'Make Payment';
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        async function initiateCashfreePayment() {
+            // Create Cashfree order
+            const response = await fetch('/api/payment/cashfree/create-order', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId: orderData.orderId })
+            });
+
+            if (!response.ok) throw new Error('Order creation failed');
+
+            const result = await response.json();
+
+            if (!cashfree) {
+                throw new Error('Cashfree SDK not initialized');
+            }
+
+            // Cashfree checkout options
+            const checkoutOptions = {
+                paymentSessionId: result.cashfreeOrder.sessionId,
+                returnUrl: `${window.location.origin}/api/payment/cashfree/callback?order_id=${orderData.orderId}`
+            };
+
+            // Open Cashfree checkout
+            cashfree.checkout(checkoutOptions).then(() => {
+                console.log('Cashfree checkout initiated');
+                // User will be redirected to callback URL after payment
+            }).catch((error) => {
+                console.error('Cashfree checkout error:', error);
+                document.getElementById('paymentBtn').disabled = false;
+                document.getElementById('payBtnText').textContent = 'Make Payment';
+                throw error;
+            });
         }
 
         async function downloadFullPDF() {
@@ -965,7 +1462,7 @@
             }
         }
 
-        async function verifyPayment(razorpayResponse) {
+        async function verifyRazorpayPayment(razorpayResponse) {
             try {
                 document.getElementById('payBtnText').textContent = 'Verifying payment...';
 
@@ -1013,6 +1510,41 @@
                     'dashboard.html',
                     5000
                 );
+            }
+        }
+
+        // Check payment status on page load (for Cashfree callback)
+        async function checkPaymentStatus() {
+            const paymentParam = urlParams.get('payment');
+            
+            if (paymentParam === 'failed') {
+                showMessage('error', 'Payment Failed', 'Your payment was not successful. Please try again.');
+                return;
+            }
+            
+            // If coming back from Cashfree, verify payment
+            if (paymentGateway.active === 'cashfree' && orderData && orderData.paymentStatus === 'pending') {
+                try {
+                    const response = await fetch('/api/payment/cashfree/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: orderData.orderId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.order.paymentStatus === 'completed') {
+                        // Payment successful - redirect to success page
+                        window.location.href = `order-success.html?orderId=${orderData.orderId}`;
+                    }
+                } catch (error) {
+                    console.error('Error verifying Cashfree payment:', error);
+                }
             }
         }
     </script>

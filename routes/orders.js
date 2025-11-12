@@ -19,6 +19,11 @@ router.get('/', auth, orderController.getUserOrders);
 // @access  Private
 router.get('/:orderId', auth, orderController.getOrder);
 
+// @route   PATCH /api/orders/:orderId/update-slips-per-page
+// @desc    Update slips per page for an order
+// @access  Private
+router.patch('/:orderId/update-slips-per-page', auth, orderController.updateSlipsPerPage);
+
 // @route   GET /api/orders/stats
 // @desc    Get order statistics
 // @access  Private

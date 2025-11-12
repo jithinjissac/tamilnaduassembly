@@ -3,6 +3,12 @@ import User from '../models/User.js';
 import { body, validationResult } from 'express-validator';
 import { generatePDFBackground } from '../utils/pdfGenerator.js';
 import { sendOrderConfirmationEmail } from '../utils/emailService.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Generate unique order ID
 const generateOrderId = () => {
@@ -257,6 +263,91 @@ export const getOrderStats = async (req, res) => {
             status: 'error',
             message: 'Failed to get statistics',
             error: error.message 
+        });
+    }
+};
+
+// Update slips per page for an order
+export const updateSlipsPerPage = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { slipsPerPage } = req.body;
+        const userId = req.userId;
+
+        console.log(`📝 Updating slips per page for order ${orderId} to ${slipsPerPage}`);
+
+        // Validate slipsPerPage
+        if (![5, 6].includes(slipsPerPage)) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid slipsPerPage value. Must be 5 or 6.'
+            });
+        }
+
+        // Find order by _id and userId
+        const order = await Order.findOne({ _id: orderId, userId });
+
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found'
+            });
+        }
+
+        // Delete existing preview PDF if it exists
+        if (order.previewPdfFilename) {
+            const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
+            const previewPath = path.join(tempDir, order.previewPdfFilename);
+            
+            try {
+                if (fs.existsSync(previewPath)) {
+                    fs.unlinkSync(previewPath);
+                    console.log(`🗑️ Deleted old preview PDF: ${order.previewPdfFilename}`);
+                }
+            } catch (err) {
+                console.warn('⚠️ Failed to delete old preview PDF:', err.message);
+            }
+        }
+
+        // Delete existing permanent PDF if it exists
+        if (order.permanentPdfFilename) {
+            const pdfsDir = path.join(__dirname, '..', 'public', 'pdfs');
+            const permanentPath = path.join(pdfsDir, order.permanentPdfFilename);
+            
+            try {
+                if (fs.existsSync(permanentPath)) {
+                    fs.unlinkSync(permanentPath);
+                    console.log(`🗑️ Deleted old permanent PDF: ${order.permanentPdfFilename}`);
+                }
+            } catch (err) {
+                console.warn('⚠️ Failed to delete old permanent PDF:', err.message);
+            }
+        }
+
+        // Update slipsPerPage
+        order.customization.slipsPerPage = slipsPerPage;
+        
+        // Clear PDF filenames to force regeneration
+        order.previewPdfFilename = null;
+        order.permanentPdfFilename = null;
+        
+        await order.save();
+
+        console.log(`✅ Updated slips per page to ${slipsPerPage} for order ${order.orderId}`);
+        console.log(`✅ Cleared PDF filenames - both preview and permanent PDFs will be regenerated`);
+
+        res.json({
+            status: 'success',
+            message: 'Slips per page updated successfully. PDFs will be regenerated.',
+            slipsPerPage: order.customization.slipsPerPage
+        });
+
+    } catch (error) {
+        console.error('Update slips per page error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to update slips per page',
+            error: error.message
         });
     }
 };

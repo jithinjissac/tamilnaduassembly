@@ -5,12 +5,18 @@ import {
     resetSettings, 
     getDefaultSettings,
     getSettingsHistory,
-    testEmail
+    testEmail,
+    getActiveGateway
 } from '../controllers/settingsController.js';
 import { previewEmailTemplate } from '../controllers/templatePreviewController.js';
 import { adminAuth } from '../middleware/auth.js';
 
-const router = express.Router();// All routes require admin authentication
+const router = express.Router();
+
+// Public route - no auth required for gateway detection
+router.get('/active-gateway', getActiveGateway);
+
+// All other routes require admin authentication
 router.use(adminAuth);
 
 // Get all settings or specific category
