@@ -577,7 +577,7 @@
 
                     <div class="secure-badge">
                         <span><i class="fas fa-lock"></i></span>
-                        <span id="gatewayBadge">Secure Payment</span>
+                        <span>Secure Payment (Razorpay)</span>
                     </div>
 
                     <div class="payment-icons">
@@ -600,60 +600,17 @@
         </div>
     </div>
 
-    <!-- Payment Gateway Scripts -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-    
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
         const token = localStorage.getItem('token');
         let orderData = null;
-        let paymentGateway = {
-            active: 'razorpay',
-            razorpayKeyId: '',
-            cashfreeEnvironment: 'TEST'
-        };
-        let cashfree = null;
+        let razorpayKeyId = '';
         let isAdmin = false;
 
         if (!token) {
             window.location.href = 'login.html';
-        }
-
-        // Load payment gateway settings
-        async function loadPaymentGateway() {
-            try {
-                const response = await fetch('/api/settings/active-gateway');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    paymentGateway.active = data.activeGateway || 'razorpay';
-                    paymentGateway.razorpayKeyId = data.razorpayKeyId || '';
-                    paymentGateway.cashfreeEnvironment = data.cashfreeEnvironment || 'TEST';
-                    
-                    console.log('💳 Active Payment Gateway:', paymentGateway.active);
-                    
-                    // Update gateway badge
-                    const badge = document.getElementById('gatewayBadge');
-                    if (badge) {
-                        const gatewayName = paymentGateway.active === 'cashfree' ? 'Cashfree' : 'Razorpay';
-                        badge.textContent = `Secure Payment (${gatewayName})`;
-                    }
-                    
-                    // Initialize Cashfree if needed
-                    if (paymentGateway.active === 'cashfree' && window.Cashfree) {
-                        cashfree = Cashfree({
-                            mode: paymentGateway.cashfreeEnvironment === 'PROD' ? 'production' : 'sandbox'
-                        });
-                        console.log('✅ Cashfree SDK initialized');
-                    }
-                } else {
-                    console.error('Failed to load payment gateway settings');
-                }
-            } catch (error) {
-                console.error('Error loading payment gateway:', error);
-            }
         }
 
         // Check if user is admin
@@ -872,13 +829,8 @@
             }
         }
 
-        // Initialize page
-        (async function init() {
-            await loadPaymentGateway();
-            await checkUserRole();
-            await loadOrderAndPreview();
-            await checkPaymentStatus();
-        })();
+        // Load order details and preview
+        loadOrderAndPreview();
 
         // Helper function to display PDF with mobile-friendly fallback
         async function displayPDF(pdfBlobUrl, container) {
@@ -1276,12 +1228,46 @@
                 document.getElementById('paymentBtn').disabled = true;
                 document.getElementById('payBtnText').textContent = 'Preparing payment...';
 
-                // Check which gateway to use
-                if (paymentGateway.active === 'cashfree') {
-                    await initiateCashfreePayment();
-                } else {
-                    await initiateRazorpayPayment();
-                }
+                // Create Razorpay order
+                const response = await fetch('/api/payment/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId: orderData.orderId })
+                });
+
+                if (!response.ok) throw new Error('Order creation failed');
+
+                const result = await response.json();
+
+                const options = {
+                    key: result.key,
+                    amount: result.razorpayOrder.amount,
+                    currency: result.razorpayOrder.currency,
+                    name: 'Kerala SEC Voter Slips',
+                    description: `Order: ${orderData.orderId}`,
+                    order_id: result.razorpayOrder.id,
+                    handler: function(razorpayResponse) {
+                        verifyPayment(razorpayResponse);
+                    },
+                    prefill: {
+                        email: orderData.user?.email || ''
+                    },
+                    theme: {
+                        color: '#006D3B'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            document.getElementById('paymentBtn').disabled = false;
+                            document.getElementById('payBtnText').textContent = 'Make Payment';
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
 
             } catch (error) {
                 console.error('Payment initiation error:', error);
@@ -1289,86 +1275,6 @@
                 document.getElementById('paymentBtn').disabled = false;
                 document.getElementById('payBtnText').textContent = 'Make Payment';
             }
-        }
-
-        async function initiateRazorpayPayment() {
-            // Create Razorpay order
-            const response = await fetch('/api/payment/razorpay/create-order', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ orderId: orderData.orderId })
-            });
-
-            if (!response.ok) throw new Error('Order creation failed');
-
-            const result = await response.json();
-
-            const options = {
-                key: result.key,
-                amount: result.razorpayOrder.amount,
-                currency: result.razorpayOrder.currency,
-                name: 'Kerala SEC Voter Slips',
-                description: `Order: ${orderData.orderId}`,
-                order_id: result.razorpayOrder.id,
-                handler: function(razorpayResponse) {
-                    verifyRazorpayPayment(razorpayResponse);
-                },
-                prefill: {
-                    email: orderData.user?.email || ''
-                },
-                theme: {
-                    color: '#006D3B'
-                },
-                modal: {
-                    ondismiss: function() {
-                        document.getElementById('paymentBtn').disabled = false;
-                        document.getElementById('payBtnText').textContent = 'Make Payment';
-                    }
-                }
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.open();
-        }
-
-        async function initiateCashfreePayment() {
-            // Create Cashfree order
-            const response = await fetch('/api/payment/cashfree/create-order', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ orderId: orderData.orderId })
-            });
-
-            if (!response.ok) throw new Error('Order creation failed');
-
-            const result = await response.json();
-
-            if (!cashfree) {
-                throw new Error('Cashfree SDK not initialized');
-            }
-
-            // Cashfree checkout options
-            const checkoutOptions = {
-                paymentSessionId: result.cashfreeOrder.sessionId,
-                returnUrl: `${window.location.origin}/api/payment/cashfree/callback?order_id=${orderData.orderId}`
-            };
-
-            // Open Cashfree checkout
-            cashfree.checkout(checkoutOptions).then(() => {
-                console.log('Cashfree checkout initiated');
-                // User will be redirected to callback URL after payment
-            }).catch((error) => {
-                console.error('Cashfree checkout error:', error);
-                document.getElementById('paymentBtn').disabled = false;
-                document.getElementById('payBtnText').textContent = 'Make Payment';
-                throw error;
-            });
         }
 
         async function downloadFullPDF() {
@@ -1462,7 +1368,7 @@
             }
         }
 
-        async function verifyRazorpayPayment(razorpayResponse) {
+        async function verifyPayment(razorpayResponse) {
             try {
                 document.getElementById('payBtnText').textContent = 'Verifying payment...';
 
@@ -1510,41 +1416,6 @@
                     'dashboard.html',
                     5000
                 );
-            }
-        }
-
-        // Check payment status on page load (for Cashfree callback)
-        async function checkPaymentStatus() {
-            const paymentParam = urlParams.get('payment');
-            
-            if (paymentParam === 'failed') {
-                showMessage('error', 'Payment Failed', 'Your payment was not successful. Please try again.');
-                return;
-            }
-            
-            // If coming back from Cashfree, verify payment
-            if (paymentGateway.active === 'cashfree' && orderData && orderData.paymentStatus === 'pending') {
-                try {
-                    const response = await fetch('/api/payment/cashfree/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            orderId: orderData.orderId
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok && data.order.paymentStatus === 'completed') {
-                        // Payment successful - redirect to success page
-                        window.location.href = `order-success.html?orderId=${orderData.orderId}`;
-                    }
-                } catch (error) {
-                    console.error('Error verifying Cashfree payment:', error);
-                }
             }
         }
     </script>

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import razorpay from '../config/razorpay.js';
+import razorpay, { initializeRazorpay, getRazorpayInstance } from '../config/razorpay.js';
 import cashfree from '../config/cashfree.js';
 import { Cashfree } from 'cashfree-pg';
 import Order from '../models/Order.js';
@@ -21,16 +21,34 @@ async function getActiveGateway() {
 // Create Razorpay order
 export const createRazorpayOrder = async (req, res) => {
     try {
-        // Check if Razorpay is initialized
-        if (!razorpay) {
+        const { orderId } = req.body;
+        const userId = req.userId;
+
+        // Get payment settings
+        const paymentSettings = await Settings.getSettings('payment');
+        const razorpayKeyId = paymentSettings?.razorpay?.keyId || process.env.RAZORPAY_KEY_ID;
+        const razorpayKeySecret = paymentSettings?.razorpay?.keySecret || process.env.RAZORPAY_KEY_SECRET;
+
+        // Check if Razorpay credentials are available
+        if (!razorpayKeyId || !razorpayKeySecret || 
+            razorpayKeyId.includes('your_') || razorpayKeySecret.includes('your_') ||
+            razorpayKeyId.includes('xxxxx')) {
             return res.status(503).json({ 
                 status: 'error',
-                message: 'Payment gateway not configured. Please add Razorpay credentials in .env file.' 
+                message: 'Razorpay not configured. Please add credentials in admin settings or .env file.' 
             });
         }
 
-        const { orderId } = req.body;
-        const userId = req.userId;
+        // Initialize/reinitialize Razorpay with current settings
+        await initializeRazorpay(razorpayKeyId, razorpayKeySecret);
+        const razorpayClient = getRazorpayInstance();
+
+        if (!razorpayClient) {
+            return res.status(503).json({ 
+                status: 'error',
+                message: 'Failed to initialize Razorpay. Please check credentials.' 
+            });
+        }
 
         // Find order
         const order = await Order.findOne({ orderId, userId });
@@ -50,7 +68,7 @@ export const createRazorpayOrder = async (req, res) => {
         }
 
         // Create Razorpay order
-        const razorpayOrder = await razorpay.orders.create({
+        const razorpayOrder = await razorpayClient.orders.create({
             amount: Math.round(order.amount * 100), // Amount in paise
             currency: 'INR',
             receipt: order.orderId,
@@ -74,7 +92,7 @@ export const createRazorpayOrder = async (req, res) => {
                 currency: razorpayOrder.currency
             },
             orderId: order.orderId,
-            key: process.env.RAZORPAY_KEY_ID
+            key: razorpayKeyId
         });
 
     } catch (error) {
@@ -197,6 +215,17 @@ export const verifyPayment = async (req, res) => {
 
         const userId = req.userId;
 
+        // Get payment settings for Razorpay secret
+        const paymentSettings = await Settings.getSettings('payment');
+        const razorpayKeySecret = paymentSettings?.razorpay?.keySecret || process.env.RAZORPAY_KEY_SECRET;
+
+        if (!razorpayKeySecret || razorpayKeySecret.includes('your_') || razorpayKeySecret.includes('xxxxx')) {
+            return res.status(503).json({ 
+                status: 'error',
+                message: 'Razorpay not configured properly' 
+            });
+        }
+
         // Find order
         const order = await Order.findOne({ orderId, userId });
 
@@ -210,7 +239,7 @@ export const verifyPayment = async (req, res) => {
         // Verify signature
         const sign = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSign = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .createHmac('sha256', razorpayKeySecret)
             .update(sign.toString())
             .digest('hex');
 
@@ -339,7 +368,18 @@ export const verifyCashfreePayment = async (req, res) => {
 // Razorpay webhook
 export const webhook = async (req, res) => {
     try {
-        const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+        // Get webhook secret from settings or .env
+        const paymentSettings = await Settings.getSettings('payment');
+        const webhookSecret = paymentSettings?.razorpay?.webhookSecret || process.env.RAZORPAY_WEBHOOK_SECRET;
+
+        if (!webhookSecret || webhookSecret.includes('your_') || webhookSecret.includes('xxxxx')) {
+            console.error('Razorpay webhook secret not configured');
+            return res.status(503).json({ 
+                status: 'error',
+                message: 'Webhook not configured' 
+            });
+        }
+
         const webhookSignature = req.headers['x-razorpay-signature'];
 
         // Verify webhook signature
