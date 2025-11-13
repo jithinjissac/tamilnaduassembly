@@ -583,7 +583,7 @@ export const downloadOrderPDF = async (req, res) => {
         }
         
         // Generate HTML for all slips
-        const html = generateSlipHTML(order);
+        const html = await generateSlipHTML(order);
         
         // Generate PDF using browser
         const browser = await getBrowser();

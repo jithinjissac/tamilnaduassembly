@@ -112,7 +112,7 @@ export const findAndLinkTempPDF = (orderId) => {
 export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
     try {
         const { generateSlipHTML } = await import('../controllers/slipController.js');
-        const html = generateSlipHTML(order);
+        const html = await generateSlipHTML(order);
 
         // Always use a fresh browser for early/background generation
         const browser = await createFreshBrowser();
@@ -144,7 +144,7 @@ export const generatePDFBackground = async (order, orderId) => {
     pdfJobs.set(orderId, { status: 'generating', createdAt: new Date(), progress: 0 });
     try {
         const { generateSlipHTML } = await import('../controllers/slipController.js');
-        const html = generateSlipHTML(order);
+        const html = await generateSlipHTML(order);
 
         // ✅ ALWAYS use fresh browser for background generation to avoid disconnection issues
         let browser;
@@ -185,14 +185,17 @@ export const generatePDFBackground = async (order, orderId) => {
             const Order = (await import('../models/Order.js')).default;
             await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
             
-            // Send PDF ready email
+            // Send PDF ready email ONLY if payment is completed
             const User = (await import('../models/User.js')).default;
             const { sendPDFReadyEmail } = await import('./emailService.js');
             const orderDoc = await Order.findOne({ orderId }).populate('userId');
-            if (orderDoc && orderDoc.userId) {
+            if (orderDoc && orderDoc.userId && orderDoc.paymentStatus === 'completed') {
+                console.log(`📧 Sending PDF ready email for completed order: ${orderId}`);
                 sendPDFReadyEmail(orderDoc.userId, orderDoc).catch(err => {
                     console.error('❌ Failed to send PDF ready email:', err.message);
                 });
+            } else if (orderDoc && orderDoc.paymentStatus !== 'completed') {
+                console.log(`⏳ Skipping PDF ready email - payment not completed yet for: ${orderId} (status: ${orderDoc.paymentStatus})`);
             }
         } catch (e) {
             console.warn('Could not update Order with permanentPdfFilename', e.message);

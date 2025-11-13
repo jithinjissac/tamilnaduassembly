@@ -1297,11 +1297,19 @@
                 border-bottom: 1px solid #e0e0e0;
             }
 
+            .comparison-col.old-way {
+                background: #ffffff;
+            }
+
+            .comparison-col.new-way {
+                background: #f0fff4;
+            }
+
             .comparison-col.old-way::before {
                 content: 'Traditional Method / പഴയ രീതി';
                 display: block;
                 font-weight: 700;
-                color: var(--kerala-green);
+                color: rgb(10, 9, 9);
                 margin-bottom: 0.5rem;
                 font-size: 0.85rem;
             }
@@ -1310,7 +1318,7 @@
                 content: 'EasySlip / ഈസിസ്ലിപ്പ്';
                 display: block;
                 font-weight: 700;
-                color: var(--kerala-gold);
+                color: #2e7d32;
                 margin-bottom: 0.5rem;
                 font-size: 0.85rem;
             }
@@ -1370,9 +1378,14 @@
             }
 
             .btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.8rem;
-                white-space: nowrap;
+                padding: 0.6rem 0.8rem;
+                font-size: 0.75rem;
+                white-space: normal;
+                line-height: 1.3;
+            }
+
+            .btn i {
+                font-size: 0.85rem;
             }
 
             .hero {

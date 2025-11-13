@@ -177,7 +177,14 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     console.log(`🔍 Full customization object:`, JSON.stringify(order.customization, null, 2));
     
     // Use Malayalam name if available, otherwise English
-    const displaySymbolName = order.customization.symbolNameMalayalam || order.customization.symbolName;
+    // Ensure we get a string value, not an object
+    const symbolNameMalayalam = typeof order.customization.symbolNameMalayalam === 'string' 
+        ? order.customization.symbolNameMalayalam 
+        : (order.customization.symbolNameMalayalam?.name || '');
+    const symbolNameEnglish = typeof order.customization.symbolName === 'string'
+        ? order.customization.symbolName
+        : (order.customization.symbolName?.name || '');
+    const displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
     const pollingStation = order.location.pollingStationName || order.location.pollingStation;
     const wardName = order.location.wardName || order.location.ward;
     
