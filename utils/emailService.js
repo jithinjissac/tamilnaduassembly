@@ -9,8 +9,9 @@ let lastConfigHash = null;
 async function getTransporter() {
     const settings = await getEmailSettings();
     
-    // Check if email is enabled
-    if (!settings.enableEmailNotifications) {
+    // Check if SMTP is configured
+    if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPassword) {
+        console.log('⚠️ SMTP not configured');
         return null;
     }
     
@@ -44,20 +45,32 @@ async function getTransporter() {
 }
 
 // Send email wrapper
-export async function sendEmail({ to, subject, html, text }) {
+export async function sendEmail({ to, subject, html, text, skipSettingsCheck = false }) {
     try {
         const settings = await getEmailSettings();
         
-        // Check if email is enabled
-        if (!settings.enableEmailNotifications) {
+        // Check if email is enabled (unless skipSettingsCheck is true for critical emails)
+        if (!skipSettingsCheck && !settings.enableEmailNotifications) {
             console.log('📧 Email notifications disabled, skipping email');
             return { success: false, reason: 'disabled' };
+        }
+        
+        // For critical emails (password reset), check if SMTP is configured
+        if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPassword) {
+            console.log('⚠️ SMTP not configured');
+            return { 
+                success: false, 
+                error: 'SMTP not configured. Please configure email settings in admin panel.' 
+            };
         }
         
         const transport = await getTransporter();
         if (!transport) {
             console.log('⚠️ Email transporter not available');
-            return { success: false, reason: 'no_transporter' };
+            return { 
+                success: false, 
+                error: 'Email transporter not available. Please check SMTP settings.' 
+            };
         }
         
         const mailOptions = {
@@ -89,75 +102,75 @@ export async function sendOrderConfirmationEmail(user, order) {
         return;
     }
     
+    // Get template settings with defaults
+    const template = settings.orderConfirmation || {
+        subject: 'Order Confirmed - {{wardName}} - {{orderId}}',
+        heading: 'Order Confirmed Successfully!',
+        message: 'Your order has been confirmed.'
+    };
+    
+    // Replace placeholders
+    const replacePlaceholders = (text) => {
+        return text
+            .replace(/\{\{orderId\}\}/g, order.orderId || '')
+            .replace(/\{\{voterCount\}\}/g, order.totalVoters || order.voterCount || '')
+            .replace(/\{\{amount\}\}/g, order.amount || order.totalAmount || '')
+            .replace(/\{\{userName\}\}/g, user.name || '')
+            .replace(/\{\{userEmail\}\}/g, user.email || '')
+            .replace(/\{\{wardName\}\}/g, order.location?.wardName || order.location?.ward || '')
+            .replace(/\{\{pollingStation\}\}/g, order.location?.pollingStationName || order.location?.pollingStation || '')
+            .replace(/\{\{symbolName\}\}/g, order.customization?.symbolNameMalayalam || order.customization?.symbolName || '')
+            .replace(/\{\{district\}\}/g, order.location?.districtName || order.location?.district || '')
+            .replace(/\{\{localBody\}\}/g, order.location?.localBodyName || order.location?.localBody || '');
+    };
+    
+    const subject = replacePlaceholders(template.subject);
+    const heading = replacePlaceholders(template.heading);
+    const message = replacePlaceholders(template.message).replace(/\n/g, '<br>');
+    
     const html = `
         <!DOCTYPE html>
         <html>
         <head>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-                .order-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-                .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-                .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-                .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+                body { font-family: 'Noto Sans Malayalam', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                .kerala-border { height: 8px; background: linear-gradient(to right, #006D3B 0%, #006D3B 33.33%, #FFB81C 33.33%, #FFB81C 66.66%, #E03A3E 66.66%, #E03A3E 100%); }
+                .header { background: #006D3B; color: white; padding: 30px 20px; text-align: center; }
+                .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+                .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+                .content { padding: 40px 30px; background: white; }
+                .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
+                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
+                .footer p { margin: 8px 0; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <h1>🎉 Order Confirmed!</h1>
-                </div>
-                <div class="content">
-                    <p>Hi ${user.name},</p>
-                    <p>Thank you for your order! We've received your request and it's being processed.</p>
-                    
-                    <div class="order-details">
-                        <h3>Order Details</h3>
-                        <div class="detail-row">
-                            <strong>Order ID:</strong>
-                            <span>${order.orderId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Voter Count:</strong>
-                            <span>${order.voterCount} voters</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Total Amount:</strong>
-                            <span>₹${order.totalAmount.toFixed(2)}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>District:</strong>
-                            <span>${order.location.districtName || order.location.district}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Local Body:</strong>
-                            <span>${order.location.localBodyName || order.location.localBody}</span>
-                        </div>
-                    </div>
-                    
-                    <p>Please complete your payment to generate the voter slip PDF.</p>
-                    
-                    <center>
-                        <a href="http://localhost:3000/order-success.html?orderId=${order.orderId}" class="button">
-                            View Order & Pay
-                        </a>
-                    </center>
-                    
-                    <div class="footer">
-                        <p>Kerala Voter Slip Generator</p>
-                        <p>This is an automated email. Please do not reply.</p>
-                    </div>
-                </div>
+            <div class="kerala-border"></div>
+            <div class="header">
+                <h1>EASYSLIP</h1>
+                <h2>${heading}</h2>
             </div>
+            <div class="content">
+                <div class="message">${message}</div>
+                <center>
+                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                </center>
+            </div>
+            <div class="kerala-border" style="height: 4px;"></div>
+            <div class="footer">
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
+                <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
+            </div>
+            <div class="kerala-border"></div>
         </body>
         </html>
     `;
     
     return await sendEmail({
         to: user.email,
-        subject: `Order Confirmation - ${order.orderId}`,
+        subject,
         html
     });
 }
@@ -170,73 +183,75 @@ export async function sendPaymentSuccessEmail(user, order) {
         return;
     }
     
+    // Get template settings with defaults
+    const template = settings.paymentSuccess || {
+        subject: 'Payment Successful - {{wardName}} - {{orderId}}',
+        heading: 'Payment Received Successfully!',
+        message: 'Your payment has been received.'
+    };
+    
+    // Replace placeholders
+    const replacePlaceholders = (text) => {
+        return text
+            .replace(/\{\{orderId\}\}/g, order.orderId || '')
+            .replace(/\{\{voterCount\}\}/g, order.totalVoters || order.voterCount || '')
+            .replace(/\{\{amount\}\}/g, order.amount || order.totalAmount || '')
+            .replace(/\{\{userName\}\}/g, user.name || '')
+            .replace(/\{\{userEmail\}\}/g, user.email || '')
+            .replace(/\{\{wardName\}\}/g, order.location?.wardName || order.location?.ward || '')
+            .replace(/\{\{pollingStation\}\}/g, order.location?.pollingStationName || order.location?.pollingStation || '')
+            .replace(/\{\{symbolName\}\}/g, order.customization?.symbolNameMalayalam || order.customization?.symbolName || '')
+            .replace(/\{\{district\}\}/g, order.location?.districtName || order.location?.district || '')
+            .replace(/\{\{localBody\}\}/g, order.location?.localBodyName || order.location?.localBody || '');
+    };
+    
+    const subject = replacePlaceholders(template.subject);
+    const heading = replacePlaceholders(template.heading);
+    const message = replacePlaceholders(template.message).replace(/\n/g, '<br>');
+    
     const html = `
         <!DOCTYPE html>
         <html>
         <head>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-                .success-icon { font-size: 64px; margin-bottom: 10px; }
-                .order-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-                .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-                .button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-                .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+                body { font-family: 'Noto Sans Malayalam', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                .kerala-border { height: 8px; background: linear-gradient(to right, #006D3B 0%, #006D3B 33.33%, #FFB81C 33.33%, #FFB81C 66.66%, #E03A3E 66.66%, #E03A3E 100%); }
+                .header { background: #006D3B; color: white; padding: 30px 20px; text-align: center; }
+                .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+                .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+                .content { padding: 40px 30px; background: white; }
+                .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
+                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
+                .footer p { margin: 8px 0; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <div class="success-icon">✅</div>
-                    <h1>Payment Successful!</h1>
-                </div>
-                <div class="content">
-                    <p>Hi ${user.name},</p>
-                    <p>Your payment has been received successfully! Your voter slip PDF is being generated.</p>
-                    
-                    <div class="order-details">
-                        <h3>Payment Details</h3>
-                        <div class="detail-row">
-                            <strong>Order ID:</strong>
-                            <span>${order.orderId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Payment ID:</strong>
-                            <span>${order.paymentId || 'Processing...'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Amount Paid:</strong>
-                            <span>₹${order.totalAmount.toFixed(2)}</span>
-                        </div>
-                        <div class="detail-row">
-                            <strong>Voter Count:</strong>
-                            <span>${order.voterCount} voters</span>
-                        </div>
-                    </div>
-                    
-                    <p>Your PDF will be ready for download shortly. You'll receive another email once it's ready.</p>
-                    
-                    <center>
-                        <a href="http://localhost:3000/order-success.html?orderId=${order.orderId}" class="button">
-                            Download PDF
-                        </a>
-                    </center>
-                    
-                    <div class="footer">
-                        <p>Kerala Voter Slip Generator</p>
-                        <p>This is an automated email. Please do not reply.</p>
-                    </div>
-                </div>
+            <div class="kerala-border"></div>
+            <div class="header">
+                <h1>EASYSLIP</h1>
+                <h2>${heading}</h2>
             </div>
+            <div class="content">
+                <div class="message">${message}</div>
+                <center>
+                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                </center>
+            </div>
+            <div class="kerala-border" style="height: 4px;"></div>
+            <div class="footer">
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
+                <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
+            </div>
+            <div class="kerala-border"></div>
         </body>
         </html>
     `;
     
     return await sendEmail({
         to: user.email,
-        subject: `Payment Successful - ${order.orderId}`,
+        subject,
         html
     });
 }
@@ -249,56 +264,75 @@ export async function sendPDFReadyEmail(user, order) {
         return;
     }
     
+    // Get template settings with defaults
+    const template = settings.pdfReady || {
+        subject: 'Your Voter Slips are Ready - {{wardName}} - {{orderId}}',
+        heading: 'Your PDF is Ready for Download!',
+        message: 'Your voter slips PDF is ready.'
+    };
+    
+    // Replace placeholders
+    const replacePlaceholders = (text) => {
+        return text
+            .replace(/\{\{orderId\}\}/g, order.orderId || '')
+            .replace(/\{\{voterCount\}\}/g, order.totalVoters || order.voterCount || '')
+            .replace(/\{\{amount\}\}/g, order.amount || order.totalAmount || '')
+            .replace(/\{\{userName\}\}/g, user.name || '')
+            .replace(/\{\{userEmail\}\}/g, user.email || '')
+            .replace(/\{\{wardName\}\}/g, order.location?.wardName || order.location?.ward || '')
+            .replace(/\{\{pollingStation\}\}/g, order.location?.pollingStationName || order.location?.pollingStation || '')
+            .replace(/\{\{symbolName\}\}/g, order.customization?.symbolNameMalayalam || order.customization?.symbolName || '')
+            .replace(/\{\{district\}\}/g, order.location?.districtName || order.location?.district || '')
+            .replace(/\{\{localBody\}\}/g, order.location?.localBodyName || order.location?.localBody || '');
+    };
+    
+    const subject = replacePlaceholders(template.subject);
+    const heading = replacePlaceholders(template.heading);
+    const message = replacePlaceholders(template.message).replace(/\n/g, '<br>');
+    
     const html = `
         <!DOCTYPE html>
         <html>
         <head>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-                .pdf-icon { font-size: 64px; margin-bottom: 10px; }
-                .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-                .footer { text-align: center; color: #888; font-size: 12px; margin-top: 30px; }
+                body { font-family: 'Noto Sans Malayalam', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                .kerala-border { height: 8px; background: linear-gradient(to right, #006D3B 0%, #006D3B 33.33%, #FFB81C 33.33%, #FFB81C 66.66%, #E03A3E 66.66%, #E03A3E 100%); }
+                .header { background: #006D3B; color: white; padding: 30px 20px; text-align: center; }
+                .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+                .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+                .content { padding: 40px 30px; background: white; }
+                .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
+                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
+                .footer p { margin: 8px 0; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <div class="pdf-icon">📄</div>
-                    <h1>Your PDF is Ready!</h1>
-                </div>
-                <div class="content">
-                    <p>Hi ${user.name},</p>
-                    <p>Great news! Your voter slip PDF has been generated and is ready for download.</p>
-                    
-                    <p><strong>Order ID:</strong> ${order.orderId}</p>
-                    <p><strong>Voter Count:</strong> ${order.voterCount} voters</p>
-                    
-                    <center>
-                        <a href="http://localhost:3000/order-success.html?orderId=${order.orderId}" class="button">
-                            Download PDF Now
-                        </a>
-                    </center>
-                    
-                    <p style="color: #888; font-size: 14px; margin-top: 30px;">
-                        Note: Your PDF will be available for download from your dashboard.
-                    </p>
-                    
-                    <div class="footer">
-                        <p>Kerala Voter Slip Generator</p>
-                        <p>This is an automated email. Please do not reply.</p>
-                    </div>
-                </div>
+            <div class="kerala-border"></div>
+            <div class="header">
+                <h1>EASYSLIP</h1>
+                <h2>${heading}</h2>
             </div>
+            <div class="content">
+                <div class="message">${message}</div>
+                <center>
+                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                </center>
+            </div>
+            <div class="kerala-border" style="height: 4px;"></div>
+            <div class="footer">
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
+                <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
+            </div>
+            <div class="kerala-border"></div>
         </body>
         </html>
     `;
     
     return await sendEmail({
         to: user.email,
-        subject: `Your Voter Slip PDF is Ready - ${order.orderId}`,
+        subject,
         html
     });
 }

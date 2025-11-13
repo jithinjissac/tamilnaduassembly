@@ -45,6 +45,52 @@ export const defaultSettings = {
             pdfReady: true,
             orderExpiry: false
         },
+        orderConfirmation: {
+            subject: 'Order Confirmed - {{wardName}} - {{orderId}}',
+            heading: 'Order Confirmed Successfully!',
+            message: `നമസ്കാരം {{userName}},
+
+Your order has been confirmed successfully!
+
+📋 Order Details:
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+• Polling Station: {{pollingStation}}
+• Symbol: {{symbolName}}
+• Total Voters: {{voterCount}}
+
+Your voter slips are being prepared and will be ready for download shortly.`
+        },
+        paymentSuccess: {
+            subject: 'Payment Successful - {{wardName}} - {{orderId}}',
+            heading: 'Payment Received Successfully!',
+            message: `നമസ്കാരം {{userName}},
+
+Your payment has been received successfully!
+
+💰 Payment Details:
+• Amount Paid: ₹{{amount}}
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+
+Your voter slips PDF is being generated and will be ready for download shortly.`
+        },
+        pdfReady: {
+            subject: 'Your Voter Slips are Ready - {{wardName}} - {{orderId}}',
+            heading: 'Your PDF is Ready for Download!',
+            message: `നമസ്കാരം {{userName}},
+
+Great news! Your voter slips PDF is now ready for download.
+
+📄 PDF Details:
+• Order ID: {{orderId}}
+• Ward: {{wardName}}
+• Polling Station: {{pollingStation}}
+• Symbol: {{symbolName}}
+• Total Voters: {{voterCount}}
+
+Login to https://easyslip.in to download your PDF.`
+        },
         smsNotifications: false,
         webhookURL: ''
     },

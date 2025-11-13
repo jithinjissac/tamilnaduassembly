@@ -933,7 +933,7 @@
                 <div id="symbolsContent" style="display: none;">
                     <div class="symbol-grid" id="symbolsGrid">
                         <div class="empty-state">
-                            <div class="empty-state-icon">🎯</div>
+                            <div class="empty-state-icon"><i class="fas fa-bullseye"></i></div>
                             <p>No symbols found</p>
                         </div>
                     </div>
@@ -958,8 +958,8 @@
                         <label for="symbolNameMalayalam">Symbol Name (Malayalam)</label>
                         <input type="text" id="symbolNameMalayalam" placeholder="Type in Manglish - converts as you type!" style="font-size: 1.1rem; text-align: left; direction: ltr;">
                         <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
-                            💡 <strong>Real-time conversion:</strong> Type "bharathiya janatha party" → automatically converts to Malayalam<br>
-                            📝 Examples: "ka" → "ക", "cha" → "ച", "aana" → "ആന", "thamara" → "താമര", "congress" → "കോൺഗ്രസ്"<br>
+                            <i class="fas fa-lightbulb"></i> <strong>Real-time conversion:</strong> Type "bharathiya janatha party" → automatically converts to Malayalam<br>
+                            <i class="fas fa-edit"></i> Examples: "ka" → "ക", "cha" → "ച", "aana" → "ആന", "thamara" → "താമര", "congress" → "കോൺഗ്രസ്"<br>
                             ⌨️ Press <kbd style="padding: 2px 6px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 3px;">Ctrl+G</kbd> to toggle on/off
                         </small>
                     </div>
@@ -1013,7 +1013,7 @@
                     <label for="editSymbolNameMalayalam">Symbol Name (Malayalam)</label>
                     <input type="text" id="editSymbolNameMalayalam" placeholder="Type in Manglish - converts as you type!" style="font-size: 1.1rem; text-align: left; direction: ltr;">
                     <small style="display: block; margin-top: 0.5rem; color: #6b7280;">
-                        💡 Real-time Malayalam conversion enabled
+                        <i class="fas fa-lightbulb"></i> Real-time Malayalam conversion enabled
                     </small>
                 </div>
 
@@ -1318,7 +1318,7 @@ Your voter slips are being prepared and will be ready for download shortly.</tex
 
 Your payment has been received successfully!
 
-💰 Payment Details:
+<i class="fas fa-rupee-sign"></i> Payment Details:
 • Amount Paid: ₹{{amount}}
 • Order ID: {{orderId}}
 • Ward: {{wardName}}
@@ -1352,7 +1352,7 @@ Your voter slips PDF is being generated and will be ready for download shortly.<
 
 Great news! Your voter slips PDF is now ready for download.
 
-📄 PDF Details:
+<i class="fas fa-file-pdf"></i> PDF Details:
 • Order ID: {{orderId}}
 • Ward: {{wardName}}
 • Polling Station: {{pollingStation}}
@@ -2101,7 +2101,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 if (data.symbols.length === 0) {
                     grid.innerHTML = `
                         <div class="empty-state" style="grid-column: 1/-1;">
-                            <div class="empty-state-icon">🎯</div>
+                            <div class="empty-state-icon"><i class="fas fa-bullseye"></i></div>
                             <p>No symbols found</p>
                         </div>`;
                 } else {

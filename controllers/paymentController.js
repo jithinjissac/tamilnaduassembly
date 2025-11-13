@@ -2,7 +2,13 @@ import crypto from 'crypto';
 import razorpay from '../config/razorpay.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
-import { sendPaymentSuccessEmail } from '../utils/emailService.js';
+import { sendPaymentSuccessEmail, sendPDFReadyEmail } from '../utils/emailService.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Create Razorpay order
 export const createRazorpayOrder = async (req, res) => {
@@ -120,6 +126,17 @@ export const verifyPayment = async (req, res) => {
             sendPaymentSuccessEmail(user, order).catch(err => {
                 console.error('❌ Failed to send payment success email:', err.message);
             });
+            
+            // Check if PDF is already ready and send PDF ready email
+            const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
+            if (fs.existsSync(permanentPdfPath)) {
+                console.log(`✅ PDF already exists for ${order.orderId}, sending PDF ready email`);
+                sendPDFReadyEmail(user, order).catch(err => {
+                    console.error('❌ Failed to send PDF ready email:', err.message);
+                });
+            } else {
+                console.log(`⏳ PDF not ready yet for ${order.orderId}, will send email when PDF generation completes`);
+            }
         }
 
         res.json({
@@ -178,6 +195,20 @@ export const webhook = async (req, res) => {
                 order.razorpayPaymentId = payload.id;
                 order.paidAt = new Date();
                 await order.save();
+                
+                // Send PDF ready email if PDF exists
+                const user = await User.findById(order.userId);
+                if (user) {
+                    const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
+                    if (fs.existsSync(permanentPdfPath)) {
+                        console.log(`✅ [Webhook] PDF exists for ${order.orderId}, sending PDF ready email`);
+                        sendPDFReadyEmail(user, order).catch(err => {
+                            console.error('❌ Failed to send PDF ready email:', err.message);
+                        });
+                    } else {
+                        console.log(`⏳ [Webhook] PDF not ready yet for ${order.orderId}`);
+                    }
+                }
             }
         } else if (event === 'payment.failed') {
             // Payment failed

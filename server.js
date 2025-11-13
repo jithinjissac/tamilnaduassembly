@@ -34,8 +34,28 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Serve static files (frontend)
-app.use(express.static(path.join(__dirname, 'frontend')));
+// Serve static files (frontend) with cache control
+app.use(express.static(path.join(__dirname, 'frontend'), {
+    setHeaders: (res, filePath) => {
+        // Disable caching for HTML files to ensure users get latest access control fixes
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+    }
+}));
+
+// Serve SEO files
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.sendFile(path.join(__dirname, 'frontend', 'robots.txt'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml');
+    res.sendFile(path.join(__dirname, 'frontend', 'sitemap.xml'));
+});
 
 // Serve captcha cache directory
 app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache')));

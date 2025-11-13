@@ -19,4 +19,14 @@ router.post('/login', authController.login);
 // @access  Private
 router.get('/profile', auth, authController.getProfile);
 
+// @route   POST /api/auth/forgot-password
+// @desc    Send password reset email
+// @access  Public
+router.post('/forgot-password', authController.forgotPassword);
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset password with token
+// @access  Public
+router.post('/reset-password', authController.resetPassword);
+
 export default router;

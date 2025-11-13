@@ -224,27 +224,3 @@ export const testEmail = async (req, res) => {
         });
     }
 };
-
-// Get active payment gateway
-export const getActiveGateway = async (req, res) => {
-    try {
-        const paymentSettings = await Settings.getSettings('payment');
-        const settings = Object.fromEntries(paymentSettings);
-        
-        res.json({
-            status: 'success',
-            activeGateway: settings.activeGateway || 'razorpay',
-            razorpayEnabled: settings.razorpay?.enabled || false,
-            cashfreeEnabled: settings.cashfree?.enabled || false,
-            razorpayKeyId: settings.razorpay?.keyId || process.env.RAZORPAY_KEY_ID || '',
-            cashfreeEnvironment: settings.cashfree?.environment || 'TEST'
-        });
-    } catch (error) {
-        console.error('❌ Error fetching active gateway:', error);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to fetch payment gateway settings',
-            error: error.message
-        });
-    }
-};

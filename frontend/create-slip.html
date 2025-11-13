@@ -8,6 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="symbol-picker.js"></script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
     <style>
         * {
             margin: 0;
@@ -277,18 +290,121 @@
         }
 
         .symbol-selection-area {
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 2rem;
+            border: 3px dashed var(--kerala-gold);
+            border-radius: 16px;
+            padding: 3rem 2rem;
             text-align: center;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symbol-selection-area::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--kerala-green), var(--kerala-gold), var(--kerala-red));
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        #selectSymbolBtn {
+            background: var(--kerala-gradient) !important;
+            border: none !important;
+            padding: 1.5rem 3rem !important;
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4), 0 0 0 0 rgba(0, 109, 59, 0.5) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: pulse 2s ease-in-out infinite !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        #selectSymbolBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        #selectSymbolBtn::after {
+            content: '\26a1 CLICK HERE FIRST \26a1';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--kerala-red);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(224, 58, 62, 0.4);
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        #selectSymbolBtn:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(0, 109, 59, 0.5), 0 0 0 4px rgba(255, 184, 28, 0.3) !important;
+            animation: none !important;
+        }
+
+        #selectSymbolBtn:active {
+            transform: translateY(-1px) !important;
         }
 
         .symbol-preview {
-            padding: 1rem;
+            padding: 1.5rem;
             background: white;
-                                                                                                                                                                                                                                                                                                border-radius: 8px;
-            border: 2px solid #48bb78;
+            border-radius: 12px;
+            border: 3px solid #48bb78;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
         }
 
         /* Slips per page option */
@@ -661,16 +777,19 @@
                 <div class="form-group">
                     <label>
                         Select Symbol
-                        <span class="label-description">Choose your EC-approved symbol</span>
+                        <span class="label-description"><i class="fas fa-exclamation-triangle"></i> Required: Choose your EC-approved election symbol first</span>
                     </label>
                     <div class="symbol-selection-area" id="symbolSelectionArea">
                         <div class="symbol-preview" id="symbolPreview" style="display: none;">
-                            <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.5rem;">
-                            <div id="selectedSymbolName" style="font-weight: 600; color: #2d3748;"></div>
-                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="margin-top: 1rem; padding: 0.5rem 1rem;">🔄 Change Symbol</button>
+                            <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;">
+                            <div id="selectedSymbolName" style="font-weight: 700; color: #2d3748; font-size: 1.1rem; margin-bottom: 0.5rem;"></div>
+                            <div style="color: #48bb78; font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Symbol Selected</div>
+                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="padding: 0.75rem 1.5rem;">
+                                <i class="fas fa-sync-alt"></i> Change Symbol
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block;">
-                            🎯 Select Symbol
+                        <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block; margin: 0 auto;">
+                            <i class="fas fa-hand-pointer" style="margin-right: 0.5rem;"></i> SELECT YOUR SYMBOL
                         </button>
                     </div>
                     <div class="error-message" id="symbolError"></div>
@@ -706,7 +825,7 @@
 
             <!-- Step 2: Create Voter Slip -->
             <div class="form-section" id="step2">
-                <h2 class="form-title">🎫 Create Voter Slip</h2>
+                <h2 class="form-title"><i class="fas fa-ticket-alt"></i> Create Voter Slip</h2>
                 <p class="form-subtitle">Select location and generate your customized voter slips</p>
 
                             <div class="voter-extraction-container">
@@ -736,7 +855,7 @@
                             <span>Polling Stations</span>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <button type="button" class="btn-link" onclick="selectAllPS()" id="selectAllBtn" style="font-size: 0.85rem; display: none;">
-                                    ✓ Select All
+                                    <i class="fas fa-check"></i> Select All
                                 </button>
                                 <button type="button" class="btn-link" onclick="clearAllPS()" id="clearAllBtn" style="font-size: 0.85rem; display: none;">
                                     ✗ Clear All
@@ -776,7 +895,7 @@
                     </div>
 
                     <button type="button" class="btn btn-primary" onclick="createSlip()" id="extractBtn">
-                        <span id="extractBtnText">🎫 Create Voter Slip</span>
+                        <span id="extractBtnText"><i class="fas fa-ticket-alt"></i> Create Voter Slip</span>
                     </button>
 
                     <div class="voters-count" id="votersCount" style="display: none;">

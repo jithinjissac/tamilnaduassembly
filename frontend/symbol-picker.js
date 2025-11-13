@@ -116,10 +116,10 @@ class SymbolPicker {
                 .symbol-picker-content {
                     position: relative;
                     background: white;
-                    border-radius: 12px;
-                    width: 90%;
-                    max-width: 900px;
-                    max-height: 80vh;
+                    border-radius: 16px;
+                    width: 95%;
+                    max-width: 1100px;
+                    max-height: 85vh;
                     display: flex;
                     flex-direction: column;
                     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -178,40 +178,69 @@ class SymbolPicker {
                 }
 
                 .symbol-picker-search {
-                    padding: 1rem 1.5rem;
-                    display: flex;
+                    padding: 1.5rem;
+                    display: grid;
+                    grid-template-columns: 1fr auto;
                     gap: 1rem;
-                    border-bottom: 1px solid #e5e7eb;
+                    border-bottom: 2px solid #e5e7eb;
+                    background: #f9fafb;
                 }
 
                 .symbol-picker-search input {
-                    flex: 1;
-                    padding: 0.75rem 1rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    font-size: 0.95rem;
+                    padding: 1rem 1.25rem;
+                    border: 2px solid #d1d5db;
+                    border-radius: 10px;
+                    font-size: 1.05rem;
+                    font-weight: 500;
                     transition: all 0.2s;
+                    background: white;
+                    color: #1f2937;
+                    width: 100%;
+                }
+
+                .symbol-picker-search input::placeholder {
+                    color: #6b7280;
+                    font-weight: 400;
                 }
 
                 .symbol-picker-search input:focus {
                     outline: none;
-                    border-color: #667eea;
-                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                    border-color: #006D3B;
+                    box-shadow: 0 0 0 4px rgba(0, 109, 59, 0.15);
+                    background: #ffffff;
                 }
 
                 .symbol-picker-search select {
-                    padding: 0.75rem 1rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    font-size: 0.95rem;
+                    padding: 1rem 1.25rem;
+                    padding-right: 2.5rem;
+                    border: 2px solid #d1d5db;
+                    border-radius: 10px;
+                    font-size: 1.05rem;
+                    font-weight: 500;
                     background: white;
                     cursor: pointer;
-                    min-width: 180px;
+                    width: 220px;
+                    color: #1f2937;
+                    appearance: none;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+                    background-repeat: no-repeat;
+                    background-position: right 1rem center;
                 }
 
                 .symbol-picker-search select:focus {
                     outline: none;
-                    border-color: #667eea;
+                    border-color: #006D3B;
+                    box-shadow: 0 0 0 4px rgba(0, 109, 59, 0.15);
+                }
+
+                @media (max-width: 768px) {
+                    .symbol-picker-search {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .symbol-picker-search select {
+                        width: 100%;
+                    }
                 }
 
                 .symbol-picker-loading {

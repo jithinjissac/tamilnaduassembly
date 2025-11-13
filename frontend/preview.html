@@ -7,7 +7,19 @@
     <link rel="stylesheet" href="kerala-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
     <!-- PDF.js for better PDF rendering on mobile -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
@@ -636,6 +648,148 @@
             }
         }
 
+        // Function to check authentication and order ownership
+        async function verifyOrderAccess() {
+            try {
+                // First verify user is authenticated
+                const profileResponse = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!profileResponse.ok) {
+                    throw new Error('Authentication failed');
+                }
+
+                const profileData = await profileResponse.json();
+                const currentUserId = profileData.user._id;
+                const isAdminUser = profileData.user.role === 'admin';
+
+                // Check if order belongs to this user
+                const orderResponse = await fetch(`/api/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!orderResponse.ok) {
+                    if (orderResponse.status === 404) {
+                        // Admins can see all pages, regular users get denied
+                        if (!isAdminUser) {
+                            throw new Error('UNAUTHORIZED');
+                        }
+                        // For admin, order truly doesn't exist
+                        throw new Error('Order not found');
+                    }
+                    throw new Error('Failed to verify order access');
+                }
+
+                const orderResult = await orderResponse.json();
+                const order = orderResult.order || orderResult;
+
+                // Debug logging for access verification
+                console.log('🔍 Access Verification:');
+                console.log('   Current User ID:', currentUserId, typeof currentUserId);
+                console.log('   Order User ID:', order.userId, typeof order.userId);
+                console.log('   Is Admin:', isAdminUser);
+                console.log('   String(order.userId):', String(order.userId));
+                console.log('   String(currentUserId):', String(currentUserId));
+                console.log('   Match:', String(order.userId) === String(currentUserId));
+
+                // Verify ownership (allow admin access to all orders)
+                // Convert both to strings to handle ObjectId vs string comparison
+                if (String(order.userId) !== String(currentUserId) && !isAdminUser) {
+                    console.error('❌ Access denied - userId mismatch');
+                    throw new Error('UNAUTHORIZED');
+                }
+                
+                console.log('✅ Access verification passed');
+
+                return { isAdmin: isAdminUser, order };
+            } catch (error) {
+                console.error('Order access verification error:', error.message);
+                
+                // Check specific error types
+                if (error.message === 'UNAUTHORIZED') {
+                    // User is authenticated but not authorized
+                    const iconClass = 'fa-lock';
+                    const title = 'Access Denied';
+                    const message = 'You are not authorized to access this page.';
+                    const buttonHtml = `<button onclick="window.location.href='/dashboard.html'" style="background: white; color: #FF9933; padding: 1rem 2rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-arrow-left"></i> Go to Dashboard
+                    </button>`;
+
+                    // Create overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        backdrop-filter: blur(10px);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 2rem;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: #138808; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 3px solid white;">
+                            <i class="fas ${iconClass}" style="font-size: 4rem; color: white; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${title}</h2>
+                            <p style="color: white; margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${message}</p>
+                            ${buttonHtml}
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(overlay);
+                    return null;
+                } else if (error.message === 'Order not found') {
+                    // Admin trying to access non-existent order - show error but don't block
+                    alert('Order not found. This order may have been deleted.');
+                    window.location.href = '/admin.html';
+                    return null;
+                } else {
+                    // Authentication failed - not logged in
+                    const iconClass = 'fa-exclamation-circle';
+                    const title = 'Authentication Required';
+                    const message = 'Please login to access this page.';
+                    const buttonHtml = `<button onclick="localStorage.removeItem('token'); window.location.href='/login.html'" style="background: white; color: #FF9933; padding: 1rem 2rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </button>`;
+
+                    // Create overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        backdrop-filter: blur(10px);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 2rem;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: #138808; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 3px solid white;">
+                            <i class="fas ${iconClass}" style="font-size: 4rem; color: white; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${title}</h2>
+                            <p style="color: white; margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${message}</p>
+                            ${buttonHtml}
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(overlay);
+                    return null;
+                }
+            }
+        }
+
         // Call checkUserRole before loading order
         checkUserRole();
 
@@ -1026,7 +1180,15 @@
 
         async function loadOrderAndPreview() {
             try {
-                // Get order details
+                // Verify order access first
+                const accessCheck = await verifyOrderAccess();
+                if (!accessCheck) return; // Access denied, UI already updated
+
+                const { isAdmin: userIsAdmin, order: verifiedOrder } = accessCheck;
+                isAdmin = userIsAdmin; // Set global isAdmin variable
+
+                // Step 1: Load order details from database
+                console.log('📊 Step 1: Loading order details from database...');
                 const orderResponse = await fetch(`/api/orders/${orderId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1044,7 +1206,7 @@
                 // Handle both direct order data and wrapped response
                 orderData = result.order || result;
                 
-                console.log('Order data:', orderData);
+                console.log('✅ Order data loaded:', orderData);
 
                 // Display order info with null checks
                 document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
@@ -1085,17 +1247,83 @@
                 // Show flat pricing (no discount)
                 const voterCount = orderData.totalVoters || orderData.voterCount || 0;
                 const amount = orderData.amount || 0;
+                const pricePerVoter = orderData.pricePerVoter || 0.50; // Use order's price or fallback to 0.50
                 
                 if (voterCount > 0 && amount > 0) {
-                    const pricePerVoter = 0.50; // Fixed price
-                    
                     document.getElementById('pricePerVoter').textContent = `₹${pricePerVoter.toFixed(2)}`;
                     document.getElementById('priceBreakdown').style.display = 'block';
                     document.getElementById('breakdownText').textContent = 
                         `${voterCount} voters × ₹${pricePerVoter.toFixed(2)} = ₹${amount.toFixed(2)}`;
                 }
 
-                // Generate PDF preview
+                console.log('✅ Order details displayed on page');
+
+                // Check payment status early - if already paid, skip preview generation
+                if (orderData.paymentStatus === 'completed') {
+                    console.log('✅ Order already paid - showing download options');
+                    
+                    // Update UI for paid order
+                    document.querySelector('.payment-title').innerHTML = 'Payment Completed <i class="fas fa-check-circle"></i>';
+                    document.getElementById('paymentBtn').style.display = 'none';
+                    document.querySelector('.secure-badge').style.display = 'none';
+                    document.querySelector('.preview-note').innerHTML = 
+                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter slips.';
+                    
+                    // Add download button
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn btn-payment';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
+                    downloadBtn.style.background = 'var(--kerala-green)';
+                    downloadBtn.onclick = downloadFullPDF;
+                    document.getElementById('paymentBtn').parentNode.insertBefore(downloadBtn, document.getElementById('paymentBtn'));
+                    
+                    // Show payment details if available
+                    if (orderData.paidAt) {
+                        const paidDate = new Date(orderData.paidAt);
+                        const paymentInfo = document.createElement('div');
+                        paymentInfo.className = 'price-breakdown';
+                        paymentInfo.style.display = 'block';
+                        paymentInfo.style.marginTop = '1rem';
+                        paymentInfo.innerHTML = `
+                            <p><strong>Payment Date:</strong> ${paidDate.toLocaleDateString('en-IN')}</p>
+                            ${orderData.razorpayPaymentId ? `<p><strong>Payment ID:</strong> ${orderData.razorpayPaymentId}</p>` : ''}
+                        `;
+                        document.querySelector('.payment-card').appendChild(paymentInfo);
+                    }
+                    
+                    // Hide preview section - not needed for paid orders
+                    document.getElementById('previewContainer').innerHTML = `
+                        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
+                            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Order Completed!</h3>
+                            <p style="margin: 0; opacity: 0.9;">Your voter slips are ready for download.</p>
+                        </div>
+                    `;
+                    
+                    return; // Exit early - no need to generate preview
+                }
+
+                // Step 2: Generate PDF preview (only for unpaid orders)
+                console.log('📄 Step 2: Generating PDF preview...');
+                
+                // Check if admin for unpaid orders
+                if (isAdmin) {
+                    // Admin user - show bypass payment option
+                    document.querySelector('.payment-title').innerHTML = 'Admin Access <i class="fas fa-user-shield"></i>';
+                    document.querySelector('.preview-note').innerHTML = 
+                        '<strong><i class="fas fa-info-circle"></i> Admin Mode:</strong> You can complete this order without payment.';
+                    
+                    // Replace payment button with admin bypass button
+                    const paymentBtn = document.getElementById('paymentBtn');
+                    paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Without Payment';
+                    paymentBtn.style.background = 'var(--kerala-green)';
+                    paymentBtn.onclick = completeOrderAsAdmin;
+                    paymentBtn.disabled = false;
+                    
+                    // Hide Razorpay badge
+                    document.querySelector('.secure-badge').style.display = 'none';
+                }
+
                 const previewResponse = await fetch('/api/slips/preview', {
                     method: 'POST',
                     headers: {
@@ -1134,57 +1362,9 @@
                     const container = document.getElementById('previewContainer');
                     displayPDF(pdfBlobUrl, container);
                     
-                    // Check payment status and update UI accordingly
-                    if (orderData.paymentStatus === 'completed') {
-                        // Payment completed - show download option instead
-                        document.querySelector('.payment-title').innerHTML = 'Payment Completed <i class="fas fa-check-circle"></i>';
-                        document.getElementById('paymentBtn').style.display = 'none';
-                        document.querySelector('.secure-badge').style.display = 'none';
-                        document.querySelector('.preview-note').innerHTML = 
-                            '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter slips.';
-                        
-                        // Add download button
-                        const downloadBtn = document.createElement('button');
-                        downloadBtn.className = 'btn btn-payment';
-                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
-                        downloadBtn.style.background = 'var(--kerala-green)';
-                        downloadBtn.onclick = downloadFullPDF;
-                        document.getElementById('paymentBtn').parentNode.insertBefore(downloadBtn, document.getElementById('paymentBtn'));
-                        
-                        // Show payment details if available
-                        if (orderData.paidAt) {
-                            const paidDate = new Date(orderData.paidAt);
-                            const paymentInfo = document.createElement('div');
-                            paymentInfo.className = 'price-breakdown';
-                            paymentInfo.style.display = 'block';
-                            paymentInfo.style.marginTop = '1rem';
-                            paymentInfo.innerHTML = `
-                                <p><strong>Payment Date:</strong> ${paidDate.toLocaleDateString('en-IN')}</p>
-                                ${orderData.razorpayPaymentId ? `<p><strong>Payment ID:</strong> ${orderData.razorpayPaymentId}</p>` : ''}
-                            `;
-                            document.querySelector('.payment-card').appendChild(paymentInfo);
-                        }
-                    } else {
-                        // Payment pending - check if admin
-                        if (isAdmin) {
-                            // Admin user - show bypass payment option
-                            document.querySelector('.payment-title').innerHTML = 'Admin Access <i class="fas fa-user-shield"></i>';
-                            document.querySelector('.preview-note').innerHTML = 
-                                '<strong><i class="fas fa-info-circle"></i> Admin Mode:</strong> You can complete this order without payment.';
-                            
-                            // Replace payment button with admin bypass button
-                            const paymentBtn = document.getElementById('paymentBtn');
-                            paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Without Payment';
-                            paymentBtn.style.background = 'var(--kerala-green)';
-                            paymentBtn.onclick = completeOrderAsAdmin;
-                            paymentBtn.disabled = false;
-                            
-                            // Hide Razorpay badge
-                            document.querySelector('.secure-badge').style.display = 'none';
-                        } else {
-                            // Regular user - enable payment button
-                            document.getElementById('paymentBtn').disabled = false;
-                        }
+                    // Enable payment button for regular users (admin already handled above)
+                    if (!isAdmin) {
+                        document.getElementById('paymentBtn').disabled = false;
                     }
                     
                     // Setup cleanup on page unload

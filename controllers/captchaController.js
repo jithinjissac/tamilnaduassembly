@@ -67,19 +67,49 @@ router.get('/initCaptchaSession', async (req, res) => {
     });
 
     console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
 
-    // Wait for captcha image to load
+    // Wait for captcha image to load - try multiple selectors
     console.log('[CAPTCHA] Waiting for captcha image...');
-    await page.waitForSelector('img[src*="captcha"]', { 
-      state: 'visible',
-      timeout: 15000 
-    });
-
-    // Get the captcha element and take a screenshot of just that element
-    const captchaElement = await page.$('img[src*="captcha"]');
+    
+    let captchaElement = null;
+    const captchaSelectors = [
+      'img[src*="captcha"]',
+      'img[alt*="captcha" i]',
+      '#view_voters_list_captcha_image',
+      '.captcha-image',
+      'img[src*="Captcha"]'
+    ];
+    
+    for (const selector of captchaSelectors) {
+      try {
+        console.log(`[CAPTCHA] Trying selector: ${selector}`);
+        await page.waitForSelector(selector, { 
+          state: 'visible',
+          timeout: 5000 
+        });
+        captchaElement = await page.$(selector);
+        if (captchaElement) {
+          console.log(`[CAPTCHA] Found captcha with selector: ${selector}`);
+          break;
+        }
+      } catch (e) {
+        console.log(`[CAPTCHA] Selector ${selector} not found, trying next...`);
+      }
+    }
+    
     if (!captchaElement) {
-      throw new Error('Captcha image not found on page');
+      // Try finding any image near the captcha input field
+      console.log('[CAPTCHA] Trying to find image near captcha input...');
+      captchaElement = await page.$('label[for="view_voters_list_captcha"] ~ img, #view_voters_list_captcha ~ img, .form-group:has(#view_voters_list_captcha) img');
+    }
+
+    if (!captchaElement) {
+      // Last resort: take screenshot of entire page for debugging
+      const debugPath = path.join(__dirname, '..', 'public', 'captcha-cache', `debug-${sessionId}.png`);
+      await page.screenshot({ path: debugPath, fullPage: true });
+      console.log('[CAPTCHA] Debug screenshot saved to:', debugPath);
+      throw new Error('Captcha image not found on page. Debug screenshot saved.');
     }
 
     // Take screenshot of the captcha element only

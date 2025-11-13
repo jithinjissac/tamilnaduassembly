@@ -183,19 +183,26 @@ export const generatePDFBackground = async (order, orderId) => {
 
         try {
             const Order = (await import('../models/Order.js')).default;
+            const orderBefore = await Order.findOne({ orderId });
+            const hadPdfBefore = orderBefore?.permanentPdfFilename;
+            
             await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
             
-            // Send PDF ready email ONLY if payment is completed
-            const User = (await import('../models/User.js')).default;
-            const { sendPDFReadyEmail } = await import('./emailService.js');
-            const orderDoc = await Order.findOne({ orderId }).populate('userId');
-            if (orderDoc && orderDoc.userId && orderDoc.paymentStatus === 'completed') {
-                console.log(`📧 Sending PDF ready email for completed order: ${orderId}`);
-                sendPDFReadyEmail(orderDoc.userId, orderDoc).catch(err => {
-                    console.error('❌ Failed to send PDF ready email:', err.message);
-                });
-            } else if (orderDoc && orderDoc.paymentStatus !== 'completed') {
-                console.log(`⏳ Skipping PDF ready email - payment not completed yet for: ${orderId} (status: ${orderDoc.paymentStatus})`);
+            // Send PDF ready email ONLY for NEW PDF generation (not when finding existing PDFs)
+            if (!hadPdfBefore) {
+                const User = (await import('../models/User.js')).default;
+                const { sendPDFReadyEmail } = await import('./emailService.js');
+                const orderDoc = await Order.findOne({ orderId }).populate('userId');
+                if (orderDoc && orderDoc.userId && orderDoc.paymentStatus === 'completed') {
+                    console.log(`📧 Sending PDF ready email for NEW PDF generation: ${orderId}`);
+                    sendPDFReadyEmail(orderDoc.userId, orderDoc).catch(err => {
+                        console.error('❌ Failed to send PDF ready email:', err.message);
+                    });
+                } else if (orderDoc && orderDoc.paymentStatus !== 'completed') {
+                    console.log(`⏳ Skipping PDF ready email - payment not completed yet for: ${orderId} (status: ${orderDoc.paymentStatus})`);
+                }
+            } else {
+                console.log(`ℹ️ PDF already existed for ${orderId}, skipping email notification`);
             }
         } catch (e) {
             console.warn('Could not update Order with permanentPdfFilename', e.message);

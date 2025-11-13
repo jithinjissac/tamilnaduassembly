@@ -427,21 +427,28 @@ export const generatePreview = async (req, res) => {
     try {
         const { orderId } = req.body;
         const userId = req.userId;
+        const userRole = req.userRole;
 
         console.log('========================================');
         console.log('GENERATE PREVIEW POST REQUEST');
         console.log('========================================');
         console.log('Order ID:', orderId);
         console.log('User ID:', userId);
+        console.log('User Role:', userRole);
         console.log('Request body:', JSON.stringify(req.body, null, 2));
         console.log('Timestamp:', new Date().toISOString());
 
         console.log('Searching for order in database...');
-        const order = await Order.findOne({ orderId, userId });
+        // Build query - admins can access all orders
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+        const order = await Order.findOne(query);
 
         if (!order) {
             console.error('❌ ORDER NOT FOUND');
-            console.error('Search criteria:', { orderId, userId });
+            console.error('Search criteria:', query);
             return res.status(404).json({ 
                 status: 'error',
                 message: 'Order not found' 
@@ -708,17 +715,23 @@ export const viewPreview = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.userId; // Set by authHTML middleware
+        const userRole = req.userRole;
 
         console.log('========================================');
         console.log('VIEW PREVIEW HTML REQUEST (Protected)');
         console.log('========================================');
         console.log('Order ID:', orderId);
         console.log('User ID:', userId);
+        console.log('User Role:', userRole);
         console.log('Timestamp:', new Date().toISOString());
 
         // Find order with user restriction (ownership check)
         console.log('Searching for order in database...');
-        const order = await Order.findOne({ orderId, userId });
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+        const order = await Order.findOne(query);
 
         if (!order) {
             console.error('❌ ORDER NOT FOUND OR UNAUTHORIZED');
@@ -916,21 +929,28 @@ export const downloadSlip = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.userId;
+        const userRole = req.userRole;
 
         console.log(`\n${'='.repeat(60)}`);
         console.log(`📥 DOWNLOAD REQUEST RECEIVED`);
         console.log(`${'='.repeat(60)}`);
         console.log(`   orderId from URL: "${orderId}"`);
         console.log(`   userId from auth: ${userId}`);
+        console.log(`   userRole: ${userRole}`);
         console.log(`   userId type: ${typeof userId}`);
         console.log(`   userId constructor: ${userId?.constructor?.name}`);
         console.log(`${'='.repeat(60)}\n`);
 
-        const order = await Order.findOne({ orderId, userId });
+        // Build query - admins can access all orders
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+        const order = await Order.findOne(query);
 
         if (!order) {
             console.log(`❌ ORDER NOT FOUND!`);
-            console.log(`   Query: { orderId: "${orderId}", userId: ${userId} }`);
+            console.log(`   Query:`, query);
             console.log(`   This usually means:`);
             console.log(`     1. Wrong orderId (check if it's MongoDB _id instead)`);
             console.log(`     2. Wrong userId (user doesn't own this order)`);
@@ -1286,11 +1306,16 @@ export const getPDFStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.userId;
+        const userRole = req.userRole;
 
-        console.log(`\n[PDF STATUS CHECK] Order: ${orderId}, User: ${userId}`);
+        console.log(`\n[PDF STATUS CHECK] Order: ${orderId}, User: ${userId}, Role: ${userRole}`);
 
-        // Verify user owns this order
-        const order = await Order.findOne({ orderId, userId });
+        // Verify user owns this order (or is admin)
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+        const order = await Order.findOne(query);
         if (!order) {
             return res.status(403).json({
                 status: 'error',

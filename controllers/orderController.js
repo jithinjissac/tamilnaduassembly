@@ -49,6 +49,15 @@ export const createOrder = [
             const { customization, location, voters } = req.body;
             const userId = req.userId;
 
+            // Get user's custom price per voter
+            const user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'User not found'
+                });
+            }
+
             // Check for existing order with same symbol + location combination
             const existingOrder = await Order.findOne({
                 userId,
@@ -70,7 +79,7 @@ export const createOrder = [
 
             // Calculate amount
             const totalVoters = voters.length;
-            const pricePerVoter = 0.50; // Fixed price
+            const pricePerVoter = user.pricePerVoter || 0.50; // Use user's custom price
             const originalAmount = totalVoters * pricePerVoter;
             const amount = Math.round(originalAmount * 100) / 100; // Final amount (same as original, no discount)
 
@@ -92,8 +101,7 @@ export const createOrder = [
 
             await order.save();
 
-            // Send order confirmation email
-            const user = await User.findById(userId);
+            // Send order confirmation email (use already fetched user)
             if (user) {
                 sendOrderConfirmationEmail(user, order).catch(err => {
                     console.error('❌ Failed to send order confirmation email:', err.message);
@@ -186,17 +194,38 @@ export const getOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.userId;
+        const userRole = req.userRole; // Get user role from auth middleware
+
+        console.log('🔍 [getOrder] Request details:');
+        console.log('   orderId:', orderId);
+        console.log('   userId:', userId, typeof userId, userId?.constructor?.name);
+        console.log('   userRole:', userRole);
+
+        // Build query - admins can access all orders, users only their own
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+
+        console.log('   Query:', JSON.stringify(query));
 
         // Use lean() for faster queries - returns plain JS object instead of Mongoose document
-        const order = await Order.findOne({ 
-            orderId,
-            userId 
-        }).lean().select('-__v'); // Exclude version key for smaller payload
+        const order = await Order.findOne(query)
+            .lean()
+            .select('-__v'); // Exclude version key for smaller payload
+
+        console.log('   Order found:', !!order);
+        if (order) {
+            console.log('   Order.userId:', order.userId, typeof order.userId, order.userId?.constructor?.name);
+            console.log('   Match (direct):', order.userId === userId);
+            console.log('   Match (toString):', order.userId?.toString() === userId?.toString());
+        }
 
         if (!order) {
+            console.log('   ❌ Order not found with query:', JSON.stringify(query));
             return res.status(404).json({ 
                 status: 'error',
-                message: 'Order not found' 
+                message: 'Order not found or access denied' 
             });
         }
 
@@ -205,6 +234,7 @@ export const getOrder = async (req, res) => {
             res.set('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
         }
 
+        console.log('   ✅ Returning order');
         res.json({
             status: 'success',
             order

@@ -29,6 +29,7 @@ const auth = async (req, res, next) => {
         // Attach user to request
         req.user = user;
         req.userId = user._id;
+        req.userRole = user.role; // Add user role for access control
         
         next();
     } catch (error) {
@@ -89,6 +90,7 @@ export const adminAuth = async (req, res, next) => {
         // Attach user to request
         req.user = user;
         req.userId = user._id;
+        req.userRole = user.role; // Add user role for access control
         
         next();
     } catch (error) {
