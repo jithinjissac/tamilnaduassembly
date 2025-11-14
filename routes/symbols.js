@@ -23,8 +23,8 @@ router.get('/symbols', auth, async (req, res) => {
         }
 
         const symbols = await Symbol.find(query)
-            .sort({ createdAt: -1 })
-            .select('name nameMalayalam imageUrl category isActive');
+            .sort({ displayOrder: 1, createdAt: 1 })
+            .select('name nameMalayalam imageUrl category isActive displayOrder');
 
         res.json({
             status: 'success',

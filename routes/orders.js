@@ -29,4 +29,9 @@ router.patch('/:orderId/update-slips-per-page', auth, orderController.updateSlip
 // @access  Private
 router.get('/stats/summary', auth, orderController.getOrderStats);
 
+// @route   GET /api/orders/:orderId/invoice
+// @desc    Download invoice for paid order
+// @access  Private
+router.get('/:orderId/invoice', auth, orderController.downloadInvoice);
+
 export default router;

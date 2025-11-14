@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview & Payment - EasySlip | Kerala Voter Slip Generator</title>
+    <title>Preview & Payment - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
     <link rel="stylesheet" href="kerala-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,6 +22,9 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
     <!-- PDF.js for better PDF rendering on mobile -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Cashfree SDK - Must be loaded from official CDN for PCI compliance -->
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js" defer></script>
     
     <style>
         * {
@@ -1410,8 +1413,8 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('paymentBtn').disabled = true;
                 document.getElementById('payBtnText').textContent = 'Preparing payment...';
 
-                // Create Razorpay order
-                const response = await fetch('/api/payment/create-order', {
+                // Create payment order (supports both Razorpay and Cashfree)
+                const response = await fetch('/api/payment/create', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1424,32 +1427,12 @@ s0.parentNode.insertBefore(s1,s0);
 
                 const result = await response.json();
 
-                const options = {
-                    key: result.key,
-                    amount: result.razorpayOrder.amount,
-                    currency: result.razorpayOrder.currency,
-                    name: 'Kerala SEC Voter Slips',
-                    description: `Order: ${orderData.orderId}`,
-                    order_id: result.razorpayOrder.id,
-                    handler: function(razorpayResponse) {
-                        verifyPayment(razorpayResponse);
-                    },
-                    prefill: {
-                        email: orderData.user?.email || ''
-                    },
-                    theme: {
-                        color: '#006D3B'
-                    },
-                    modal: {
-                        ondismiss: function() {
-                            document.getElementById('paymentBtn').disabled = false;
-                            document.getElementById('payBtnText').textContent = 'Make Payment';
-                        }
-                    }
-                };
-
-                const rzp = new Razorpay(options);
-                rzp.open();
+                // Route to appropriate payment gateway
+                if (result.gateway === 'cashfree') {
+                    initiateCashfreePayment(result);
+                } else {
+                    initiateRazorpayPayment(result);
+                }
 
             } catch (error) {
                 console.error('Payment initiation error:', error);
@@ -1459,98 +1442,107 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        async function downloadFullPDF() {
-            try {
-                // Show loading state
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '⏳ Downloading...';
-
-                const response = await fetch(`/api/slips/download/${orderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+        function initiateRazorpayPayment(result) {
+            const options = {
+                key: result.key,
+                amount: result.razorpayOrder.amount,
+                currency: result.razorpayOrder.currency,
+                name: 'Kerala SEC Voter Slips',
+                description: `Order: ${orderData.orderId}`,
+                order_id: result.razorpayOrder.id,
+                handler: function(razorpayResponse) {
+                    verifyRazorpayPayment(razorpayResponse);
+                },
+                prefill: {
+                    email: orderData.user?.email || ''
+                },
+                theme: {
+                    color: '#006D3B'
+                },
+                modal: {
+                    ondismiss: function() {
+                        document.getElementById('paymentBtn').disabled = false;
+                        document.getElementById('payBtnText').textContent = 'Make Payment';
                     }
-                });
-
-                if (!response.ok) {
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Download failed');
-                    }
-                    throw new Error('Download failed');
                 }
+            };
 
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `voter-slips-${orderId}.pdf`;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
+            const rzp = new Razorpay(options);
+            rzp.open();
+        }
+
+        async function initiateCashfreePayment(result) {
+            try {
+                console.log('Initiating Cashfree payment with:', result);
                 
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                }, 100);
-
-                // Success state
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> Download Complete!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 3000);
-
-            } catch (error) {
-                console.error('Download error:', error);
-                showMessage('error', 'Download Failed', error.message + '. Please try again.');
-                event.target.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
-                event.target.disabled = false;
-            }
-        }
-
-        // Admin function to complete order without payment
-        async function completeOrderAsAdmin() {
-            if (!confirm('Complete this order without payment?\n\nThis will mark the order as completed and allow PDF download.')) {
-                return;
-            }
-
-            const btn = document.getElementById('paymentBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-            try {
-                const response = await fetch(`/api/admin/orders/${orderData.orderId}/complete`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to complete order');
+                if (!result.sessionId) {
+                    throw new Error('No session ID received from server');
                 }
 
-                const data = await response.json();
-                console.log('Order completed by admin:', data);
+                // Ensure Cashfree SDK is loaded
+                if (typeof Cashfree === 'undefined') {
+                    // If not loaded via script tag, load dynamically
+                    const script = document.createElement('script');
+                    script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+                    
+                    await new Promise((resolve, reject) => {
+                        script.onload = () => {
+                            console.log('✅ Cashfree SDK loaded dynamically');
+                            setTimeout(resolve, 200); // Wait for SDK to initialize
+                        };
+                        script.onerror = () => reject(new Error('Failed to load Cashfree SDK'));
+                        document.head.appendChild(script);
+                    });
+                }
 
-                // Show success message
-                showMessage('success', 'Order Completed!', 'Order marked as completed. Redirecting to download page...', `order-success.html?orderId=${orderData.orderId}`, 2000);
+                if (typeof Cashfree === 'undefined') {
+                    throw new Error('Cashfree SDK not available after loading');
+                }
+
+                console.log('🔧 Initializing Cashfree in', result.environment, 'mode');
+
+                // Initialize Cashfree with environment mode
+                const cashfree = Cashfree({
+                    mode: result.environment === 'sandbox' ? 'sandbox' : 'production'
+                });
+
+                // Prepare checkout options
+                const checkoutOptions = {
+                    paymentSessionId: result.sessionId,
+                    returnUrl: `${window.location.origin}/order-success.html?orderId=${result.orderId}`,
+                    redirectTarget: '_self'
+                };
+
+                console.log('🚀 Opening Cashfree checkout...');
+                console.log('Session ID:', result.sessionId);
+                console.log('Return URL:', checkoutOptions.returnUrl);
+
+                // Open Cashfree payment checkout
+                const paymentResponse = await cashfree.checkout(checkoutOptions);
+                
+                console.log('💳 Cashfree response:', paymentResponse);
+
+                // Handle errors
+                if (paymentResponse && paymentResponse.error) {
+                    const errorMsg = paymentResponse.error.message || 'Payment checkout failed';
+                    console.error('❌ Cashfree error:', errorMsg);
+                    throw new Error(errorMsg);
+                }
+
+                // If we get here, payment was completed or redirected
+                if (paymentResponse && paymentResponse.paymentDetails) {
+                    console.log('✅ Payment details received:', paymentResponse.paymentDetails);
+                }
 
             } catch (error) {
-                console.error('Error completing order:', error);
-                showMessage('error', 'Failed to Complete Order', error.message);
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+                console.error('❌ Cashfree payment error:', error);
+                showMessage('error', 'Payment Failed', error.message || 'Failed to process Cashfree payment');
+                document.getElementById('paymentBtn').disabled = false;
+                document.getElementById('payBtnText').textContent = 'Make Payment';
             }
         }
 
-        async function verifyPayment(razorpayResponse) {
+        async function verifyRazorpayPayment(razorpayResponse) {
             try {
                 document.getElementById('payBtnText').textContent = 'Verifying payment...';
 
@@ -1598,6 +1590,66 @@ s0.parentNode.insertBefore(s1,s0);
                     'dashboard.html',
                     5000
                 );
+            }
+        }
+
+        async function downloadFullPDF() {
+            if (!orderData) {
+                showMessage('info', 'Please Wait', 'Loading order details...');
+                return;
+            }
+
+            // Check payment status
+            if (orderData.paymentStatus !== 'completed') {
+                console.error('Download blocked - payment not completed:', orderData.paymentStatus);
+                showMessage(
+                    'error',
+                    'Download Not Allowed',
+                    'Please complete the payment first.'
+                );
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showMessage('error', 'Authentication Required', 'Please login to download.');
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                    return;
+                }
+
+                showMessage('info', 'Preparing Download', 'Your PDF is being prepared...');
+
+                const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Download failed');
+                    }
+                    throw new Error('Download failed');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderData.orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showMessage('success', 'Download Started', 'Your PDF download has started!');
+
+            } catch (error) {
+                console.error('Download error:', error);
+                showMessage('error', 'Download Failed', error.message || 'Please try again or contact support.');
             }
         }
     </script>

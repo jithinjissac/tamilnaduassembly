@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import { body, validationResult } from 'express-validator';
 import { generatePDFBackground } from '../utils/pdfGenerator.js';
 import { sendOrderConfirmationEmail } from '../utils/emailService.js';
+import { generateInvoice, getInvoiceFilename } from '../utils/invoiceGenerator.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -377,6 +378,91 @@ export const updateSlipsPerPage = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to update slips per page',
+            error: error.message
+        });
+    }
+};
+
+// Download invoice for paid order
+export const downloadInvoice = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.userId; // This is a MongoDB ObjectId
+        const userRole = req.userRole;
+
+        console.log(`📄 Invoice download request for order: ${orderId}`);
+        console.log(`   User ID: ${userId}`);
+        console.log(`   User Role: ${userRole}`);
+
+        // Find order
+        const order = await Order.findOne({ orderId }).populate('customization.symbolId');
+        
+        if (!order) {
+            console.log(`❌ Order not found: ${orderId}`);
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found'
+            });
+        }
+
+        console.log(`   Order.userId: ${order.userId}`);
+        console.log(`   Payment Status: ${order.paymentStatus}`);
+
+        // Verify ownership (unless admin)
+        // Both userId from req and order.userId are ObjectId objects
+        const isOwner = order.userId.equals(userId);
+        const isAdmin = userRole === 'admin';
+        
+        console.log(`   Is Owner: ${isOwner}, Is Admin: ${isAdmin}`);
+        
+        if (!isAdmin && !isOwner) {
+            console.log(`❌ Unauthorized access attempt`);
+            return res.status(403).json({
+                status: 'error',
+                message: 'Unauthorized access'
+            });
+        }
+
+        // Check if order is paid
+        if (order.paymentStatus !== 'completed') {
+            console.log(`❌ Payment not completed: ${order.paymentStatus}`);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invoice only available for completed payments'
+            });
+        }
+
+        // Get user details
+        const user = await User.findById(order.userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        console.log(`✅ Generating invoice for ${orderId}`);
+
+        // Generate invoice PDF
+        const invoicePDF = await generateInvoice(order, user);
+        const filename = getInvoiceFilename(orderId);
+
+        // Set headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Length', invoicePDF.length);
+        res.setHeader('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
+
+        console.log(`📄 Invoice sent: ${filename} (${invoicePDF.length} bytes)`);
+        
+        res.send(invoicePDF);
+
+    } catch (error) {
+        console.error('Download invoice error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to generate invoice',
             error: error.message
         });
     }

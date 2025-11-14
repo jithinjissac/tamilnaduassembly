@@ -95,9 +95,14 @@ const OrderSchema = new mongoose.Schema({
         enum: ['pending', 'completed', 'failed'],
         default: 'pending'
     },
+    // Razorpay payment fields
     razorpayOrderId: String,
     razorpayPaymentId: String,
     razorpaySignature: String,
+    // Cashfree payment fields
+    cashfreeOrderId: String,
+    cashfreeSessionId: String,
+    cashfreePaymentId: String,
     createdAt: {
         type: Date,
         default: Date.now

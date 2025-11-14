@@ -7,6 +7,8 @@ import {
     getAllSymbols,
     updateSymbol,
     toggleSymbolStatus,
+    reorderSymbol,
+    resetSymbolOrder,
     deleteSymbol,
     getAllOrders,
     getOrderDetails,
@@ -37,6 +39,8 @@ router.post('/symbols', upload.single('image'), uploadSymbol);
 router.get('/symbols', getAllSymbols);
 router.put('/symbols/:symbolId', upload.single('image'), updateSymbol);
 router.patch('/symbols/:symbolId/toggle-status', toggleSymbolStatus);
+router.patch('/symbols/:symbolId/reorder', reorderSymbol);
+router.post('/symbols/reset-order', resetSymbolOrder);
 router.delete('/symbols/:symbolId', deleteSymbol);
 
 // Order Management

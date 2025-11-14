@@ -257,7 +257,7 @@ export const getAllSymbols = async (req, res) => {
         }
 
         const symbols = await Symbol.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ displayOrder: 1, createdAt: 1 })
             .populate('uploadedBy', 'name email')
             .lean();  // 30-40% faster!
 
@@ -303,6 +303,144 @@ export const toggleSymbolStatus = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to toggle symbol status',
+            error: error.message
+        });
+    }
+};
+
+// Reorder symbols
+export const reorderSymbol = async (req, res) => {
+    try {
+        const { symbolId } = req.params;
+        const { direction, newOrder } = req.body; // 'up' or 'down' OR specific number
+        
+        const currentSymbol = await Symbol.findById(symbolId);
+        if (!currentSymbol) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Symbol not found'
+            });
+        }
+
+        // Get all symbols sorted by displayOrder
+        const allSymbols = await Symbol.find().sort({ displayOrder: 1, createdAt: 1 });
+        
+        // Initialize displayOrder if needed
+        let needsInit = allSymbols.some(s => !s.displayOrder && s.displayOrder !== 0);
+        if (needsInit) {
+            for (let i = 0; i < allSymbols.length; i++) {
+                allSymbols[i].displayOrder = i + 1;
+                await allSymbols[i].save();
+            }
+        }
+
+        // If specific order number provided
+        if (newOrder !== undefined) {
+            const targetOrder = parseInt(newOrder);
+            
+            if (targetOrder < 1 || targetOrder > allSymbols.length) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: `Order must be between 1 and ${allSymbols.length}`
+                });
+            }
+
+            const currentOrder = currentSymbol.displayOrder || allSymbols.findIndex(s => s._id.toString() === symbolId) + 1;
+            
+            if (currentOrder === targetOrder) {
+                return res.json({
+                    status: 'success',
+                    message: 'Symbol already at this position'
+                });
+            }
+
+            // Reorder all symbols
+            if (targetOrder < currentOrder) {
+                // Moving up - shift others down
+                for (let symbol of allSymbols) {
+                    if (symbol._id.toString() === symbolId) continue;
+                    if (symbol.displayOrder >= targetOrder && symbol.displayOrder < currentOrder) {
+                        symbol.displayOrder += 1;
+                        await symbol.save();
+                    }
+                }
+            } else {
+                // Moving down - shift others up
+                for (let symbol of allSymbols) {
+                    if (symbol._id.toString() === symbolId) continue;
+                    if (symbol.displayOrder > currentOrder && symbol.displayOrder <= targetOrder) {
+                        symbol.displayOrder -= 1;
+                        await symbol.save();
+                    }
+                }
+            }
+
+            currentSymbol.displayOrder = targetOrder;
+            await currentSymbol.save();
+
+            return res.json({
+                status: 'success',
+                message: `Symbol moved to position ${targetOrder}`
+            });
+        }
+
+        // Original up/down logic
+        const currentIndex = allSymbols.findIndex(s => s._id.toString() === symbolId);
+        
+        if (direction === 'up' && currentIndex > 0) {
+            // Swap with previous
+            const temp = allSymbols[currentIndex - 1].displayOrder;
+            allSymbols[currentIndex - 1].displayOrder = currentSymbol.displayOrder;
+            currentSymbol.displayOrder = temp;
+            
+            await allSymbols[currentIndex - 1].save();
+            await currentSymbol.save();
+        } else if (direction === 'down' && currentIndex < allSymbols.length - 1) {
+            // Swap with next
+            const temp = allSymbols[currentIndex + 1].displayOrder;
+            allSymbols[currentIndex + 1].displayOrder = currentSymbol.displayOrder;
+            currentSymbol.displayOrder = temp;
+            
+            await allSymbols[currentIndex + 1].save();
+            await currentSymbol.save();
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Symbol order updated successfully'
+        });
+    } catch (error) {
+        console.error('Reorder symbol error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to reorder symbol',
+            error: error.message
+        });
+    }
+};
+
+// Reset symbol order to creation date
+export const resetSymbolOrder = async (req, res) => {
+    try {
+        // Get all symbols sorted by creation date
+        const allSymbols = await Symbol.find().sort({ createdAt: 1 });
+        
+        // Reset displayOrder to match creation order
+        for (let i = 0; i < allSymbols.length; i++) {
+            allSymbols[i].displayOrder = i + 1;
+            await allSymbols[i].save();
+        }
+
+        res.json({
+            status: 'success',
+            message: `Reset order for ${allSymbols.length} symbols`,
+            count: allSymbols.length
+        });
+    } catch (error) {
+        console.error('Reset symbol order error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to reset symbol order',
             error: error.message
         });
     }

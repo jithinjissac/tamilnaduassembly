@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - EasySlip | Kerala Voter Slip Generator</title>
+    <title>Payment Successful - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
     <link rel="stylesheet" href="kerala-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -406,6 +406,9 @@ s0.parentNode.insertBefore(s1,s0);
             <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
                 <i class="fas fa-download"></i> Download PDF
             </button>
+            <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); margin-left: 0.5rem;">
+                <i class="fas fa-file-invoice"></i> Download Invoice
+            </button>
         </div>
 
         <div style="margin-bottom: 2rem;">
@@ -687,34 +690,55 @@ s0.parentNode.insertBefore(s1,s0);
                 
                 // Add payment button
                 const messageAction = document.getElementById('messageAction');
-                messageAction.innerHTML = `
-                    <button onclick="window.location.href='preview.html?orderId=${orderId}'" 
-                            style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); 
-                                   color: white; 
-                                   border: none; 
-                                   padding: 1rem 2rem; 
-                                   border-radius: 8px; 
-                                   font-size: 1rem; 
-                                   font-weight: 600; 
-                                   cursor: pointer;
-                                   margin-top: 1rem;">
-                        <i class="fas fa-credit-card"></i> Complete Payment
-                    </button>
-                    <button onclick="window.location.href='dashboard.html'" 
-                            style="background: #718096; 
-                                   color: white; 
-                                   border: none; 
-                                   padding: 1rem 2rem; 
-                                   border-radius: 8px; 
-                                   font-size: 1rem; 
-                                   font-weight: 600; 
-                                   cursor: pointer;
-                                   margin-top: 1rem;
-                                   margin-left: 0.5rem;">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
-                    </button>
-                `;
-                return;
+                
+                // Check if this order has Cashfree session (pending payment verification)
+                if (data.cashfreeSessionId) {
+                    messageAction.innerHTML = `
+                        <button onclick="manualVerifyCashfreePayment()" 
+                                id="verifyPaymentBtn"
+                                style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;
+                                       margin-right: 1rem;">
+                            <i class="fas fa-check-circle"></i> Verify Cashfree Payment
+                        </button>
+                        <button onclick="window.location.href='preview.html?orderId=${orderId}'" 
+                                style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;">
+                                <i class="fas fa-credit-card"></i> Make Payment
+                        </button>
+                    `;
+                } else {
+                    messageAction.innerHTML = `
+                        <button onclick="window.location.href='preview.html?orderId=${orderId}'" 
+                                style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;">
+                                <i class="fas fa-credit-card"></i> Make Payment
+                        </button>
+                    `;
+                }
+                
+                return; // Exit early for unpaid orders
             }
 
             // Debug: Log the data to see what we're receiving
@@ -766,6 +790,67 @@ s0.parentNode.insertBefore(s1,s0);
             document.getElementById('orderDetails').style.display = 'block';
         }
 
+        // Verify Cashfree payment after redirect
+        async function verifyCashfreePayment() {
+            try {
+                console.log('💳 Verifying Cashfree payment for order:', orderId);
+                
+                const response = await fetch('/api/payment/cashfree/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId
+                    })
+                });
+
+                const result = await response.json();
+                console.log('✅ Cashfree verification result:', result);
+
+                if (!response.ok) {
+                    console.error('❌ Cashfree verification failed:', result.message);
+                    // Don't throw error, just log it - the payment might still be processing
+                    return false;
+                }
+
+                if (result.status === 'success') {
+                    console.log('✅ Cashfree payment verified successfully');
+                    return true;
+                }
+
+                return false;
+
+            } catch (error) {
+                console.error('❌ Cashfree verification error:', error);
+                // Don't throw - let the page load anyway
+                return false;
+            }
+        }
+
+        // Manual verification function triggered by button
+        async function manualVerifyCashfreePayment() {
+            const btn = document.getElementById('verifyPaymentBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            }
+
+            const verified = await verifyCashfreePayment();
+            
+            if (verified) {
+                showMessage('success', 'Payment Verified!', 'Your payment has been confirmed. Reloading...', null, 2000);
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showMessage('error', 'Verification Failed', 'Could not verify payment. Please try again or contact support.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify Cashfree Payment';
+                }
+            }
+        }
+
         async function loadOrderDetails() {
             try {
                 // Verify order access first
@@ -804,6 +889,26 @@ s0.parentNode.insertBefore(s1,s0);
 
                 if (!orderData) {
                     throw new Error('No order data received from API');
+                }
+
+                // If order has a Cashfree session ID and is pending, try to verify payment
+                if (orderData.cashfreeSessionId && orderData.paymentStatus === 'pending') {
+                    console.log('🔄 Order has Cashfree session and is pending, attempting verification...');
+                    const verified = await verifyCashfreePayment();
+                    if (verified) {
+                        // Reload order data to get updated status
+                        console.log('✅ Payment verified, reloading order data...');
+                        const reloadResponse = await fetch(`/api/orders/${orderId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        if (reloadResponse.ok) {
+                            const reloadResult = await reloadResponse.json();
+                            orderData = reloadResult.order || reloadResult;
+                            console.log('✅ Order data reloaded:', orderData);
+                        }
+                    }
                 }
 
                 // Display order details
@@ -1013,12 +1118,74 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
+        // Download Invoice
+        async function downloadInvoice() {
+            try {
+                const invoiceBtn = document.getElementById('invoiceBtn');
+                const originalHTML = invoiceBtn.innerHTML;
+                
+                // Disable button and show loading
+                invoiceBtn.disabled = true;
+                invoiceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Invoice...';
+
+                console.log('📄 Downloading invoice for:', orderId);
+
+                const response = await fetch(`/api/orders/${orderId}/invoice`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to download invoice');
+                }
+
+                // Get the PDF blob
+                const blob = await response.blob();
+                
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+
+                console.log('✅ Invoice downloaded successfully');
+                
+                // Reset button
+                invoiceBtn.innerHTML = '<i class="fas fa-check"></i> Invoice Downloaded!';
+                setTimeout(() => {
+                    invoiceBtn.innerHTML = originalHTML;
+                    invoiceBtn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('Invoice download error:', error);
+                showMessage('error', 'Invoice Download Failed', error.message);
+                
+                const invoiceBtn = document.getElementById('invoiceBtn');
+                invoiceBtn.innerHTML = '<i class="fas fa-file-invoice"></i> Download Invoice';
+                invoiceBtn.disabled = false;
+            }
+        }
+
         // Initialize page
         (function init() {
             console.log('=== ORDER SUCCESS PAGE INITIALIZATION ===');
             console.log('Order ID from URL:', orderId);
             console.log('Token available:', !!token);
             console.log('Token length:', token ? token.length : 0);
+            console.log('🔍 ALL URL PARAMS:', window.location.search);
+            console.log('🔍 URL Params object:', Object.fromEntries(urlParams));
             
             // Check if orderId exists
             if (!orderId) {

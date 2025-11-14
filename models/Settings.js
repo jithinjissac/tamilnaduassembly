@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email', 'slip']
+        enum: ['email', 'slip', 'payment']
     },
     settings: {
         type: Map,
@@ -30,6 +30,20 @@ settingsSchema.index({ lastModified: -1 });  // Fast history sorting
 
 // Default settings for email only
 export const defaultSettings = {
+    payment: {
+        activeGateway: 'razorpay', // 'razorpay' or 'cashfree'
+        razorpay: {
+            enabled: true,
+            keyId: process.env.RAZORPAY_KEY_ID || '',
+            keySecret: process.env.RAZORPAY_KEY_SECRET || ''
+        },
+        cashfree: {
+            enabled: false,
+            appId: process.env.CASHFREE_APP_ID || '',
+            secretKey: process.env.CASHFREE_SECRET_KEY || '',
+            environment: process.env.CASHFREE_ENV || 'production' // 'sandbox' or 'production'
+        }
+    },
     email: {
         enableEmailNotifications: false,
         smtpHost: '',

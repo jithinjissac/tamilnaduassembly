@@ -185,7 +185,7 @@ export async function sendPaymentSuccessEmail(user, order) {
     
     // Get template settings with defaults
     const template = settings.paymentSuccess || {
-        subject: 'Payment Successful - {{wardName}} - {{orderId}}',
+        subject: 'Payment Successful - Invoice & PDF - {{wardName}} - {{orderId}}',
         heading: 'Payment Received Successfully!',
         message: 'Your payment has been received.'
     };
@@ -209,6 +209,9 @@ export async function sendPaymentSuccessEmail(user, order) {
     const heading = replacePlaceholders(template.heading);
     const message = replacePlaceholders(template.message).replace(/\n/g, '<br>');
     
+    const frontendUrl = process.env.FRONTEND_URL || 'https://easyslip.in';
+    const invoiceUrl = `${frontendUrl}/order-success.html?orderId=${order.orderId}`;
+    
     const html = `
         <!DOCTYPE html>
         <html>
@@ -221,7 +224,8 @@ export async function sendPaymentSuccessEmail(user, order) {
                 .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
                 .content { padding: 40px 30px; background: white; }
                 .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
-                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
+                .button.invoice { background: #10b981; border-color: #059669; }
                 .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
                 .footer p { margin: 8px 0; }
             </style>
@@ -235,6 +239,7 @@ export async function sendPaymentSuccessEmail(user, order) {
             <div class="content">
                 <div class="message">${message}</div>
                 <center>
+                    <a href="${invoiceUrl}" class="button invoice">📄 Download Invoice</a>
                     <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
                 </center>
             </div>
@@ -290,6 +295,9 @@ export async function sendPDFReadyEmail(user, order) {
     const heading = replacePlaceholders(template.heading);
     const message = replacePlaceholders(template.message).replace(/\n/g, '<br>');
     
+    const frontendUrl = process.env.FRONTEND_URL || 'https://easyslip.in';
+    const pdfUrl = `${frontendUrl}/order-success.html?orderId=${order.orderId}`;
+    
     const html = `
         <!DOCTYPE html>
         <html>
@@ -302,7 +310,7 @@ export async function sendPDFReadyEmail(user, order) {
                 .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
                 .content { padding: 40px 30px; background: white; }
                 .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
-                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
                 .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
                 .footer p { margin: 8px 0; }
             </style>
@@ -316,6 +324,7 @@ export async function sendPDFReadyEmail(user, order) {
             <div class="content">
                 <div class="message">${message}</div>
                 <center>
+                    <a href="${pdfUrl}" class="button">📄 Download PDF Now</a>
                     <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
                 </center>
             </div>

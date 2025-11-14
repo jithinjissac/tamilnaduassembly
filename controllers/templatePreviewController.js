@@ -114,7 +114,7 @@ function generateOrderConfirmationHTML(user, order) {
                     </center>
                     
                     <div class="footer">
-                        <p><strong>Kerala Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>
@@ -182,7 +182,7 @@ function generatePaymentSuccessHTML(user, order) {
                     </center>
                     
                     <div class="footer">
-                        <p><strong>Kerala Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>
@@ -235,7 +235,7 @@ function generatePDFReadyHTML(user, order) {
                     </p>
                     
                     <div class="footer">
-                        <p><strong>Kerala Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>

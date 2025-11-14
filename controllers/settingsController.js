@@ -7,6 +7,21 @@ export const getSettings = async (req, res) => {
     try {
         const { category } = req.params;
         
+        // Helper function to convert nested Maps to objects
+        const convertMapToObject = (settingsMap) => {
+            const settings = {};
+            for (const [key, value] of settingsMap) {
+                if (value instanceof Map) {
+                    settings[key] = Object.fromEntries(value);
+                } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                    settings[key] = value;
+                } else {
+                    settings[key] = value;
+                }
+            }
+            return settings;
+        };
+        
         if (category) {
             // Get specific category
             if (!defaultSettings[category]) {
@@ -16,20 +31,21 @@ export const getSettings = async (req, res) => {
                 });
             }
             
-            const settings = await Settings.getSettings(category);
+            const settingsMap = await Settings.getSettings(category);
+            const settings = convertMapToObject(settingsMap);
             
             return res.json({
                 status: 'success',
                 category,
-                settings: Object.fromEntries(settings)
+                settings: settings
             });
         } else {
             // Get all categories
             const allSettings = {};
             
             for (const cat of Object.keys(defaultSettings)) {
-                const settings = await Settings.getSettings(cat);
-                allSettings[cat] = Object.fromEntries(settings);
+                const settingsMap = await Settings.getSettings(cat);
+                allSettings[cat] = convertMapToObject(settingsMap);
             }
             
             return res.json({

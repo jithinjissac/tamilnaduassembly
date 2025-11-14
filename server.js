@@ -73,6 +73,10 @@ app.use('/api/slips', slipRoutes);
 import adminRoutes from './routes/admin.js';
 app.use('/api/admin', adminRoutes);
 
+// Media Routes (Admin only)
+import mediaRoutes from './routes/media.js';
+app.use('/api/admin/media', mediaRoutes);
+
 // Settings Routes (Admin only)
 import settingsRoutes from './routes/settings.js';
 app.use('/api/settings', settingsRoutes);
