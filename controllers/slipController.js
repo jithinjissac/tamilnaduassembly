@@ -247,11 +247,12 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         };
     }
     
-    // Calculate slip height based on slipsPerPage
-    // A4 height: 297mm, with 8mm top/bottom padding = 281mm usable
-    // For 5 slips: 52mm each (with 5mm gap = 280mm total)
-    // For 6 slips: 43mm each (with 5mm gap = 283mm total)
-    const slipHeight = slipsPerPage === 6 ? '43mm' : '52mm';
+    // Calculate slip height and gap based on slipsPerPage
+    // A4 height: 297mm, with 5mm top/bottom padding = 287mm usable
+    // For 5 slips: 52mm each (with 4mm gap × 4 = 16mm) = 260 + 16 = 276mm ✓
+    // For 6 slips: 42mm each (with 4mm gap × 5 = 20mm) = 252 + 20 = 272mm ✓
+    const slipHeight = slipsPerPage === 6 ? '42mm' : '52mm';
+    const slipGap = '4mm';
     
     let html = `
 <!DOCTYPE html>
@@ -269,11 +270,11 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         
         :root { --symbol-image: url('${symbolUrl}'); }
         
-        .page { width: 210mm; height: 297mm; padding: 8mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
+        .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
         
-        .voter-slip { width: 100%; height: ${slipHeight}; border: 2px solid; display: flex; padding: 2mm; position: relative; flex-shrink: 0; margin-bottom: 5mm; }
-        .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2.5mm; height: 0; border-bottom: 2px dashed #999; }
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 2px solid; display: flex; padding: 2mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
+        .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -${parseInt(slipGap)/2}mm; height: 0; border-bottom: 2px dashed #999; }
         .voter-slip:last-child { margin-bottom: 0; }
         .voter-slip:last-child::after { display: none; }
         .voter-slip > * { overflow: hidden; }
