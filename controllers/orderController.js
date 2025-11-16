@@ -87,6 +87,11 @@ export const createOrder = [
             // Generate order ID
             const orderId = generateOrderId();
 
+            // Ensure slipsPerPage is set (default to 5 if not provided)
+            if (!customization.slipsPerPage) {
+                customization.slipsPerPage = 5;
+            }
+
             // Create order
             const order = new Order({
                 userId,
