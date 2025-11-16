@@ -114,4 +114,29 @@ export const adminAuth = async (req, res, next) => {
     }
 };
 
+// Optional authentication middleware (doesn't fail if no token)
+export const optionalAuth = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+
+        if (token) {
+            // Verify token if provided
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-this');
+            const user = await User.findById(decoded.userId).select('-password');
+            
+            if (user) {
+                req.user = user;
+                req.userId = user._id;
+                req.userRole = user.role;
+            }
+        }
+        
+        // Continue regardless of whether token was provided/valid
+        next();
+    } catch (error) {
+        // Ignore authentication errors for optional auth
+        next();
+    }
+};
+
 export default auth;

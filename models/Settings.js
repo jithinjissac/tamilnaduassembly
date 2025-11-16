@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email', 'slip', 'payment']
+        enum: ['email', 'slip', 'payment', 'popup']
     },
     settings: {
         type: Map,
@@ -133,6 +133,13 @@ Login to https://easyslip.in to download your PDF.`
             infoLabel: '16mm',
             pollingStation: '9pt'
         }
+    },
+    popup: {
+        enabled: false,
+        title: 'Announcement',
+        content: '',
+        showOnce: false,
+        delay: 1000
     }
 };
 

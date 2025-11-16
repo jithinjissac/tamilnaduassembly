@@ -8,9 +8,24 @@ import {
     testEmail
 } from '../controllers/settingsController.js';
 import { previewEmailTemplate } from '../controllers/templatePreviewController.js';
-import { adminAuth } from '../middleware/auth.js';
+import { adminAuth, optionalAuth } from '../middleware/auth.js';
 
-const router = express.Router();// All routes require admin authentication
+const router = express.Router();
+
+// Public endpoint for popup settings (needed for index.html)
+// This must come BEFORE adminAuth middleware
+router.get('/popup', optionalAuth, async (req, res, next) => {
+    req.params.category = 'popup';
+    return getSettings(req, res, next);
+});
+
+// PUT endpoint for popup (requires auth)
+router.put('/popup', adminAuth, async (req, res, next) => {
+    req.params.category = 'popup';
+    return updateSettings(req, res, next);
+});
+
+// All other routes require admin authentication
 router.use(adminAuth);
 
 // Get all settings or specific category
