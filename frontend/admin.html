@@ -698,6 +698,7 @@
             <button class="tab" onclick="switchTab('popup-editor')"><i class="fas fa-window-restore"></i> Popup Editor</button>
             <button class="tab" onclick="switchTab('media-manager')"><i class="fas fa-folder-open"></i> Media Manager</button>
             <button class="tab" onclick="switchTab('profile-settings')"><i class="fas fa-user-cog"></i> Profile Settings</button>
+            <button class="tab" onclick="switchTab('developer-settings')"><i class="fas fa-code"></i> Developer</button>
         </div>
 
         <!-- Analytics Tab -->
@@ -1916,6 +1917,57 @@ Login to https://easyslip.in to download your PDF.</textarea>
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Settings Tab -->
+    <div id="developer-settings-tab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; color: #1f2937;"><i class="fas fa-code"></i> Developer Settings</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.95rem;">Configure developer tools and debugging options</p>
+            </div>
+            <div class="card-body">
+                <!-- Console Logging Settings -->
+                <div style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0 0 1rem 0; color: #1f2937; font-size: 1.1rem;">
+                        <i class="fas fa-terminal"></i> Console Logging
+                    </h3>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div>
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 0.25rem;">
+                                <i class="fas fa-bug"></i> Enable Debug Logs
+                            </label>
+                            <p style="margin: 0; color: #666; font-size: 0.9rem;">Show detailed console logs for debugging (recommended for development only)</p>
+                        </div>
+                        <label class="switch" style="margin-left: 1rem;">
+                            <input type="checkbox" id="console-logging-toggle" onchange="toggleConsoleLogs(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px;">
+                        <p style="margin: 0; color: #92400e; font-size: 0.9rem;">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Disabling logs improves browser performance and reduces clutter in the console. Enable only when debugging issues.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Current Status -->
+                <div style="background: #ecfdf5; border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="margin: 0 0 1rem 0; color: #065f46; font-size: 1.1rem;">
+                        <i class="fas fa-info-circle"></i> Current Status
+                    </h3>
+                    <div style="display: grid; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-circle" id="logging-status-icon" style="font-size: 0.5rem; color: #10b981;"></i>
+                            <span style="font-weight: 600; color: #065f46;">Console Logging:</span>
+                            <span id="logging-status-text" style="color: #047857;">Enabled</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -4688,7 +4740,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
                 if (!response.ok) throw new Error('Failed to load profile');
 
-                const data = await response.json();
+                const result = await response.json();
+                const data = result.user || result;
                 
                 // Update form fields
                 document.getElementById('profile-name').value = data.name || '';
@@ -5102,8 +5155,82 @@ Login to https://easyslip.in to download your PDF.</textarea>
             }, 5000);
         }
 
+        // ==================== DEVELOPER SETTINGS FUNCTIONS ====================
+        
+        // Console logging control
+        let consoleLoggingEnabled = localStorage.getItem('consoleLoggingEnabled') !== 'false';
+        
+        // Override console methods
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
+
+        function updateConsoleState() {
+            if (consoleLoggingEnabled) {
+                console.log = originalConsole.log;
+                console.error = originalConsole.error;
+                console.warn = originalConsole.warn;
+                console.info = originalConsole.info;
+            } else {
+                console.log = () => {};
+                console.error = originalConsole.error; // Keep errors visible
+                console.warn = () => {};
+                console.info = () => {};
+            }
+        }
+
+        function toggleConsoleLogs(enabled) {
+            consoleLoggingEnabled = enabled;
+            localStorage.setItem('consoleLoggingEnabled', enabled);
+            updateConsoleState();
+            
+            // Update UI
+            const statusIcon = document.getElementById('logging-status-icon');
+            const statusText = document.getElementById('logging-status-text');
+            
+            if (enabled) {
+                statusIcon.style.color = '#10b981';
+                statusText.textContent = 'Enabled';
+                statusText.style.color = '#047857';
+                originalConsole.log('✅ Console logging enabled');
+            } else {
+                statusIcon.style.color = '#ef4444';
+                statusText.textContent = 'Disabled';
+                statusText.style.color = '#dc2626';
+                originalConsole.log('🔇 Console logging disabled (errors still visible)');
+            }
+        }
+
+        // Initialize console logging state on page load
+        function initDeveloperSettings() {
+            const toggle = document.getElementById('console-logging-toggle');
+            if (toggle) {
+                toggle.checked = consoleLoggingEnabled;
+            }
+            updateConsoleState();
+            
+            // Update UI
+            const statusIcon = document.getElementById('logging-status-icon');
+            const statusText = document.getElementById('logging-status-text');
+            if (statusIcon && statusText) {
+                if (consoleLoggingEnabled) {
+                    statusIcon.style.color = '#10b981';
+                    statusText.textContent = 'Enabled';
+                    statusText.style.color = '#047857';
+                } else {
+                    statusIcon.style.color = '#ef4444';
+                    statusText.textContent = 'Disabled';
+                    statusText.style.color = '#dc2626';
+                }
+            }
+        }
+
         // Initialize on page load
         checkAuth();
+        initDeveloperSettings();
     </script>
 </body>
 </html>

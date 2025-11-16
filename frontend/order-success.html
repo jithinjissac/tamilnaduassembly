@@ -406,7 +406,7 @@ s0.parentNode.insertBefore(s1,s0);
             <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
                 <i class="fas fa-download"></i> Download PDF
             </button>
-            <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); margin-left: 0.5rem;">
+            <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
                 <i class="fas fa-file-invoice"></i> Download Invoice
             </button>
         </div>
@@ -441,6 +441,7 @@ s0.parentNode.insertBefore(s1,s0);
         </div>
     </div>
 
+    <script src="console-control.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
