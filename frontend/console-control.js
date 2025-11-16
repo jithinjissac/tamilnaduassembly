@@ -18,10 +18,11 @@
             console.warn = originalConsole.warn;
             console.info = originalConsole.info;
         } else {
+            // Suppress ALL console output including errors when disabled
             console.log = function(){};
             console.warn = function(){};
             console.info = function(){};
-            console.error = originalConsole.error;
+            console.error = function(){};
         }
     }
 
