@@ -77,6 +77,10 @@ s0.parentNode.insertBefore(s1,s0);
             font-weight: 600;
             letter-spacing: 2px;
         }
+        .logo img.app-logo { height:80px; width:auto; display:block; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        @keyframes logoFade { 0% { opacity:0; transform:scale(0.9);} 100% { opacity:1; transform:scale(1);} }
 
         .btn-back {
             background: rgba(255,255,255,0.2);
@@ -750,8 +754,7 @@ s0.parentNode.insertBefore(s1,s0);
     <header>
         <div class="header-container">
             <div class="logo">
-                EasySlip
-                <small>KERALA ELECTIONS</small>
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
             </div>
             <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
         </div>
@@ -791,7 +794,8 @@ s0.parentNode.insertBefore(s1,s0);
                     <div class="symbol-selection-area" id="symbolSelectionArea">
                         <div class="symbol-preview" id="symbolPreview" style="display: none;">
                             <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;">
-                            <div id="selectedSymbolName" style="font-weight: 700; color: #2d3748; font-size: 1.1rem; margin-bottom: 0.5rem;"></div>
+                            <div id="selectedSymbolName" style="font-weight: 700; color: #2d3748; font-size: 1.1rem; margin-bottom: 0.3rem;"></div>
+                            <div id="selectedSymbolNameMalayalam" style="font-family: 'Noto Sans Malayalam', sans-serif; font-weight: 600; color: #FFB81C; font-size: 1.2rem; margin-bottom: 0.5rem;"></div>
                             <div style="color: #48bb78; font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Symbol Selected</div>
                             <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="padding: 0.75rem 1.5rem;">
                                 <i class="fas fa-sync-alt"></i> Change Symbol
@@ -1030,6 +1034,16 @@ s0.parentNode.insertBefore(s1,s0);
                 // Update UI
                 document.getElementById('selectedSymbolImage').src = symbol.imageUrl;
                 document.getElementById('selectedSymbolName').textContent = symbol.name;
+                
+                // Display Malayalam name if available
+                const malayalamNameElement = document.getElementById('selectedSymbolNameMalayalam');
+                if (symbol.nameMalayalam && symbol.nameMalayalam.trim()) {
+                    malayalamNameElement.textContent = symbol.nameMalayalam;
+                    malayalamNameElement.style.display = 'block';
+                } else {
+                    malayalamNameElement.style.display = 'none';
+                }
+                
                 document.getElementById('symbolPreview').style.display = 'block';
                 document.getElementById('selectSymbolBtn').style.display = 'none';
                 

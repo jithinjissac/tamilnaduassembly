@@ -184,10 +184,16 @@
             gap: 1rem;
         }
 
-        .logo-icon {
-            font-size: 2.5rem;
-            animation: float 3s ease-in-out infinite;
+        .logo-container img.app-logo {
+            height: 80px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
         }
+
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        @keyframes logoFade { 0% { opacity:0; transform:scale(0.9);} 100% { opacity:1; transform:scale(1);} }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
@@ -1729,11 +1735,7 @@ s0.parentNode.insertBefore(s1,s0);
     <header>
         <div class="nav-container">
             <div class="logo-container">
-                <div class="logo-icon"><i class="fas fa-vote-yea"></i></div>
-                <div class="logo-text">
-                    <div class="logo-main">EasySlip</div>
-                    <div class="logo-sub">KERALA ELECTIONS</div>
-                </div>
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
             </div>
             <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
                 <i class="fas fa-bars"></i>

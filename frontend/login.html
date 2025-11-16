@@ -8,19 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="kerala-theme.css">
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+   
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-G0M40G1DK1"></script>
 <script>
@@ -59,6 +47,16 @@ s0.parentNode.insertBefore(s1,s0);
             font-size: 4rem;
             margin-bottom: 1rem;
         }
+        .logo-section img.app-logo {
+            height: 120px;
+            width: auto;
+            display: block;
+            margin: 0 auto 0.75rem;
+           
+        }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes logoFade { 0% { opacity:0; transform: scale(0.9);} 100% { opacity:1; transform: scale(1);} }
 
         .logo-section h1 {
             font-size: 2.2rem;
@@ -282,7 +280,8 @@ s0.parentNode.insertBefore(s1,s0);
 <body>
     <div class="login-container">
         <div class="logo-section">
-            <h1>EasySlip</h1>
+            <img src="logo-dark.png" alt="EasySlip Logo" class="app-logo animated-logo" />
+            
             <p>Sign in to your account</p>
         </div>
 

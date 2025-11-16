@@ -67,6 +67,15 @@ s0.parentNode.insertBefore(s1,s0);
             font-weight: 600;
             letter-spacing: 2px;
         }
+        .logo img.app-logo {
+            height: 80px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes logoFade { 0% { opacity:0; transform: scale(0.9);} 100% { opacity:1; transform: scale(1);} }
 
         .user-section {
             display: flex;
@@ -398,8 +407,7 @@ s0.parentNode.insertBefore(s1,s0);
     <header>
         <div class="header-container">
             <div class="logo">
-                EasySlip
-                <small>KERALA ELECTIONS</small>
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
             </div>
             <div class="user-section">
                 <div class="user-info">

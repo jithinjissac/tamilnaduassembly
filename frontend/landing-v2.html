@@ -50,17 +50,15 @@
             color: var(--kerala-green);
         }
 
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--kerala-green), #00a651);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
+        .logo img.app-logo {
+            height: 80px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
         }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        @keyframes logoFade { 0% { opacity:0; transform:scale(0.9);} 100% { opacity:1; transform:scale(1);} }
 
         .nav-links {
             display: flex;
@@ -750,10 +748,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-vote-yea"></i>
-                </div>
-                <span>EasySlip</span>
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
             </div>
             <div class="nav-links">
                 <a href="#features">Features</a>

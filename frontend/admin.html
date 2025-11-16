@@ -1086,6 +1086,21 @@
                             <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
                                 <i class="fas fa-file"></i> 5 Slips Per Page (Default)
                             </h3>
+                            
+                            <!-- A4 Preview for 5 Slips -->
+                            <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600; color: #667eea; font-size: 0.9rem;">
+                                        <i class="fas fa-eye"></i> Live Preview (Single Slip - Actual Size)
+                                    </span>
+                                </div>
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd;">
+                                    <div id="fiveSlipsPreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
+                                        <!-- Preview will be generated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div style="display: grid; gap: 1rem;">
                                 <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
                                     <label style="font-weight: 500;">Symbol Header:</label>
@@ -1131,6 +1146,21 @@
                             <h3 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
                                 <i class="fas fa-file"></i> 6 Slips Per Page (Compact)
                             </h3>
+                            
+                            <!-- A4 Preview for 6 Slips -->
+                            <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600; color: #667eea; font-size: 0.9rem;">
+                                        <i class="fas fa-eye"></i> Live Preview (Single Slip - Actual Size)
+                                    </span>
+                                </div>
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd;">
+                                    <div id="sixSlipsPreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
+                                        <!-- Preview will be generated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div style="display: grid; gap: 1rem;">
                                 <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
                                     <label style="font-weight: 500;">Symbol Header:</label>
@@ -3264,8 +3294,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
             
             const formData = new FormData(form);
             
-            // Get current settings (use 5 slips layout for preview)
-            const settings = {
+            // Get settings for 5 slips
+            const fiveSlipsSettings = {
                 symbolHeader: formData.get('fiveSlips.symbolHeader'),
                 symbolImage: formData.get('fiveSlips.symbolImage'),
                 symbolName: formData.get('fiveSlips.symbolName'),
@@ -3277,17 +3307,40 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 pollingStation: formData.get('fiveSlips.pollingStation')
             };
 
-            // Render slip at EXACT PDF SIZE (210mm × 52mm for 5 slips/page)
-            // Scale to fit in preview container
-            const previewHTML = `
-                <div style="width: 210mm; height: 52mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; transform: scale(0.48); transform-origin: top left; margin-bottom: -27mm;">
+            // Get settings for 6 slips
+            const sixSlipsSettings = {
+                symbolHeader: formData.get('sixSlips.symbolHeader'),
+                symbolImage: formData.get('sixSlips.symbolImage'),
+                symbolName: formData.get('sixSlips.symbolName'),
+                slipNumber: formData.get('sixSlips.slipNumber'),
+                secId: formData.get('sixSlips.secId'),
+                voterName: formData.get('sixSlips.voterName'),
+                infoRow: formData.get('sixSlips.infoRow'),
+                infoLabel: formData.get('sixSlips.infoLabel'),
+                pollingStation: formData.get('sixSlips.pollingStation')
+            };
+
+            // Generate 5 slips per page preview
+            generateFiveSlipsPreview(fiveSlipsSettings);
+            
+            // Generate 6 slips per page preview
+            generateSixSlipsPreview(sixSlipsSettings);
+        }
+
+        function generateFiveSlipsPreview(settings) {
+            const container = document.getElementById('fiveSlipsPreview');
+            if (!container) return;
+
+            // Generate single slip exactly as PDF
+            const html = `
+                <div style="width: 210mm; height: 56.4mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
                     <div style="width: 38mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center;">
-                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm;">നമ്മുടെ ചിഹ്നം</div>
-                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #999;">Symbol</div>
-                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">രണ്ടില</div>
+                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 1mm;">നമ്മുടെ ചിഹ്നം</div>
+                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 1mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #999;">🏵️</div>
+                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">കമലം</div>
                     </div>
                     <div style="flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="font-size: ${settings.slipNumber}; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; gap: 1mm;">
                             <div style="font-weight: bold; font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
                             <div style="font-weight: bold; font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
@@ -3310,8 +3363,46 @@ Login to https://easyslip.in to download your PDF.</textarea>
                     </div>
                 </div>
             `;
+            container.innerHTML = html;
+        }
 
-            document.getElementById('slipPreview').innerHTML = previewHTML;
+        function generateSixSlipsPreview(settings) {
+            const container = document.getElementById('sixSlipsPreview');
+            if (!container) return;
+
+            // Generate single slip exactly as PDF
+            const html = `
+                <div style="width: 210mm; height: 47mm; border: 2px solid #000; display: flex; padding: 1.8mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
+                    <div style="width: 35mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.2mm; margin-right: 2mm; text-align: center;">
+                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm;">നമ്മുടെ ചിഹ്നം</div>
+                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 9pt; color: #999;">🏵️</div>
+                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">കമലം</div>
+                    </div>
+                    <div style="flex: 1; padding: 1.2mm 2mm; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="font-size: ${settings.slipNumber}; font-weight: bold; margin-bottom: 0.8mm; padding: 0.8mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8mm; gap: 0.8mm;">
+                            <div style="font-weight: bold; font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
+                            <div style="font-weight: bold; font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="margin-bottom: 0.6mm; font-size: ${settings.voterName}; display: flex; font-weight: bold;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">പേര്:</span>
+                                <span style="flex: 1;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                            </div>
+                            <div style="margin-bottom: 0.6mm; font-size: ${settings.infoRow}; display: flex;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">വീട്ടുപേര്:</span>
+                                <span style="flex: 1;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            </div>
+                            <div style="margin-bottom: 0.6mm; font-size: ${settings.infoRow}; display: flex;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1;">${sampleVoter.guardian_name}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.6mm; margin-top: 0.5mm; font-weight: 600;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
         // Save slip settings
