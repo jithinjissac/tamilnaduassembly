@@ -38,6 +38,11 @@ const OrderSchema = new mongoose.Schema({
         colorScheme: {
             type: Object,
             default: {}
+        },
+        slipsPerPage: {
+            type: Number,
+            enum: [5, 6],
+            default: 5
         }
     },
     location: {

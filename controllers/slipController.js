@@ -469,6 +469,17 @@ export const generatePreview = async (req, res) => {
         });
         console.log('🎫 Customization.slipsPerPage:', order.customization?.slipsPerPage);
 
+        // Ensure slipsPerPage is set (for backward compatibility with old orders)
+        if (!order.customization.slipsPerPage) {
+            order.customization.slipsPerPage = 5;
+            // Update in database for future requests
+            await Order.updateOne(
+                { _id: order._id },
+                { $set: { 'customization.slipsPerPage': 5 } }
+            );
+            console.log('✅ Set default slipsPerPage=5 for existing order');
+        }
+
         if (!order.voters || order.voters.length === 0) {
             console.error('❌ NO VOTERS IN ORDER');
             return res.status(400).json({ 
