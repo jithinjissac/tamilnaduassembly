@@ -1,7 +1,7 @@
 // Console Logging Control (Global)
 (function() {
     let enabled = localStorage.getItem('consoleLoggingEnabled');
-    if (enabled === null) enabled = 'true';
+    if (enabled === null) enabled = 'false'; // Default to DISABLED for cleaner console
     enabled = enabled !== 'false';
 
     const originalConsole = {
