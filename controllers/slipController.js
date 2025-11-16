@@ -64,7 +64,7 @@ export const getBrowser = async () => {
                             '--no-pings',
                             '--print-to-pdf-without-header'
                         ],
-                        timeout: 30000 // 30 second timeout
+                        timeout: 60000 // 30 second timeout
                     });
                     
                     console.log('✅ Browser instance ready with PDF performance optimizations');
@@ -300,7 +300,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
         .slip-right { flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
-        .ward-info { font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center; }
+        .ward-info { font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 0.3mm 0; border-bottom: 1px solid #000; text-align: center; }
         .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
         .slip-number { font-weight: bold; font-size: ${fontSize.slipNumber}; white-space: nowrap; }
         .sec-id { font-weight: bold; font-size: ${fontSize.secId}; white-space: nowrap; }
