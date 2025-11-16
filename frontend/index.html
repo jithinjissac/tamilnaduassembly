@@ -2578,42 +2578,46 @@ s0.parentNode.insertBefore(s1,s0);
 
             // Create modal content
             modal.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 12px;
-                    max-width: 600px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                    position: relative;
-                    animation: slideIn 0.3s ease;
-                ">
+                <div style="position: relative;">
+                    <button onclick="closePopup()" style="
+                        position: absolute;
+                        top: -15px;
+                        right: -15px;
+                        background: white;
+                        border: 2px solid #ddd;
+                        color: #666;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        font-size: 24px;
+                        line-height: 1;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                        z-index: 10001;
+                    " onmouseover="this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';" onmouseout="this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';">×</button>
                     <div style="
-                        background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
-                        color: white;
-                        padding: 20px;
-                        border-radius: 12px 12px 0 0;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
+                        background: white;
+                        border-radius: 12px;
+                        max-width: 600px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        position: relative;
+                        animation: slideIn 0.3s ease;
                     ">
-                        <h2 style="margin: 0; font-size: 24px;">${settings.title || 'Welcome!'}</h2>
-                        <button onclick="closePopup()" style="
-                            background: rgba(255,255,255,0.2);
-                            border: none;
+                        <div style="
+                            background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
                             color: white;
-                            width: 32px;
-                            height: 32px;
-                            border-radius: 50%;
-                            cursor: pointer;
-                            font-size: 20px;
-                            line-height: 1;
-                            transition: background 0.3s ease;
-                        " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
-                    </div>
-                    <div style="padding: 30px;">
-                        ${settings.content || ''}
+                            padding: 20px;
+                            border-radius: 12px 12px 0 0;
+                        ">
+                            <h2 style="margin: 0; font-size: 24px;">${settings.title || 'Announcement'}</h2>
+                        </div>
+                        <div style="padding: 30px;">
+                            ${settings.content || ''}
+                        </div>
                     </div>
                 </div>
             `;
@@ -2624,9 +2628,43 @@ s0.parentNode.insertBefore(s1,s0);
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                z-index: 9999;
+                z-index: 10000;
                 display: block;
             `;
+            
+            // Add responsive styles
+            const responsiveStyle = `
+                @media (max-width: 640px) {
+                    #welcome-popup-modal > div > div {
+                        width: 95% !important;
+                        max-height: 90vh !important;
+                    }
+                    #welcome-popup-modal > div > div > div:first-child {
+                        padding: 15px !important;
+                    }
+                    #welcome-popup-modal > div > div > div:first-child h2 {
+                        font-size: 18px !important;
+                    }
+                    #welcome-popup-modal > div > div > div:last-child {
+                        padding: 20px !important;
+                    }
+                    #welcome-popup-modal > div > button {
+                        width: 35px !important;
+                        height: 35px !important;
+                        font-size: 20px !important;
+                        top: -12px !important;
+                        right: -12px !important;
+                    }
+                }
+            `;
+            
+            // Add responsive styles if not already present
+            if (!document.querySelector('#popup-responsive-styles')) {
+                const styleElem = document.createElement('style');
+                styleElem.id = 'popup-responsive-styles';
+                styleElem.textContent = responsiveStyle;
+                document.head.appendChild(styleElem);
+            }
 
             // Close on overlay click
             overlay.onclick = closePopup;

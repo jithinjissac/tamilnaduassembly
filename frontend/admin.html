@@ -4514,41 +4514,46 @@ Login to https://easyslip.in to download your PDF.</textarea>
             `;
 
             modal.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 12px;
-                    max-width: 600px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                    position: relative;
-                    animation: slideIn 0.3s ease;
-                ">
+                <div style="position: relative;">
+                    <button onclick="this.closest('.preview-modal').remove()" style="
+                        position: absolute;
+                        top: -15px;
+                        right: -15px;
+                        background: white;
+                        border: 2px solid #ddd;
+                        color: #666;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        font-size: 24px;
+                        line-height: 1;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                        z-index: 10001;
+                    " onmouseover="this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';" onmouseout="this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';">×</button>
                     <div style="
-                        background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
-                        color: white;
-                        padding: 20px;
-                        border-radius: 12px 12px 0 0;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
+                        background: white;
+                        border-radius: 12px;
+                        max-width: 600px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                        position: relative;
+                        animation: slideIn 0.3s ease;
                     ">
-                        <h2 style="margin: 0; font-size: 24px;">${title}</h2>
-                        <button onclick="this.closest('.preview-modal').remove()" style="
-                            background: rgba(255,255,255,0.2);
-                            border: none;
+                        <div style="
+                            background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);
                             color: white;
-                            width: 32px;
-                            height: 32px;
-                            border-radius: 50%;
-                            cursor: pointer;
-                            font-size: 20px;
-                            line-height: 1;
-                        ">×</button>
-                    </div>
-                    <div style="padding: 30px;">
-                        ${content}
+                            padding: 20px;
+                            border-radius: 12px 12px 0 0;
+                        ">
+                            <h2 style="margin: 0; font-size: 24px;">${title}</h2>
+                        </div>
+                        <div style="padding: 30px;">
+                            ${content}
+                        </div>
                     </div>
                 </div>
             `;
