@@ -140,7 +140,9 @@ export async function sendOrderConfirmationEmail(user, order) {
                 .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
                 .content { padding: 40px 30px; background: white; }
                 .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
-                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .button { display: inline-block; background: #006D3B; color: white !important; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin-top: 30px; }
+                .button:visited { color: white !important; }
+                .button:hover { color: white !important; }
                 .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
                 .footer p { margin: 8px 0; }
             </style>
@@ -154,7 +156,7 @@ export async function sendOrderConfirmationEmail(user, order) {
             <div class="content">
                 <div class="message">${message}</div>
                 <center>
-                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                    <a href="https://easyslip.in/dashboard.html" class="button" style="color: white !important;">View Dashboard</a>
                 </center>
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
@@ -224,7 +226,9 @@ export async function sendPaymentSuccessEmail(user, order) {
                 .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
                 .content { padding: 40px 30px; background: white; }
                 .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
-                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
+                .button { display: inline-block; background: #006D3B; color: white !important; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
+                .button:visited { color: white !important; }
+                .button:hover { color: white !important; }
                 .button.invoice { background: #10b981; border-color: #059669; }
                 .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
                 .footer p { margin: 8px 0; }
@@ -239,8 +243,8 @@ export async function sendPaymentSuccessEmail(user, order) {
             <div class="content">
                 <div class="message">${message}</div>
                 <center>
-                    <a href="${invoiceUrl}" class="button invoice">📄 Download Invoice</a>
-                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                    <a href="${invoiceUrl}" class="button invoice" style="color: white !important;">📄 Download Invoice</a>
+                    <a href="https://easyslip.in/dashboard.html" class="button" style="color: white !important;">View Dashboard</a>
                 </center>
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
@@ -310,7 +314,9 @@ export async function sendPDFReadyEmail(user, order) {
                 .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
                 .content { padding: 40px 30px; background: white; }
                 .message { margin: 20px 0; font-size: 15px; line-height: 1.8; }
-                .button { display: inline-block; background: #006D3B; color: white; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
+                .button { display: inline-block; background: #006D3B; color: white !important; padding: 14px 35px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; border: 2px solid #FFB81C; margin: 10px 5px; }
+                .button:visited { color: white !important; }
+                .button:hover { color: white !important; }
                 .footer { background: #FFF8DC; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; }
                 .footer p { margin: 8px 0; }
             </style>
@@ -324,8 +330,8 @@ export async function sendPDFReadyEmail(user, order) {
             <div class="content">
                 <div class="message">${message}</div>
                 <center>
-                    <a href="${pdfUrl}" class="button">📄 Download PDF Now</a>
-                    <a href="https://easyslip.in/dashboard.html" class="button">View Dashboard</a>
+                    <a href="${pdfUrl}" class="button" style="color: white !important;">📄 Download PDF Now</a>
+                    <a href="https://easyslip.in/dashboard.html" class="button" style="color: white !important;">View Dashboard</a>
                 </center>
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
