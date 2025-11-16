@@ -578,8 +578,8 @@ s0.parentNode.insertBefore(s1,s0);
                     </div>
                 </div>
 
-                <div class="preview-note">
-                    <strong>Note:</strong> This is a preview of the first 10 slips (2 pages) only. Download the complete PDF after payment.
+                <div class="preview-note" id="previewNote">
+                    <strong>Note:</strong> This is a preview of the first 2 pages only. Download the complete PDF after payment.
                 </div>
             </div>
 
@@ -995,9 +995,14 @@ s0.parentNode.insertBefore(s1,s0);
                 // Update feature text
                 document.getElementById('featureSlipsCount').textContent = slipsPerPage;
                 
+                // Update preview note with dynamic slip count
+                const totalPreviewSlips = slipsPerPage * 2;
+                document.getElementById('previewNote').innerHTML = 
+                    `<strong>Note:</strong> This is a preview of the first ${totalPreviewSlips} slips (2 pages with ${slipsPerPage} slips/page). Download the complete PDF after payment.`;
+                
                 // Show success message
                 showMessage('success', 'Updated Successfully!', 
-                    `Preview regenerated with ${slipsPerPage} slips per page. Old PDFs have been deleted. Your final PDF will be regenerated when you download it.`, 
+                    `Preview regenerated with ${slipsPerPage} slips per page (showing ${totalPreviewSlips} slips in preview). Old PDFs have been deleted.`, 
                     null, 0);
 
             } catch (error) {
@@ -1267,6 +1272,11 @@ s0.parentNode.insertBefore(s1,s0);
                 
                 // Update feature text
                 document.getElementById('featureSlipsCount').textContent = slipsPerPage;
+                
+                // Update preview note with dynamic slip count
+                const totalPreviewSlips = slipsPerPage * 2;
+                document.getElementById('previewNote').innerHTML = 
+                    `<strong>Note:</strong> This is a preview of the first ${totalPreviewSlips} slips (2 pages with ${slipsPerPage} slips/page). Download the complete PDF after payment.`;
 
                 // Show flat pricing (no discount)
                 const voterCount = orderData.totalVoters || orderData.voterCount || 0;

@@ -509,10 +509,11 @@ export const generatePreview = async (req, res) => {
             }
         }
 
-        // Generate HTML for preview (first 10 voters)
-        const previewVoterLimit = 10;
+        // Generate HTML for preview (first 2 pages based on slipsPerPage)
+        const slipsPerPage = order.customization?.slipsPerPage || 5;
+        const previewVoterLimit = slipsPerPage * 2; // 2 pages: 10 for 5/page, 12 for 6/page
 
-        console.log(`Generating HTML for preview (first ${previewVoterLimit} voters only)...`);
+        console.log(`Generating HTML for preview (first ${previewVoterLimit} voters = 2 pages with ${slipsPerPage} slips/page)...`);
         console.log('Total voters in order:', order.voters.length);
         console.log('First voter sample:', JSON.stringify(order.voters[0], null, 2));
         console.log('Customization details:', JSON.stringify(order.customization, null, 2).substring(0, 500) + '...');
