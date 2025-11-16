@@ -213,11 +213,26 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     let fontSize;
     try {
         const Settings = (await import('../models/Settings.js')).default;
-        const slipSettings = await Settings.getSettings('slip');
+        const slipSettingsMap = await Settings.getSettings('slip');
+        
+        // Convert Map to plain object if needed
+        const slipSettings = slipSettingsMap instanceof Map 
+            ? Object.fromEntries(slipSettingsMap) 
+            : slipSettingsMap;
+        
+        console.log('🔍 Loaded slip settings:', slipSettings);
         
         if (slipSettings && slipSettings.fiveSlips && slipSettings.sixSlips) {
-            fontSize = slipsPerPage === 6 ? slipSettings.sixSlips : slipSettings.fiveSlips;
-            console.log('✅ Loaded font settings from database');
+            // Convert nested Maps to objects if needed
+            const fiveSlips = slipSettings.fiveSlips instanceof Map 
+                ? Object.fromEntries(slipSettings.fiveSlips)
+                : slipSettings.fiveSlips;
+            const sixSlips = slipSettings.sixSlips instanceof Map 
+                ? Object.fromEntries(slipSettings.sixSlips)
+                : slipSettings.sixSlips;
+                
+            fontSize = slipsPerPage === 6 ? sixSlips : fiveSlips;
+            console.log('✅ Loaded font settings from database for', slipsPerPage, 'slips per page');
         } else {
             throw new Error('Settings not found, using defaults');
         }
