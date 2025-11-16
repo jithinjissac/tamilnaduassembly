@@ -445,7 +445,8 @@ export const generatePreview = async (req, res) => {
         if (userRole !== 'admin') {
             query.userId = userId;
         }
-        const order = await Order.findOne(query);
+        // Use .lean() to get fresh data from DB and avoid Mongoose document caching
+        const order = await Order.findOne(query).lean();
 
         if (!order) {
             console.error('❌ ORDER NOT FOUND');
