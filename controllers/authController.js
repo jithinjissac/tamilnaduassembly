@@ -189,6 +189,135 @@ export const getProfile = async (req, res) => {
     }
 };
 
+// Update profile
+export const updateProfile = [
+    body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
+    body('email').optional().isEmail().normalizeEmail().withMessage('Valid email is required'),
+    body('phone').optional().matches(/^[6-9]\d{9}$/).withMessage('Valid Indian phone number is required'),
+    
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ 
+                    status: 'error',
+                    message: 'Validation failed',
+                    errors: errors.array() 
+                });
+            }
+
+            const { name, email, phone } = req.body;
+            const updates = {};
+
+            if (name) updates.name = name;
+
+            // Check if email is being changed and if it's already in use
+            if (email && email !== req.user.email) {
+                const existingUser = await User.findOne({ email });
+                if (existingUser) {
+                    return res.status(400).json({ 
+                        status: 'error',
+                        message: 'Email already registered' 
+                    });
+                }
+                updates.email = email;
+            }
+
+            // Check if phone is being changed and if it's already in use
+            if (phone && phone !== req.user.phone) {
+                const existingUser = await User.findOne({ phone });
+                if (existingUser) {
+                    return res.status(400).json({ 
+                        status: 'error',
+                        message: 'Phone number already registered' 
+                    });
+                }
+                updates.phone = phone;
+            }
+
+            // Update user
+            const user = await User.findByIdAndUpdate(
+                req.user._id,
+                { $set: updates },
+                { new: true, runValidators: true }
+            ).select('-password');
+
+            res.json({
+                status: 'success',
+                message: 'Profile updated successfully',
+                user: {
+                    _id: user._id,
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    role: user.role,
+                    pricePerVoter: user.pricePerVoter,
+                    isActive: user.isActive,
+                    createdAt: user.createdAt,
+                    lastLogin: user.lastLogin
+                }
+            });
+        } catch (error) {
+            console.error('Update profile error:', error);
+            res.status(500).json({ 
+                status: 'error',
+                message: 'Failed to update profile',
+                error: error.message 
+            });
+        }
+    }
+];
+
+// Change password
+export const changePassword = [
+    body('currentPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+    
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ 
+                    status: 'error',
+                    message: 'Validation failed',
+                    errors: errors.array() 
+                });
+            }
+
+            const { currentPassword, newPassword } = req.body;
+
+            // Get user with password field
+            const user = await User.findById(req.user._id).select('+password');
+
+            // Verify current password
+            const isPasswordValid = await user.comparePassword(currentPassword);
+            if (!isPasswordValid) {
+                return res.status(400).json({ 
+                    status: 'error',
+                    message: 'Current password is incorrect' 
+                });
+            }
+
+            // Update password
+            user.password = newPassword;
+            await user.save();
+
+            res.json({
+                status: 'success',
+                message: 'Password changed successfully'
+            });
+        } catch (error) {
+            console.error('Change password error:', error);
+            res.status(500).json({ 
+                status: 'error',
+                message: 'Failed to change password',
+                error: error.message 
+            });
+        }
+    }
+];
+
 // Forgot password - send reset email
 export const forgotPassword = [
     body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),

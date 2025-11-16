@@ -697,6 +697,7 @@
             <button class="tab" onclick="switchTab('payment-settings')"><i class="fas fa-credit-card"></i> Payment Settings</button>
             <button class="tab" onclick="switchTab('popup-editor')"><i class="fas fa-window-restore"></i> Popup Editor</button>
             <button class="tab" onclick="switchTab('media-manager')"><i class="fas fa-folder-open"></i> Media Manager</button>
+            <button class="tab" onclick="switchTab('profile-settings')"><i class="fas fa-user-cog"></i> Profile Settings</button>
         </div>
 
         <!-- Analytics Tab -->
@@ -1828,6 +1829,91 @@ Login to https://easyslip.in to download your PDF.</textarea>
                         <button type="button" class="btn btn-secondary" onclick="resetPopupToDefault()"><i class="fas fa-undo"></i> Reset to Default</button>
                         <button type="button" class="btn btn-primary" onclick="previewPopup()"><i class="fas fa-eye"></i> Preview</button>
                         <button type="button" class="btn btn-success" onclick="savePopupSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Settings Tab -->
+    <div id="profile-settings-tab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-user-cog"></i> Profile Settings</h2>
+            </div>
+
+            <div id="profile-alert" class="alert" style="display: none;"></div>
+
+            <div class="settings-form-wrapper">
+                <!-- Account Information -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.3rem;"><i class="fas fa-user-circle"></i> Account Information</h3>
+                    <div style="display: grid; gap: 0.5rem; font-size: 0.95rem;">
+                        <div><strong>Role:</strong> <span id="profile-role" style="opacity: 0.9;">Admin</span></div>
+                        <div><strong>Account Created:</strong> <span id="profile-created" style="opacity: 0.9;">Loading...</span></div>
+                    </div>
+                </div>
+
+                <!-- Personal Information Form -->
+                <form id="personalInfoForm" style="margin-bottom: 2rem;">
+                    <h3 style="color: #667eea; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                        <i class="fas fa-id-card"></i> Personal Information
+                    </h3>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Name:</label>
+                            <input type="text" id="profile-name" placeholder="Your full name" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                        </div>
+
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Email:</label>
+                            <input type="email" id="profile-email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">Used for login and notifications</small>
+                        </div>
+
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Phone Number:</label>
+                            <input type="tel" id="profile-phone" placeholder="9876543210" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">Optional - can be used for login</small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Personal Info
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Change Password Form -->
+                <form id="changePasswordForm">
+                    <h3 style="color: #667eea; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb;">
+                        <i class="fas fa-key"></i> Change Password
+                    </h3>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Current Password:</label>
+                            <input type="password" id="current-password" placeholder="Enter current password" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                        </div>
+
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">New Password:</label>
+                            <input type="password" id="new-password" placeholder="Enter new password" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">Minimum 6 characters</small>
+                        </div>
+
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Confirm New Password:</label>
+                            <input type="password" id="confirm-password" placeholder="Confirm new password" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-lock"></i> Change Password
+                        </button>
                     </div>
                 </form>
             </div>
@@ -4198,6 +4284,10 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 setTimeout(() => {
                     loadPopupSettings();
                 }, 100);
+            } else if (tabName === 'profile-settings') {
+                setTimeout(() => {
+                    loadProfileSettings();
+                }, 100);
             }
         };
 
@@ -4587,6 +4677,149 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
             showPopupAlert('Popup content cleared', 'success');
         }
+
+        // ==================== PROFILE SETTINGS FUNCTIONS ====================
+        
+        async function loadProfileSettings() {
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load profile');
+
+                const data = await response.json();
+                
+                // Update form fields
+                document.getElementById('profile-name').value = data.name || '';
+                document.getElementById('profile-email').value = data.email || '';
+                document.getElementById('profile-phone').value = data.phone || '';
+                document.getElementById('profile-role').textContent = data.role || 'Admin';
+                
+                // Format created date
+                if (data.createdAt) {
+                    const date = new Date(data.createdAt);
+                    document.getElementById('profile-created').textContent = date.toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showProfileAlert('Failed to load profile data', 'error');
+            }
+        }
+
+        function showProfileAlert(message, type = 'success') {
+            const alert = document.getElementById('profile-alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle personal info form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const personalForm = document.getElementById('personalInfoForm');
+            if (personalForm) {
+                personalForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    try {
+                        const response = await fetch('/api/auth/profile', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                name: document.getElementById('profile-name').value,
+                                email: document.getElementById('profile-email').value,
+                                phone: document.getElementById('profile-phone').value
+                            })
+                        });
+
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.message || 'Update failed');
+                        }
+
+                        showProfileAlert('Personal information updated successfully!', 'success');
+                        
+                        // Update header name if changed
+                        const data = await response.json();
+                        const headerName = document.querySelector('.user-info');
+                        if (headerName && data.name) {
+                            headerName.textContent = data.name;
+                        }
+
+                    } catch (error) {
+                        console.error('Error updating profile:', error);
+                        showProfileAlert(error.message || 'Failed to update profile', 'error');
+                    }
+                });
+            }
+
+            // Handle password change form
+            const passwordForm = document.getElementById('changePasswordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const currentPassword = document.getElementById('current-password').value;
+                    const newPassword = document.getElementById('new-password').value;
+                    const confirmPassword = document.getElementById('confirm-password').value;
+
+                    // Validation
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        showProfileAlert('All password fields are required', 'error');
+                        return;
+                    }
+
+                    if (newPassword.length < 6) {
+                        showProfileAlert('New password must be at least 6 characters', 'error');
+                        return;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        showProfileAlert('New passwords do not match', 'error');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/auth/change-password', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                currentPassword,
+                                newPassword
+                            })
+                        });
+
+                        if (!response.ok) {
+                            const error = await response.json();
+                            throw new Error(error.message || 'Password change failed');
+                        }
+
+                        showProfileAlert('Password changed successfully!', 'success');
+                        
+                        // Clear form
+                        passwordForm.reset();
+
+                    } catch (error) {
+                        console.error('Error changing password:', error);
+                        showProfileAlert(error.message || 'Failed to change password', 'error');
+                    }
+                });
+            }
+        });
 
         // ==================== MEDIA MANAGER FUNCTIONS ====================
         
