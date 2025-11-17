@@ -37,7 +37,7 @@ const UserActivitySchema = new mongoose.Schema({
     },
     // Activity Details
     details: {
-        type: mongoose.Schema.Mixed,
+        type: mongoose.Schema.Types.Mixed,
         default: {}
     },
     // Page Information

@@ -1,6 +1,6 @@
 import UserActivity from '../models/UserActivity.js';
 import UserSession from '../models/UserSession.js';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 
 // Track user activity
 export const trackActivity = async (req, action, details = {}) => {
