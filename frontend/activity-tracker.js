@@ -135,6 +135,83 @@ class ActivityTracker {
             }
         });
 
+        // Track dropdown/select changes
+        document.addEventListener('change', (e) => {
+            const element = e.target;
+            
+            if (element.tagName === 'SELECT') {
+                const selectId = element.id || element.name || 'unknown';
+                const selectedOption = element.options[element.selectedIndex];
+                
+                // Determine action type based on select ID
+                let action = 'dropdown_selected';
+                if (selectId.includes('district')) {
+                    action = 'district_selected';
+                } else if (selectId.includes('localBody') || selectId.includes('local-body')) {
+                    action = 'local_body_selected';
+                } else if (selectId.includes('ward')) {
+                    action = 'ward_selected';
+                } else if (selectId.includes('polling') || selectId.includes('station')) {
+                    action = 'polling_station_selected';
+                }
+                
+                this.track(action, {
+                    selectId: selectId,
+                    selectedValue: element.value,
+                    selectedText: selectedOption?.text || element.value,
+                    selectName: element.name
+                });
+            }
+            
+            // Track radio button changes
+            if (element.type === 'radio') {
+                this.track('radio_selected', {
+                    name: element.name,
+                    value: element.value,
+                    id: element.id
+                });
+            }
+            
+            // Track checkbox changes
+            if (element.type === 'checkbox') {
+                this.track('checkbox_toggled', {
+                    name: element.name,
+                    id: element.id,
+                    checked: element.checked
+                });
+            }
+        });
+
+        // Track text input changes (debounced)
+        let inputTimeout;
+        document.addEventListener('input', (e) => {
+            const element = e.target;
+            
+            if (element.tagName === 'INPUT' && (element.type === 'text' || element.type === 'search')) {
+                clearTimeout(inputTimeout);
+                inputTimeout = setTimeout(() => {
+                    this.track('input_changed', {
+                        inputId: element.id || element.name || 'unknown',
+                        inputName: element.name,
+                        inputType: element.type,
+                        hasValue: !!element.value
+                    });
+                }, 1000); // Track after 1 second of no typing
+            }
+        });
+
+        // Track file uploads
+        document.addEventListener('change', (e) => {
+            if (e.target.type === 'file' && e.target.files.length > 0) {
+                this.track('file_uploaded', {
+                    fileName: e.target.files[0].name,
+                    fileSize: e.target.files[0].size,
+                    fileType: e.target.files[0].type,
+                    inputId: e.target.id || e.target.name
+                });
+            }
+        });
+
         // Track navigation
         let lastPath = window.location.pathname;
         setInterval(() => {

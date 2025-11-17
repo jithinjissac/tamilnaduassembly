@@ -514,11 +514,28 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
-                allUsers = result.data.users;
+                
+                // Handle different response structures
+                if (result.status === 'success') {
+                    allUsers = result.users || [];
+                } else {
+                    allUsers = [];
+                }
+                
                 displayUsers(allUsers);
             } catch (error) {
                 console.error('Error loading users:', error);
+                document.getElementById('usersTable').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load users: ${error.message}</p>
+                    </div>
+                `;
             }
         }
 
@@ -583,13 +600,21 @@
                     })
                 ]);
 
+                if (!sessionsRes.ok || !activityRes.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+
                 const sessionsData = await sessionsRes.json();
                 const activityData = await activityRes.json();
 
-                displayUserDetails(sessionsData.data, activityData.data);
+                if (sessionsData.status === 'success' && activityData.status === 'success') {
+                    displayUserDetails(sessionsData.data, activityData.data);
+                } else {
+                    throw new Error('Invalid response from server');
+                }
             } catch (error) {
                 console.error('Error loading user details:', error);
-                document.getElementById('userDetailContent').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load user details</p></div>';
+                document.getElementById('userDetailContent').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load user details: ${error.message}</p></div>`;
             }
         }
 
@@ -641,7 +666,7 @@
                                 ${sessions.map(session => `
                                     <tr>
                                         <td>
-                                            <span class="badge ${session.device.device.type.toLowerCase()}">${session.device.device.type}</span>
+                                            <span class="badge ${session.device.device.deviceType.toLowerCase()}">${session.device.device.deviceType}</span>
                                             ${session.device.browser.name} on ${session.device.os.name}
                                         </td>
                                         <td>${session.location.city}, ${session.location.country}</td>
@@ -731,7 +756,7 @@
                         <i class="fas fa-laptop"></i>
                         <div>
                             <span class="label">Device Type</span>
-                            <span class="value">${session.device.device.type}</span>
+                            <span class="value">${session.device.device.deviceType}</span>
                         </div>
                     </div>
                     <div class="info-item">
@@ -834,7 +859,7 @@
                             <tr>
                                 <td>${session.userId.name}<br><small>${session.userId.email}</small></td>
                                 <td>
-                                    <span class="badge ${session.device.device.type.toLowerCase()}">${session.device.device.type}</span>
+                                    <span class="badge ${session.device.device.deviceType.toLowerCase()}">${session.device.device.deviceType}</span>
                                     ${session.device.browser.name}
                                 </td>
                                 <td>${session.location.city}, ${session.location.country}</td>

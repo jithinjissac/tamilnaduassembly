@@ -25,7 +25,7 @@ const UserSessionSchema = new mongoose.Schema({
             version: String
         },
         device: {
-            type: String, // Mobile, Desktop, Tablet
+            deviceType: String, // Mobile, Desktop, Tablet
             vendor: String,
             model: String
         },

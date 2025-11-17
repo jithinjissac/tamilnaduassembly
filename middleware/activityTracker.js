@@ -70,7 +70,7 @@ export const parseDeviceInfo = (userAgent) => {
             version: result.os.version || ''
         },
         device: {
-            type: result.device.type || 'Desktop',
+            deviceType: result.device.type || 'Desktop',
             vendor: result.device.vendor || '',
             model: result.device.model || ''
         }

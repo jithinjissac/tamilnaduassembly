@@ -21,10 +21,13 @@ const UserActivitySchema = new mongoose.Schema({
             'login', 'logout', 'register', 'password_reset_request', 'password_reset',
             // Navigation
             'page_view', 'dashboard_view', 'create_slip_view', 'preview_view',
-            // Slip Creation
+            // Slip Creation & Form Interactions
             'form_data_loaded', 'district_selected', 'local_body_selected', 'ward_selected',
             'polling_station_selected', 'voter_list_extracted', 'symbol_selected', 
             'slip_data_entered', 'preview_generated',
+            // Form Interactions
+            'dropdown_selected', 'radio_selected', 'checkbox_toggled', 'input_changed',
+            'button_clicked', 'form_submitted',
             // Orders & Payment
             'order_created', 'payment_initiated', 'payment_success', 'payment_failed',
             'invoice_downloaded', 'pdf_downloaded', 'order_viewed',

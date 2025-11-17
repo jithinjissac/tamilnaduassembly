@@ -530,6 +530,15 @@ class SymbolPicker {
         // Store selected symbol
         this.selectedSymbol = this.symbols.find(s => s._id === symbolId);
 
+        // Track symbol selection activity
+        if (window.trackActivity) {
+            window.trackActivity('symbol_selected', {
+                symbolId: this.selectedSymbol._id,
+                symbolName: this.selectedSymbol.name,
+                symbolNameMalayalam: this.selectedSymbol.nameMalayalam
+            });
+        }
+
         // Enable confirm button
         document.getElementById('symbolPickerConfirm').disabled = false;
     }

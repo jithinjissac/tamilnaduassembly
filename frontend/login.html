@@ -430,6 +430,19 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
+                    // Initialize activity tracker with new token
+                    if (window.activityTracker) {
+                        window.activityTracker.setToken(data.token);
+                    }
+                    
+                    // Track login activity
+                    if (window.trackActivity) {
+                        window.trackActivity('login', {
+                            userRole: data.user.role,
+                            userName: data.user.name
+                        });
+                    }
+                    
                     // Check if there's a saved redirect URL
                     const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
                     if (redirectUrl) {

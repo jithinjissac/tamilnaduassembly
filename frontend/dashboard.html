@@ -702,6 +702,14 @@ s0.parentNode.insertBefore(s1,s0);
                 document.body.appendChild(a);
                 a.click();
                 
+                // Track invoice download
+                if (window.trackActivity) {
+                    window.trackActivity('invoice_downloaded', {
+                        orderId: orderId,
+                        fileName: `invoice-${orderId}.pdf`
+                    });
+                }
+                
                 setTimeout(() => {
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(url);
@@ -739,6 +747,14 @@ s0.parentNode.insertBefore(s1,s0);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
+                    
+                    // Track PDF download
+                    if (window.trackActivity) {
+                        window.trackActivity('pdf_downloaded', {
+                            orderId: orderId,
+                            fileName: `voter-slips-${orderId}.pdf`
+                        });
+                    }
                 } else {
                     // Parse error response to show actual error
                     try {
@@ -768,6 +784,13 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Logout
         function logout() {
+            // Track logout activity
+            if (window.trackActivity) {
+                window.trackActivity('logout', {
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = 'login.html';

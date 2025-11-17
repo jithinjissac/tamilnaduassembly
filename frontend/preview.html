@@ -1449,6 +1449,15 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('paymentBtn').disabled = true;
                 document.getElementById('payBtnText').textContent = 'Preparing payment...';
 
+                // Track payment initiation
+                if (window.trackActivity) {
+                    window.trackActivity('payment_initiated', {
+                        orderId: orderData.orderId,
+                        amount: orderData.totalPrice,
+                        voterCount: orderData.voterCount
+                    });
+                }
+
                 // Create payment order (supports both Razorpay and Cashfree)
                 const response = await fetch('/api/payment/create', {
                     method: 'POST',
@@ -1472,6 +1481,15 @@ s0.parentNode.insertBefore(s1,s0);
 
             } catch (error) {
                 console.error('Payment initiation error:', error);
+                
+                // Track payment error
+                if (window.trackError) {
+                    window.trackError(error, {
+                        context: 'payment_initiation',
+                        orderId: orderData.orderId
+                    });
+                }
+                
                 showMessage('error', 'Payment Failed', error.message + '. Please try again.');
                 document.getElementById('paymentBtn').disabled = false;
                 document.getElementById('payBtnText').textContent = 'Make Payment';
