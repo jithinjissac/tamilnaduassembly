@@ -80,40 +80,71 @@ export const parseDeviceInfo = (userAgent) => {
 // Get location from IP (using ipapi.co free service)
 export const getLocationFromIP = async (ip) => {
     try {
-        // Skip private/local IPs
-        if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+        // Clean up IP address
+        let cleanIp = ip?.trim();
+        
+        // Remove IPv6 prefix if present
+        if (cleanIp?.startsWith('::ffff:')) {
+            cleanIp = cleanIp.substring(7);
+        }
+        
+        // Skip private/local IPs - but log them for debugging
+        const isLocal = !cleanIp || 
+                       cleanIp === '::1' || 
+                       cleanIp === '127.0.0.1' || 
+                       cleanIp.startsWith('192.168.') || 
+                       cleanIp.startsWith('10.') ||
+                       cleanIp.startsWith('172.16.') ||
+                       cleanIp.startsWith('172.31.') ||
+                       cleanIp === 'localhost';
+        
+        if (isLocal) {
+            console.log(`⚠️ Local IP detected: ${cleanIp}. Location will show as 'Local Development'.`);
+            console.log('💡 In production, ensure reverse proxy (nginx/cloudflare) forwards real client IP via X-Forwarded-For header');
+            
             return {
-                ip,
-                country: 'Local',
-                region: 'Local',
-                city: 'Local',
-                timezone: 'Asia/Kolkata'
+                ip: cleanIp,
+                country: 'Local Development',
+                region: 'Localhost',
+                city: 'Development Environment',
+                timezone: 'Asia/Kolkata',
+                isp: 'Local Network'
             };
         }
 
-        const response = await fetch(`https://ipapi.co/${ip}/json/`);
-        if (!response.ok) throw new Error('IP lookup failed');
+        console.log(`🌍 Looking up location for IP: ${cleanIp}`);
+        
+        const response = await fetch(`https://ipapi.co/${cleanIp}/json/`, {
+            timeout: 5000 // 5 second timeout
+        });
+        
+        if (!response.ok) {
+            throw new Error(`IP lookup failed with status: ${response.status}`);
+        }
         
         const data = await response.json();
         
+        console.log(`✅ Location found: ${data.city}, ${data.region}, ${data.country_name}`);
+        
         return {
-            ip,
-            country: data.country_name || '',
-            region: data.region || '',
-            city: data.city || '',
+            ip: cleanIp,
+            country: data.country_name || 'Unknown',
+            region: data.region || 'Unknown',
+            city: data.city || 'Unknown',
             latitude: data.latitude || null,
             longitude: data.longitude || null,
-            timezone: data.timezone || '',
-            isp: data.org || ''
+            timezone: data.timezone || 'Asia/Kolkata',
+            isp: data.org || 'Unknown ISP'
         };
     } catch (error) {
-        console.error('Location lookup error:', error.message);
+        console.error('❌ Location lookup error:', error.message);
         return {
-            ip,
+            ip: ip || 'unknown',
             country: 'Unknown',
             region: 'Unknown',
             city: 'Unknown',
-            timezone: 'Asia/Kolkata'
+            timezone: 'Asia/Kolkata',
+            isp: 'Unknown'
         };
     }
 };
@@ -137,14 +168,34 @@ export const trackSession = async (req, res, next) => {
             // Get device info
             const deviceInfo = parseDeviceInfo(req.headers['user-agent'] || '');
             
-            // Get client IP
-            const ip = req.headers['x-forwarded-for']?.split(',')[0] || 
-                       req.headers['x-real-ip'] || 
-                       req.connection.remoteAddress || 
-                       req.socket.remoteAddress || '';
+            // Get client IP with better extraction logic
+            let clientIp = null;
+            
+            // Try multiple headers in order of priority
+            if (req.headers['cf-connecting-ip']) {
+                // Cloudflare
+                clientIp = req.headers['cf-connecting-ip'];
+            } else if (req.headers['x-real-ip']) {
+                // Nginx
+                clientIp = req.headers['x-real-ip'];
+            } else if (req.headers['x-forwarded-for']) {
+                // Standard proxy header (get first IP in chain)
+                clientIp = req.headers['x-forwarded-for'].split(',')[0].trim();
+            } else if (req.connection?.remoteAddress) {
+                // Direct connection
+                clientIp = req.connection.remoteAddress;
+            } else if (req.socket?.remoteAddress) {
+                // Socket connection
+                clientIp = req.socket.remoteAddress;
+            } else {
+                clientIp = 'unknown';
+            }
+
+            console.log(`📍 Client IP detected: ${clientIp}`);
+            console.log(`📋 Headers: x-forwarded-for=${req.headers['x-forwarded-for']}, x-real-ip=${req.headers['x-real-ip']}, cf-connecting-ip=${req.headers['cf-connecting-ip']}`);
 
             // Get location (async, don't wait for it)
-            const location = await getLocationFromIP(ip);
+            const location = await getLocationFromIP(clientIp);
 
             // Get screen info from headers (sent from frontend)
             const screen = {
