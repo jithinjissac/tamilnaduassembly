@@ -18,7 +18,12 @@ import {
     getAnalytics,
     deleteOrder,
     deleteOrders,
-    upload
+    upload,
+    getUserActivity,
+    getUserSessions,
+    getSessionDetails,
+    getAllActiveSessions,
+    getUserActivityLog
 } from '../controllers/adminController.js';
 import auth from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
@@ -55,5 +60,12 @@ router.delete('/orders/:orderId', deleteOrder);
 
 // Analytics
 router.get('/analytics', getAnalytics);
+
+// User Activity & Session Tracking
+router.get('/users/:userId/activity', getUserActivity);
+router.get('/users/:userId/sessions', getUserSessions);
+router.get('/users/:userId/activity-log', getUserActivityLog);
+router.get('/sessions/:sessionId', getSessionDetails);
+router.get('/sessions', getAllActiveSessions);
 
 export default router;

@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import Symbol from '../models/Symbol.js';
 import Order from '../models/Order.js';
+import UserActivity from '../models/UserActivity.js';
+import UserSession from '../models/UserSession.js';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -924,4 +926,339 @@ export const deleteOrders = async (req, res) => {
         });
     }
 };
+
+// ============================================
+// USER ACTIVITY & SESSION TRACKING
+// ============================================
+
+// Get user activity summary
+export const getUserActivity = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { limit = 50, action } = req.query;
+
+        // Verify user exists
+        const user = await User.findById(userId).select('name email');
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        // Build query
+        const query = { userId };
+        if (action) {
+            query.action = action;
+        }
+
+        // Get activities
+        const activities = await UserActivity.find(query)
+            .sort({ timestamp: -1 })
+            .limit(parseInt(limit))
+            .lean();
+
+        // Get activity statistics
+        const stats = await UserActivity.aggregate([
+            { $match: { userId: user._id } },
+            {
+                $group: {
+                    _id: '$action',
+                    count: { $sum: 1 },
+                    lastActivity: { $max: '$timestamp' }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]);
+
+        // Get total activity count
+        const totalActivities = await UserActivity.countDocuments({ userId });
+
+        res.json({
+            status: 'success',
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
+                },
+                activities,
+                statistics: stats,
+                totalActivities
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching user activity:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch user activity',
+            error: error.message
+        });
+    }
+};
+
+// Get user sessions with device and location info
+export const getUserSessions = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { active, limit = 20 } = req.query;
+
+        // Verify user exists
+        const user = await User.findById(userId).select('name email');
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        // Build query
+        const query = { userId };
+        if (active === 'true') {
+            query.isActive = true;
+        }
+
+        // Get sessions
+        const sessions = await UserSession.find(query)
+            .sort({ startTime: -1 })
+            .limit(parseInt(limit))
+            .lean();
+
+        // Calculate session durations
+        const sessionsWithDuration = sessions.map(session => {
+            const endTime = session.endTime || session.lastActivity || new Date();
+            const duration = Math.floor((endTime - session.startTime) / 1000); // in seconds
+            
+            return {
+                ...session,
+                duration: {
+                    seconds: duration,
+                    formatted: formatDuration(duration)
+                }
+            };
+        });
+
+        res.json({
+            status: 'success',
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
+                },
+                sessions: sessionsWithDuration,
+                totalSessions: sessions.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching user sessions:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch user sessions',
+            error: error.message
+        });
+    }
+};
+
+// Get detailed activity log for a user (chronological, with all details)
+export const getUserActivityLog = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { 
+            sessionId, 
+            startDate, 
+            endDate, 
+            limit = 100,
+            page = 1 
+        } = req.query;
+
+        // Verify user exists
+        const user = await User.findById(userId).select('name email');
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        // Build query
+        const query = { userId };
+        
+        if (sessionId) {
+            query.sessionId = sessionId;
+        }
+
+        if (startDate || endDate) {
+            query.timestamp = {};
+            if (startDate) query.timestamp.$gte = new Date(startDate);
+            if (endDate) query.timestamp.$lte = new Date(endDate);
+        }
+
+        // Pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Get activities with pagination
+        const activities = await UserActivity.find(query)
+            .sort({ timestamp: -1 })
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean();
+
+        // Get total count
+        const totalActivities = await UserActivity.countDocuments(query);
+
+        // Get session info if sessionId provided
+        let sessionInfo = null;
+        if (sessionId) {
+            sessionInfo = await UserSession.findOne({ sessionId }).lean();
+        }
+
+        res.json({
+            status: 'success',
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
+                },
+                session: sessionInfo,
+                activities,
+                pagination: {
+                    total: totalActivities,
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    totalPages: Math.ceil(totalActivities / parseInt(limit))
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching activity log:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch activity log',
+            error: error.message
+        });
+    }
+};
+
+// Get session details with all activities
+export const getSessionDetails = async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+
+        // Get session
+        const session = await UserSession.findOne({ sessionId })
+            .populate('userId', 'name email')
+            .lean();
+
+        if (!session) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Session not found'
+            });
+        }
+
+        // Get all activities for this session
+        const activities = await UserActivity.find({ sessionId })
+            .sort({ timestamp: 1 })
+            .lean();
+
+        // Calculate session duration
+        const endTime = session.endTime || session.lastActivity || new Date();
+        const duration = Math.floor((endTime - session.startTime) / 1000);
+
+        // Get activity summary
+        const activitySummary = activities.reduce((acc, activity) => {
+            acc[activity.action] = (acc[activity.action] || 0) + 1;
+            return acc;
+        }, {});
+
+        res.json({
+            status: 'success',
+            data: {
+                session: {
+                    ...session,
+                    duration: {
+                        seconds: duration,
+                        formatted: formatDuration(duration)
+                    }
+                },
+                activities,
+                activitySummary,
+                totalActivities: activities.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching session details:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch session details',
+            error: error.message
+        });
+    }
+};
+
+// Get all active sessions
+export const getAllActiveSessions = async (req, res) => {
+    try {
+        const sessions = await UserSession.find({ isActive: true })
+            .populate('userId', 'name email role')
+            .sort({ lastActivity: -1 })
+            .lean();
+
+        // Calculate durations
+        const sessionsWithInfo = sessions.map(session => {
+            const duration = Math.floor((new Date() - session.startTime) / 1000);
+            const idleTime = Math.floor((new Date() - session.lastActivity) / 1000);
+            
+            return {
+                ...session,
+                duration: {
+                    seconds: duration,
+                    formatted: formatDuration(duration)
+                },
+                idleTime: {
+                    seconds: idleTime,
+                    formatted: formatDuration(idleTime)
+                }
+            };
+        });
+
+        res.json({
+            status: 'success',
+            data: {
+                sessions: sessionsWithInfo,
+                totalActiveSessions: sessions.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching active sessions:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch active sessions',
+            error: error.message
+        });
+    }
+};
+
+// Helper function to format duration
+function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m ${secs}s`;
+    } else if (minutes > 0) {
+        return `${minutes}m ${secs}s`;
+    } else {
+        return `${secs}s`;
+    }
+}
+
 
