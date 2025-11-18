@@ -12,6 +12,37 @@ const __dirname = path.dirname(__filename);
 // Persistent browser instance for better performance
 let browserInstance = null;
 
+// Browser pool to limit concurrent operations
+const MAX_CONCURRENT_PREVIEWS = 2;
+let currentPreviewCount = 0;
+const previewQueue = [];
+
+// Process queued preview requests
+async function processPreviewQueue() {
+    while (previewQueue.length > 0 && currentPreviewCount < MAX_CONCURRENT_PREVIEWS) {
+        const { resolve, reject, fn } = previewQueue.shift();
+        currentPreviewCount++;
+        
+        try {
+            const result = await fn();
+            resolve(result);
+        } catch (error) {
+            reject(error);
+        } finally {
+            currentPreviewCount--;
+            processPreviewQueue(); // Process next in queue
+        }
+    }
+}
+
+// Queue preview generation to limit concurrent browsers
+function queuePreview(fn) {
+    return new Promise((resolve, reject) => {
+        previewQueue.push({ resolve, reject, fn });
+        processPreviewQueue();
+    });
+}
+
 // Store temporary PDF files with timestamps
 const tempPDFs = new Map(); // Map<filename, { path, createdAt, timeout }>
 
@@ -46,7 +77,14 @@ export const getBrowser = async () => {
                             '--no-sandbox',
                             '--disable-setuid-sandbox',
                             '--disable-dev-shm-usage',
-                            '--single-process=false',
+                            '--disable-gpu',
+                            '--disable-software-rasterizer',
+                            '--single-process',
+                            
+                            // Resource limits
+                            '--max-old-space-size=512',
+                            '--disable-background-timer-throttling',
+                            '--disable-renderer-backgrounding',
                             
                             // Performance optimizations
                             '--disable-blink-features=AutomationControlled',
@@ -64,7 +102,7 @@ export const getBrowser = async () => {
                             '--no-pings',
                             '--print-to-pdf-without-header'
                         ],
-                        timeout: 60000 // 30 second timeout
+                        timeout: 60000
                     });
                     
                     console.log('✅ Browser instance ready with PDF performance optimizations');
@@ -558,104 +596,105 @@ export const generatePreview = async (req, res) => {
             throw htmlError;
         }
 
-        // Generate PDF using FRESH browser for true concurrency (each user gets their own browser)
-        let pdf;
-        let browser;
-        let page;
-        const maxAttempts = 2;
-        
-        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-            try {
-                console.log(`\n📄 PDF Generation Attempt ${attempt}/${maxAttempts}`);
-                console.log('Creating fresh browser for this user (concurrent-safe)...');
-                const browserStartTime = Date.now();
-                
-                // ✅ USE FRESH BROWSER - allows multiple users to generate previews simultaneously
-                browser = await createFreshBrowser();
-                console.log('✅ Fresh browser ready in', Date.now() - browserStartTime, 'ms');
-                
-                console.log('Creating new page...');
-                page = await browser.newPage();
-                
-                // Disable unnecessary features for faster PDF generation
-                await page.setBypassCSP(true);
-                await page.setJavaScriptEnabled(false); // No JS needed for PDF
-                await page.setCacheEnabled(true);
-                
-                console.log('✅ New page created');
-                
-                // Set content - symbols are base64 embedded, no network wait needed
-                console.log('Setting HTML content...');
-                const contentStartTime = Date.now();
-                await page.setContent(html, { 
-                    waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
-                    timeout: 15000  // 15 seconds (preview is small)
-                });
-                console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
-                
-                // Skip image wait - symbols are base64 embedded, renders immediately
-                
-                console.log('Generating PDF from HTML...');
-                const pdfStartTime = Date.now();
-                pdf = await page.pdf({
-                    format: 'A4',
-                    printBackground: true,
-                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                    timeout: 15000  // 15 seconds (reduced)
-                });
-                console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
-                console.log('PDF size:', pdf.length, 'bytes (', (pdf.length / 1024).toFixed(2), 'KB)');
-                
-                // Verify PDF starts with correct header
-                const pdfHeader = String.fromCharCode(...pdf.slice(0, 8));
-                console.log('Validating PDF header:', pdfHeader);
-                if (!pdfHeader.startsWith('%PDF')) {
-                    console.error('❌ INVALID PDF HEADER');
-                    console.error('First 20 bytes:', pdf.slice(0, 20));
-                    throw new Error('Generated PDF is invalid - missing PDF header');
+        // Generate PDF using queued browser (limit concurrent operations)
+        const pdfResult = await queuePreview(async () => {
+            let browser;
+            let page;
+            const maxAttempts = 2;
+            
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    console.log(`\n📄 PDF Generation Attempt ${attempt}/${maxAttempts} [Queue position handled]`);
+                    console.log('Using shared browser instance (resource-optimized)...');
+                    const browserStartTime = Date.now();
+                    
+                    // ✅ USE SHARED BROWSER - prevents resource exhaustion
+                    browser = await getBrowser();
+                    console.log('✅ Browser ready in', Date.now() - browserStartTime, 'ms');
+                    
+                    console.log('Creating new page...');
+                    page = await browser.newPage();
+                    
+                    // Disable unnecessary features for faster PDF generation
+                    await page.setBypassCSP(true);
+                    await page.setJavaScriptEnabled(false); // No JS needed for PDF
+                    await page.setCacheEnabled(true);
+                    
+                    console.log('✅ New page created');
+                    
+                    // Set content - symbols are base64 embedded, no network wait needed
+                    console.log('Setting HTML content...');
+                    const contentStartTime = Date.now();
+                    await page.setContent(html, { 
+                        waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
+                        timeout: 15000  // 15 seconds (preview is small)
+                    });
+                    console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
+                    
+                    // Skip image wait - symbols are base64 embedded, renders immediately
+                    
+                    console.log('Generating PDF from HTML...');
+                    const pdfStartTime = Date.now();
+                    const pdf = await page.pdf({
+                        format: 'A4',
+                        printBackground: true,
+                        margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                        timeout: 15000  // 15 seconds (reduced)
+                    });
+                    console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
+                    console.log('PDF size:', pdf.length, 'bytes (', (pdf.length / 1024).toFixed(2), 'KB)');
+                    
+                    // Verify PDF starts with correct header
+                    const pdfHeader = String.fromCharCode(...pdf.slice(0, 8));
+                    console.log('Validating PDF header:', pdfHeader);
+                    if (!pdfHeader.startsWith('%PDF')) {
+                        console.error('❌ INVALID PDF HEADER');
+                        console.error('First 20 bytes:', pdf.slice(0, 20));
+                        throw new Error('Generated PDF is invalid - missing PDF header');
+                    }
+                    console.log('✅ PDF validation successful');
+                    
+                    // ✅ Close page only (keep shared browser alive)
+                    await page.close();
+                    console.log('✅ Page closed (shared browser kept alive)');
+                    console.log('Total processing time:', Date.now() - browserStartTime, 'ms');
+                    
+                    // Success! Return PDF
+                    return pdf;
+                    
+                } catch (pdfError) {
+                    console.error(`❌ Preview PDF generation attempt ${attempt} failed:`, pdfError.message);
+                    
+                    // Clean up page if it exists
+                    try { if (page) await page.close(); } catch (e) {}
+                    
+                    // Check if this is a transient error that we should retry
+                    const isTransient = pdfError && (
+                        pdfError.code === 'ECONNRESET' || 
+                        (pdfError.message && (
+                            pdfError.message.includes('ECONNRESET') ||
+                            pdfError.message.includes('Target closed') ||
+                            pdfError.message.includes('Connection closed')
+                        ))
+                    );
+                    
+                    if (isTransient && attempt < maxAttempts) {
+                        console.log('⚠️ Transient error detected, will retry with shared browser');
+                        console.log(`⏳ Retrying in 2 seconds... (attempt ${attempt + 1}/${maxAttempts})`);
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        continue; // Retry
+                    }
+                    
+                    // Non-transient error or max attempts reached
+                    if (attempt === maxAttempts) {
+                        console.error('❌ All retry attempts exhausted');
+                    }
+                    throw pdfError; // Re-throw to outer catch
                 }
-                console.log('✅ PDF validation successful');
-                
-                // ✅ Close fresh browser (not shared, safe to close)
-                await page.close();
-                await browser.close();
-                console.log('✅ Fresh browser closed');
-                console.log('Total processing time:', Date.now() - browserStartTime, 'ms');
-                
-                // Success! Break out of retry loop
-                break;
-                
-            } catch (pdfError) {
-                console.error(`❌ Preview PDF generation attempt ${attempt} failed:`, pdfError.message);
-                
-                // Clean up page and browser if they exist
-                try { if (page) await page.close(); } catch (e) {}
-                try { if (browser) await browser.close(); } catch (e) {}
-                
-                // Check if this is a transient error that we should retry
-                const isTransient = pdfError && (
-                    pdfError.code === 'ECONNRESET' || 
-                    (pdfError.message && (
-                        pdfError.message.includes('ECONNRESET') ||
-                        pdfError.message.includes('Target closed') ||
-                        pdfError.message.includes('Connection closed')
-                    ))
-                );
-                
-                if (isTransient && attempt < maxAttempts) {
-                    console.log('⚠️ Transient error detected, will create new fresh browser');
-                    console.log(`⏳ Retrying in 2 seconds... (attempt ${attempt + 1}/${maxAttempts})`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    continue; // Retry
-                }
-                
-                // Non-transient error or max attempts reached
-                if (attempt === maxAttempts) {
-                    console.error('❌ All retry attempts exhausted');
-                }
-                throw pdfError; // Re-throw to outer catch
             }
-        }
+        });
+        
+        const pdf = pdfResult;
 
         // Save PDF to temporary directory with STABLE filename
         const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
