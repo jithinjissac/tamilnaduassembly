@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Slip - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
     
+    <!-- Preload critical API endpoint for instant district loading -->
+    <link rel="preconnect" href="/api">
+    <link rel="dns-prefetch" href="/api">
+    
     <!-- Open Graph / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://easyslip.in/create-slip">
@@ -1154,17 +1158,29 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        // Load districts and captcha on page load
-        loadDistricts();
-        loadCaptcha();
+        // CRITICAL: Load districts FIRST before anything else
+        // This ensures dropdowns are populated immediately when page loads
+        (async function initializeApp() {
+            console.log('🚀 Loading districts first (highest priority)...');
+            
+            // Load districts immediately - blocking operation
+            await loadDistricts();
+            
+            console.log('✅ Districts loaded, now loading captcha in background...');
+            
+            // Load captcha in background after districts
+            loadCaptcha();
+        })();
 
         async function loadDistricts() {
             try {
+                console.log('📡 Fetching districts from database...');
                 const response = await fetch('/api/getDistricts');
                 const data = await response.json();
                 const select = document.getElementById('district');
                 
                 if (data.status === 'success' && data.districts) {
+                    console.log(`✅ Loaded ${data.districts.length} districts`);
                     data.districts.forEach(district => {
                         const option = document.createElement('option');
                         option.value = district.value;
@@ -1173,7 +1189,7 @@ s0.parentNode.insertBefore(s1,s0);
                     });
                 }
             } catch (error) {
-                console.error('Error loading districts:', error);
+                console.error('❌ Error loading districts:', error);
                 showError('Failed to load districts. Please refresh the page.');
             }
         }
