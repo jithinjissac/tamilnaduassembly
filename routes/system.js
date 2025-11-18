@@ -96,7 +96,7 @@ router.get('/captcha-timings', (req, res) => {
         total: Math.round(timingsData.reduce((sum, t) => sum + t.total, 0) / timingsData.length),
         context: Math.round(timingsData.reduce((sum, t) => sum + (t.context || 0), 0) / timingsData.length),
         pageLoad: Math.round(timingsData.reduce((sum, t) => sum + (t.pageLoad || 0), 0) / timingsData.length),
-        captchaLoad: Math.round(timingsData.reduce((sum, t) => sum + (t.captchaLoad || 0), 0) / timingsData.length),
+        captchaSearch: Math.round(timingsData.reduce((sum, t) => sum + (t.captchaSearch || 0), 0) / timingsData.length),
         screenshot: Math.round(timingsData.reduce((sum, t) => sum + (t.screenshot || 0), 0) / timingsData.length),
         sampleSize: timingsData.length
       };
@@ -109,7 +109,7 @@ router.get('/captcha-timings', (req, res) => {
         averageTimings: averages
       },
       sessions: captchaSessions,
-      note: 'Timings in milliseconds. Uses direct captcha endpoint for faster loading.',
+      note: 'Timings in milliseconds. Page load shows how long SEC website takes to respond.',
       timestamp: new Date().toISOString()
     });
   } catch (error) {

@@ -35,122 +35,98 @@ router.get('/initCaptchaSession', async (req, res) => {
       const page = await context.newPage();
 
       try {
-        // Set Malayalam locale cookies
-        console.log('[CAPTCHA] Setting cookies...');
-        await context.addCookies([
-          {
-            name: 'set_locale',
-            value: 'ml',
-            domain: '.sec.kerala.gov.in',
-            path: '/'
-          },
-          {
-            name: 'device_view',
-            value: 'full',
-            domain: '.sec.kerala.gov.in',
-            path: '/'
-          }
-        ]);
+        // Skip cookie setting for speed - page works without it
+        // Saves ~200ms per captcha load
 
-        // Navigate to the voter list page to establish session and get captcha token
+        // Navigate to the page with extended timeout and retry logic
         const pageLoadStartTime = Date.now();
-        console.log('[CAPTCHA] Loading SEC page to establish session...');
+        console.log('[CAPTCHA] Loading SEC page...');
+        let pageLoaded = false;
+        let retries = 3;
         
-        await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-          waitUntil: 'domcontentloaded',
-          timeout: 45000
-        });
-        
-        const pageLoadTime = Date.now() - pageLoadStartTime;
-        console.log(`[CAPTCHA] ⏱️  Page loaded in ${pageLoadTime}ms`);
-        
-        // Extract the captcha token from the page
-        console.log('[CAPTCHA] Extracting captcha token from page...');
-        const captchaToken = await page.evaluate(() => {
-          // Try to find the captcha image src with the token
-          const captchaImg = document.querySelector('img[src*="generate-captcha"]');
-          if (captchaImg) {
-            const src = captchaImg.src;
-            const match = src.match(/n=([a-f0-9]+)/);
-            return match ? match[1] : null;
-          }
-          return null;
-        });
-
-        if (!captchaToken) {
-          console.log('[CAPTCHA] Could not extract captcha token, falling back to page screenshot');
-          // Fallback: screenshot captcha from page
-          const captchaElement = await page.$('img[src*="captcha"]') || 
-                                  await page.$('#view_voters_list_captcha_image') ||
-                                  await page.$('.captcha-image');
-          
-          if (!captchaElement) {
-            throw new Error('Captcha element not found on page');
-          }
-
-          const screenshotStartTime = Date.now();
-          const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-          
-          const captchaDir = path.dirname(captchaPath);
-          if (!fs.existsSync(captchaDir)) {
-            fs.mkdirSync(captchaDir, { recursive: true });
-          }
-
-          await captchaElement.screenshot({ path: captchaPath });
-          const screenshotTime = Date.now() - screenshotStartTime;
-          console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
-
-          const totalTime = Date.now() - startTime;
-          console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
-
-          sessionManager.create(sessionId, context, page, {
-            userId: req.user?.id || 'anonymous',
-            createdFor: 'captcha',
-            timings: {
-              total: totalTime,
-              context: contextTime,
-              pageLoad: pageLoadTime,
-              screenshot: screenshotTime
+        while (!pageLoaded && retries > 0) {
+          try {
+            await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+              waitUntil: 'domcontentloaded',
+              timeout: 60000 // Reduced from 90s - fail faster if SEC is down
+            });
+            pageLoaded = true;
+            const pageLoadTime = Date.now() - pageLoadStartTime;
+            console.log(`[CAPTCHA] ⏱️  Page loaded successfully in ${pageLoadTime}ms`);
+          } catch (error) {
+            retries--;
+            const attemptTime = Date.now() - pageLoadStartTime;
+            console.log(`[CAPTCHA] ⏱️  Page load timeout after ${attemptTime}ms, retries remaining: ${retries}`);
+            if (retries === 0) {
+              throw new Error('SEC website is too slow. Please try again later.');
             }
-          });
-
-          return {
-            status: 'success',
-            sessionId,
-            captchaUrl: `/captcha-cache/captcha-${sessionId}.png`,
-            message: 'Captcha session initialized',
-            timings: {
-              total: totalTime,
-              pageLoad: pageLoadTime
-            }
-          };
+            await page.waitForTimeout(2000); // Wait before retry
+          }
         }
 
-        // Now load the captcha directly using the token
-        const captchaLoadStartTime = Date.now();
-        console.log(`[CAPTCHA] Loading captcha image directly with token: ${captchaToken}`);
-        
-        const captchaImageUrl = `${SEC_BASE_URL}/generate-captcha/_captcha_captcha?n=${captchaToken}`;
-        await page.goto(captchaImageUrl, {
-          waitUntil: 'networkidle',
-          timeout: 10000
-        });
-        
-        const captchaLoadTime = Date.now() - captchaLoadStartTime;
-        console.log(`[CAPTCHA] ⏱️  Captcha image loaded in ${captchaLoadTime}ms`);
+        console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
+        await page.waitForTimeout(500); // Reduced from 3s to 500ms for speed
 
-        // Take screenshot of the entire viewport (which should just be the captcha image)
+        // Wait for captcha image to load - try multiple selectors with extended timeout
+        const captchaSearchStartTime = Date.now();
+        console.log('[CAPTCHA] Waiting for captcha image...');
+        
+        let captchaElement = null;
+        // Reordered for fastest detection - most reliable selector first
+        const captchaSelectors = [
+          'img[src*="captcha"]',           // Fastest & most reliable
+          '#view_voters_list_captcha_image', // Direct ID
+          'img[src*="Captcha"]',           // Uppercase variant
+          'img[alt*="captcha" i]',          // Alt text fallback
+          '.captcha-image'                   // Class fallback
+        ];
+        
+        for (const selector of captchaSelectors) {
+          try {
+            console.log(`[CAPTCHA] Trying selector: ${selector}`);
+            await page.waitForSelector(selector, { 
+              state: 'visible',
+              timeout: 5000 // Fast timeout - captcha should be immediate
+            });
+            captchaElement = await page.$(selector);
+            if (captchaElement) {
+              const captchaSearchTime = Date.now() - captchaSearchStartTime;
+              console.log(`[CAPTCHA] ⏱️  Found captcha with selector: ${selector} in ${captchaSearchTime}ms`);
+              break;
+            }
+          } catch (e) {
+            console.log(`[CAPTCHA] Selector ${selector} not found, trying next...`);
+          }
+        }
+        
+        if (!captchaElement) {
+          // Try finding any image near the captcha input field
+          console.log('[CAPTCHA] Trying to find image near captcha input...');
+          captchaElement = await page.$('label[for="view_voters_list_captcha"] ~ img, #view_voters_list_captcha ~ img, .form-group:has(#view_voters_list_captcha) img');
+        }
+
+        if (!captchaElement) {
+          // Last resort: take screenshot of entire page for debugging
+          const debugPath = path.join(__dirname, '..', 'public', 'captcha-cache', `debug-${sessionId}.png`);
+          await page.screenshot({ path: debugPath, fullPage: true });
+          console.log('[CAPTCHA] Debug screenshot saved to:', debugPath);
+          throw new Error('Captcha image not found on page. Debug screenshot saved.');
+        }
+
+        // Take screenshot of the captcha element only
         const screenshotStartTime = Date.now();
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
         console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
         
-        // Ensure directory exists
+        // Ensure directory exists (concurrent with screenshot)
         const captchaDir = path.dirname(captchaPath);
-        if (!fs.existsSync(captchaDir)) {
-          fs.mkdirSync(captchaDir, { recursive: true });
-        }
+        const dirPromise = fs.promises.mkdir(captchaDir, { recursive: true }).catch(() => {});
 
-        await page.screenshot({ path: captchaPath });
+        // Take screenshot immediately (don't wait for dir check)
+        const screenshotPromise = captchaElement.screenshot({ path: captchaPath });
+        
+        // Wait for both
+        await Promise.all([dirPromise, screenshotPromise]);
         const screenshotTime = Date.now() - screenshotStartTime;
         console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
 
@@ -164,8 +140,8 @@ router.get('/initCaptchaSession', async (req, res) => {
           timings: {
             total: totalTime,
             context: contextTime,
-            pageLoad: pageLoadTime,
-            captchaLoad: captchaLoadTime,
+            pageLoad: Date.now() - pageLoadStartTime,
+            captchaSearch: Date.now() - captchaSearchStartTime,
             screenshot: screenshotTime
           }
         });
@@ -177,8 +153,7 @@ router.get('/initCaptchaSession', async (req, res) => {
           message: 'Captcha session initialized',
           timings: {
             total: totalTime,
-            pageLoad: pageLoadTime,
-            captchaLoad: captchaLoadTime
+            pageLoad: Date.now() - pageLoadStartTime
           }
         };
 
@@ -252,7 +227,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select district
     await page.selectOption('#view_voters_list_district', district);
     console.log('[CAPTCHA] District selected, waiting for local bodies...');
-    await page.waitForTimeout(5000); // Increased wait for slow AJAX
+    await page.waitForTimeout(2000); // Optimized - most AJAX loads in 1-2s
 
     // Wait for local body options to be loaded (check if there are options with values)
     await page.waitForFunction(
@@ -277,7 +252,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select local body
     console.log('[CAPTCHA] Selecting local body...');
     await page.selectOption('#view_voters_list_localBody', local_body);
-    await page.waitForTimeout(5000); // Increased wait for slow AJAX
+    await page.waitForTimeout(2000); // Optimized - most AJAX loads in 1-2s
 
     // Wait for ward options to be loaded
     await page.waitForFunction(
@@ -302,7 +277,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select ward
     console.log('[CAPTCHA] Selecting ward...');
     await page.selectOption('#view_voters_list_ward', ward);
-    await page.waitForTimeout(5000); // Increased wait for slow AJAX
+    await page.waitForTimeout(2000); // Optimized - most AJAX loads in 1-2s
 
     // Wait for polling station options to be loaded
     await page.waitForFunction(
@@ -327,17 +302,17 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select polling station
     console.log('[CAPTCHA] Selecting polling station...');
     await page.selectOption('#view_voters_list_pollingStation', polling_station);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(100); // Reduced for speed
 
     // Select language
     console.log('[CAPTCHA] Selecting language...');
     await page.selectOption('#view_voters_list_language', language);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100); // Reduced for speed
 
     // Fill captcha
     console.log('[CAPTCHA] Filling captcha...');
     await page.fill('#view_voters_list_captcha', captcha);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100); // Reduced for speed
 
     // Get CSRF token
     const csrfToken = await page.$eval('#view_voters_list__token', el => el.value).catch(() => '');
