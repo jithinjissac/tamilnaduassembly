@@ -1,5 +1,7 @@
 import express from 'express';
-import { chromium } from 'playwright';
+import { browserPool } from '../utils/browserPool.js';
+import { sessionManager } from '../utils/sessionManager.js';
+import { captchaQueue } from '../utils/requestQueue.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,157 +12,131 @@ const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Store active browser sessions with captcha images
-const activeSessions = new Map();
-
 /**
  * GET /api/initCaptchaSession
  * Initializes a headless browser session and captures the captcha image
  * Returns a session ID and the captcha image path
  */
 router.get('/initCaptchaSession', async (req, res) => {
-  let browser;
-  let sessionId;
+  const sessionId = Date.now().toString();
   
   try {
-    console.log('[CAPTCHA] Initializing captcha session...');
+    console.log(`[CAPTCHA] Initializing session ${sessionId}...`);
     
-    sessionId = Date.now().toString();
-    
-    // Launch browser
-    console.log('[CAPTCHA] Launching browser...');
-    browser = await chromium.launch({ 
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      timeout: 30000
-    });
+    // Queue the request to prevent overload
+    const result = await captchaQueue.add(async () => {
+      // Get isolated context from browser pool
+      const context = await browserPool.getBrowserContext(sessionId);
+      const page = await context.newPage();
 
-    console.log('[CAPTCHA] Creating context...');
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
-    });
-
-    const page = await context.newPage();
-
-    // Set Malayalam locale cookies
-    console.log('[CAPTCHA] Setting cookies...');
-    await context.addCookies([
-      {
-        name: 'set_locale',
-        value: 'ml',
-        domain: '.sec.kerala.gov.in',
-        path: '/'
-      },
-      {
-        name: 'device_view',
-        value: 'full',
-        domain: '.sec.kerala.gov.in',
-        path: '/'
-      }
-    ]);
-
-    // Navigate to the page
-    console.log('[CAPTCHA] Loading SEC page:', `${SEC_BASE_URL}/public/voters/list`);
-    await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 45000 
-    });
-
-    console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
-    await page.waitForTimeout(3000);
-
-    // Wait for captcha image to load - try multiple selectors
-    console.log('[CAPTCHA] Waiting for captcha image...');
-    
-    let captchaElement = null;
-    const captchaSelectors = [
-      'img[src*="captcha"]',
-      'img[alt*="captcha" i]',
-      '#view_voters_list_captcha_image',
-      '.captcha-image',
-      'img[src*="Captcha"]'
-    ];
-    
-    for (const selector of captchaSelectors) {
       try {
-        console.log(`[CAPTCHA] Trying selector: ${selector}`);
-        await page.waitForSelector(selector, { 
-          state: 'visible',
-          timeout: 5000 
+        // Set Malayalam locale cookies
+        console.log('[CAPTCHA] Setting cookies...');
+        await context.addCookies([
+          {
+            name: 'set_locale',
+            value: 'ml',
+            domain: '.sec.kerala.gov.in',
+            path: '/'
+          },
+          {
+            name: 'device_view',
+            value: 'full',
+            domain: '.sec.kerala.gov.in',
+            path: '/'
+          }
+        ]);
+
+        // Navigate to the page
+        console.log('[CAPTCHA] Loading SEC page...');
+        await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+          waitUntil: 'domcontentloaded',
+          timeout: 45000 
         });
-        captchaElement = await page.$(selector);
-        if (captchaElement) {
-          console.log(`[CAPTCHA] Found captcha with selector: ${selector}`);
-          break;
+
+        console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
+        await page.waitForTimeout(3000);
+
+        // Wait for captcha image to load - try multiple selectors
+        console.log('[CAPTCHA] Waiting for captcha image...');
+        
+        let captchaElement = null;
+        const captchaSelectors = [
+          'img[src*="captcha"]',
+          'img[alt*="captcha" i]',
+          '#view_voters_list_captcha_image',
+          '.captcha-image',
+          'img[src*="Captcha"]'
+        ];
+        
+        for (const selector of captchaSelectors) {
+          try {
+            console.log(`[CAPTCHA] Trying selector: ${selector}`);
+            await page.waitForSelector(selector, { 
+              state: 'visible',
+              timeout: 5000 
+            });
+            captchaElement = await page.$(selector);
+            if (captchaElement) {
+              console.log(`[CAPTCHA] Found captcha with selector: ${selector}`);
+              break;
+            }
+          } catch (e) {
+            console.log(`[CAPTCHA] Selector ${selector} not found, trying next...`);
+          }
         }
-      } catch (e) {
-        console.log(`[CAPTCHA] Selector ${selector} not found, trying next...`);
+        
+        if (!captchaElement) {
+          // Try finding any image near the captcha input field
+          console.log('[CAPTCHA] Trying to find image near captcha input...');
+          captchaElement = await page.$('label[for="view_voters_list_captcha"] ~ img, #view_voters_list_captcha ~ img, .form-group:has(#view_voters_list_captcha) img');
+        }
+
+        if (!captchaElement) {
+          // Last resort: take screenshot of entire page for debugging
+          const debugPath = path.join(__dirname, '..', 'public', 'captcha-cache', `debug-${sessionId}.png`);
+          await page.screenshot({ path: debugPath, fullPage: true });
+          console.log('[CAPTCHA] Debug screenshot saved to:', debugPath);
+          throw new Error('Captcha image not found on page. Debug screenshot saved.');
+        }
+
+        // Take screenshot of the captcha element only
+        const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+        console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
+        
+        // Ensure directory exists
+        const captchaDir = path.dirname(captchaPath);
+        if (!fs.existsSync(captchaDir)) {
+          fs.mkdirSync(captchaDir, { recursive: true });
+        }
+
+        await captchaElement.screenshot({ path: captchaPath });
+        console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png`);
+
+        // Store the session using session manager
+        sessionManager.create(sessionId, context, page, {
+          userId: req.user?.id || 'anonymous',
+          createdFor: 'captcha'
+        });
+
+        return {
+          status: 'success',
+          sessionId,
+          captchaUrl: `/captcha-cache/captcha-${sessionId}.png`,
+          message: 'Captcha session initialized'
+        };
+
+      } catch (error) {
+        // Release context on error
+        await browserPool.releaseContext(context);
+        throw error;
       }
-    }
-    
-    if (!captchaElement) {
-      // Try finding any image near the captcha input field
-      console.log('[CAPTCHA] Trying to find image near captcha input...');
-      captchaElement = await page.$('label[for="view_voters_list_captcha"] ~ img, #view_voters_list_captcha ~ img, .form-group:has(#view_voters_list_captcha) img');
-    }
-
-    if (!captchaElement) {
-      // Last resort: take screenshot of entire page for debugging
-      const debugPath = path.join(__dirname, '..', 'public', 'captcha-cache', `debug-${sessionId}.png`);
-      await page.screenshot({ path: debugPath, fullPage: true });
-      console.log('[CAPTCHA] Debug screenshot saved to:', debugPath);
-      throw new Error('Captcha image not found on page. Debug screenshot saved.');
-    }
-
-    // Take screenshot of the captcha element only
-    const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-    console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
-    
-    // Ensure directory exists
-    const captchaDir = path.dirname(captchaPath);
-    if (!fs.existsSync(captchaDir)) {
-      fs.mkdirSync(captchaDir, { recursive: true });
-    }
-
-    await captchaElement.screenshot({ path: captchaPath });
-    console.log(`Captcha screenshot saved: captcha-${sessionId}.png`);
-
-    // Store the session
-    activeSessions.set(sessionId, {
-      browser,
-      page,
-      context,
-      timestamp: Date.now()
     });
 
-    // Clean up old sessions (older than 5 minutes)
-    for (const [id, session] of activeSessions.entries()) {
-      if (Date.now() - session.timestamp > 300000) {
-        await session.browser.close();
-        activeSessions.delete(id);
-        // Delete old captcha file
-        const oldCaptchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${id}.png`);
-        if (fs.existsSync(oldCaptchaPath)) {
-          fs.unlinkSync(oldCaptchaPath);
-        }
-      }
-    }
-
-    res.json({
-      status: 'success',
-      sessionId,
-      captchaUrl: `/captcha-cache/captcha-${sessionId}.png`,
-      message: 'Captcha session initialized'
-    });
+    res.json(result);
 
   } catch (error) {
-    console.error('Error initializing captcha session:', error);
-    if (browser) {
-      await browser.close();
-    }
-    if (sessionId && activeSessions.has(sessionId)) {
-      activeSessions.delete(sessionId);
-    }
+    console.error('❌ Error initializing captcha session:', error);
     res.status(500).json({ 
       status: 'error', 
       message: 'Failed to initialize captcha session',
@@ -177,17 +153,19 @@ router.post('/submitWithCaptcha', async (req, res) => {
   try {
     const { sessionId, district, local_body, ward, polling_station, language, captcha } = req.body;
 
-    if (!sessionId || !activeSessions.has(sessionId)) {
+    // Get session from session manager
+    const session = sessionManager.get(sessionId);
+    
+    if (!session) {
       return res.status(400).json({
         status: 'error',
         message: 'Invalid or expired session. Please refresh captcha.'
       });
     }
 
-    const session = activeSessions.get(sessionId);
     const { page } = session;
 
-    console.log('Filling form with existing session...');
+    console.log('[CAPTCHA] Filling form with existing session...');
 
     // Force all select elements to be visible
     await page.evaluate(() => {
@@ -356,8 +334,10 @@ router.post('/submitWithCaptcha', async (req, res) => {
       console.log('[CAPTCHA] JSON Response status:', submitResult.json.status);
       
       if (submitResult.json.status === 'danger' || submitResult.json.status === 'error') {
-        await session.browser.close();
-        activeSessions.delete(sessionId);
+        // Cleanup session
+        await sessionManager.cleanup(sessionId);
+        
+        // Delete captcha file
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
         if (fs.existsSync(captchaPath)) {
           fs.unlinkSync(captchaPath);
@@ -378,9 +358,8 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     console.log('[CAPTCHA] Response preview:', submitResult.html.substring(0, 500));
 
-    // Close the browser session
-    await session.browser.close();
-    activeSessions.delete(sessionId);
+    // Cleanup session after use
+    await sessionManager.cleanup(sessionId);
 
     // Delete captcha file
     const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);

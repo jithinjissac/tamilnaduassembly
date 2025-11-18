@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js';
 import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
 import slipRoutes from './routes/slips.js';
+import systemRoutes from './routes/system.js';
 import { closeBrowser } from './controllers/slipController.js';
 import { cleanupExpiredPDFs } from './utils/pdfGenerator.js';
 
@@ -83,7 +84,11 @@ app.use('/api/admin/media', mediaRoutes);
 
 // Settings Routes (Admin only)
 import settingsRoutes from './routes/settings.js';
+// Settings API routes
 app.use('/api/settings', settingsRoutes);
+
+// System monitoring routes
+app.use('/api/system', systemRoutes);
 
 // Public Symbols Routes (for users)
 import symbolRoutes from './routes/symbols.js';
