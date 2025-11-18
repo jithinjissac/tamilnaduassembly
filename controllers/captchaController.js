@@ -142,9 +142,6 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Take screenshot of the entire viewport (which should just be the captcha image)
         const screenshotStartTime = Date.now();
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-        // Take screenshot of the entire viewport (which should just be the captcha image)
-        const screenshotStartTime = Date.now();
-        const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
         console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
         
         // Ensure directory exists
