@@ -1557,12 +1557,20 @@ s0.parentNode.insertBefore(s1,s0);
             const loadingOverlay = document.getElementById('extractionLoading');
             loadingOverlay.classList.add('show');
             
-            // IMPORTANT: Scroll to loading overlay and focus on it
-            loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            loadingOverlay.focus();
-            
-            // Also scroll to top of page for better visibility
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // IMPORTANT: Focus on loading overlay and ensure it's visible
+            // Use setTimeout to ensure overlay is rendered before scrolling
+            setTimeout(() => {
+                loadingOverlay.focus();
+                
+                // Get overlay position and viewport height
+                const rect = loadingOverlay.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // Only scroll if overlay is not fully visible in viewport
+                if (rect.top < 0 || rect.bottom > viewportHeight) {
+                    loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
             
             // Update loader text
             document.getElementById('loadingMainText').textContent = 'Fetching voter data...';
@@ -1689,12 +1697,19 @@ s0.parentNode.insertBefore(s1,s0);
             const loadingOverlay = document.getElementById('extractionLoading');
             loadingOverlay.classList.add('show');
             
-            // IMPORTANT: Scroll to loading overlay and focus on it
-            loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            loadingOverlay.focus();
-            
-            // Also scroll to top of page for better visibility
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Focus on loading overlay and ensure it's visible
+            setTimeout(() => {
+                loadingOverlay.focus();
+                
+                // Get overlay position and viewport height
+                const rect = loadingOverlay.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // Only scroll if overlay is not fully visible in viewport
+                if (rect.top < 0 || rect.bottom > viewportHeight) {
+                    loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
             
             let allVoters = [];
             let successCount = 0;
