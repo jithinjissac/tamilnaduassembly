@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas', {
-            // Connection pool settings for better performance
-            maxPoolSize: 10,          // Maximum connections in pool
-            minPoolSize: 2,           // Minimum connections to maintain
+            // Connection pool settings for 20 concurrent users
+            maxPoolSize: 25,          // Maximum connections in pool (25 for 20 users + buffer)
+            minPoolSize: 5,           // Minimum connections to maintain
             maxIdleTimeMS: 30000,     // Close idle connections after 30s
             
             // Timeout settings
@@ -24,7 +24,7 @@ const connectDB = async () => {
         });
         
         console.log('✅ MongoDB Connected Successfully');
-        console.log(`📊 Connection Pool: Max ${10} connections`);
+        console.log(`📊 Connection Pool: Max ${25} connections (optimized for 20+ concurrent users)`);
         
         // Log slow queries (queries taking more than 100ms)
         mongoose.set('debug', (collectionName, method, query, doc) => {

@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 // Persistent browser instance for better performance
 let browserInstance = null;
 
-// Browser pool to limit concurrent operations
-const MAX_CONCURRENT_PREVIEWS = 2;
+// Browser pool to limit concurrent operations (optimized for 20 concurrent users)
+const MAX_CONCURRENT_PREVIEWS = 8;
 let currentPreviewCount = 0;
 const previewQueue = [];
 

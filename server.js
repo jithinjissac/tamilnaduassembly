@@ -29,10 +29,13 @@ const PORT = process.env.PORT || 3000;
 // Connect to database
 connectDB();
 
-// Middleware
+// Middleware (optimized for 20 concurrent users)
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// Increase max listeners for event emitters (prevent memory leak warnings)
+process.setMaxListeners(30);
 
 // Serve static files (frontend) with cache control
 app.use(express.static(path.join(__dirname, 'frontend'), {

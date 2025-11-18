@@ -16,63 +16,66 @@ export const pdfJobs = new Map();
 
 export const registerPDFJob = (orderId, job) => pdfJobs.set(orderId, job);
 
-// Browser launch queue
+// Browser launch queue (optimized for concurrent operations)
 let freshBrowserLaunchPromise = null;
+let activeBrowserCount = 0;
+const MAX_CONCURRENT_BROWSERS = 10; // Allow up to 10 browsers for background PDF generation
 
 export const createFreshBrowser = async () => {
-    // If browser launch is in progress, wait for it
-    if (freshBrowserLaunchPromise) {
-        console.log('⏳ Fresh browser launch already in progress, waiting...');
-        try {
-            const browser = await freshBrowserLaunchPromise;
-            // Return a new browser anyway since this might be for parallel use
-        } catch (e) {
-            console.log('⚠️ Previous fresh browser launch failed, will retry');
-        }
+    // Wait if too many browsers are active
+    while (activeBrowserCount >= MAX_CONCURRENT_BROWSERS) {
+        console.log(`⏳ Waiting for browser slot (${activeBrowserCount}/${MAX_CONCURRENT_BROWSERS} active)...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
-    freshBrowserLaunchPromise = (async () => {
-        console.log('🚀 Creating fresh browser instance for PDF generation...');
+    activeBrowserCount++;
+    console.log(`🚀 Creating fresh browser instance (${activeBrowserCount}/${MAX_CONCURRENT_BROWSERS} active)...`);
         
-        // Retry with exponential backoff
-        let lastError;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-            try {
-                const browser = await puppeteer.launch({
-                    headless: true,
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--disable-background-networking',
-                        '--disable-default-apps',
-                        '--disable-extensions'
-                    ],
-                    timeout: 30000 // 30 second timeout
-                });
-                console.log('✅ Fresh browser instance created successfully');
-                return browser;
-                
-            } catch (launchError) {
-                lastError = launchError;
-                console.error(`❌ Fresh browser launch attempt ${attempt}/3 failed:`, launchError.message);
-                
-                if (attempt < 3) {
-                    const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
-                    console.log(`⏳ Waiting ${delay/1000}s before retry...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
+    // Retry with exponential backoff
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            const browser = await puppeteer.launch({
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--disable-software-rasterizer',
+                    '--single-process',
+                    '--max-old-space-size=512',
+                    '--disable-background-networking',
+                    '--disable-default-apps',
+                    '--disable-extensions'
+                ],
+                timeout: 30000 // 30 second timeout
+            });
+            console.log('✅ Fresh browser instance created successfully');
+            
+            // Track browser close to decrement counter
+            browser.on('disconnected', () => {
+                activeBrowserCount = Math.max(0, activeBrowserCount - 1);
+                console.log(`🔽 Browser closed (${activeBrowserCount}/${MAX_CONCURRENT_BROWSERS} active)`);
+            });
+            
+            return browser;
+            
+        } catch (launchError) {
+            lastError = launchError;
+            console.error(`❌ Fresh browser launch attempt ${attempt}/3 failed:`, launchError.message);
+            
+            if (attempt < 3) {
+                const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
+                console.log(`⏳ Waiting ${delay/1000}s before retry...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
-        
-        throw lastError;
-    })();
-    
-    try {
-        return await freshBrowserLaunchPromise;
-    } finally {
-        freshBrowserLaunchPromise = null;
     }
+    
+    // Failed all attempts - decrement counter
+    activeBrowserCount = Math.max(0, activeBrowserCount - 1);
+    throw lastError;
 };
 
 const tempPDFCache = new Map();

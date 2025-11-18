@@ -10,8 +10,25 @@ const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Store active browser sessions with captcha images
+// Store active browser sessions with captcha images (optimized for 20 concurrent users)
 const activeSessions = new Map();
+const MAX_ACTIVE_SESSIONS = 30; // Allow up to 30 concurrent captcha sessions
+
+// Clean up old sessions periodically
+setInterval(() => {
+    const now = Date.now();
+    for (const [id, session] of activeSessions.entries()) {
+        if (now - session.timestamp > 300000) { // 5 minutes
+            session.browser?.close().catch(() => {});
+            activeSessions.delete(id);
+            // Delete old captcha file
+            const oldCaptchaPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'captcha-cache', `captcha-${id}.png`);
+            if (fs.existsSync(oldCaptchaPath)) {
+                fs.unlinkSync(oldCaptchaPath);
+            }
+        }
+    }
+}, 60000); // Run every minute
 
 /**
  * GET /api/initCaptchaSession
