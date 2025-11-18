@@ -824,11 +824,13 @@ s0.parentNode.insertBefore(s1,s0);
                     return false;
                 }
 
-                if (result.status === 'success') {
+                // Check actual payment status, not just API success
+                if (result.status === 'success' && result.order && result.order.paymentStatus === 'completed') {
                     console.log('✅ Cashfree payment verified successfully');
                     return true;
                 }
 
+                console.log('⚠️ Payment not completed yet:', result.order?.paymentStatus || 'unknown');
                 return false;
 
             } catch (error) {

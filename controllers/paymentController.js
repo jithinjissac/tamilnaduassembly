@@ -624,13 +624,15 @@ export const verifyCashfreePayment = async (req, res) => {
             }
         }
 
-        // Return current order status
+        // Return current order status with clear indication if payment is not completed
+        const isCompleted = order.paymentStatus === 'completed';
         res.json({
-            status: 'success',
-            message: 'Payment status retrieved',
+            status: isCompleted ? 'success' : 'pending',
+            message: isCompleted ? 'Payment completed' : 'Payment not completed yet',
             order: {
                 orderId: order.orderId,
-                paymentStatus: order.paymentStatus
+                paymentStatus: order.paymentStatus,
+                cashfreePaymentId: order.cashfreePaymentId
             }
         });
 
