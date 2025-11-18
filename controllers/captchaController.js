@@ -34,6 +34,26 @@ router.get('/initCaptchaSession', async (req, res) => {
       
       const page = await context.newPage();
 
+      // Block unnecessary resources for faster loading (like ad blockers)
+      await page.route('**/*', (route) => {
+        const url = route.request().url();
+        const resourceType = route.request().resourceType();
+        
+        // Block ads, analytics, fonts that slow down page
+        if (
+          resourceType === 'font' ||
+          resourceType === 'media' ||
+          url.includes('google-analytics') ||
+          url.includes('googletagmanager') ||
+          url.includes('facebook') ||
+          url.includes('doubleclick')
+        ) {
+          route.abort();
+        } else {
+          route.continue();
+        }
+      });
+
       try {
         // Skip cookie setting for speed - page works without it
         // Saves ~200ms per captcha load
@@ -47,8 +67,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         while (!pageLoaded && retries > 0) {
           try {
             await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-              waitUntil: 'domcontentloaded',
-              timeout: 60000 // Reduced from 90s - fail faster if SEC is down
+              waitUntil: 'load', // Faster than domcontentloaded - like normal browser
+              timeout: 45000 // Reduced to 45s - should be fast with optimizations
             });
             pageLoaded = true;
             const pageLoadTime = Date.now() - pageLoadStartTime;
@@ -65,7 +85,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         }
 
         console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
-        await page.waitForTimeout(500); // Reduced from 3s to 500ms for speed
+        await page.waitForTimeout(200); // Minimal wait - page loads fast now
 
         // Wait for captcha image to load - try multiple selectors with extended timeout
         const captchaSearchStartTime = Date.now();
@@ -86,7 +106,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 5000 // Fast timeout - captcha should be immediate
+              timeout: 3000 // Very fast - captcha loads with page now
             });
             captchaElement = await page.$(selector);
             if (captchaElement) {

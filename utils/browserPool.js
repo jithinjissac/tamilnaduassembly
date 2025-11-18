@@ -53,11 +53,15 @@ class BrowserPool {
       selectedBrowser = await this.ensureBrowser();
     }
 
-    // Create isolated context
+    // Create isolated context with caching enabled (like normal browser)
     const context = await selectedBrowser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
       viewport: { width: 1280, height: 720 },
-      // Isolated storage - no sharing between contexts
+      // Enable caching for faster loads (like normal browser)
+      acceptDownloads: false,
+      // Enable JavaScript and CSS caching
+      javaScriptEnabled: true,
+      // Allow cookies for session reuse
       storageState: undefined
     });
 
