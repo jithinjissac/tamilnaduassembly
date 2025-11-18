@@ -19,14 +19,19 @@ const __dirname = path.dirname(__filename);
  */
 router.get('/initCaptchaSession', async (req, res) => {
   const sessionId = Date.now().toString();
+  const startTime = Date.now();
   
   try {
     console.log(`[CAPTCHA] Initializing session ${sessionId}...`);
     
     // Queue the request to prevent overload
     const result = await captchaQueue.add(async () => {
+      const contextStartTime = Date.now();
       // Get isolated context from browser pool
       const context = await browserPool.getBrowserContext(sessionId);
+      const contextTime = Date.now() - contextStartTime;
+      console.log(`[CAPTCHA] ⏱️  Browser context acquired in ${contextTime}ms`);
+      
       const page = await context.newPage();
 
       try {
@@ -48,6 +53,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         ]);
 
         // Navigate to the page with extended timeout and retry logic
+        const pageLoadStartTime = Date.now();
         console.log('[CAPTCHA] Loading SEC page...');
         let pageLoaded = false;
         let retries = 3;
@@ -59,10 +65,12 @@ router.get('/initCaptchaSession', async (req, res) => {
               timeout: 90000 // Increased to 90 seconds
             });
             pageLoaded = true;
-            console.log('[CAPTCHA] Page loaded successfully');
+            const pageLoadTime = Date.now() - pageLoadStartTime;
+            console.log(`[CAPTCHA] ⏱️  Page loaded successfully in ${pageLoadTime}ms`);
           } catch (error) {
             retries--;
-            console.log(`[CAPTCHA] Page load timeout, retries remaining: ${retries}`);
+            const attemptTime = Date.now() - pageLoadStartTime;
+            console.log(`[CAPTCHA] ⏱️  Page load timeout after ${attemptTime}ms, retries remaining: ${retries}`);
             if (retries === 0) {
               throw new Error('SEC website is too slow. Please try again later.');
             }
@@ -74,6 +82,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         await page.waitForTimeout(3000);
 
         // Wait for captcha image to load - try multiple selectors with extended timeout
+        const captchaSearchStartTime = Date.now();
         console.log('[CAPTCHA] Waiting for captcha image...');
         
         let captchaElement = null;
@@ -94,7 +103,8 @@ router.get('/initCaptchaSession', async (req, res) => {
             });
             captchaElement = await page.$(selector);
             if (captchaElement) {
-              console.log(`[CAPTCHA] Found captcha with selector: ${selector}`);
+              const captchaSearchTime = Date.now() - captchaSearchStartTime;
+              console.log(`[CAPTCHA] ⏱️  Found captcha with selector: ${selector} in ${captchaSearchTime}ms`);
               break;
             }
           } catch (e) {
@@ -117,6 +127,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         }
 
         // Take screenshot of the captcha element only
+        const screenshotStartTime = Date.now();
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
         console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
         
@@ -127,19 +138,34 @@ router.get('/initCaptchaSession', async (req, res) => {
         }
 
         await captchaElement.screenshot({ path: captchaPath });
-        console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png`);
+        const screenshotTime = Date.now() - screenshotStartTime;
+        console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
+
+        const totalTime = Date.now() - startTime;
+        console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
 
         // Store the session using session manager
         sessionManager.create(sessionId, context, page, {
           userId: req.user?.id || 'anonymous',
-          createdFor: 'captcha'
+          createdFor: 'captcha',
+          timings: {
+            total: totalTime,
+            context: contextTime,
+            pageLoad: Date.now() - pageLoadStartTime,
+            captchaSearch: Date.now() - captchaSearchStartTime,
+            screenshot: screenshotTime
+          }
         });
 
         return {
           status: 'success',
           sessionId,
           captchaUrl: `/captcha-cache/captcha-${sessionId}.png`,
-          message: 'Captcha session initialized'
+          message: 'Captcha session initialized',
+          timings: {
+            total: totalTime,
+            pageLoad: Date.now() - pageLoadStartTime
+          }
         };
 
       } catch (error) {

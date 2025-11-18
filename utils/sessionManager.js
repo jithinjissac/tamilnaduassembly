@@ -182,6 +182,29 @@ class SessionManager {
   }
 
   /**
+   * Get all sessions (including expired, for admin monitoring)
+   * @returns {Array} Array of all session info
+   */
+  getAllSessions() {
+    const now = Date.now();
+    const sessions = [];
+
+    for (const [sessionId, session] of this.sessions.entries()) {
+      sessions.push({
+        sessionId,
+        createdAt: session.createdAt,
+        expiresAt: session.expiresAt,
+        lastAccessed: session.lastAccessed,
+        timeRemaining: Math.max(0, session.expiresAt - now),
+        expired: now > session.expiresAt,
+        metadata: session.metadata
+      });
+    }
+
+    return sessions;
+  }
+
+  /**
    * Get session statistics
    */
   getStats() {

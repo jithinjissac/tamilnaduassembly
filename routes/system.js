@@ -66,4 +66,60 @@ router.get('/health', (req, res) => {
   }
 });
 
+/**
+ * GET /api/system/captcha-timings
+ * Get detailed captcha session timing information
+ * Shows how long SEC website takes to load
+ */
+router.get('/captcha-timings', (req, res) => {
+  try {
+    const sessions = sessionManager.getAllSessions();
+    
+    const captchaSessions = sessions
+      .filter(s => s.metadata?.createdFor === 'captcha')
+      .map(s => ({
+        sessionId: s.sessionId,
+        userId: s.metadata?.userId || 'anonymous',
+        createdAt: s.createdAt,
+        age: Math.floor((Date.now() - s.createdAt) / 1000) + 's',
+        timings: s.metadata?.timings || null
+      }));
+
+    // Calculate averages if we have timing data
+    const timingsData = captchaSessions
+      .filter(s => s.timings)
+      .map(s => s.timings);
+
+    let averages = null;
+    if (timingsData.length > 0) {
+      averages = {
+        total: Math.round(timingsData.reduce((sum, t) => sum + t.total, 0) / timingsData.length),
+        context: Math.round(timingsData.reduce((sum, t) => sum + (t.context || 0), 0) / timingsData.length),
+        pageLoad: Math.round(timingsData.reduce((sum, t) => sum + (t.pageLoad || 0), 0) / timingsData.length),
+        captchaSearch: Math.round(timingsData.reduce((sum, t) => sum + (t.captchaSearch || 0), 0) / timingsData.length),
+        screenshot: Math.round(timingsData.reduce((sum, t) => sum + (t.screenshot || 0), 0) / timingsData.length),
+        sampleSize: timingsData.length
+      };
+    }
+
+    res.json({
+      status: 'success',
+      summary: {
+        activeCaptchaSessions: captchaSessions.length,
+        averageTimings: averages
+      },
+      sessions: captchaSessions,
+      note: 'Timings in milliseconds. Page load shows how long SEC website takes to respond.',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error getting captcha timings:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to get captcha timings',
+      error: error.message
+    });
+  }
+});
+
 export default router;
