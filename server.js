@@ -106,6 +106,10 @@ app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
 
+// Alternative HTTP-based captcha (faster, no browser needed)
+import captchaHttpRoutes from './controllers/captchaControllerHttp.js';
+app.use('/api', captchaHttpRoutes);
+
 // Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
