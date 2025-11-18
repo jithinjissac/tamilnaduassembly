@@ -91,25 +91,20 @@ export async function generateInvoice(order, user) {
                .text(`Order ID: ${order.orderId}`, doc.page.width / 2, yPosition)
                .text(`Total Voters: ${order.totalVoters}`, doc.page.width / 2, yPosition + 15);
             
-            // Add location details with Malayalam support
+            // Add location details (sanitized to avoid fontkit errors)
             if (order.location) {
-                const district = order.location.districtName || order.location.district || 'N/A';
-                const localBody = order.location.localBodyName || order.location.localBody || 'N/A';
-                const ward = order.location.wardName || order.location.ward || 'N/A';
+                const district = sanitizeTextForPDF(order.location.districtName || order.location.district);
+                const localBody = sanitizeTextForPDF(order.location.localBodyName || order.location.localBody);
+                const ward = sanitizeTextForPDF(order.location.wardName || order.location.ward);
                 
                 yPosition += 30;
-                doc.font('Helvetica').text('District: ', doc.page.width / 2, yPosition, { continued: true });
-                doc.font(contentFont).text(district, { width: 200, lineBreak: false });
+                doc.font('Helvetica').text(`District: ${district}`, doc.page.width / 2, yPosition);
                 
                 yPosition += 15;
-                doc.font('Helvetica').text('Local Body: ', doc.page.width / 2, yPosition, { continued: true });
-                doc.font(contentFont).text(localBody, { width: 200, lineBreak: false });
+                doc.font('Helvetica').text(`Local Body: ${localBody}`, doc.page.width / 2, yPosition);
                 
                 yPosition += 15;
-                doc.font('Helvetica').text('Ward: ', doc.page.width / 2, yPosition, { continued: true });
-                doc.font(contentFont).text(ward, { width: 200, lineBreak: false });
-                
-                yPosition += 0; // Reset adjustment
+                doc.font('Helvetica').text(`Ward: ${ward}`, doc.page.width / 2, yPosition);
             }
             
             doc.font('Helvetica').text(`Payment Gateway: ${paymentGateway}`, doc.page.width / 2, yPosition + 30);
@@ -143,14 +138,14 @@ export async function generateInvoice(order, user) {
 
             // Item row
             yPosition += 20;
-            const symbolName = order.customization?.symbolName || order.customization?.partyName || 'N/A';
+            const symbolName = sanitizeTextForPDF(order.customization?.symbolName || order.customization?.partyName);
 
-            // Build comprehensive description with location details
+            // Build comprehensive description with location details (sanitized)
             let description = 'Voter Slip Generation\n';
             if (order.location) {
-               const district = order.location.districtName || order.location.district || '';
-               const localBody = order.location.localBodyName || order.location.localBody || '';
-               const ward = order.location.wardName || order.location.ward || '';
+               const district = sanitizeTextForPDF(order.location.districtName || order.location.district);
+               const localBody = sanitizeTextForPDF(order.location.localBodyName || order.location.localBody);
+               const ward = sanitizeTextForPDF(order.location.wardName || order.location.ward);
 
                if (district && district !== 'N/A') description += `District: ${district}\n`;
                if (localBody && localBody !== 'N/A') description += `Local Body: ${localBody}\n`;
@@ -163,9 +158,9 @@ export async function generateInvoice(order, user) {
             const descX = 50;
             const descWidth = qtyX - descX - 20; // more padding for Malayalam text
 
-            // Use contentFont for description (supports Malayalam)
+            // Use Helvetica for all text (sanitized)
             const descStartY = yPosition;
-            doc.font(contentFont).fontSize(10);
+            doc.font('Helvetica').fontSize(10);
             doc.text(description, descX, yPosition, { 
                 width: descWidth,
                 lineBreak: true,
