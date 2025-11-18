@@ -40,6 +40,31 @@ class SessionManager {
   }
 
   /**
+   * Alias for create() for compatibility
+   */
+  createSession(sessionId, context, page, metadata = {}) {
+    return this.create(sessionId, context, page, metadata);
+  }
+
+  /**
+   * Alias for get() for compatibility
+   */
+  getSession(sessionId) {
+    return this.get(sessionId);
+  }
+
+  /**
+   * Update session metadata
+   */
+  updateSession(sessionId, metadata) {
+    const session = this.sessions.get(sessionId);
+    if (session) {
+      session.metadata = { ...session.metadata, ...metadata };
+      console.log(`📝 Session metadata updated: ${sessionId}`);
+    }
+  }
+
+  /**
    * Get an existing session
    * @param {string} sessionId - Session identifier
    * @returns {Object|null} Session object or null if not found/expired

@@ -13,16 +13,173 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
+ * GET /api/prewarm-captcha
+ * Pre-warms a browser session by loading SEC page (no screenshot yet)
+ * Returns sessionId for instant captcha later
+ */
+router.get('/prewarm-captcha', async (req, res) => {
+  const sessionId = `prewarm-${Date.now()}`;
+  
+  try {
+    console.log(`[PREWARM] Starting pre-warm for session ${sessionId}...`);
+    
+    // Check browser pool capacity - only prewarm if we have resources
+    const stats = browserPool.getStats();
+    if (stats.activeSessions >= 15) {
+      console.log('[PREWARM] Browser pool busy, skipping pre-warm');
+      return res.json({ 
+        success: false, 
+        message: 'System busy, will load captcha on demand',
+        sessionId: null 
+      });
+    }
+    
+    // Queue the request
+    captchaQueue.add(async () => {
+      const context = await browserPool.getBrowserContext(sessionId);
+      const page = await context.newPage();
+
+      // Block unnecessary resources
+      await page.route('**/*', (route) => {
+        const url = route.request().url();
+        const resourceType = route.request().resourceType();
+        
+        if (
+          resourceType === 'font' ||
+          resourceType === 'media' ||
+          url.includes('google-analytics') ||
+          url.includes('googletagmanager') ||
+          url.includes('facebook') ||
+          url.includes('doubleclick')
+        ) {
+          route.abort();
+        } else {
+          route.continue();
+        }
+      });
+
+      try {
+        // Load SEC page
+        console.log('[PREWARM] Loading SEC page...');
+        await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+          waitUntil: 'load',
+          timeout: 45000
+        });
+        
+        console.log('[PREWARM] Page loaded, minimal stabilization...');
+        await page.waitForTimeout(200);
+        
+        // Verify captcha is present but don't screenshot yet
+        const captchaExists = await page.$('img[src*="captcha"]');
+        if (!captchaExists) {
+          throw new Error('Captcha not found during pre-warm');
+        }
+        
+        console.log(`✅ [PREWARM] Session ${sessionId} ready`);
+        
+        // Store session with page context (expires in 3 minutes)
+        sessionManager.createSession(sessionId, context, page, {
+          prewarmed: true,
+          createdAt: Date.now()
+        });
+        
+      } catch (error) {
+        console.error('[PREWARM] Error:', error.message);
+        await context.close();
+        throw error;
+      }
+    }).catch(err => {
+      console.error('[PREWARM] Queue error:', err.message);
+    });
+    
+    // Return immediately - session will be ready in 1-2 seconds
+    res.json({ 
+      success: true, 
+      sessionId,
+      message: 'Pre-warming captcha session...'
+    });
+    
+  } catch (error) {
+    console.error('[PREWARM] Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to pre-warm session' 
+    });
+  }
+});
+
+/**
  * GET /api/initCaptchaSession
  * Initializes a headless browser session and captures the captcha image
  * Returns a session ID and the captcha image path
+ * Can optionally use a pre-warmed session for instant loading
  */
 router.get('/initCaptchaSession', async (req, res) => {
-  const sessionId = Date.now().toString();
+  const prewarmSessionId = req.query.sessionId; // Optional pre-warmed session
+  const sessionId = prewarmSessionId || Date.now().toString();
   const startTime = Date.now();
   
   try {
     console.log(`[CAPTCHA] Initializing session ${sessionId}...`);
+    
+    // Check if this is a pre-warmed session
+    const existingSession = sessionManager.getSession(sessionId);
+    if (existingSession && existingSession.metadata?.prewarmed) {
+      console.log(`[CAPTCHA] ⚡ Using pre-warmed session ${sessionId} - instant load!`);
+      
+      // Just take screenshot from existing page
+      const result = await captchaQueue.add(async () => {
+        const page = existingSession.page;
+        const context = existingSession.context;
+        
+        // Find captcha element (should be instant)
+        const captchaElement = await page.$('img[src*="captcha"]') || 
+                             await page.$('#view_voters_list_captcha_image');
+        
+        if (!captchaElement) {
+          throw new Error('Captcha not found in pre-warmed session');
+        }
+        
+        // Take screenshot
+        const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+        const captchaDir = path.dirname(captchaPath);
+        await fs.promises.mkdir(captchaDir, { recursive: true });
+        await captchaElement.screenshot({ path: captchaPath });
+        
+        console.log(`✅ [CAPTCHA] Instant screenshot from pre-warmed session`);
+        
+        // Update session - no longer pre-warmed, now active
+        sessionManager.updateSession(sessionId, {
+          ...existingSession.metadata,
+          prewarmed: false,
+          screenshotTaken: true
+        });
+        
+        return {
+          sessionId,
+          captchaImageUrl: `/captcha-cache/captcha-${sessionId}.png`,
+          context,
+          page,
+          timings: {
+            total: Date.now() - startTime,
+            instant: true
+          }
+        };
+      });
+      
+      const totalTime = Date.now() - startTime;
+      console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms (pre-warmed)`);
+
+      return res.json({
+        success: true,
+        sessionId: result.sessionId,
+        captchaImageUrl: result.captchaImageUrl,
+        timings: result.timings
+      });
+    }
+    
+    // Not pre-warmed - do full initialization
+    console.log(`[CAPTCHA] No pre-warm available, loading fresh session...`);
     
     // Queue the request to prevent overload
     const result = await captchaQueue.add(async () => {
@@ -85,7 +242,15 @@ router.get('/initCaptchaSession', async (req, res) => {
         }
 
         console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
-        await page.waitForTimeout(200); // Minimal wait - page loads fast now
+        await page.waitForTimeout(1000); // Page needs time to render captcha after load
+        
+        // Wait for network to be idle (captcha image fully loaded)
+        try {
+          await page.waitForLoadState('networkidle', { timeout: 5000 });
+          console.log('[CAPTCHA] Network idle - captcha should be ready');
+        } catch (e) {
+          console.log('[CAPTCHA] Network not idle yet, proceeding anyway...');
+        }
 
         // Wait for captcha image to load - try multiple selectors with extended timeout
         const captchaSearchStartTime = Date.now();
@@ -106,7 +271,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 3000 // Very fast - captcha loads with page now
+              timeout: 10000 // Captcha takes time to render after page load
             });
             captchaElement = await page.$(selector);
             if (captchaElement) {

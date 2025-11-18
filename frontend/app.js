@@ -42,6 +42,30 @@
     });
 })();
 
+// Pre-warm captcha session on page load for instant captcha
+let prewarmSessionId = null;
+
+(function prewarmCaptchaOnLoad() {
+    // Wait for page to fully load before prewarming
+    window.addEventListener('load', async () => {
+        try {
+            console.log('🔥 Pre-warming captcha session...');
+            const response = await fetch('/api/prewarm-captcha');
+            const data = await response.json();
+            
+            if (data.success && data.sessionId) {
+                prewarmSessionId = data.sessionId;
+                sessionStorage.setItem('prewarmSessionId', prewarmSessionId);
+                console.log('✅ Captcha pre-warmed:', prewarmSessionId);
+            } else {
+                console.log('⚠️ Captcha pre-warm skipped:', data.message);
+            }
+        } catch (error) {
+            console.log('⚠️ Pre-warm failed (captcha will load on demand):', error.message);
+        }
+    });
+})();
+
 // API Base URL
 const API_BASE = '/api';
 
@@ -216,7 +240,18 @@ async function loadCaptchaSession() {
         loadingIndicator.classList.remove('hidden');
         hideMessages();
         
-        const response = await fetch(`${API_BASE}/initCaptchaSession`);
+        // Check if we have a pre-warmed session
+        const sessionId = sessionStorage.getItem('prewarmSessionId');
+        const url = sessionId 
+            ? `${API_BASE}/initCaptchaSession?sessionId=${sessionId}`
+            : `${API_BASE}/initCaptchaSession`;
+        
+        if (sessionId) {
+            console.log('⚡ Using pre-warmed session for instant load!');
+            sessionStorage.removeItem('prewarmSessionId'); // Use once
+        }
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         loadingIndicator.classList.add('hidden');
