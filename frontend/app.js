@@ -96,18 +96,19 @@ const generateSlipsBtn = document.getElementById('generateSlips');
 let voterData = null;
 let currentSessionId = null;
 
-// Initialize - Load districts FIRST before anything else
+// Initialize - Load districts AND captcha in PARALLEL for maximum speed
 (async function initializeApp() {
-    console.log('🚀 Initializing app - loading districts first...');
+    console.log('🚀 Initializing app - loading districts and captcha in parallel...');
     
-    // Load districts immediately - highest priority
-    await loadDistricts();
-    
-    // Setup event listeners
+    // Setup event listeners first
     setupEventListeners();
     
-    // Then load captcha in background
-    loadCaptchaSession();
+    // Load districts AND captcha simultaneously (don't wait for each other)
+    // This ensures captcha loads as fast as possible
+    loadDistricts(); // Non-blocking
+    loadCaptchaSession(); // Non-blocking - starts immediately
+    
+    console.log('✅ Both requests started in parallel for instant loading');
 })();
 
 // Fallback for DOMContentLoaded if script loads early
