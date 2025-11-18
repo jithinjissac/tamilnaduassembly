@@ -1312,25 +1312,15 @@ s0.parentNode.insertBefore(s1,s0);
             }
         });
 
-        // Try HTTP method first (faster), fallback to browser method
         async function loadCaptcha() {
             try {
                 document.getElementById('captchaImage').src = '';
                 document.getElementById('captchaImage').style.display = 'none';
                 
-                // Try HTTP method first (10x faster, no browser needed)
-                console.log('Attempting HTTP method (fast)...');
-                let response = await fetch('/api/initCaptchaSessionHttp');
-                
-                // If HTTP method fails, fallback to browser method
-                if (!response.ok) {
-                    console.warn('HTTP method failed, falling back to browser method...');
-                    response = await fetch('/api/initCaptchaSession');
-                }
+                const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -1339,13 +1329,12 @@ s0.parentNode.insertBefore(s1,s0);
                     sessionId = data.sessionId;
                     document.getElementById('captchaImage').src = data.captchaUrl;
                     document.getElementById('captchaImage').style.display = 'block';
-                    console.log(`Captcha loaded via ${data.method || 'browser'} method`);
                 } else {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
             } catch (error) {
                 console.error('Error loading captcha:', error);
-                showError(error.message || 'Failed to load captcha. The Kerala SEC website may be temporarily unavailable. Please try again in a few minutes.');
+                showError('Failed to load captcha. Please refresh the page.');
             }
         }
 
@@ -1825,21 +1814,13 @@ s0.parentNode.insertBefore(s1,s0);
             }, 2000);
         }
 
-        // Load captcha for bulk extraction (with HTTP fallback)
+        // Load captcha for bulk extraction (without displaying)
         async function loadCaptchaForBulk() {
             try {
-                // Try HTTP method first
-                let response = await fetch('/api/initCaptchaSessionHttp');
-                
-                // Fallback to browser method if HTTP fails
-                if (!response.ok) {
-                    console.warn('HTTP method failed, using browser method...');
-                    response = await fetch('/api/initCaptchaSession');
-                }
+                const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -1850,13 +1831,12 @@ s0.parentNode.insertBefore(s1,s0);
                     window.currentSessionId = data.sessionId;
                     // Store captcha image URL for dialog
                     window.currentCaptchaImage = data.captchaUrl;
-                    console.log(`✅ New captcha session loaded via ${data.method || 'browser'} method: ${data.sessionId}`);
+                    console.log(`✅ New captcha session loaded: ${data.sessionId}`);
                     return true;
                 }
                 return false;
             } catch (error) {
                 console.error('Error loading captcha:', error);
-                showError(error.message || 'Failed to load captcha. The Kerala SEC website may be temporarily unavailable.');
                 return false;
             }
         }

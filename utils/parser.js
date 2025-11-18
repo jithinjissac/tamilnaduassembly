@@ -9,22 +9,38 @@ export function parseVotersTable(html) {
   const $ = cheerio.load(html);
   const voters = [];
 
+  // Debug: Log what tables we found
+  const tables = $('table');
+  console.log(`Found ${tables.length} table(s) in HTML`);
+  
   // Try different selectors for voter rows
   const rowSelectors = [
     'tbody.voters-list tr',
     'tbody tr',
+    'table.table tbody tr', // Bootstrap table
+    'table.dataTable tbody tr', // DataTables
+    'div.table-responsive table tbody tr', // Responsive tables
+    '#votersTable tbody tr', // Specific ID
     'table tr:not(:first-child)', // Exclude header row
     'tr.voter-row'
   ];
 
   let rows = $([]);
+  let usedSelector = '';
   
   for (const selector of rowSelectors) {
     rows = $(selector);
     if (rows.length > 0) {
-      console.log(`Found ${rows.length} rows using selector: ${selector}`);
+      usedSelector = selector;
+      console.log(`✅ Found ${rows.length} rows using selector: ${selector}`);
       break;
     }
+  }
+  
+  if (rows.length === 0) {
+    console.log('❌ No table rows found with standard selectors');
+    console.log('HTML structure:', html.substring(0, 1000));
+    return voters;
   }
 
   rows.each((index, element) => {
@@ -32,6 +48,16 @@ export function parseVotersTable(html) {
     
     if (cols.length === 0) {
       return; // Skip header rows or empty rows
+    }
+    
+    // Debug first row to understand structure
+    if (index === 0) {
+      console.log(`First row has ${cols.length} columns`);
+      const colContents = [];
+      cols.each((i, col) => {
+        colContents.push($(col).text().trim());
+      });
+      console.log('First row data:', colContents);
     }
 
     // Standard 7-column format

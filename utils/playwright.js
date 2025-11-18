@@ -166,6 +166,11 @@ export async function extractVoterList(params) {
 
     console.log('Form submitted successfully via XHR');
     
+    // Save the response HTML for debugging
+    const fs = await import('fs');
+    await fs.promises.writeFile('response.html', submitResult.html, 'utf-8');
+    console.log('Response HTML saved to response.html');
+    
     // The response should contain the voter list HTML
     // Parse it directly instead of waiting for page reload
     const voters = parseVotersTable(submitResult.html);
@@ -175,9 +180,14 @@ export async function extractVoterList(params) {
       if (submitResult.html.includes('captcha') || submitResult.html.includes('Invalid')) {
         throw new Error('Invalid captcha. Please try again with correct captcha.');
       }
+      
+      // Log a snippet of the response for debugging
+      const snippet = submitResult.html.substring(0, 500);
+      console.log('Response HTML snippet:', snippet);
+      
       return {
         error: 'No voters found',
-        details: 'The form was submitted but no voter data could be extracted. Please verify your selections.'
+        details: 'The form was submitted but no voter data could be extracted. Please verify your selections. Check response.html for the full response.'
       };
     }
 

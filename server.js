@@ -29,13 +29,10 @@ const PORT = process.env.PORT || 3000;
 // Connect to database
 connectDB();
 
-// Middleware (optimized for 20 concurrent users)
+// Middleware
 app.use(cors());
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
-
-// Increase max listeners for event emitters (prevent memory leak warnings)
-process.setMaxListeners(30);
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files (frontend) with cache control
 app.use(express.static(path.join(__dirname, 'frontend'), {
@@ -105,10 +102,6 @@ app.use('/voter-slip-examples', express.static(path.join(__dirname, 'voter-slip-
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
-
-// Alternative HTTP-based captcha (faster, no browser needed)
-import captchaHttpRoutes from './controllers/captchaControllerHttp.js';
-app.use('/api', captchaHttpRoutes);
 
 // Root route
 app.get('/', (req, res) => {
