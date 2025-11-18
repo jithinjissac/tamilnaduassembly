@@ -938,7 +938,7 @@ s0.parentNode.insertBefore(s1,s0);
                     </div>
                 </div>
 
-                <div class="loading" id="extractionLoading">
+                <div class="loading" id="extractionLoading" tabindex="-1" role="alert" aria-live="polite">
                     <div>
                         <div class="spinner"></div>
                         <div>
@@ -1515,7 +1515,17 @@ s0.parentNode.insertBefore(s1,s0);
             }
 
             document.getElementById('extractBtn').disabled = true;
-            document.getElementById('extractionLoading').classList.add('show');
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('extractionLoading');
+            loadingOverlay.classList.add('show');
+            
+            // IMPORTANT: Scroll to loading overlay and focus on it
+            loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            loadingOverlay.focus();
+            
+            // Also scroll to top of page for better visibility
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             
             // Update loader text
             document.getElementById('loadingMainText').textContent = 'Fetching voter data...';
@@ -1637,7 +1647,17 @@ s0.parentNode.insertBefore(s1,s0);
             const language = 'M';
 
             document.getElementById('extractBtn').disabled = true;
-            document.getElementById('extractionLoading').classList.add('show');
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('extractionLoading');
+            loadingOverlay.classList.add('show');
+            
+            // IMPORTANT: Scroll to loading overlay and focus on it
+            loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            loadingOverlay.focus();
+            
+            // Also scroll to top of page for better visibility
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             
             let allVoters = [];
             let successCount = 0;
