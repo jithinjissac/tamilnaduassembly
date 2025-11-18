@@ -47,17 +47,33 @@ router.get('/initCaptchaSession', async (req, res) => {
           }
         ]);
 
-        // Navigate to the page
+        // Navigate to the page with extended timeout and retry logic
         console.log('[CAPTCHA] Loading SEC page...');
-        await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-          waitUntil: 'domcontentloaded',
-          timeout: 45000 
-        });
+        let pageLoaded = false;
+        let retries = 3;
+        
+        while (!pageLoaded && retries > 0) {
+          try {
+            await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+              waitUntil: 'domcontentloaded',
+              timeout: 90000 // Increased to 90 seconds
+            });
+            pageLoaded = true;
+            console.log('[CAPTCHA] Page loaded successfully');
+          } catch (error) {
+            retries--;
+            console.log(`[CAPTCHA] Page load timeout, retries remaining: ${retries}`);
+            if (retries === 0) {
+              throw new Error('SEC website is too slow. Please try again later.');
+            }
+            await page.waitForTimeout(2000); // Wait before retry
+          }
+        }
 
         console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
         await page.waitForTimeout(3000);
 
-        // Wait for captcha image to load - try multiple selectors
+        // Wait for captcha image to load - try multiple selectors with extended timeout
         console.log('[CAPTCHA] Waiting for captcha image...');
         
         let captchaElement = null;
@@ -74,7 +90,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 5000 
+              timeout: 10000 // Increased from 5s to 10s
             });
             captchaElement = await page.$(selector);
             if (captchaElement) {
@@ -196,7 +212,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select district
     await page.selectOption('#view_voters_list_district', district);
     console.log('[CAPTCHA] District selected, waiting for local bodies...');
-    await page.waitForTimeout(3000); // Wait for AJAX to load local bodies
+    await page.waitForTimeout(5000); // Increased wait for slow AJAX
 
     // Wait for local body options to be loaded (check if there are options with values)
     await page.waitForFunction(
@@ -204,7 +220,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_localBody');
         return select && select.options.length > 1;
       },
-      { timeout: 15000 }
+      { timeout: 30000 } // Increased from 15s to 30s
     );
     
     // Force local body select to be visible
@@ -221,7 +237,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select local body
     console.log('[CAPTCHA] Selecting local body...');
     await page.selectOption('#view_voters_list_localBody', local_body);
-    await page.waitForTimeout(3000); // Wait for AJAX to load wards
+    await page.waitForTimeout(5000); // Increased wait for slow AJAX
 
     // Wait for ward options to be loaded
     await page.waitForFunction(
@@ -229,7 +245,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_ward');
         return select && select.options.length > 1;
       },
-      { timeout: 15000 }
+      { timeout: 30000 } // Increased from 15s to 30s
     );
     
     // Force ward select to be visible
@@ -246,7 +262,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Select ward
     console.log('[CAPTCHA] Selecting ward...');
     await page.selectOption('#view_voters_list_ward', ward);
-    await page.waitForTimeout(3000); // Wait for AJAX to load polling stations
+    await page.waitForTimeout(5000); // Increased wait for slow AJAX
 
     // Wait for polling station options to be loaded
     await page.waitForFunction(
@@ -254,7 +270,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_pollingStation');
         return select && select.options.length > 1;
       },
-      { timeout: 15000 }
+      { timeout: 30000 } // Increased from 15s to 30s
     );
     
     // Force polling station select to be visible

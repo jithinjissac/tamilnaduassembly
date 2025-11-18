@@ -137,6 +137,19 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         // Create unique Cashfree order ID (append timestamp to avoid conflicts)
         const cashfreeOrderId = `${order.orderId}-${Date.now()}`;
 
+        // Prepare order data to pass in URL (lightweight, essential data only)
+        const orderDataForUrl = {
+            orderId: order.orderId,
+            totalVoters: order.totalVoters,
+            amount: order.amount,
+            symbolName: order.customization?.symbolName || 'N/A',
+            symbolNameMalayalam: order.customization?.symbolNameMalayalam || '',
+            paymentStatus: order.paymentStatus
+        };
+
+        // Encode order data as URL parameter
+        const encodedOrderData = encodeURIComponent(JSON.stringify(orderDataForUrl));
+
         // Create Cashfree order
         const cashfreeOrderRequest = {
             order_id: cashfreeOrderId,
@@ -149,7 +162,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
                 customer_phone: user.phone || '9999999999'
             },
             order_meta: {
-                return_url: `${process.env.FRONTEND_URL || 'https://easyslip.in'}/order-success.html?orderId=${order.orderId}`,
+                return_url: `${process.env.FRONTEND_URL || 'https://easyslip.in'}/order-success.html?orderId=${order.orderId}&orderData=${encodedOrderData}`,
                 notify_url: `${process.env.BACKEND_URL || 'https://easyslip.in'}/api/payment/cashfree/webhook`
             }
         };
