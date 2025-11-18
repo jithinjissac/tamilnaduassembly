@@ -2095,7 +2095,27 @@ Login to https://easyslip.in to download your PDF.</textarea>
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!response.ok) throw new Error('Unauthorized');
+                if (response.status === 401) {
+                    // Only remove token on explicit unauthorized
+                    console.log('Token expired or invalid, logging out...');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                if (!response.ok) {
+                    // Network error - don't logout, just show error
+                    console.error('Network error during auth check, staying logged in');
+                    showError('Network error. Please check your connection.');
+                    // Still try to load the page with cached data
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const userData = JSON.parse(cachedUser);
+                        document.getElementById('adminName').textContent = userData.name;
+                    }
+                    return;
+                }
 
                 const data = await response.json();
                 
@@ -2105,13 +2125,21 @@ Login to https://easyslip.in to download your PDF.</textarea>
                     return;
                 }
 
+                // Update cached user data
+                localStorage.setItem('user', JSON.stringify(data.user));
                 document.getElementById('adminName').textContent = data.user.name;
                 loadAnalytics();
 
             } catch (error) {
                 console.error('Auth check failed:', error);
-                localStorage.removeItem('token');
-                window.location.href = '/login.html';
+                // Network error - don't logout automatically
+                showError('Connection error. Please check your network.');
+                // Use cached user data if available
+                const cachedUser = localStorage.getItem('user');
+                if (cachedUser) {
+                    const userData = JSON.parse(cachedUser);
+                    document.getElementById('adminName').textContent = userData.name;
+                }
             }
         }
 

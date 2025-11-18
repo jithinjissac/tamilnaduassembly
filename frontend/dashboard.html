@@ -512,11 +512,28 @@ s0.parentNode.insertBefore(s1,s0);
                 });
 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        // Only logout on explicit unauthorized
+                        throw new Error('Authentication failed');
+                    }
+                    // Network error - use cached data
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const userData = JSON.parse(cachedUser);
+                        currentUserId = userData._id;
+                        document.getElementById('userName').textContent = userData.name;
+                        document.getElementById('userEmail').textContent = userData.email;
+                        console.log('Using cached user data due to network error');
+                        return;
+                    }
                     throw new Error('Authentication failed');
                 }
 
                 const data = await response.json();
                 currentUserId = data.user._id; // Store user ID
+                
+                // Cache user data
+                localStorage.setItem('user', JSON.stringify(data.user));
                 
                 // Check if user is admin and redirect
                 if (data.user.role === 'admin') {
@@ -529,8 +546,12 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('userEmail').textContent = data.user.email;
             } catch (error) {
                 console.error('Error loading user:', error);
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
+                // Only logout on auth failure, not network errors
+                if (error.message === 'Authentication failed') {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                }
             }
         }
 
