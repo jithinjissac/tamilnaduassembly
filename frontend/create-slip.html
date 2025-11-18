@@ -922,8 +922,19 @@ s0.parentNode.insertBefore(s1,s0);
 
                     <div class="form-group">
                         <label>Captcha</label>
-                        <img id="captchaImage" src="" alt="Captcha" style="display: none;">
-                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">Load Captcha</button>
+                        <div style="position: relative; min-height: 80px;">
+                            <!-- Captcha Loader -->
+                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
+                                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
+                            </div>
+                            
+                            <!-- Captcha Image -->
+                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto;">
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
+                            <span id="loadCaptchaText">Load Captcha</span>
+                        </button>
                         <input type="text" id="captcha" placeholder="Enter Captcha" style="margin-top: 1rem;">
                         <div class="error-message" id="captchaError"></div>
                     </div>
@@ -1330,8 +1341,16 @@ s0.parentNode.insertBefore(s1,s0);
 
         async function loadCaptcha() {
             try {
+                // Hide captcha image and show loader
                 document.getElementById('captchaImage').src = '';
                 document.getElementById('captchaImage').style.display = 'none';
+                document.getElementById('captchaLoader').style.display = 'block';
+                
+                // Disable button and show loading text
+                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+                const loadBtnText = document.getElementById('loadCaptchaText');
+                if (loadBtn) loadBtn.disabled = true;
+                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 
                 const response = await fetch('/api/initCaptchaSession');
                 
@@ -1343,14 +1362,32 @@ s0.parentNode.insertBefore(s1,s0);
                 
                 if (data.status === 'success') {
                     sessionId = data.sessionId;
+                    
+                    // Hide loader and show captcha image
+                    document.getElementById('captchaLoader').style.display = 'none';
                     document.getElementById('captchaImage').src = data.captchaUrl;
                     document.getElementById('captchaImage').style.display = 'block';
+                    
+                    // Update button text
+                    if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
                 } else {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
             } catch (error) {
                 console.error('Error loading captcha:', error);
-                showError('Failed to load captcha. Please refresh the page.');
+                
+                // Hide loader
+                document.getElementById('captchaLoader').style.display = 'none';
+                
+                showError('Failed to load captcha. Please try again.');
+            } finally {
+                // Re-enable button
+                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+                const loadBtnText = document.getElementById('loadCaptchaText');
+                if (loadBtn) loadBtn.disabled = false;
+                if (loadBtnText && loadBtnText.innerHTML.includes('Loading')) {
+                    loadBtnText.innerHTML = 'Load Captcha';
+                }
             }
         }
 
