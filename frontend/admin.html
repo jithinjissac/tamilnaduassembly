@@ -5261,9 +5261,18 @@ Login to https://easyslip.in to download your PDF.</textarea>
             }
         }
 
-        // Initialize on page load
-        checkAuth();
-        initDeveloperSettings();
+        // PRIORITY: Initialize admin page - auth check and data loading first
+        (async function initializeAdminPage() {
+            console.log('🚀 Initializing admin page - checking auth and loading data first...');
+            
+            // Check auth first (blocking - required for all data)
+            await checkAuth();
+            
+            // Initialize developer settings
+            initDeveloperSettings();
+            
+            console.log('✅ Admin page initialized');
+        })();
     </script>
 </body>
 </html>

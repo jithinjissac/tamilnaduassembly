@@ -1019,8 +1019,13 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        // Load order details and preview
-        loadOrderAndPreview();
+        // PRIORITY: Load order details FIRST before anything else
+        // This ensures order data is fetched immediately when page loads
+        (async function initializePreviewPage() {
+            console.log('🚀 Initializing preview page - loading order data first...');
+            await loadOrderAndPreview();
+            console.log('✅ Order data loaded and preview ready');
+        })();
 
         // Helper function to display PDF with mobile-friendly fallback
         async function displayPDF(pdfBlobUrl, container) {

@@ -935,9 +935,18 @@
             }
         }
 
-        // Initialize
-        loadSlipSettings();
-        loadEmailSettings();
+        // PRIORITY: Initialize settings page - load data first
+        (async function initializeSettingsPage() {
+            console.log('🚀 Initializing settings page - loading data first...');
+            
+            // Load both settings in parallel
+            await Promise.all([
+                loadSlipSettings(),
+                loadEmailSettings()
+            ]);
+            
+            console.log('✅ Settings loaded');
+        })();
     </script>
 </body>
 </html>

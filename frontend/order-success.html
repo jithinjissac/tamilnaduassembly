@@ -1184,9 +1184,11 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        // Initialize page
+        // PRIORITY: Initialize page and load order data FIRST
+        // This ensures order details are fetched immediately when page loads
         (function init() {
             console.log('=== ORDER SUCCESS PAGE INITIALIZATION ===');
+            console.log('🚀 Loading order data first (highest priority)...');
             console.log('Order ID from URL:', orderId);
             console.log('Token available:', !!token);
             console.log('Token length:', token ? token.length : 0);

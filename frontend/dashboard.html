@@ -817,10 +817,22 @@ s0.parentNode.insertBefore(s1,s0);
             window.location.href = 'login.html';
         }
 
-        // Load data on page load
-        loadUserData();
-        loadStats();
-        loadOrders();
+        // PRIORITY: Load data immediately when page loads
+        // User data and stats load first, orders in parallel
+        (async function initializeDashboard() {
+            console.log('🚀 Initializing dashboard - loading data first...');
+            
+            // Load user data and stats in parallel (both needed for UI)
+            await Promise.all([
+                loadUserData(),
+                loadStats()
+            ]);
+            
+            console.log('✅ User data and stats loaded');
+            
+            // Load orders (can be slightly delayed)
+            loadOrders();
+        })();
     </script>
 </body>
 </html>
