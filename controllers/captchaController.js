@@ -31,8 +31,13 @@ router.get('/initCaptchaSession', async (req, res) => {
     console.log('[CAPTCHA] Launching browser...');
     browser = await chromium.launch({ 
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      timeout: 30000
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+      ],
+      timeout: 60000
     });
 
     console.log('[CAPTCHA] Creating context...');
@@ -59,12 +64,27 @@ router.get('/initCaptchaSession', async (req, res) => {
       }
     ]);
 
-    // Navigate to the page
+    // Navigate to the page with retry logic
     console.log('[CAPTCHA] Loading SEC page:', `${SEC_BASE_URL}/public/voters/list`);
-    await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 45000 
-    });
+    
+    let retries = 3;
+    let pageLoaded = false;
+    
+    while (retries > 0 && !pageLoaded) {
+      try {
+        await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+          waitUntil: 'networkidle',
+          timeout: 90000 
+        });
+        pageLoaded = true;
+        console.log('[CAPTCHA] Page loaded successfully');
+      } catch (error) {
+        retries--;
+        console.log(`[CAPTCHA] Page load failed, retries left: ${retries}`);
+        if (retries === 0) throw error;
+        await page.waitForTimeout(2000);
+      }
+    }
 
     console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
     await page.waitForTimeout(3000);
@@ -155,16 +175,30 @@ router.get('/initCaptchaSession', async (req, res) => {
 
   } catch (error) {
     console.error('Error initializing captcha session:', error);
+    
+    // Provide more helpful error messages
+    let errorMessage = 'Failed to initialize captcha session';
+    if (error.name === 'TimeoutError') {
+      errorMessage = 'Kerala SEC website is not responding. The website may be down or experiencing heavy traffic. Please try again in a few minutes.';
+    } else if (error.message?.includes('net::ERR_')) {
+      errorMessage = 'Cannot connect to Kerala SEC website. Please check your internet connection or try again later.';
+    }
+    
     if (browser) {
-      await browser.close();
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error('Error closing browser:', closeError);
+      }
     }
     if (sessionId && activeSessions.has(sessionId)) {
       activeSessions.delete(sessionId);
     }
-    res.status(500).json({ 
+    res.status(503).json({ 
       status: 'error', 
-      message: 'Failed to initialize captcha session',
-      error: error.message 
+      message: errorMessage,
+      technicalError: error.message,
+      hint: 'The Kerala SEC website may be temporarily unavailable. Please try again in a few minutes.'
     });
   }
 });

@@ -1320,7 +1320,8 @@ s0.parentNode.insertBefore(s1,s0);
                 const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -1334,7 +1335,7 @@ s0.parentNode.insertBefore(s1,s0);
                 }
             } catch (error) {
                 console.error('Error loading captcha:', error);
-                showError('Failed to load captcha. Please refresh the page.');
+                showError(error.message || 'Failed to load captcha. The Kerala SEC website may be temporarily unavailable. Please try again in a few minutes.');
             }
         }
 
@@ -1820,7 +1821,8 @@ s0.parentNode.insertBefore(s1,s0);
                 const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -1837,6 +1839,7 @@ s0.parentNode.insertBefore(s1,s0);
                 return false;
             } catch (error) {
                 console.error('Error loading captcha:', error);
+                showError(error.message || 'Failed to load captcha. The Kerala SEC website may be temporarily unavailable.');
                 return false;
             }
         }
