@@ -1,5 +1,5 @@
 import { Cashfree } from 'cashfree-pg';
-import { CFEnvironment } from 'cashfree-pg/dist/configuration';
+import { CFEnvironment } from 'cashfree-pg/dist/configuration.js';
 
 let cashfreeInstance = null;
 
