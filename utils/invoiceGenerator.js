@@ -3,6 +3,27 @@ import fs from 'fs';
 import path from 'path';
 
 /**
+ * Sanitize text for PDF to avoid fontkit errors with special characters
+ * @param {string} text - Text to sanitize
+ * @returns {string} - Sanitized text
+ */
+function sanitizeTextForPDF(text) {
+    if (!text) return '';
+    // Remove or replace characters that might cause fontkit errors
+    return text
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+        .replace(/[^\x00-\x7F]/g, (char) => {
+            // Keep common printable characters, replace others with '?'
+            const code = char.charCodeAt(0);
+            if (code >= 0x0600 && code <= 0x06FF) return char; // Arabic
+            if (code >= 0x0D00 && code <= 0x0D7F) return char; // Malayalam
+            if (code >= 0x0900 && code <= 0x097F) return char; // Devanagari
+            return '?';
+        })
+        .trim();
+}
+
+/**
  * Generate invoice PDF for a paid order
  * @param {Object} order - Order document from MongoDB
  * @param {Object} user - User document from MongoDB
