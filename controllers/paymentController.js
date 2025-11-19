@@ -176,8 +176,13 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
 
         console.log('📦 Creating Cashfree order:', cashfreeOrderId);
 
-        // For Cashfree SDK v5+, call PGCreateOrder on the instance
-        const response = await cashfree.PGCreateOrder(cashfreeOrderRequest);
+        // For Cashfree SDK v5+, call PGCreateOrder
+        // Check what methods are available
+        console.log('🔍 Cashfree object type:', typeof cashfree);
+        console.log('🔍 Cashfree methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(cashfree)));
+        console.log('🔍 Has PGCreateOrder:', typeof cashfree.PGCreateOrder);
+        
+        const response = await cashfree.PGCreateOrder("2023-08-01", cashfreeOrderRequest);
 
         console.log('✅ Cashfree order created successfully');
         console.log('📄 Cashfree response:', JSON.stringify(response.data, null, 2));

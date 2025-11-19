@@ -11,17 +11,20 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             return null;
         }
 
-        // Set global Cashfree credentials
+        // For Cashfree SDK v5, we need to set credentials and return the Cashfree object
+        // The SDK uses static properties that need to be set
         Cashfree.XClientId = appId;
         Cashfree.XClientSecret = secretKey;
-        // Use string values for environment - 'SANDBOX' or 'PRODUCTION'
         Cashfree.XEnvironment = (environment === 'sandbox' || environment === 'test') 
-            ? 'SANDBOX' 
-            : 'PRODUCTION';
+            ? Cashfree.Environment.SANDBOX 
+            : Cashfree.Environment.PRODUCTION;
         
+        // Return the Cashfree object with methods like PGCreateOrder
         cashfreeInstance = Cashfree;
         
-        console.log(`✅ Cashfree initialized successfully (${environment} mode, XEnvironment: ${Cashfree.XEnvironment})`);
+        console.log(`✅ Cashfree initialized successfully (${environment} mode)`);
+        console.log('📦 Cashfree methods available:', Object.getOwnPropertyNames(Cashfree));
+        
         return cashfreeInstance;
     } catch (error) {
         console.error('❌ Cashfree initialization failed:', error.message);
