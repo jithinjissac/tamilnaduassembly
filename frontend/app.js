@@ -42,28 +42,31 @@
     });
 })();
 
-// Pre-warm captcha session on page load for instant captcha
+// Pre-warm captcha session IMMEDIATELY for instant captcha
 let prewarmSessionId = null;
+let prewarmPromise = null;
 
-(function prewarmCaptchaOnLoad() {
-    // Wait for page to fully load before prewarming
-    window.addEventListener('load', async () => {
-        try {
-            console.log('🔥 Pre-warming captcha session...');
-            const response = await fetch('/api/prewarm-captcha');
-            const data = await response.json();
-            
+// Start pre-warming immediately - don't wait for any events
+(function prewarmCaptchaImmediately() {
+    console.log('🔥 Starting immediate captcha pre-warm...');
+    
+    prewarmPromise = fetch('/api/prewarm-captcha')
+        .then(response => response.json())
+        .then(data => {
             if (data.success && data.sessionId) {
                 prewarmSessionId = data.sessionId;
                 sessionStorage.setItem('prewarmSessionId', prewarmSessionId);
                 console.log('✅ Captcha pre-warmed:', prewarmSessionId);
+                return data.sessionId;
             } else {
                 console.log('⚠️ Captcha pre-warm skipped:', data.message);
+                return null;
             }
-        } catch (error) {
+        })
+        .catch(error => {
             console.log('⚠️ Pre-warm failed (captcha will load on demand):', error.message);
-        }
-    });
+            return null;
+        });
 })();
 
 // API Base URL
@@ -252,6 +255,12 @@ async function loadCaptchaSession() {
         captchaImage.src = '';
         loadingIndicator.classList.remove('hidden');
         hideMessages();
+        
+        // Wait for pre-warm to complete (if it's still loading)
+        if (prewarmPromise) {
+            console.log('⏳ Waiting for pre-warm to complete...');
+            await prewarmPromise;
+        }
         
         // Check if we have a pre-warmed session
         const sessionId = sessionStorage.getItem('prewarmSessionId');
