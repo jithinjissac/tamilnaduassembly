@@ -263,7 +263,10 @@ export const getOrderStats = async (req, res) => {
         
         stats.forEach(stat => {
             totalVoters += stat.totalVoters;
-            totalAmount += stat.totalAmount;
+            // Only count amount from completed orders
+            if (stat._id === 'completed') {
+                totalAmount += stat.totalAmount;
+            }
         });
 
         // Return format expected by dashboard
