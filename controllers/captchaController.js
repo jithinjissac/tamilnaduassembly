@@ -141,7 +141,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         }
         
         // Get captcha image source URL
-        const captchaSrc = await captchaElement.getAttribute('src');
+        const captchaSrc = await captchaElement.evaluate(el => el.src);
         
         // Download captcha image directly
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
@@ -296,7 +296,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             
             if (captchaElement) {
               // Get the image source URL
-              captchaSrc = await captchaElement.getAttribute('src');
+              captchaSrc = await captchaElement.evaluate(el => el.src);
               const captchaSearchTime = Date.now() - captchaSearchStartTime;
               console.log(`[CAPTCHA] ⏱️  Found captcha with selector: ${selector} in ${captchaSearchTime}ms`);
               console.log(`[CAPTCHA] Captcha source URL:`, captchaSrc);
