@@ -59,25 +59,6 @@ export const createOrder = [
                 });
             }
 
-            // Check for existing order with same symbol + location combination
-            const existingOrder = await Order.findOne({
-                userId,
-                'customization.symbolId': customization.symbolId,
-                'location.district': location.district,
-                'location.localBody': location.localBody,
-                'location.ward': location.ward,
-                'location.pollingStation': location.pollingStation
-            });
-
-            if (existingOrder) {
-                return res.status(409).json({
-                    status: 'error',
-                    message: 'Order already exists for this symbol and location combination',
-                    existingOrderId: existingOrder.orderId,
-                    note: 'Please change the symbol or select a different location to create a new order'
-                });
-            }
-
             // Calculate amount
             const totalVoters = voters.length;
             const pricePerVoter = user.pricePerVoter || 0.50; // Use user's custom price
