@@ -1396,6 +1396,83 @@ s0.parentNode.insertBefore(s1,s0);
 
         function parseVotersFromHTML(doc) {
             const voters = [];
+            let pollingStationName = null;
+
+            // Try to extract Malayalam polling station name from the HTML
+            // The SEC website shows it in the selected dropdown option after form submission
+            try {
+                console.log('🔍 Attempting to extract Malayalam polling station name from HTML...');
+                
+                // PRIORITY 1: Try to find it in the selected option text (most accurate)
+                const selectedOption = doc.querySelector(
+                    'select[id*="pollingStation"] option[selected], ' +
+                    'select[name*="pollingStation"] option[selected], ' +
+                    '#view_voters_list_pollingStation option[selected="selected"]'
+                );
+                if (selectedOption) {
+                    // Get text content and clean up HTML entities
+                    pollingStationName = selectedOption.textContent
+                        .trim()
+                        .replace(/\s+/g, ' '); // Normalize multiple spaces
+                    console.log('✅ Found polling station from selected option:', pollingStationName);
+                }
+
+                // PRIORITY 2: Try the chosen-single span (for Chosen.js dropdown)
+                if (!pollingStationName) {
+                    const chosenSpan = doc.querySelector('.chosen-container .chosen-single span, .chosen-single span');
+                    if (chosenSpan) {
+                        const text = chosenSpan.textContent
+                            .trim()
+                            .replace(/\s+/g, ' '); // Normalize multiple spaces
+                        console.log('🔍 Found chosen-single span text:', text);
+                        if (text && text !== '-- തിരഞ്ഞെടുക്കുക --' && text !== 'Select' && text !== '--' && !text.startsWith('--')) {
+                            pollingStationName = text;
+                            console.log('✅ Found polling station from Chosen dropdown:', pollingStationName);
+                        }
+                    } else {
+                        console.log('⚠️ No chosen-single span found');
+                    }
+                }
+
+                // PRIORITY 3: Try chosen-results list item that is selected
+                if (!pollingStationName) {
+                    const resultSelected = doc.querySelector('.chosen-results li.result-selected, .chosen-results li.active-result.result-selected');
+                    if (resultSelected) {
+                        const text = resultSelected.textContent
+                            .trim()
+                            .replace(/\s+/g, ' '); // Normalize multiple spaces
+                        console.log('🔍 Found result-selected text:', text);
+                        if (text && text !== '-- തിരഞ്ഞെടുക്കുക --' && text !== 'Select' && text !== '--' && !text.startsWith('--')) {
+                            pollingStationName = text;
+                            console.log('✅ Found polling station from chosen-results:', pollingStationName);
+                        }
+                    }
+                }
+
+                // PRIORITY 4: Try to find polling station name in breadcrumb or title
+                if (!pollingStationName) {
+                    const breadcrumbs = doc.querySelectorAll('.breadcrumb li, .page-title, h1, h2, h3');
+                    console.log('🔍 Searching in', breadcrumbs.length, 'header elements');
+                    for (const elem of breadcrumbs) {
+                        const text = elem.textContent.trim();
+                        // Look for text containing "പോളിംഗ്" or similar patterns
+                        if (text.includes('പോളിംഗ്') || text.includes('പോളിങ്') || text.includes('സ്റ്റേഷൻ')) {
+                            pollingStationName = text;
+                            console.log('✅ Found Malayalam polling station name from page header:', pollingStationName);
+                            break;
+                        }
+                    }
+                }
+                
+                if (!pollingStationName) {
+                    console.warn('❌ Could not find Malayalam polling station name in HTML');
+                    // Debug: Log the HTML structure to see what we're working with
+                    console.log('🔍 HTML structure of polling station dropdown:', 
+                        doc.querySelector('select[id*="pollingStation"]')?.outerHTML?.substring(0, 500) || 'Not found');
+                }
+            } catch (e) {
+                console.error('❌ Error extracting polling station name from HTML:', e);
+            }
 
             // Section handling
             const INCLUDE_SECTIONS = new Set([
@@ -1516,7 +1593,7 @@ s0.parentNode.insertBefore(s1,s0);
             });
 
             console.log(`Parsed ${voters.length} filtered voters from HTML`);
-            return voters;
+            return { voters, pollingStationName };
         }
 
         async function createSlip() {
@@ -1603,7 +1680,25 @@ s0.parentNode.insertBefore(s1,s0);
                     const doc = parser.parseFromString(extractData.html, 'text/html');
                     
                     // Extract voter data from the HTML table
-                    extractedVoters = parseVotersFromHTML(doc);
+                    const parseResult = parseVotersFromHTML(doc);
+                    extractedVoters = parseResult.voters;
+                    const malayalamPollingStationName = parseResult.pollingStationName;
+                    
+                    console.log('🔍 Extracted Malayalam polling station name:', malayalamPollingStationName);
+                    console.log('🔍 Sample voter before adding station name:', extractedVoters[0]);
+                    
+                    // Add Malayalam polling station name to each voter
+                    if (malayalamPollingStationName) {
+                        console.log('✅ Adding Malayalam polling station name to voters:', malayalamPollingStationName);
+                        extractedVoters = extractedVoters.map(voter => ({
+                            ...voter,
+                            polling_station_name: malayalamPollingStationName
+                        }));
+                        console.log('✅ Sample voter after adding station name:', extractedVoters[0]);
+                    } else {
+                        console.warn('⚠️ No Malayalam polling station name found in HTML response!');
+                        console.log('⚠️ Will use fallback polling station name from location data');
+                    }
                     
                     if (extractedVoters.length === 0) {
                         showError('captchaError', 'No voters found. Please check your selection and try again.');
@@ -1792,13 +1887,15 @@ s0.parentNode.insertBefore(s1,s0);
                     if (extractData.status === 'success' && extractData.html) {
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(extractData.html, 'text/html');
-                        const voters = parseVotersFromHTML(doc);
+                        const parseResult = parseVotersFromHTML(doc);
+                        const voters = parseResult.voters;
+                        const malayalamStationName = parseResult.pollingStationName;
                         
                         if (voters.length > 0) {
-                            // Add polling station metadata to each voter
+                            // Add polling station metadata to each voter (use Malayalam name if available)
                             const votersWithStation = voters.map(voter => ({
                                 ...voter,
-                                polling_station_name: station.text,
+                                polling_station_name: malayalamStationName || station.text,
                                 polling_station_value: station.value
                             }));
                             

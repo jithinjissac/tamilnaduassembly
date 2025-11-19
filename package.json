@@ -41,6 +41,7 @@
     "playwright": "^1.40.0",
     "puppeteer": "^24.29.1",
     "razorpay": "^2.9.6",
+    "snappy": "^7.3.3",
     "ua-parser-js": "^2.0.6"
   },
   "devDependencies": {

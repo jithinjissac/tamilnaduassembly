@@ -111,6 +111,17 @@ export const findAndLinkTempPDF = (orderId) => {
 
 export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
     try {
+        // Re-fetch order from database to ensure we have the latest slipsPerPage setting
+        const Order = (await import('../models/Order.js')).default;
+        const latestOrder = await Order.findOne({ orderId: order.orderId }).lean();
+        if (latestOrder) {
+            console.log(`📄 Re-fetched order for session PDF, slipsPerPage: ${latestOrder.customization?.slipsPerPage}`);
+            order = latestOrder; // Use the latest order
+        } else {
+            console.warn(`⚠️ Order not found for session ${sessionId}, using provided order object`);
+            // Fallback to provided order if not found in DB yet
+        }
+        
         const { generateSlipHTML } = await import('../controllers/slipController.js');
         const html = await generateSlipHTML(order);
 
@@ -143,8 +154,16 @@ export const generatePDFBackground = async (order, orderId) => {
     // set in-progress
     pdfJobs.set(orderId, { status: 'generating', createdAt: new Date(), progress: 0 });
     try {
+        // Re-fetch order from database to ensure we have the latest slipsPerPage setting
+        const Order = (await import('../models/Order.js')).default;
+        const latestOrder = await Order.findOne({ orderId }).lean();
+        if (!latestOrder) {
+            throw new Error(`Order not found: ${orderId}`);
+        }
+        console.log(`📄 Re-fetched order for permanent PDF, slipsPerPage: ${latestOrder.customization?.slipsPerPage}`);
+        
         const { generateSlipHTML } = await import('../controllers/slipController.js');
-        const html = await generateSlipHTML(order);
+        const html = await generateSlipHTML(latestOrder);
 
         // ✅ ALWAYS use fresh browser for background generation to avoid disconnection issues
         let browser;
