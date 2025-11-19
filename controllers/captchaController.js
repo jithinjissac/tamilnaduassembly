@@ -372,7 +372,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             context: contextTime,
             pageLoad: Date.now() - pageLoadStartTime,
             captchaSearch: Date.now() - captchaSearchStartTime,
-            screenshot: screenshotTime
+            download: Date.now() - downloadStartTime
           }
         });
 

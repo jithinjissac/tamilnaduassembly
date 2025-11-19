@@ -313,7 +313,7 @@ function parseTableToVoters(html) {
     // Find the table with voters-list tbody
     const rows = doc.querySelectorAll('tbody.voters-list tr');
     
-    let skipSection = false; // Flag to skip "ഒഴിവാക്കലുകൾ" section
+    let skipSection = false; // Flag to skip "ഒഴിവാക്കലുകൾ" (Deletions) section only
     
     rows.forEach((row) => {
         const cells = row.querySelectorAll('td');
@@ -322,13 +322,13 @@ function parseTableToVoters(html) {
         if (cells.length === 1 || cells[0?.getAttribute('colspan')]) {
             const headerText = row.textContent.trim();
             
-            // Start skipping if we encounter "ഒഴിവാക്കലുകൾ" (Deletions)
+            // Start skipping ONLY if we encounter "ഒഴിവാക്കലുകൾ" (Deletions)
             if (headerText.includes('ഒഴിവാക്കലുകൾ')) {
                 skipSection = true;
                 return;
             }
             
-            // Stop skipping if we encounter other sections after deletions
+            // Stop skipping when we encounter ANY other section (including തിരുത്തലുകൾ - Corrections)
             if (skipSection && (headerText.includes('കൂട്ടിച്ചേർക്കലുകൾ') || 
                                 headerText.includes('തിരുത്തലുകൾ') || 
                                 headerText.includes('പ്രവാസി വോട്ടർപട്ടിക'))) {
@@ -338,12 +338,12 @@ function parseTableToVoters(html) {
             return; // Skip header rows themselves
         }
         
-        // Skip rows in the deletion section
+        // Skip rows ONLY in the deletion section
         if (skipSection) {
             return;
         }
         
-        // Parse data rows with 7 columns
+        // Parse data rows with 7 columns (includes തിരുത്തലുകൾ section)
         if (cells.length >= 7) {
             const genderAge = cells[5]?.textContent.trim() || '';
             const genderAgeParts = genderAge.split('/').map(s => s.trim());
