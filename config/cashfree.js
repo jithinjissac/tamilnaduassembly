@@ -11,25 +11,21 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             return null;
         }
 
-        // Map environment string to Cashfree enum
-        let envMode;
-        if (environment === 'sandbox' || environment === 'test') {
-            envMode = Cashfree.Environment.SANDBOX;
-        } else {
-            envMode = Cashfree.Environment.PRODUCTION;
-        }
+        // Set global Cashfree credentials
+        Cashfree.XClientId = appId;
+        Cashfree.XClientSecret = secretKey;
+        // Use string values for environment - 'SANDBOX' or 'PRODUCTION'
+        Cashfree.XEnvironment = (environment === 'sandbox' || environment === 'test') 
+            ? 'SANDBOX' 
+            : 'PRODUCTION';
         
-        // Initialize with Cashfree v5+ constructor
-        cashfreeInstance = new Cashfree({
-            environment: envMode,
-            appId: appId,
-            secretKey: secretKey
-        });
+        cashfreeInstance = Cashfree;
         
-        console.log(`✅ Cashfree initialized successfully (${environment} mode, using ${environment === 'sandbox' ? 'sandbox' : 'production'} endpoint)`);
+        console.log(`✅ Cashfree initialized successfully (${environment} mode, XEnvironment: ${Cashfree.XEnvironment})`);
         return cashfreeInstance;
     } catch (error) {
         console.error('❌ Cashfree initialization failed:', error.message);
+        console.error('Error stack:', error.stack);
         cashfreeInstance = null;
         return null;
     }

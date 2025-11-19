@@ -103,6 +103,11 @@ app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
 // Serve voter slip examples
 app.use('/voter-slip-examples', express.static(path.join(__dirname, 'voter-slip-examples')));
 
+// Serve Razorpay verification page
+app.get('/razorpay-verification.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'razorpay-verification.html'));
+});
+
 // API Routes - Existing voter extraction
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
