@@ -104,6 +104,12 @@ export const createPaymentOrder = async (req, res) => {
 // Internal function for Cashfree order creation
 async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
     try {
+        console.log('🔧 Cashfree settings received:', {
+            hasAppId: !!cashfreeSettings.appId,
+            hasSecretKey: !!cashfreeSettings.secretKey,
+            environment: cashfreeSettings.environment
+        });
+
         // Initialize Cashfree with current settings
         const cashfree = initializeCashfree(
             cashfreeSettings.appId,
@@ -112,6 +118,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         );
 
         if (!cashfree) {
+            console.error('❌ Cashfree initialization failed - missing credentials');
             return res.status(503).json({ 
                 status: 'error',
                 message: 'Cashfree not configured. Please configure in Payment Settings.' 
@@ -191,7 +198,16 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         });
 
     } catch (error) {
-        console.error('Create Cashfree order error:', error);
+        console.error('❌ Create Cashfree order error:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            cashfreeSettings: {
+                hasAppId: !!cashfreeSettings.appId,
+                hasSecretKey: !!cashfreeSettings.secretKey,
+                environment: cashfreeSettings.environment
+            }
+        });
         throw error;
     }
 }
