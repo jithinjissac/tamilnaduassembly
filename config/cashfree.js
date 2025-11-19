@@ -11,11 +11,22 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             return null;
         }
 
-        // For Cashfree SDK v5+, we need to instantiate the class
-        const envMode = environment === 'sandbox' ? Cashfree.SANDBOX : Cashfree.PRODUCTION;
-        cashfreeInstance = new Cashfree(envMode, appId, secretKey);
+        // Map environment string to Cashfree enum
+        let envMode;
+        if (environment === 'sandbox' || environment === 'test') {
+            envMode = Cashfree.Environment.SANDBOX;
+        } else {
+            envMode = Cashfree.Environment.PRODUCTION;
+        }
         
-        console.log(`✅ Cashfree initialized successfully (${environment})`);
+        // Initialize with Cashfree v5+ constructor
+        cashfreeInstance = new Cashfree({
+            environment: envMode,
+            appId: appId,
+            secretKey: secretKey
+        });
+        
+        console.log(`✅ Cashfree initialized successfully (${environment} mode, using ${environment === 'sandbox' ? 'sandbox' : 'production'} endpoint)`);
         return cashfreeInstance;
     } catch (error) {
         console.error('❌ Cashfree initialization failed:', error.message);
