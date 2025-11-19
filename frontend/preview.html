@@ -452,11 +452,52 @@ s0.parentNode.insertBefore(s1,s0);
 
             .payment-section {
                 position: static;
-                order: 1;
+                order: 2;
             }
 
             .preview-section {
+                order: 1;
+            }
+
+            /* Show pay button right after preview on mobile */
+            .btn-payment {
+                order: 1.5;
+                margin: 1.5rem 0;
+            }
+
+            /* Reorder payment card children on mobile */
+            .payment-card {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .payment-card .btn-payment {
+                order: -1; /* Move button to top */
+                margin-bottom: 1.5rem;
+            }
+
+            .payment-card .payment-title {
+                order: 1;
+            }
+
+            .payment-card .order-summary {
                 order: 2;
+            }
+
+            .payment-card .price-breakdown {
+                order: 3;
+            }
+
+            .payment-card .secure-badge {
+                order: 4;
+            }
+
+            .payment-card .payment-icons {
+                order: 5;
+            }
+
+            .payment-card .features-list {
+                order: 6;
             }
 
             .container {
