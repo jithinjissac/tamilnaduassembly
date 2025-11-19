@@ -46,9 +46,12 @@ export const createFreshBrowser = async () => {
                         '--disable-dev-shm-usage',
                         '--disable-background-networking',
                         '--disable-default-apps',
-                        '--disable-extensions'
+                        '--disable-extensions',
+                        '--disable-gpu',
+                        '--disable-software-rasterizer',
+                        '--max-old-space-size=2048' // Increase memory for large PDFs
                     ],
-                    timeout: 30000 // 30 second timeout
+                    timeout: 120000 // 120 second timeout for large voter lists
                 });
                 console.log('✅ Fresh browser instance created successfully');
                 return browser;
@@ -130,8 +133,13 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         const page = await browser.newPage();
         await page.setBypassCSP(true);
         await page.setJavaScriptEnabled(false);
-        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
-        const pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
+        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
+        const pdf = await page.pdf({ 
+            format: 'A4', 
+            printBackground: true, 
+            margin: { top: 0, bottom: 0, left: 0, right: 0 },
+            timeout: 180000 // 3 minutes for large PDFs
+        });
         await page.close();
         await browser.close();
 
@@ -177,8 +185,13 @@ export const generatePDFBackground = async (order, orderId) => {
                 page = await browser.newPage();
                 await page.setBypassCSP(true);
                 await page.setJavaScriptEnabled(false);
-                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 120000 });
-                pdf = await page.pdf({ format: 'A4', printBackground: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
+                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
+                pdf = await page.pdf({ 
+                    format: 'A4', 
+                    printBackground: true, 
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                    timeout: 180000 // 3 minutes for large PDFs
+                });
                 await page.close();
                 await browser.close();
                 console.log(`✅ Background PDF generated successfully for ${orderId}`);
