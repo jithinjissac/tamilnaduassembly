@@ -12,20 +12,20 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             return null;
         }
 
-        // For Cashfree SDK v5, create new instance with configuration
+        // For Cashfree SDK v5, constructor takes positional parameters
         const cfEnvironment = (environment === 'sandbox' || environment === 'test') 
             ? CFEnvironment.SANDBOX 
             : CFEnvironment.PRODUCTION;
         
-        // Create new Cashfree instance
-        cashfreeInstance = new Cashfree({
-            XClientId: appId,
-            XClientSecret: secretKey,
-            XEnvironment: cfEnvironment,
-            XApiVersion: '2025-01-01'
-        });
+        // Create new Cashfree instance with positional parameters
+        // constructor(XEnvironment, XClientId, XClientSecret, XPartnerKey, XClientSignature, XPartnerMerchantId, XEnableErrorAnalytics, axios)
+        cashfreeInstance = new Cashfree(
+            cfEnvironment,  // XEnvironment
+            appId,          // XClientId
+            secretKey       // XClientSecret
+        );
         
-        console.log(`✅ Cashfree initialized successfully (${environment} mode, API version: 2025-01-01)`);
+        console.log(`✅ Cashfree initialized successfully (${environment} mode, env value: ${cfEnvironment})`);
         
         return cashfreeInstance;
     } catch (error) {
