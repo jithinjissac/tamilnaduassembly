@@ -173,7 +173,11 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     
     // Use slipsPerPage from order customization, default to 5
     const slipsPerPage = order.customization?.slipsPerPage || 5;
+    console.log(`\n📄 ========== GENERATE SLIP HTML ==========`);
     console.log(`📄 Using ${slipsPerPage} slips per page (from order.customization.slipsPerPage: ${order.customization?.slipsPerPage})`);
+    console.log(`📄 Voter range: ${startIndex} to ${endIndex || 'end'} (${voters.length} voters will be rendered)`);
+    console.log(`📄 Order ID: ${order.orderId}`);
+    console.log(`📄 ==========================================\n`);
     console.log(`🔍 Full customization object:`, JSON.stringify(order.customization, null, 2));
     
     // Use Malayalam name if available, otherwise English
@@ -540,6 +544,11 @@ export const generatePreview = async (req, res) => {
         const slipsPerPage = order.customization?.slipsPerPage || 5;
         const previewVoterLimit = slipsPerPage * 2; // 2 pages: 10 for 5/page, 12 for 6/page
 
+        console.log(`\n🎫 ========== PREVIEW GENERATION SLIPS PER PAGE ==========`);
+        console.log(`🎫 order.customization.slipsPerPage: ${order.customization?.slipsPerPage}`);
+        console.log(`🎫 Computed slipsPerPage: ${slipsPerPage}`);
+        console.log(`🎫 Preview voter limit: ${previewVoterLimit} (${slipsPerPage} × 2 pages)`);
+        console.log(`🎫 ========================================================\n`);
         console.log(`Generating HTML for preview (first ${previewVoterLimit} voters = 2 pages with ${slipsPerPage} slips/page)...`);
         console.log('Total voters in order:', order.voters.length);
         console.log('First voter sample:', JSON.stringify(order.voters[0], null, 2));
