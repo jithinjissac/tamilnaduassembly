@@ -1316,8 +1316,12 @@ s0.parentNode.insertBefore(s1,s0);
 
                 // Display order info immediately - no waiting
                 document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
-                document.getElementById('displayPartyName').textContent = 
-                    (orderData.customization && (orderData.customization.symbolName || orderData.customization.partyName)) || '-';
+                // Show Malayalam symbol name with English fallback
+                const symbolDisplay = orderData.customization?.symbolNameMalayalam || 
+                                     orderData.customization?.symbolName || 
+                                     orderData.customization?.partyName || 
+                                     '-';
+                document.getElementById('displayPartyName').textContent = symbolDisplay;
                 
                 // Display location with individual labels
                 if (orderData.location) {

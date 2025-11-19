@@ -159,7 +159,12 @@ export async function generateInvoice(order, user) {
 
             // Item row
             yPosition += 20;
-            const symbolName = sanitizeTextForPDF(order.customization?.symbolName || order.customization?.partyName);
+            // Use Malayalam symbol name with English fallback
+            const symbolName = sanitizeTextForPDF(
+                order.customization?.symbolNameMalayalam || 
+                order.customization?.symbolName || 
+                order.customization?.partyName
+            );
 
             // Build comprehensive description with location details (sanitized)
             let description = 'Voter Slip Generation\n';
