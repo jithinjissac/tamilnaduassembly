@@ -2004,19 +2004,13 @@ s0.parentNode.insertBefore(s1,s0);
                         <input type="text" id="bulkCaptchaInput" placeholder="Enter Captcha" 
                                style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="display: flex; gap: 1rem;">
-                            <button onclick="this.closest('div').parentElement.querySelector('#bulkCaptchaInput').value = ''; return false;" 
-                                    style="flex: 1; padding: 0.75rem; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                                Skip Station
-                            </button>
-                            <button id="submitBulkCaptcha" 
-                                    style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                                Continue
-                            </button>
-                        </div>
+                        <button id="submitBulkCaptcha" 
+                                style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05rem;">
+                            Continue
+                        </button>
                         
                         <p style="margin: 1rem 0 0 0; color: #718096; font-size: 0.85rem; text-align: center;">
-                            Press Enter to continue or click Skip to move to next station
+                            Press Enter to continue
                         </p>
                     </div>
                 `;
@@ -2038,12 +2032,6 @@ s0.parentNode.insertBefore(s1,s0);
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') submit();
                 });
-
-                // Skip button
-                modal.querySelector('button:first-of-type').onclick = () => {
-                    document.body.removeChild(modal);
-                    resolve(null);
-                };
             });
         }
 
