@@ -59,15 +59,15 @@ router.get('/prewarm-captcha', async (req, res) => {
       });
 
       try {
-        // Load SEC page
+        // Load SEC page with domcontentloaded for speed
         console.log('[PREWARM] Loading SEC page...');
         await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-          waitUntil: 'load',
-          timeout: 45000
+          waitUntil: 'domcontentloaded', // Faster than 'load'
+          timeout: 30000
         });
         
         console.log('[PREWARM] Page loaded, minimal stabilization...');
-        await page.waitForTimeout(200);
+        await page.waitForTimeout(100);
         
         // Verify captcha is present but don't screenshot yet
         const captchaExists = await page.$('img[src*="captcha"]');
@@ -224,8 +224,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         while (!pageLoaded && retries > 0) {
           try {
             await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-              waitUntil: 'load', // Faster than domcontentloaded - like normal browser
-              timeout: 45000 // Reduced to 45s - should be fast with optimizations
+              waitUntil: 'domcontentloaded', // Much faster than 'load'
+              timeout: 30000
             });
             pageLoaded = true;
             const pageLoadTime = Date.now() - pageLoadStartTime;
@@ -237,20 +237,12 @@ router.get('/initCaptchaSession', async (req, res) => {
             if (retries === 0) {
               throw new Error('SEC website is too slow. Please try again later.');
             }
-            await page.waitForTimeout(2000); // Wait before retry
+            await page.waitForTimeout(1000); // Reduced retry wait
           }
         }
 
-        console.log('[CAPTCHA] Page loaded, waiting for stabilization...');
-        await page.waitForTimeout(1000); // Page needs time to render captcha after load
-        
-        // Wait for network to be idle (captcha image fully loaded)
-        try {
-          await page.waitForLoadState('networkidle', { timeout: 5000 });
-          console.log('[CAPTCHA] Network idle - captcha should be ready');
-        } catch (e) {
-          console.log('[CAPTCHA] Network not idle yet, proceeding anyway...');
-        }
+        console.log('[CAPTCHA] Page loaded, waiting for captcha to render...');
+        await page.waitForTimeout(500); // Minimal wait for captcha rendering
 
         // Wait for captcha image to load - try multiple selectors with extended timeout
         const captchaSearchStartTime = Date.now();
@@ -271,7 +263,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 10000 // Captcha takes time to render after page load
+              timeout: 5000 // Reduced timeout for faster failure
             });
             captchaElement = await page.$(selector);
             if (captchaElement) {
