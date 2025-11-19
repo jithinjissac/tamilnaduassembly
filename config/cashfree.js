@@ -1,4 +1,5 @@
 import { Cashfree } from 'cashfree-pg';
+import { CFEnvironment } from 'cashfree-pg/dist/configuration';
 
 let cashfreeInstance = null;
 
@@ -11,17 +12,17 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             return null;
         }
 
-        // For Cashfree SDK v5, set credentials directly
+        // For Cashfree SDK v5, set credentials and configuration
         Cashfree.XClientId = appId;
         Cashfree.XClientSecret = secretKey;
-        // Use lowercase string values: 'sandbox' or 'production'
         Cashfree.XEnvironment = (environment === 'sandbox' || environment === 'test') 
-            ? 'sandbox' 
-            : 'production';
+            ? CFEnvironment.SANDBOX 
+            : CFEnvironment.PRODUCTION;
+        Cashfree.XApiVersion = '2025-01-01'; // Latest API version from SDK
         
         cashfreeInstance = Cashfree;
         
-        console.log(`✅ Cashfree initialized successfully (${Cashfree.XEnvironment} mode)`);
+        console.log(`✅ Cashfree initialized successfully (${environment} mode, API version: 2025-01-01)`);
         
         return cashfreeInstance;
     } catch (error) {
