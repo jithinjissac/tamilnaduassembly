@@ -484,9 +484,13 @@ export const generatePreview = async (req, res) => {
             hasLocation: !!order.location,
             customizationKeys: order.customization ? Object.keys(order.customization) : [],
             locationKeys: order.location ? Object.keys(order.location) : [],
-            slipsPerPage: order.customization?.slipsPerPage
+            slipsPerPage: order.customization?.slipsPerPage,
+            previewPdfFilename: order.previewPdfFilename,
+            permanentPdfFilename: order.permanentPdfFilename
         });
         console.log('🎫 Customization.slipsPerPage:', order.customization?.slipsPerPage);
+        console.log('📄 PreviewPdfFilename:', order.previewPdfFilename);
+        console.log('📄 PermanentPdfFilename:', order.permanentPdfFilename);
 
         // Ensure slipsPerPage is set (for backward compatibility with old orders)
         if (!order.customization.slipsPerPage) {
@@ -508,7 +512,8 @@ export const generatePreview = async (req, res) => {
         }
 
         // ✅ CHECK IF PREVIEW PDF ALREADY EXISTS (avoid re-generation)
-        if (order.previewPdfFilename) {
+        // Skip cache if previewPdfFilename is null or empty (indicates it was just cleared)
+        if (order.previewPdfFilename && order.previewPdfFilename.trim()) {
             const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
             const existingPath = path.join(tempDir, order.previewPdfFilename);
             if (fs.existsSync(existingPath)) {
@@ -524,6 +529,8 @@ export const generatePreview = async (req, res) => {
             } else {
                 console.log('⚠️ Preview filename in DB but file missing, regenerating...');
             }
+        } else {
+            console.log('🔄 No cached preview (previewPdfFilename is null/empty), generating fresh preview...');
         }
 
         // If Malayalam name is not in order, fetch it from Symbol model

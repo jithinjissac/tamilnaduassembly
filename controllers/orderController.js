@@ -331,7 +331,7 @@ export const updateSlipsPerPage = async (req, res) => {
 
         // Delete existing permanent PDF if it exists
         if (order.permanentPdfFilename) {
-            const pdfsDir = path.join(__dirname, '..', 'public', 'pdfs');
+            const pdfsDir = path.join(__dirname, '..', 'public', 'permanent-pdfs');
             const permanentPath = path.join(pdfsDir, order.permanentPdfFilename);
             
             try {
