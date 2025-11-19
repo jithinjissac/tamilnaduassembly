@@ -127,7 +127,7 @@ router.get('/initCaptchaSession', async (req, res) => {
     if (existingSession && existingSession.metadata?.prewarmed) {
       console.log(`[CAPTCHA] ⚡ Using pre-warmed session ${sessionId} - instant load!`);
       
-      // Just take screenshot from existing page
+      // Just download captcha image from existing page
       const result = await captchaQueue.add(async () => {
         const page = existingSession.page;
         const context = existingSession.context;
@@ -140,13 +140,38 @@ router.get('/initCaptchaSession', async (req, res) => {
           throw new Error('Captcha not found in pre-warmed session');
         }
         
-        // Take screenshot
+        // Get captcha image source URL
+        const captchaSrc = await captchaElement.getAttribute('src');
+        
+        // Download captcha image directly
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
         const captchaDir = path.dirname(captchaPath);
         await fs.promises.mkdir(captchaDir, { recursive: true });
-        await captchaElement.screenshot({ path: captchaPath });
         
-        console.log(`✅ [CAPTCHA] Instant screenshot from pre-warmed session`);
+        try {
+          // Resolve full URL
+          const fullCaptchaUrl = captchaSrc.startsWith('http') 
+            ? captchaSrc 
+            : `${SEC_BASE_URL}${captchaSrc.startsWith('/') ? captchaSrc : '/' + captchaSrc}`;
+          
+          // Download directly
+          const imageResponse = await page.goto(fullCaptchaUrl, { 
+            waitUntil: 'domcontentloaded',
+            timeout: 10000 
+          });
+          
+          if (imageResponse && imageResponse.ok()) {
+            const imageBuffer = await imageResponse.body();
+            await fs.promises.writeFile(captchaPath, imageBuffer);
+            console.log(`✅ [CAPTCHA] Instant captcha download from pre-warmed session`);
+          } else {
+            // Fallback to screenshot
+            await captchaElement.screenshot({ path: captchaPath });
+          }
+        } catch (err) {
+          // Fallback to screenshot
+          await captchaElement.screenshot({ path: captchaPath });
+        }
         
         // Update session - no longer pre-warmed, now active
         sessionManager.updateSession(sessionId, {
@@ -241,14 +266,16 @@ router.get('/initCaptchaSession', async (req, res) => {
           }
         }
 
-        console.log('[CAPTCHA] Page loaded, waiting for captcha to render...');
-        await page.waitForTimeout(500); // Minimal wait for captcha rendering
-
-        // Wait for captcha image to load - try multiple selectors with extended timeout
+        console.log('[CAPTCHA] Page loaded, waiting for captcha to appear...');
+        
+        // Wait for captcha image to load - try multiple selectors
+        // Don't wait for full page load, just wait for captcha to appear
         const captchaSearchStartTime = Date.now();
         console.log('[CAPTCHA] Waiting for captcha image...');
         
         let captchaElement = null;
+        let captchaSrc = null;
+        
         // Reordered for fastest detection - most reliable selector first
         const captchaSelectors = [
           'img[src*="captcha"]',           // Fastest & most reliable
@@ -261,14 +288,18 @@ router.get('/initCaptchaSession', async (req, res) => {
         for (const selector of captchaSelectors) {
           try {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
-            await page.waitForSelector(selector, { 
-              state: 'visible',
-              timeout: 5000 // Reduced timeout for faster failure
+            // Wait for captcha to appear (no need for full page load)
+            captchaElement = await page.waitForSelector(selector, { 
+              state: 'attached', // Just need it in DOM, not necessarily visible
+              timeout: 5000
             });
-            captchaElement = await page.$(selector);
+            
             if (captchaElement) {
+              // Get the image source URL
+              captchaSrc = await captchaElement.getAttribute('src');
               const captchaSearchTime = Date.now() - captchaSearchStartTime;
               console.log(`[CAPTCHA] ⏱️  Found captcha with selector: ${selector} in ${captchaSearchTime}ms`);
+              console.log(`[CAPTCHA] Captcha source URL:`, captchaSrc);
               break;
             }
           } catch (e) {
@@ -276,13 +307,7 @@ router.get('/initCaptchaSession', async (req, res) => {
           }
         }
         
-        if (!captchaElement) {
-          // Try finding any image near the captcha input field
-          console.log('[CAPTCHA] Trying to find image near captcha input...');
-          captchaElement = await page.$('label[for="view_voters_list_captcha"] ~ img, #view_voters_list_captcha ~ img, .form-group:has(#view_voters_list_captcha) img');
-        }
-
-        if (!captchaElement) {
+        if (!captchaElement || !captchaSrc) {
           // Last resort: take screenshot of entire page for debugging
           const debugPath = path.join(__dirname, '..', 'public', 'captcha-cache', `debug-${sessionId}.png`);
           await page.screenshot({ path: debugPath, fullPage: true });
@@ -290,22 +315,50 @@ router.get('/initCaptchaSession', async (req, res) => {
           throw new Error('Captcha image not found on page. Debug screenshot saved.');
         }
 
-        // Take screenshot of the captcha element only
-        const screenshotStartTime = Date.now();
+        // Download captcha image directly from source instead of taking screenshot
+        const downloadStartTime = Date.now();
         const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-        console.log('[CAPTCHA] Taking screenshot to:', captchaPath);
+        console.log('[CAPTCHA] Downloading captcha image to:', captchaPath);
         
-        // Ensure directory exists (concurrent with screenshot)
+        // Ensure directory exists
         const captchaDir = path.dirname(captchaPath);
-        const dirPromise = fs.promises.mkdir(captchaDir, { recursive: true }).catch(() => {});
+        await fs.promises.mkdir(captchaDir, { recursive: true });
 
-        // Take screenshot immediately (don't wait for dir check)
-        const screenshotPromise = captchaElement.screenshot({ path: captchaPath });
-        
-        // Wait for both
-        await Promise.all([dirPromise, screenshotPromise]);
-        const screenshotTime = Date.now() - screenshotStartTime;
-        console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
+        try {
+          // Resolve relative URL if needed
+          const fullCaptchaUrl = captchaSrc.startsWith('http') 
+            ? captchaSrc 
+            : `${SEC_BASE_URL}${captchaSrc.startsWith('/') ? captchaSrc : '/' + captchaSrc}`;
+          
+          console.log('[CAPTCHA] Downloading from:', fullCaptchaUrl);
+          
+          // Download the image directly using page.goto to leverage the same session
+          const imageResponse = await page.goto(fullCaptchaUrl, { 
+            waitUntil: 'domcontentloaded',
+            timeout: 10000 
+          });
+          
+          if (imageResponse && imageResponse.ok()) {
+            const imageBuffer = await imageResponse.body();
+            await fs.promises.writeFile(captchaPath, imageBuffer);
+            const downloadTime = Date.now() - downloadStartTime;
+            console.log(`✅ Captcha image downloaded: captcha-${sessionId}.png (took ${downloadTime}ms)`);
+          } else {
+            throw new Error('Failed to download captcha image');
+          }
+        } catch (downloadError) {
+          console.log('⚠️ Failed to download captcha directly, falling back to screenshot...');
+          // Fallback: navigate back and take screenshot
+          await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
+            waitUntil: 'domcontentloaded',
+            timeout: 30000
+          });
+          await page.waitForTimeout(300);
+          captchaElement = await page.$(captchaSelectors[0]);
+          if (captchaElement) {
+            await captchaElement.screenshot({ path: captchaPath });
+          }
+        }
 
         const totalTime = Date.now() - startTime;
         console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
