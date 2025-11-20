@@ -17,8 +17,9 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             ? CFEnvironment.SANDBOX 
             : CFEnvironment.PRODUCTION;
         
-        // Set the API version to stable 2023-08-01 instead of 2025-01-01
-        Cashfree.XApiVersion = "2023-08-01";
+        // Set the API version to 2024-01-01 (latest stable as of SDK v5.1.0)
+        // Previous versions: 2023-08-01 (stable), 2022-09-01 (legacy)
+        Cashfree.XApiVersion = "2024-01-01";
         
         // Create new Cashfree instance with positional parameters
         // constructor(XEnvironment, XClientId, XClientSecret, XPartnerKey, XClientSignature, XPartnerMerchantId, XEnableErrorAnalytics, axios)
