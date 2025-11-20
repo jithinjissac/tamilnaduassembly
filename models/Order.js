@@ -69,7 +69,8 @@ const OrderSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        pollingStationName: String
+        pollingStationName: String,
+        pollingStationMalayalam: String
     },
     voters: [{
         sl_no: String,
