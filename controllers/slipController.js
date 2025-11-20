@@ -189,7 +189,11 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         ? order.customization.symbolName
         : (order.customization.symbolName?.name || '');
     const displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
-    const pollingStation = order.location.pollingStationName || order.location.pollingStation;
+    
+    // Use Malayalam polling station name with fallback to current fields
+    const pollingStation = order.location.pollingStationMalayalam || 
+                          order.location.pollingStationName || 
+                          order.location.pollingStation;
     const wardName = order.location.wardName || order.location.ward;
     
     // Convert symbol to base64 ONCE (not per slip)
@@ -1140,7 +1144,7 @@ export const downloadSlip = async (req, res) => {
             const contentStartTime = Date.now();
             await page.setContent(html, { 
                 waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
-                timeout: 120000  // 2 minutes
+                timeout: 180000  // 2 minutes
             });
             console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
             
@@ -1150,7 +1154,7 @@ export const downloadSlip = async (req, res) => {
                 format: 'A4',
                 printBackground: true,
                 margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                timeout: 120000
+                timeout: 180000
             });
             console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
             console.log('PDF size:', (pdf.length / 1024 / 1024).toFixed(2), 'MB');
