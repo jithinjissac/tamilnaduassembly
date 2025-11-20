@@ -1679,12 +1679,19 @@ s0.parentNode.insertBefore(s1,s0);
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(extractData.html, 'text/html');
                     
+                    // DEBUG: Log HTML to see if polling station dropdown is present
+                    console.log('🔍 HTML response length:', extractData.html.length);
+                    console.log('🔍 HTML contains "pollingStation"?', extractData.html.includes('pollingStation'));
+                    console.log('🔍 HTML contains "പോളിംഗ്"?', extractData.html.includes('പോളിംഗ്'));
+                    
                     // Extract voter data from the HTML table
                     const parseResult = parseVotersFromHTML(doc);
                     extractedVoters = parseResult.voters;
                     const malayalamPollingStationName = parseResult.pollingStationName;
                     
+                    console.log('🔍 Parse result:', parseResult);
                     console.log('🔍 Extracted Malayalam polling station name:', malayalamPollingStationName);
+                    console.log('🔍 Type of malayalamPollingStationName:', typeof malayalamPollingStationName);
                     console.log('🔍 Sample voter before adding station name:', extractedVoters[0]);
                     
                     // Add Malayalam polling station name to each voter
