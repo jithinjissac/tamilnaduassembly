@@ -1,8 +1,23 @@
 import express from 'express';
 import { chromium } from 'playwright';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
+
+// Create debug screenshots directory if it doesn't exist
+const debugDir = path.join(__dirname, '..', 'public', 'debug-screenshots');
+if (!fs.existsSync(debugDir)) {
+  fs.mkdirSync(debugDir, { recursive: true });
+  console.log('[PLAYWRIGHT_STATIONS] Created debug directory:', debugDir);
+} else {
+  console.log('[PLAYWRIGHT_STATIONS] Debug directory exists:', debugDir);
+}
 
 // Simple in-memory cache for Malayalam polling stations
 // Key: `${district}|${localBody}|${ward}` => { stations: [...], cachedAt }
@@ -106,6 +121,12 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
     // ===== NEW APPROACH: Submit initial form to get Malayalam polling stations =====
     console.log('[PLAYWRIGHT_STATIONS] Submitting initial form to reveal Malayalam polling stations...');
     
+    // Take screenshot BEFORE form submission
+    const timestamp = Date.now();
+    const screenshotBefore = path.join(debugDir, `polling-before-submit-${timestamp}.png`);
+    await page.screenshot({ path: screenshotBefore, fullPage: true });
+    console.log('[PLAYWRIGHT_STATIONS] Screenshot BEFORE submission saved:', screenshotBefore);
+    
     // Fill in a dummy captcha (or try to submit without it if possible)
     try {
       // Select first polling station option
@@ -137,9 +158,22 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
         // Wait for either success page or error response
         await page.waitForTimeout(3000);
         
+        // Take screenshot AFTER form submission
+        const screenshotAfter = path.join(debugDir, `polling-after-submit-${timestamp}.png`);
+        await page.screenshot({ path: screenshotAfter, fullPage: true });
+        console.log('[PLAYWRIGHT_STATIONS] Screenshot AFTER submission saved:', screenshotAfter);
+        
+        // Save page HTML for inspection
+        const htmlContent = await page.content();
+        const htmlFile = path.join(debugDir, `polling-response-${timestamp}.html`);
+        fs.writeFileSync(htmlFile, htmlContent, 'utf8');
+        console.log('[PLAYWRIGHT_STATIONS] HTML response saved:', htmlFile);
+        
         // Check if form2 appeared or if there's new content with polling station data
         const hasForm2 = await page.$('#form2');
         const hasError = await page.$('.alert-danger, .error-message');
+        
+        console.log('[PLAYWRIGHT_STATIONS] Page status - hasForm2:', !!hasForm2, 'hasError:', !!hasError);
         
         if (hasForm2) {
           console.log('[PLAYWRIGHT_STATIONS] Form2 detected - extracting polling stations from response');
@@ -178,9 +212,43 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
           
           console.log('[PLAYWRIGHT_STATIONS] Response data:', JSON.stringify(pollingStationFromResponse, null, 2));
         }
+        
+        // Extract all form fields and visible text for analysis
+        const pageAnalysis = await page.evaluate(() => {
+          // Get all form fields
+          const formFields = [];
+          document.querySelectorAll('input, select, textarea').forEach(el => {
+            const name = el.name || el.id || 'unnamed';
+            const value = el.value || el.textContent?.trim();
+            const type = el.type || el.tagName.toLowerCase();
+            if (value) {
+              formFields.push({ name, value, type, hasMalayalam: /[\u0D00-\u0D7F]/.test(value) });
+            }
+          });
+          
+          // Get visible text with Malayalam
+          const visibleText = [];
+          document.querySelectorAll('div, p, span, td, th, label').forEach(el => {
+            const text = el.textContent?.trim();
+            if (text && text.length > 5 && /[\u0D00-\u0D7F]/.test(text)) {
+              const classes = el.className || '';
+              const id = el.id || '';
+              visibleText.push({ text: text.substring(0, 100), classes, id });
+            }
+          });
+          
+          return { formFields, visibleText: visibleText.slice(0, 20) };
+        });
+        
+        console.log('[PLAYWRIGHT_STATIONS] Page analysis:', JSON.stringify(pageAnalysis, null, 2));
       }
     } catch (submitError) {
       console.log('[PLAYWRIGHT_STATIONS] Form submission for Malayalam extraction failed (expected):', submitError.message);
+      
+      // Take error screenshot
+      const screenshotError = path.join(debugDir, `polling-error-${timestamp}.png`);
+      await page.screenshot({ path: screenshotError, fullPage: true });
+      console.log('[PLAYWRIGHT_STATIONS] Error screenshot saved:', screenshotError);
     }
     // ===== END NEW APPROACH =====
 

@@ -69,7 +69,8 @@ router.post('/extractVoters', async (req, res) => {
       polling_station,
       language: language === 'E' ? 'English' : language === 'M' ? 'Malayalam' : language === 'T' ? 'Tamil' : 'Kannada',
       total_voters: result.voters.length,
-      voters: result.voters
+      voters: result.voters,
+      pollingStationMalayalam: result.pollingStationMalayalam || null
     });
 
   } catch (error) {

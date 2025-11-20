@@ -1692,12 +1692,17 @@ s0.parentNode.insertBefore(s1,s0);
                     const parseResult = parseVotersFromHTML(doc);
                     extractedVoters = parseResult.voters;
                     
-                    // ✅ USE POLLING STATION TEXT FROM FRONTEND DROPDOWN (not from HTML response)
-                    // The SEC response HTML doesn't include the form dropdown, only the voter table
-                    const malayalamPollingStationName = selectedStations.length === 1 ? selectedStations[0].text : null;
+                    // ✅ USE POLLING STATION TEXT FROM API RESPONSE (Malayalam) OR FRONTEND DROPDOWN (fallback)
+                    // Priority: 1. API response (Malayalam), 2. Frontend dropdown text, 3. null
+                    const malayalamPollingStationName = 
+                        extractData.pollingStationMalayalam || 
+                        (selectedStations.length === 1 ? selectedStations[0].text : null) || 
+                        null;
                     
                     console.log('🔍 Parse result pollingStationName from HTML:', parseResult.pollingStationName);
-                    console.log('✅ Using polling station from frontend dropdown:', malayalamPollingStationName);
+                    console.log('✅ API response Malayalam name:', extractData.pollingStationMalayalam);
+                    console.log('✅ Frontend dropdown text (fallback):', selectedStations.length === 1 ? selectedStations[0].text : null);
+                    console.log('✅ Final Malayalam polling station name:', malayalamPollingStationName);
                     
                     console.log('🔍 Parse result:', parseResult);
                     console.log('🔍 Extracted Malayalam polling station name:', malayalamPollingStationName);

@@ -23,7 +23,7 @@ export async function extractVoterList(params) {
   try {
     console.log('Launching browser...');
     browser = await chromium.launch({ 
-      headless: true,
+      headless: false, // Set to false to see browser GUI
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
@@ -33,24 +33,23 @@ export async function extractVoterList(params) {
 
     page = await context.newPage();
 
-    // Set cookies including Malayalam locale BEFORE navigating
-    console.log('Setting cookies with Malayalam locale...');
-    await context.addCookies([
-      {
-        name: 'set_locale',
-        value: 'ml',
-        domain: '.sec.kerala.gov.in',
-        path: '/'
-      },
-      {
-        name: 'device_view',
-        value: 'full',
-        domain: '.sec.kerala.gov.in',
-        path: '/'
-      }
-    ]);
-
-    console.log('Navigating to SEC voter list page with Malayalam locale...');
+    // First, navigate to home page with Malayalam locale parameter to set cookie
+    console.log('Setting locale to Malayalam via URL parameter...');
+    await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
+      waitUntil: 'networkidle',
+      timeout: 60000 
+    });
+    
+    console.log('Malayalam locale set via URL, waiting...');
+    await page.waitForTimeout(2000);
+    
+    // Verify cookie is set
+    const cookies = await context.cookies();
+    const localeCookie = cookies.find(c => c.name === 'set_locale');
+    console.log('📍 Locale cookie:', localeCookie ? localeCookie.value : 'NOT SET');
+    
+    // Now navigate to the voter list page - it will be in Malayalam
+    console.log('Navigating to SEC voter list page (should be in Malayalam now)...');
     await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
       waitUntil: 'networkidle',
       timeout: 60000 
@@ -144,21 +143,23 @@ export async function extractVoterList(params) {
     console.log('Submitting form data...');
     
     // Submit the form using page.evaluate to make XHR request
-    const submitResult = await page.evaluate(async (url, data) => {
-      const response = await fetch(url, {
+    const submitResult = await page.evaluate(async (params) => {
+      const response = await fetch(params.url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'X-Requested-With': 'XMLHttpRequest'
+          'X-Requested-With': 'XMLHttpRequest',
+          'Cookie': 'set_locale=ml' // Include Malayalam locale in request
         },
-        body: data
+        body: params.data,
+        credentials: 'include' // Include cookies in request
       });
       return {
         ok: response.ok,
         status: response.status,
         html: await response.text()
       };
-    }, `${SEC_BASE_URL}/public/voters/list`, formData.toString());
+    }, { url: `${SEC_BASE_URL}/public/voters/list`, data: formData.toString() });
 
     if (!submitResult.ok) {
       throw new Error(`Form submission failed with status ${submitResult.status}`);
@@ -170,6 +171,27 @@ export async function extractVoterList(params) {
     const fs = await import('fs');
     await fs.promises.writeFile('response.html', submitResult.html, 'utf-8');
     console.log('Response HTML saved to response.html');
+    
+    // Inject the response HTML into the page to see the rendered form with Malayalam
+    try {
+      console.log('Injecting response HTML into page for screenshot...');
+      await page.evaluate((html) => {
+        // Create a container for the response
+        const container = document.createElement('div');
+        container.id = 'response-preview';
+        container.innerHTML = html;
+        document.body.appendChild(container);
+      }, submitResult.html);
+      
+      await page.waitForTimeout(2000); // Wait for page to fully render
+      
+      // Take screenshot after form submission and page load
+      const timestamp = Date.now();
+      await page.screenshot({ path: `after-submit-${timestamp}.png`, fullPage: true });
+      console.log(`📸 Screenshot saved after submission: after-submit-${timestamp}.png`);
+    } catch (screenshotError) {
+      console.error('Failed to save screenshot:', screenshotError);
+    }
     
     // The response should contain the voter list HTML
     // Parse it directly instead of waiting for page reload
@@ -193,7 +215,67 @@ export async function extractVoterList(params) {
 
     console.log(`Successfully extracted ${voters.length} voters`);
 
-    return { voters };
+    // Extract Malayalam polling station name from the response HTML
+    let pollingStationMalayalam = null;
+    try {
+      const cheerio = await import('cheerio');
+      const $ = cheerio.load(submitResult.html);
+      
+      console.log('Attempting to extract Malayalam polling station from response...');
+      
+      // Method 1: Look for polling station in headings or strong text
+      const headings = $('h1, h2, h3, h4, h5, strong, b').toArray();
+      for (const heading of headings) {
+        const text = $(heading).text().trim();
+        // Look for text that contains polling station patterns
+        if (text.includes('പോളിംഗ്') || text.match(/^\d{3}\s*-\s*/)) {
+          pollingStationMalayalam = text;
+          console.log('📍 Found Malayalam polling station in heading:', pollingStationMalayalam);
+          break;
+        }
+      }
+      
+      // Method 2: Look for the form with the selected polling station
+      if (!pollingStationMalayalam) {
+        const selectedOption = $('#view_voters_list_pollingStation option[selected]');
+        if (selectedOption.length > 0) {
+          pollingStationMalayalam = selectedOption.text().trim();
+          console.log('📍 Found Malayalam polling station in selected option:', pollingStationMalayalam);
+        } else {
+          // Try to find it by matching the polling_station value
+          const allOptions = $('#view_voters_list_pollingStation option');
+          allOptions.each((i, el) => {
+            const optionValue = $(el).attr('value');
+            if (optionValue === polling_station) {
+              pollingStationMalayalam = $(el).text().trim();
+              console.log('📍 Found Malayalam polling station by matching value:', pollingStationMalayalam);
+              return false; // break
+            }
+          });
+        }
+      }
+      
+      // Method 3: Look in table caption or station info elements
+      if (!pollingStationMalayalam) {
+        const caption = $('table caption, .polling-station-name, .station-info').text().trim();
+        if (caption && caption.length > 0) {
+          pollingStationMalayalam = caption;
+          console.log('📍 Found Malayalam polling station in caption:', pollingStationMalayalam);
+        }
+      }
+      
+      if (!pollingStationMalayalam) {
+        console.log('⚠️ Could not find Malayalam polling station name in response');
+        console.log('Response HTML snippet:', submitResult.html.substring(0, 1000));
+      }
+    } catch (parseError) {
+      console.error('Failed to parse Malayalam polling station:', parseError);
+    }
+
+    return { 
+      voters,
+      pollingStationMalayalam // Return the Malayalam polling station name from response
+    };
 
   } catch (error) {
     console.error('Playwright extraction error:', error);

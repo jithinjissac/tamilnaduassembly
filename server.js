@@ -65,6 +65,9 @@ app.get('/sitemap.xml', (req, res) => {
 // Serve captcha cache directory
 app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache')));
 
+// Serve debug screenshots directory
+app.use('/debug-screenshots', express.static(path.join(__dirname, 'public', 'debug-screenshots')));
+
 // REMOVED: temp-pdfs is now protected through API routes only
 // Access PDFs through /api/slips/preview-pdf/:filename with authentication
 
@@ -116,6 +119,10 @@ app.get('/razorpay-verification.html', (req, res) => {
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
+
+// Playwright Stations Route (Malayalam polling stations)
+import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
+app.use('/api', playwrightStationsRoutes);
 
 // Root route
 app.get('/', (req, res) => {

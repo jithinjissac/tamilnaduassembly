@@ -214,12 +214,24 @@ router.get('/initCaptchaSession', async (req, res) => {
       });
 
       try {
-        // Skip cookie setting for speed - page works without it
-        // Saves ~200ms per captcha load
+        // First, navigate to home page and set Malayalam locale by actually navigating to it
+        console.log('[CAPTCHA] Setting locale to Malayalam...');
+        await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
+          waitUntil: 'domcontentloaded',
+          timeout: 60000 
+        });
+        
+        console.log('[CAPTCHA] Malayalam locale set via URL, waiting...');
+        await page.waitForTimeout(1000);
+        
+        // Verify cookie is set
+        const cookies = await page.context().cookies();
+        const localeCookie = cookies.find(c => c.name === 'set_locale');
+        console.log('[CAPTCHA] 📍 Locale cookie:', localeCookie ? localeCookie.value : 'NOT SET');
 
         // Navigate to the page with extended timeout and retry logic
         const pageLoadStartTime = Date.now();
-        console.log('[CAPTCHA] Loading SEC page...');
+        console.log('[CAPTCHA] Loading SEC voter list page in Malayalam...');
         let pageLoaded = false;
         let retries = 3;
         
@@ -474,6 +486,33 @@ router.post('/submitWithCaptcha', async (req, res) => {
     await page.selectOption('#view_voters_list_pollingStation', polling_station);
     await page.waitForTimeout(100); // Reduced for speed
 
+    // ✅ EXTRACT MALAYALAM POLLING STATION NAME HERE - AFTER locale set and option selected
+    // The page is already in Malayalam locale, and the option text is in Malayalam
+    let pollingStationMalayalam = null;
+    try {
+      // Wait a bit for Chosen.js to update the dropdown
+      await page.waitForTimeout(500);
+      
+      pollingStationMalayalam = await page.$eval(
+        `#view_voters_list_pollingStation option[value="${polling_station}"]`,
+        el => el.textContent.trim()
+      );
+      console.log('[CAPTCHA] 📍 Malayalam Polling Station extracted from page (AFTER locale set):', pollingStationMalayalam);
+    } catch (extractError) {
+      console.error('[CAPTCHA] Failed to extract Malayalam polling station from page:', extractError);
+      
+      // Try to debug - log all options
+      try {
+        const allOptions = await page.$$eval(
+          '#view_voters_list_pollingStation option',
+          options => options.map(opt => ({ value: opt.value, text: opt.textContent.trim().substring(0, 50) }))
+        );
+        console.log('[CAPTCHA] Available polling station options:', JSON.stringify(allOptions.slice(0, 5), null, 2));
+      } catch (debugErr) {
+        console.error('[CAPTCHA] Could not debug options:', debugErr.message);
+      }
+    }
+
     // Select language
     console.log('[CAPTCHA] Selecting language...');
     await page.selectOption('#view_voters_list_language', language);
@@ -500,75 +539,36 @@ router.post('/submitWithCaptcha', async (req, res) => {
       'view_voters_list[_token]': csrfToken
     });
 
-    const submitResult = await page.evaluate(async (params) => {
-      const response = await fetch(params.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: params.data
-      });
-      const text = await response.text();
-      
-      // Try to parse as JSON first
-      let jsonData = null;
-      try {
-        jsonData = JSON.parse(text);
-      } catch (e) {
-        // Not JSON, it's HTML
-      }
-      
-      return {
-        ok: response.ok,
-        status: response.status,
-        html: text,
-        json: jsonData
-      };
-    }, { url: `${SEC_BASE_URL}/public/voters/list`, data: formData.toString() });
+    // Click the submit button instead of using XHR in evaluate
+    // This allows the page to naturally update with the response
+    console.log('[CAPTCHA] Clicking submit button...');
+    await page.click('button[data-success-path="/public/voters/list"]');
+    
+    // Wait for the page to update with the response
+    // The page will update .ajxpos div with voter data and update the form
+    console.log('[CAPTCHA] ⏳ Waiting for page to update with response...');
+    await page.waitForTimeout(3000); // Give time for XHR response and DOM update
+    
+    // Get the entire page HTML after it's been updated
+    const submitResult = {
+      ok: true,
+      status: 200,
+      html: await page.content()
+    };
 
     console.log('[CAPTCHA] Form submission result:', submitResult.status);
     console.log('[CAPTCHA] Response HTML length:', submitResult.html.length);
-    
-    // Check if response is JSON with error
-    if (submitResult.json) {
-      console.log('[CAPTCHA] JSON Response status:', submitResult.json.status);
-      
-      if (submitResult.json.status === 'danger' || submitResult.json.status === 'error') {
-        // Cleanup session
-        await sessionManager.cleanup(sessionId);
-        
-        // Delete captcha file
-        const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-        if (fs.existsSync(captchaPath)) {
-          fs.unlinkSync(captchaPath);
-        }
-        
-        return res.status(400).json({
-          status: 'error',
-          message: submitResult.json.message || 'Captcha validation failed. Please try again.'
-        });
-      }
-      
-      // If status is success, extract the voter HTML from form2
-      if (submitResult.json.status === 'success' && submitResult.json.form2) {
-        console.log('[CAPTCHA] Success! Extracting voter data from form2');
-        submitResult.html = submitResult.json.form2;
-      }
-    }
-    
-    console.log('[CAPTCHA] Response preview:', submitResult.html.substring(0, 500));
-
-    // Cleanup session after use
-    await sessionManager.cleanup(sessionId);
-
-    // Delete captcha file
-    const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-    if (fs.existsSync(captchaPath)) {
-      fs.unlinkSync(captchaPath);
-    }
 
     if (!submitResult.ok) {
+      // Cleanup before returning error
+      await sessionManager.cleanup(sessionId);
+      
+      // Delete captcha file
+      const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+      if (fs.existsSync(captchaPath)) {
+        fs.unlinkSync(captchaPath);
+      }
+      
       return res.status(400).json({
         status: 'error',
         message: `Form submission failed with status ${submitResult.status}`,
@@ -583,10 +583,54 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     console.log('[CAPTCHA] Has voter table indicators:', hasVoterTable);
 
+    // After form submission, the ENTIRE response HTML contains the updated form with Malayalam
+    // Extract Malayalam polling station from the response HTML, not from the page
+    console.log('[CAPTCHA] 🔍 Extracting Malayalam polling station from response HTML...');
+    try {
+      const cheerio = await import('cheerio');
+      const $ = cheerio.load(submitResult.html);
+      
+      // Find the selected polling station option
+      const selectedOption = $(`#view_voters_list_pollingStation option[selected="selected"]`);
+      if (selectedOption.length > 0) {
+        pollingStationMalayalam = selectedOption.text().trim();
+        console.log('[CAPTCHA] 📍 ✅ Malayalam Polling Station from response HTML:', pollingStationMalayalam);
+      } else {
+        // Fallback: try to find by value
+        const optionByValue = $(`#view_voters_list_pollingStation option[value="${polling_station}"]`);
+        if (optionByValue.length > 0) {
+          pollingStationMalayalam = optionByValue.text().trim();
+          console.log('[CAPTCHA] 📍 ✅ Malayalam Polling Station (by value):', pollingStationMalayalam);
+        } else {
+          console.log('[CAPTCHA] ⚠️ Could not find polling station in response HTML');
+          // Log available options for debugging
+          const allOptions = $(`#view_voters_list_pollingStation option`);
+          console.log('[CAPTCHA] Available options count:', allOptions.length);
+          allOptions.each((i, el) => {
+            if (i < 3) { // Log first 3 for debugging
+              console.log(`[CAPTCHA]   Option ${i}: value="${$(el).attr('value')}", text="${$(el).text().trim().substring(0, 50)}"`);
+            }
+          });
+        }
+      }
+    } catch (parseError) {
+      console.error('[CAPTCHA] ❌ Failed to parse Malayalam from response:', parseError.message);
+    }
+
+    // NOW cleanup session after extraction is complete
+    await sessionManager.cleanup(sessionId);
+
+    // Delete captcha file
+    const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+    if (fs.existsSync(captchaPath)) {
+      fs.unlinkSync(captchaPath);
+    }
+
     // Return the HTML response to be parsed
     res.json({
       status: 'success',
-      html: submitResult.html
+      html: submitResult.html,
+      pollingStationMalayalam: pollingStationMalayalam || null
     });
 
   } catch (error) {
