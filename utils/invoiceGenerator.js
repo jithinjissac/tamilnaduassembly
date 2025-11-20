@@ -49,16 +49,30 @@ export async function generateInvoice(order, user) {
 
             // Try to register Noto Sans Malayalam if available in assets/fonts
             const notoFontPath = path.join(process.cwd(), 'assets', 'fonts', 'NotoSansMalayalam-Regular.ttf');
-            let contentFont = 'Helvetica';
+            let hasMalayalamFont = false;
             try {
                if (fs.existsSync(notoFontPath)) {
                   doc.registerFont('NotoSansMalayalam', notoFontPath);
-                  contentFont = 'NotoSansMalayalam';
+                  hasMalayalamFont = true;
                }
             } catch (e) {
                // fallback to Helvetica if anything goes wrong
-               contentFont = 'Helvetica';
+               hasMalayalamFont = false;
             }
+            
+            // Helper function to detect if text contains Malayalam characters
+            const hasMalayalamChars = (text) => {
+                if (!text) return false;
+                return /[\u0D00-\u0D7F]/.test(text);
+            };
+            
+            // Helper function to select appropriate font based on content
+            const selectFont = (text, isBold = false) => {
+                if (hasMalayalamFont && hasMalayalamChars(text)) {
+                    return 'NotoSansMalayalam';
+                }
+                return isBold ? 'Helvetica-Bold' : 'Helvetica';
+            };
 
             // Header with Kerala theme colors
             doc.rect(0, 0, doc.page.width, 150).fill('#667eea');
@@ -92,9 +106,10 @@ export async function generateInvoice(order, user) {
                .text('BILL TO:', 50, yPosition);
             
             yPosition += 20;
+            const userName = user.name || 'N/A';
             doc.fontSize(11)
-               .font(contentFont) // Use contentFont for user name (may contain Malayalam)
-               .text(user.name || 'N/A', 50, yPosition);
+               .font(selectFont(userName)) // Use appropriate font for user name
+               .text(userName, 50, yPosition);
             
             doc.font('Helvetica') // Switch back to Helvetica for email/phone
                .text(user.email || 'N/A', 50, yPosition + 15)
@@ -119,16 +134,14 @@ export async function generateInvoice(order, user) {
                 const ward = sanitizeTextForPDF(order.location.wardName || order.location.ward);
                 
                 yPosition += 30;
-                doc.font('Helvetica').text(`District: ${district}`, doc.page.width / 2, yPosition);
+                doc.font(selectFont(district)).text(`District: ${district}`, doc.page.width / 2, yPosition);
+                  
+                yPosition += 15;
+                doc.font(selectFont(localBody)).text(`Local Body: ${localBody}`, doc.page.width / 2, yPosition);
                 
                 yPosition += 15;
-                doc.font('Helvetica').text(`Local Body: ${localBody}`, doc.page.width / 2, yPosition);
-                
-                yPosition += 15;
-                doc.font('Helvetica').text(`Ward: ${ward}`, doc.page.width / 2, yPosition);
-            }
-            
-            doc.font('Helvetica').text(`Payment Gateway: ${paymentGateway}`, doc.page.width / 2, yPosition + 30);
+                doc.font(selectFont(ward)).text(`Ward: ${ward}`, doc.page.width / 2, yPosition);
+            }            doc.font('Helvetica').text(`Payment Gateway: ${paymentGateway}`, doc.page.width / 2, yPosition + 30);
 
             // Line separator
             yPosition = 330; // Adjusted for location details
@@ -168,25 +181,29 @@ export async function generateInvoice(order, user) {
 
             // Build comprehensive description with location details (sanitized)
             let description = 'Voter Slip Generation\n';
+            const descParts = [];
+            
             if (order.location) {
                const district = sanitizeTextForPDF(order.location.districtName || order.location.district);
                const localBody = sanitizeTextForPDF(order.location.localBodyName || order.location.localBody);
                const ward = sanitizeTextForPDF(order.location.wardName || order.location.ward);
 
-               if (district && district !== 'N/A') description += `District: ${district}\n`;
-               if (localBody && localBody !== 'N/A') description += `Local Body: ${localBody}\n`;
-               if (ward && ward !== 'N/A') description += `Ward: ${ward}\n`;
+               if (district && district !== 'N/A') descParts.push(`District: ${district}`);
+               if (localBody && localBody !== 'N/A') descParts.push(`Local Body: ${localBody}`);
+               if (ward && ward !== 'N/A') descParts.push(`Ward: ${ward}`);
             }
-            description += `Symbol: ${symbolName}\n`;
-            description += `Voters: ${order.totalVoters}`;
+            descParts.push(`Symbol: ${symbolName}`);
+            descParts.push(`Voters: ${order.totalVoters}`);
+            
+            description += descParts.join('\n');
 
             // Calculate description column width to prevent overflow
             const descX = 50;
             const descWidth = qtyX - descX - 20; // more padding for Malayalam text
 
-            // Use Helvetica for all text (sanitized)
+            // Use appropriate font for description (detect Malayalam)
             const descStartY = yPosition;
-            doc.font('Helvetica').fontSize(10);
+            doc.font(selectFont(description)).fontSize(10);
             doc.text(description, descX, yPosition, { 
                 width: descWidth,
                 lineBreak: true,
