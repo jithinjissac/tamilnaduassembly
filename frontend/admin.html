@@ -757,6 +757,7 @@
                                 <tr>
                                     <th>Order ID</th>
                                     <th>User</th>
+                                    <th>Phone</th>
                                     <th>Location</th>
                                     <th>Voters</th>
                                     <th>Amount</th>
@@ -766,7 +767,7 @@
                             </thead>
                             <tbody id="recentOrdersTable">
                                 <tr>
-                                    <td colspan="7" class="empty-state">
+                                    <td colspan="8" class="empty-state">
                                         <div class="empty-state-icon">📦</div>
                                         <p>No orders yet</p>
                                     </td>
@@ -890,6 +891,7 @@
                                     </th>
                                     <th>Order ID</th>
                                     <th>User</th>
+                                    <th>Phone</th>
                                     <th>Location</th>
                                     <th>Voters</th>
                                     <th>Amount</th>
@@ -900,7 +902,7 @@
                             </thead>
                             <tbody id="ordersTable">
                                 <tr>
-                                    <td colspan="9" class="empty-state">
+                                    <td colspan="10" class="empty-state">
                                         <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                         <p>No orders found</p>
                                     </td>
@@ -2179,7 +2181,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 if (!recentOrders || recentOrders.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="7" class="empty-state">
+                            <td colspan="8" class="empty-state">
                                 <div class="empty-state-icon">📦</div>
                                 <p>No orders yet</p>
                             </td>
@@ -2189,6 +2191,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                         <tr>
                             <td>${order.orderId}</td>
                             <td>${order.userId?.name || 'N/A'}<br><small>${order.userId?.email || 'N/A'}</small></td>
+                            <td>${order.userId?.phone || 'N/A'}</td>
                             <td>${order.location?.localBody || 'N/A'}<br><small>${order.location?.district || 'N/A'}</small></td>
                             <td>${order.totalVoters || 0}</td>
                             <td>₹${(order.amount || 0).toFixed(2)}</td>
@@ -2360,7 +2363,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 if (!data.orders || data.orders.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="9" class="empty-state">
+                            <td colspan="10" class="empty-state">
                                 <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                 <p>No orders found</p>
                             </td>
@@ -2381,6 +2384,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                     <div style="color: #666; font-size: 0.85rem;">${order.userId?.email || 'N/A'}</div>
                                 </div>
                             </td>
+                            <td>${order.userId?.phone || 'N/A'}</td>
                             <td>
                                 <div style="font-size: 0.85rem; line-height: 1.4;">
                                     <div><strong>${order.location?.wardName || order.location?.ward || '-'}</strong></div>
