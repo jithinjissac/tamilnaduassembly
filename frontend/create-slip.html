@@ -1612,7 +1612,11 @@ s0.parentNode.insertBefore(s1,s0);
 
             // Single station mode
             const pollingStation = selectedStations.length === 1 ? selectedStations[0].value : null;
+            const pollingStationMalayalamText = selectedStations.length === 1 ? selectedStations[0].text : null;
             const captcha = document.getElementById('captcha').value.trim();
+
+            console.log('📍 Polling Station Value:', pollingStation);
+            console.log('📍 Polling Station Malayalam Text:', pollingStationMalayalamText);
 
             // Validation
             if (!district || !localBody || !ward || !pollingStation || !captcha) {
@@ -1687,7 +1691,13 @@ s0.parentNode.insertBefore(s1,s0);
                     // Extract voter data from the HTML table
                     const parseResult = parseVotersFromHTML(doc);
                     extractedVoters = parseResult.voters;
-                    const malayalamPollingStationName = parseResult.pollingStationName;
+                    
+                    // ✅ USE POLLING STATION TEXT FROM FRONTEND DROPDOWN (not from HTML response)
+                    // The SEC response HTML doesn't include the form dropdown, only the voter table
+                    const malayalamPollingStationName = selectedStations.length === 1 ? selectedStations[0].text : null;
+                    
+                    console.log('🔍 Parse result pollingStationName from HTML:', parseResult.pollingStationName);
+                    console.log('✅ Using polling station from frontend dropdown:', malayalamPollingStationName);
                     
                     console.log('🔍 Parse result:', parseResult);
                     console.log('🔍 Extracted Malayalam polling station name:', malayalamPollingStationName);
