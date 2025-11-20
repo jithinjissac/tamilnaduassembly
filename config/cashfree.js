@@ -17,6 +17,9 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             ? CFEnvironment.SANDBOX 
             : CFEnvironment.PRODUCTION;
         
+        // Set the API version to stable 2023-08-01 instead of 2025-01-01
+        Cashfree.XApiVersion = "2023-08-01";
+        
         // Create new Cashfree instance with positional parameters
         // constructor(XEnvironment, XClientId, XClientSecret, XPartnerKey, XClientSignature, XPartnerMerchantId, XEnableErrorAnalytics, axios)
         cashfreeInstance = new Cashfree(
@@ -25,7 +28,7 @@ export const initializeCashfree = (appId, secretKey, environment = 'production')
             secretKey       // XClientSecret
         );
         
-        console.log(`✅ Cashfree initialized successfully (${environment} mode, env value: ${cfEnvironment})`);
+        console.log(`✅ Cashfree initialized successfully (${environment} mode, env value: ${cfEnvironment}, API version: ${Cashfree.XApiVersion})`);
         
         return cashfreeInstance;
     } catch (error) {
