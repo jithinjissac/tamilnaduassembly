@@ -25,6 +25,10 @@ const OrderSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        symbolNameMalayalam: {
+            type: String,
+            default: ''
+        },
         // Legacy fields for backward compatibility
         partyLogo: {
             type: String

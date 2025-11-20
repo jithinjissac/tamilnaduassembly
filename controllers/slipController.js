@@ -605,7 +605,7 @@ export const generatePreview = async (req, res) => {
                 const contentStartTime = Date.now();
                 await page.setContent(html, { 
                     waitUntil: 'domcontentloaded', // Faster than 'load' - no external resources
-                    timeout: 15000  // 15 seconds (preview is small)
+                    timeout: 30000  // 15 seconds (preview is small)
                 });
                 console.log('✅ Content set in', Date.now() - contentStartTime, 'ms');
                 
