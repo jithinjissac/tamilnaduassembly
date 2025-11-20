@@ -64,7 +64,7 @@ export const getBrowser = async () => {
                             '--no-pings',
                             '--print-to-pdf-without-header'
                         ],
-                        timeout: 30000 // 30 second timeout
+                        timeout: 60000 // 30 second timeout
                     });
                     
                     console.log('✅ Browser instance ready with PDF performance optimizations');
@@ -449,7 +449,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
 // Generate preview (first 2 pages = 10 slips)
 export const generatePreview = async (req, res) => {
     try {
-        const { orderId } = req.body;
+        const { orderId, pollingStationValue, slipsPerPage: requestedSlipsPerPage } = req.body;
         const userId = req.userId;
         const userRole = req.userRole;
 
@@ -457,6 +457,8 @@ export const generatePreview = async (req, res) => {
         console.log('GENERATE PREVIEW POST REQUEST');
         console.log('========================================');
         console.log('Order ID:', orderId);
+        console.log('Polling Station Value:', pollingStationValue);
+        console.log('Requested Slips Per Page:', requestedSlipsPerPage);
         console.log('User ID:', userId);
         console.log('User Role:', userRole);
         console.log('Request body:', JSON.stringify(req.body, null, 2));
@@ -515,35 +517,102 @@ export const generatePreview = async (req, res) => {
             });
         }
 
-        // ✅ CHECK IF PREVIEW PDF ALREADY EXISTS (avoid re-generation)
-        // Skip cache if previewPdfFilename is null or empty (indicates it was just cleared)
-        if (order.previewPdfFilename && order.previewPdfFilename.trim()) {
-            const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
-            const existingPath = path.join(tempDir, order.previewPdfFilename);
-            if (fs.existsSync(existingPath)) {
-                console.log('✅ Preview PDF already exists, serving cached version:', order.previewPdfFilename);
-                const pdfUrl = `/api/slips/preview-pdf/${order.previewPdfFilename}`;
-                return res.json({
-                    status: 'success',
-                    message: 'Preview already generated (cached).',
-                    pdfUrl: pdfUrl,
-                    filename: order.previewPdfFilename,
-                    cleanup: `/api/slips/cleanup/${order.previewPdfFilename}`
+        // 🔍 FILTER VOTERS BY POLLING STATION (for multi-station orders)
+        let filteredOrder = { ...order };
+        if (pollingStationValue) {
+            console.log(`🔍 Filtering voters for polling station: ${pollingStationValue}`);
+            const filteredVoters = order.voters.filter(v => v.polling_station_value === pollingStationValue);
+            console.log(`✅ Filtered ${filteredVoters.length} voters out of ${order.voters.length} total voters`);
+            
+            if (filteredVoters.length === 0) {
+                console.error('❌ NO VOTERS FOUND FOR THIS POLLING STATION');
+                console.error('Looking for polling_station_value:', pollingStationValue);
+                console.error('Sample voter polling_station_value:', order.voters[0]?.polling_station_value);
+                return res.status(400).json({ 
+                    status: 'error',
+                    message: 'No voters found for the specified polling station' 
                 });
-            } else {
-                console.log('⚠️ Preview filename in DB but file missing, regenerating...');
+            }
+            
+            // Update the order with filtered voters
+            filteredOrder.voters = filteredVoters;
+            
+            // Update location info with the specific polling station name from the first voter
+            if (filteredVoters[0].polling_station_name) {
+                filteredOrder.location = {
+                    ...order.location,
+                    pollingStationMalayalam: filteredVoters[0].polling_station_name,
+                    pollingStationName: filteredVoters[0].polling_station_name,
+                    pollingStation: pollingStationValue
+                };
+                console.log(`📍 Updated location with polling station name: ${filteredVoters[0].polling_station_name}`);
             }
         } else {
-            console.log('🔄 No cached preview (previewPdfFilename is null/empty), generating fresh preview...');
+            console.log(`📊 No polling station filter - using all ${order.voters.length} voters`);
         }
 
+        // ✅ SMART CACHING FOR PREVIEW PDFs
+        // Generate a cache key based on orderId, pollingStationValue, and slipsPerPage
+        const slipsPerPage = requestedSlipsPerPage || filteredOrder.customization?.slipsPerPage || 5;
+        const cacheKey = pollingStationValue 
+            ? `${order.orderId}_${pollingStationValue}_${slipsPerPage}`
+            : `${order.orderId}_full_${slipsPerPage}`;
+        
+        const previewDir = path.join(__dirname, '..', 'public', 'preview-pdfs');
+        await fs.promises.mkdir(previewDir, { recursive: true });
+        const cachedPdfPath = path.join(previewDir, `${cacheKey}.pdf`);
+        
+        // Check if cached PDF exists and slipsPerPage matches
+        if (fs.existsSync(cachedPdfPath)) {
+            console.log(`✅ Cached preview PDF found for ${cacheKey}, serving from storage...`);
+            const pdfUrl = `/api/slips/preview-pdf/${cacheKey}.pdf`;
+            return res.json({
+                status: 'success',
+                message: 'Preview served from cache (instant load)',
+                pdfUrl: pdfUrl,
+                filename: `${cacheKey}.pdf`,
+                cached: true
+            });
+        }
+        
+        // If slipsPerPage changed, delete old previews for this order/station
+        if (pollingStationValue) {
+            // Delete old station-specific previews with different slipsPerPage
+            const oldPreviewPattern = `${order.orderId}_${pollingStationValue}_`;
+            const files = await fs.promises.readdir(previewDir).catch(() => []);
+            for (const file of files) {
+                if (file.startsWith(oldPreviewPattern) && file !== `${cacheKey}.pdf`) {
+                    const oldPath = path.join(previewDir, file);
+                    await fs.promises.unlink(oldPath).catch(() => {});
+                    console.log(`🗑️ Deleted old preview with different slipsPerPage: ${file}`);
+                }
+            }
+        } else {
+            // Delete old full order previews with different slipsPerPage
+            const oldPreviewPattern = `${order.orderId}_full_`;
+            const files = await fs.promises.readdir(previewDir).catch(() => []);
+            for (const file of files) {
+                if (file.startsWith(oldPreviewPattern) && file !== `${cacheKey}.pdf`) {
+                    const oldPath = path.join(previewDir, file);
+                    await fs.promises.unlink(oldPath).catch(() => {});
+                    console.log(`🗑️ Deleted old preview with different slipsPerPage: ${file}`);
+                }
+            }
+        }
+        
+        console.log(`🔄 Generating new preview PDF: ${cacheKey}`);
+        
+        // ✅ DISABLE OLD CACHE SYSTEM - we use the new permanent cache above
+        // const shouldUseCache = !pollingStationValue && order.previewPdfFilename && order.previewPdfFilename.trim();
+        // if (shouldUseCache) { ... }
+
         // If Malayalam name is not in order, fetch it from Symbol model
-        if (!order.customization.symbolNameMalayalam && order.customization.symbolId) {
+        if (!filteredOrder.customization.symbolNameMalayalam && filteredOrder.customization.symbolId) {
             try {
                 const Symbol = (await import('../models/Symbol.js')).default;
-                const symbol = await Symbol.findById(order.customization.symbolId);
+                const symbol = await Symbol.findById(filteredOrder.customization.symbolId);
                 if (symbol && symbol.nameMalayalam) {
-                    order.customization.symbolNameMalayalam = symbol.nameMalayalam;
+                    filteredOrder.customization.symbolNameMalayalam = symbol.nameMalayalam;
                     console.log('✅ Fetched Malayalam name from Symbol:', symbol.nameMalayalam);
                 }
             } catch (err) {
@@ -552,24 +621,25 @@ export const generatePreview = async (req, res) => {
         }
 
         // Generate HTML for preview (first 2 pages based on slipsPerPage)
-        const slipsPerPage = order.customization?.slipsPerPage || 5;
         const previewVoterLimit = slipsPerPage * 2; // 2 pages: 10 for 5/page, 12 for 6/page
 
         console.log(`\n🎫 ========== PREVIEW GENERATION SLIPS PER PAGE ==========`);
-        console.log(`🎫 order.customization.slipsPerPage: ${order.customization?.slipsPerPage}`);
+        console.log(`🎫 filteredOrder.customization.slipsPerPage: ${filteredOrder.customization?.slipsPerPage}`);
+        console.log(`🎫 Requested slipsPerPage: ${requestedSlipsPerPage}`);
         console.log(`🎫 Computed slipsPerPage: ${slipsPerPage}`);
+        console.log(`🎫 Cache Key: ${cacheKey}`);
         console.log(`🎫 Preview voter limit: ${previewVoterLimit} (${slipsPerPage} × 2 pages)`);
         console.log(`🎫 ========================================================\n`);
         console.log(`Generating HTML for preview (first ${previewVoterLimit} voters = 2 pages with ${slipsPerPage} slips/page)...`);
-        console.log('Total voters in order:', order.voters.length);
-        console.log('First voter sample:', JSON.stringify(order.voters[0], null, 2));
-        console.log('Customization details:', JSON.stringify(order.customization, null, 2).substring(0, 500) + '...');
-        console.log('Location details:', JSON.stringify(order.location, null, 2));
+        console.log('Total voters in filteredOrder:', filteredOrder.voters.length);
+        console.log('First voter sample:', JSON.stringify(filteredOrder.voters[0], null, 2));
+        console.log('Customization details:', JSON.stringify(filteredOrder.customization, null, 2).substring(0, 500) + '...');
+        console.log('Location details:', JSON.stringify(filteredOrder.location, null, 2));
         
         let html;
         try {
             const htmlStartTime = Date.now();
-            html = await generateSlipHTML(order, 0, previewVoterLimit);
+            html = await generateSlipHTML(filteredOrder, 0, previewVoterLimit);
             console.log(`✅ HTML generated for ${previewVoterLimit} voters in`, Date.now() - htmlStartTime, 'ms');
             console.log('HTML length:', html.length, 'characters (', (html.length / 1024).toFixed(2), 'KB)');
         } catch (htmlError) {
@@ -677,67 +747,46 @@ export const generatePreview = async (req, res) => {
             }
         }
 
-        // Save PDF to temporary directory with STABLE filename
-        const tempDir = path.join(__dirname, '..', 'public', 'temp-pdfs');
-        if (!fs.existsSync(tempDir)) {
-            fs.mkdirSync(tempDir, { recursive: true });
-        }
+        // Save PDF to permanent preview directory with cache key
+        fs.writeFileSync(cachedPdfPath, pdf);
+        console.log(`✅ PDF saved permanently to: ${cachedPdfPath}`);
+        console.log(`📦 File size: ${(pdf.length / 1024).toFixed(2)} KB`);
         
-        // ✅ STABLE FILENAME - same filename per order (no timestamp)
-        const filename = `preview-${orderId}.pdf`;
-        const filepath = path.join(tempDir, filename);
-        fs.writeFileSync(filepath, pdf);
+        // No auto-cleanup - PDFs are permanent until slipsPerPage changes
         
-        // ✅ PERSIST preview filename to database
-        try {
-            await Order.findOneAndUpdate({ orderId }, { previewPdfFilename: filename });
-            console.log(`✅ Saved previewPdfFilename to DB: ${filename}`);
-        } catch (dbErr) {
-            console.warn('⚠️ Could not update Order with previewPdfFilename:', dbErr.message);
-        }
-        
-        // Store in map for cleanup
-        tempPDFs.set(filename, {
-            path: filepath,
-            createdAt: Date.now(),
-            timeout: null
-        });
-        
-        // Schedule auto-cleanup after 5 minutes
-        scheduleCleanup(filename);
-        
-        console.log('✅ PDF saved to:', filepath);
-        console.log('✅ Scheduled for auto-cleanup in 5 minutes');
-        
-        // ✅ TRIGGER PERMANENT PDF GENERATION immediately after extraction
+        // ✅ TRIGGER PERMANENT FULL PDF GENERATION (only for full order, not individual stations)
         // This generates the full PDF while user views preview
         // By the time they complete payment, PDF is ready for instant download
-        console.log(`\n🔔 TRIGGERING PERMANENT PDF GENERATION (${order.voters.length} voters)...`);
-        console.log(`📝 Order ID: ${orderId}`);
-        
-        try {
-            const { generatePDFBackground } = await import('../utils/pdfGenerator.js');
-            console.log('✅ Dynamic import successful');
+        if (!pollingStationValue) {
+            console.log(`\n🔔 TRIGGERING PERMANENT PDF GENERATION (${order.voters.length} voters)...`);
+            console.log(`📝 Order ID: ${orderId}`);
             
-            // Generate permanent PDF in background (saves to permanent-pdfs/)
-            generatePDFBackground(order, orderId).catch(err => {
-                console.error('⚠️ Background permanent PDF generation error (non-blocking):', err.message);
-                console.error('⚠️ Stack:', err.stack);
-                // Don't let background PDF errors fail the preview response
-            });
-            console.log(`✅ Permanent PDF generation started in background for: ${orderId}\n`);
-        } catch (importErr) {
-            console.error('❌ Failed to import generatePDFBackground:', importErr.message);
+            try {
+                const { generatePDFBackground } = await import('../utils/pdfGenerator.js');
+                console.log('✅ Dynamic import successful');
+                
+                // Generate permanent PDF in background (saves to permanent-pdfs/)
+                generatePDFBackground(order, orderId).catch(err => {
+                    console.error('⚠️ Background permanent PDF generation error (non-blocking):', err.message);
+                    console.error('⚠️ Stack:', err.stack);
+                });
+                
+                console.log('✅ Background permanent PDF generation started (non-blocking)');
+            } catch (importErr) {
+                console.error('❌ Failed to import pdfGenerator:', importErr.message);
+            }
+        } else {
+            console.log(`ℹ️ Skipping full PDF generation for station-specific preview`);
         }
         
         // Send PROTECTED PDF file URL (requires authentication)
-        const pdfUrl = `/api/slips/preview-pdf/${filename}`;
+        const pdfUrl = `/api/slips/preview-pdf/${cacheKey}.pdf`;
         res.json({
             status: 'success',
-            message: 'Preview generated. Full PDF is being prepared for download.',
+            message: 'Preview generated and cached permanently.',
             pdfUrl: pdfUrl,
-            filename: filename,
-            cleanup: `/api/slips/cleanup/${filename}`
+            filename: `${cacheKey}.pdf`,
+            cached: false
         });
         
         console.log('✅ Sent PDF URL to client:', pdfUrl);
@@ -1154,7 +1203,7 @@ export const downloadSlip = async (req, res) => {
                 format: 'A4',
                 printBackground: true,
                 margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                timeout: 180000
+                timeout: 240000
             });
             console.log('✅ PDF generated in', Date.now() - pdfStartTime, 'ms');
             console.log('PDF size:', (pdf.length / 1024 / 1024).toFixed(2), 'MB');
@@ -1295,14 +1344,28 @@ export const servePreviewPDF = async (req, res) => {
     try {
         const { filename } = req.params;
         const userId = req.userId;
+        const userRole = req.userRole;
 
         console.log('📄 Preview PDF request:', filename, 'by user:', userId);
 
-        // Extract order ID from filename (format: preview-ORD-YYYYMMDD-XXXXXX.pdf)
-        // Remove .pdf extension first, then extract orderId
-        const filenameWithoutExt = filename.replace('.pdf', '');
-        const orderIdMatch = filenameWithoutExt.match(/preview-(ORD-.+)/);
-        if (!orderIdMatch) {
+        // Extract order ID from filename 
+        // Formats: preview-ORD-YYYYMMDD-XXXXXX.pdf (old) or ORD-YYYYMMDD-XXXXXX_stationValue_5.pdf (new)
+        let orderId;
+        
+        // New format: ORD-YYYYMMDD-XXXXXX_stationValue_5.pdf or ORD-YYYYMMDD-XXXXXX_full_5.pdf
+        const newFormatMatch = filename.match(/^(ORD-[^_]+)/);
+        if (newFormatMatch) {
+            orderId = newFormatMatch[1];
+        } else {
+            // Old format: preview-ORD-YYYYMMDD-XXXXXX.pdf
+            const filenameWithoutExt = filename.replace('.pdf', '');
+            const oldFormatMatch = filenameWithoutExt.match(/preview-(ORD-.+)/);
+            if (oldFormatMatch) {
+                orderId = oldFormatMatch[1];
+            }
+        }
+        
+        if (!orderId) {
             console.error('❌ Invalid filename format:', filename);
             return res.status(400).json({
                 status: 'error',
@@ -1310,11 +1373,14 @@ export const servePreviewPDF = async (req, res) => {
             });
         }
 
-        const orderId = orderIdMatch[1];
         console.log('Extracted order ID:', orderId);
 
-        // Verify user owns this order
-        const order = await Order.findOne({ orderId, userId });
+        // Verify user owns this order (or is admin)
+        const query = { orderId };
+        if (userRole !== 'admin') {
+            query.userId = userId;
+        }
+        const order = await Order.findOne(query);
         if (!order) {
             console.error('❌ Order not found or unauthorized:', orderId, userId);
             return res.status(403).json({
@@ -1325,8 +1391,13 @@ export const servePreviewPDF = async (req, res) => {
 
         console.log('✅ User authorized for order:', orderId);
 
-        // Serve the PDF file
-        const filePath = path.join(__dirname, '..', 'public', 'temp-pdfs', filename);
+        // Try new permanent preview location first, then fall back to old temp location
+        let filePath = path.join(__dirname, '..', 'public', 'preview-pdfs', filename);
+        
+        if (!fs.existsSync(filePath)) {
+            // Fall back to old temp location for backward compatibility
+            filePath = path.join(__dirname, '..', 'public', 'temp-pdfs', filename);
+        }
         
         if (!fs.existsSync(filePath)) {
             console.error('❌ PDF file not found:', filePath);

@@ -958,6 +958,15 @@ s0.parentNode.insertBefore(s1,s0);
                         <div>
                             <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
                             <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.4;">Please wait while we fetch the voter list from SEC portal</small>
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                                    <div style="text-align: left;">
+                                        <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.95rem;">Please stay on this page</strong>
+                                        <small style="font-size: 0.85rem; line-height: 1.3;">Do not minimize or close the browser window during extraction</small>
+                                    </div>
+                                </div>
+                            </div>
                             <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0, 0, 0, 0.08);">
                                 <small style="color: #999; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                                     <i class="fas fa-info-circle"></i>
@@ -1780,8 +1789,26 @@ s0.parentNode.insertBefore(s1,s0);
                         throw new Error(orderResult.message || 'Failed to create order');
                     }
                 } else {
-                    const errorMsg = extractData.message || 'Extraction failed. Please check your captcha and try again.';
-                    showError('captchaError', errorMsg);
+                    // Check if this is a SEC website error
+                    if (extractData.errorType === 'SEC_WEBSITE_ERROR') {
+                        // Fetch custom error message from settings (or use fallback)
+                        const errorTitle = extractData.customErrorTitle || 'SEC Website Unavailable';
+                        const errorMessage = extractData.customErrorMessage || extractData.message;
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: errorTitle,
+                            html: `<p>${errorMessage}</p>` +
+                                  `<p class="text-muted mt-2" style="font-size: 0.9em;">The Kerala State Election Commission website is currently down or experiencing issues. This is beyond our control.</p>` +
+                                  `<p class="text-muted mt-1" style="font-size: 0.9em;">Please try again after some time.</p>`,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                    } else {
+                        const errorMsg = extractData.message || 'Extraction failed. Please check your captcha and try again.';
+                        showError('captchaError', errorMsg);
+                    }
                 }
             } catch (error) {
                 console.error('Create slip error:', error);
@@ -1929,7 +1956,30 @@ s0.parentNode.insertBefore(s1,s0);
                             failedStations.push({ station: station.text, reason: 'No voters found' });
                         }
                     } else {
-                        failedStations.push({ station: station.text, reason: extractData.message || 'Extraction failed' });
+                        // Check if this is a SEC website error
+                        if (extractData.errorType === 'SEC_WEBSITE_ERROR') {
+                            // Stop the entire extraction process
+                            const errorTitle = extractData.customErrorTitle || 'SEC Website Unavailable';
+                            const errorMessage = extractData.customErrorMessage || extractData.message;
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: errorTitle,
+                                html: `<p>${errorMessage}</p>` +
+                                      `<p class="text-muted mt-2" style="font-size: 0.9em;">The Kerala State Election Commission website is currently down or experiencing issues. This is beyond our control.</p>` +
+                                      `<p class="text-muted mt-1" style="font-size: 0.9em;">Please try again after some time.</p>`,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6',
+                                allowOutsideClick: false
+                            }).then(() => {
+                                // Hide loading and reset
+                                document.getElementById('extractBtn').disabled = false;
+                                document.getElementById('extractionLoading').classList.remove('show');
+                            });
+                            return; // Stop extraction
+                        } else {
+                            failedStations.push({ station: station.text, reason: extractData.message || 'Extraction failed' });
+                        }
                     }
 
                 } catch (error) {

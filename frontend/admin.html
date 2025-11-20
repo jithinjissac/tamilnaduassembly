@@ -701,6 +701,7 @@
             <button class="tab" onclick="switchTab('email-settings')"><i class="fas fa-envelope"></i> Email Settings</button>
             <button class="tab" onclick="switchTab('payment-settings')"><i class="fas fa-credit-card"></i> Payment Settings</button>
             <button class="tab" onclick="switchTab('popup-editor')"><i class="fas fa-window-restore"></i> Popup Editor</button>
+            <button class="tab" onclick="switchTab('sec-error')"><i class="fas fa-exclamation-triangle"></i> SEC Error Popup</button>
             <button class="tab" onclick="switchTab('media-manager')"><i class="fas fa-folder-open"></i> Media Manager</button>
             <button class="tab" onclick="switchTab('profile-settings')"><i class="fas fa-user-cog"></i> Profile Settings</button>
             <button class="tab" onclick="switchTab('developer-settings')"><i class="fas fa-code"></i> Developer</button>
@@ -1977,6 +1978,50 @@ Login to https://easyslip.in to download your PDF.</textarea>
         </div>
     </div>
 
+    <!-- SEC Error Popup Settings Tab -->
+    <div id="sec-error-tab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> SEC Website Error Popup</h2>
+                <button class="btn btn-success" onclick="saveSECErrorSettings()"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+
+            <div id="sec-error-alert" class="alert" style="display: none;"></div>
+
+            <div class="settings-form-wrapper" style="margin-top: 1.5rem;">
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <p style="margin: 0; color: #856404;">
+                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> This popup is shown when the Kerala SEC website (sec.kerala.gov.in) is unavailable or returns an error. Customize the message to inform users about the situation.
+                    </p>
+                </div>
+
+                <form id="secErrorSettingsForm">
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Popup Title:</label>
+                            <input type="text" name="title" id="sec-error-title" placeholder="e.g., SEC Website Unavailable" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">The title shown at the top of the error popup</small>
+                        </div>
+
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #333;">Error Message:</label>
+                            <textarea name="message" id="sec-error-message" rows="5" placeholder="Explain to users why the extraction failed and what they should do" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">The message explaining the situation to users</small>
+                        </div>
+
+                        <div style="background: #e0f2fe; border: 1px solid #0284c7; border-radius: 8px; padding: 1rem;">
+                            <h4 style="margin: 0 0 0.75rem 0; color: #0c4a6e;"><i class="fas fa-eye"></i> Preview</h4>
+                            <div style="background: white; padding: 1.5rem; border-radius: 8px; border: 2px solid #0284c7;">
+                                <h3 style="margin: 0 0 1rem 0; color: #dc2626;" id="sec-error-preview-title">SEC Website Unavailable</h3>
+                                <p style="margin: 0; color: #333; white-space: pre-wrap;" id="sec-error-preview-message">The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Media Manager Tab -->
     <div id="media-manager-tab" class="tab-content">
         <div class="card">
@@ -2244,8 +2289,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             <td><span class="badge badge-${user.role === 'admin' ? 'info' : 'success'}">${user.role || 'user'}</span></td>
                             <td>
                                 <select onchange="updateUserPricing('${user._id}', this.value)" style="padding: 0.25rem 0.5rem; border: 1px solid #e5e7eb; border-radius: 4px;">
-                                    ${[0.25, 0.30, 0.35, 0.40, 0.45, 0.50].map(price => 
-                                        `<option value="${price}" ${user.pricePerVoter === price ? 'selected' : ''}>₹${price.toFixed(2)}</option>`
+                                    ${[0, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50].map(price => 
+                                        `<option value="${price}" ${user.pricePerVoter === price ? 'selected' : ''}>${price === 0 ? 'FREE' : `₹${price.toFixed(2)}`}</option>`
                                     ).join('')}
                                 </select>
                             </td>
@@ -3236,6 +3281,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 loadSymbols();
             } else if (tabName === 'media-manager') {
                 loadPDFList();
+            } else if (tabName === 'sec-error') {
+                loadSECErrorSettings();
             }
         }
 
@@ -4740,6 +4787,90 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
             document.body.appendChild(modal);
         }
+
+        // SEC Error Popup Settings Functions
+        async function loadSECErrorSettings() {
+            try {
+                const response = await fetch('/api/settings/secError', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load SEC error settings');
+
+                const settings = await response.json();
+                
+                document.getElementById('sec-error-title').value = settings.title || 'SEC Website Unavailable';
+                document.getElementById('sec-error-message').value = settings.message || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
+                
+                // Update preview
+                updateSECErrorPreview();
+
+            } catch (error) {
+                console.error('Error loading SEC error settings:', error);
+                showSECErrorAlert('Failed to load SEC error settings', 'error');
+            }
+        }
+
+        async function saveSECErrorSettings() {
+            try {
+                const settings = {
+                    title: document.getElementById('sec-error-title').value.trim() || 'SEC Website Unavailable',
+                    message: document.getElementById('sec-error-message').value.trim() || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.'
+                };
+
+                const response = await fetch('/api/settings/secError', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (!response.ok) throw new Error('Failed to save SEC error settings');
+
+                showSECErrorAlert('SEC error popup settings saved successfully!', 'success');
+                updateSECErrorPreview();
+
+            } catch (error) {
+                console.error('Error saving SEC error settings:', error);
+                showSECErrorAlert('Failed to save SEC error settings: ' + error.message, 'error');
+            }
+        }
+
+        function updateSECErrorPreview() {
+            const title = document.getElementById('sec-error-title').value.trim() || 'SEC Website Unavailable';
+            const message = document.getElementById('sec-error-message').value.trim() || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
+            
+            document.getElementById('sec-error-preview-title').textContent = title;
+            document.getElementById('sec-error-preview-message').textContent = message;
+        }
+
+        function showSECErrorAlert(message, type = 'success') {
+            const alert = document.getElementById('sec-error-alert');
+            alert.textContent = message;
+            alert.className = 'alert alert-' + type;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Add event listeners for live preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleInput = document.getElementById('sec-error-title');
+            const messageInput = document.getElementById('sec-error-message');
+            
+            if (titleInput) {
+                titleInput.addEventListener('input', updateSECErrorPreview);
+            }
+            if (messageInput) {
+                messageInput.addEventListener('input', updateSECErrorPreview);
+            }
+        });
 
         function resetPopupToDefault() {
             if (!confirm('Reset popup content? This will clear your current design.')) {

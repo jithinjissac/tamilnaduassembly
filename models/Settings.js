@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email', 'slip', 'payment', 'popup']
+        enum: ['email', 'slip', 'payment', 'popup', 'secError']
     },
     settings: {
         type: Map,
@@ -140,6 +140,10 @@ Login to https://easyslip.in to download your PDF.`
         content: '',
         showOnce: false,
         delay: 1000
+    },
+    secError: {
+        title: 'SEC Website Unavailable',
+        message: 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.'
     }
 };
 

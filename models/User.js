@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema({
     pricePerVoter: {
         type: Number,
         default: 0.50,
-        min: 0.25,
+        min: 0,
         max: 0.50
     },
     isActive: {

@@ -544,6 +544,22 @@ s0.parentNode.insertBefore(s1,s0);
                 margin: 1rem auto !important;
                 padding: 1rem !important;
             }
+
+            /* Mobile-friendly station pagination */
+            #stationPagination > div {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            #stationPagination button {
+                padding: 0.75rem 1rem !important;
+                font-size: 0.95rem !important;
+            }
+
+            #stationPagination span[id*="StationVoters"],
+            #stationPagination span[id*="StationName"] {
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -559,6 +575,29 @@ s0.parentNode.insertBefore(s1,s0);
 
             .payment-card h3 {
                 font-size: 1.25rem;
+            }
+
+            /* Compact station controls for small mobile */
+            #stationPagination {
+                padding: 0.75rem !important;
+            }
+
+            #stationPagination button {
+                justify-content: center;
+                min-width: 50px;
+            }
+
+            #stationPagination .btn-text {
+                display: none; /* Hide "Previous" and "Next" text, keep icons */
+            }
+
+            #stationPagination > div > div:first-child {
+                width: 100%; /* Full width station info */
+            }
+
+            #stationPagination > div > div:last-child {
+                width: 100%; /* Full width button row */
+                justify-content: space-between;
             }
         }
     </style>
@@ -624,7 +663,40 @@ s0.parentNode.insertBefore(s1,s0);
                     <p><strong>District:</strong> <span id="displayDistrict">-</span></p>
                     <p><strong>Local Body:</strong> <span id="displayLocalBody">-</span></p>
                     <p><strong>Ward:</strong> <span id="displayWard">-</span></p>
-                    <p><strong>Polling Station:</strong> <span id="displayPollingStation">-</span></p>
+                    <p id="pollingStationDisplay"><strong>Polling Station:</strong> <span id="displayPollingStation">-</span></p>
+                </div>
+
+                <!-- Station Pagination Controls -->
+                <div id="stationPagination" style="display: none; margin: 1.5rem 0; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #2d3748; font-size: 0.95rem;">
+                                <i class="fas fa-building" style="color: #006D3B; margin-right: 0.5rem;"></i>
+                                <span id="currentStationName">Station Name</span>
+                            </p>
+                            <p style="margin: 0; color: #718096; font-size: 0.85rem;">
+                                <i class="fas fa-users" style="margin-right: 0.5rem;"></i>
+                                <span id="currentStationVoters">0 voters</span> in this station
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; width: 100%; max-width: 500px;">
+                            <button id="prevStationBtn" onclick="navigateStation(-1)" 
+                                    style="padding: 0.5rem 1rem; background: #006D3B; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; flex: 1;"
+                                    onmouseover="this.style.background='#005A30'" 
+                                    onmouseout="this.style.background='#006D3B'">
+                                <i class="fas fa-chevron-left"></i><span class="btn-text"> Previous</span>
+                            </button>
+                            <span style="padding: 0.5rem 1rem; background: #F0F4F8; border-radius: 6px; font-weight: 600; color: #2d3748; min-width: 80px; text-align: center; white-space: nowrap;">
+                                <span id="currentStationIndex">1</span> of <span id="totalStations">1</span>
+                            </span>
+                            <button id="nextStationBtn" onclick="navigateStation(1)" 
+                                    style="padding: 0.5rem 1rem; background: #006D3B; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; flex: 1;"
+                                    onmouseover="this.style.background='#005A30'" 
+                                    onmouseout="this.style.background='#006D3B'">
+                                <span class="btn-text">Next </span><i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="preview-container" id="previewContainer">
@@ -700,6 +772,11 @@ s0.parentNode.insertBefore(s1,s0);
         let orderData = null;
         let razorpayKeyId = '';
         let isAdmin = false;
+        
+        // Station pagination state
+        let pollingStations = [];
+        let currentStationIndex = 0;
+        let currentStationPdfUrl = null;
 
         if (!token) {
             // Save the intended destination with query params before redirecting to login
@@ -937,6 +1014,130 @@ s0.parentNode.insertBefore(s1,s0);
 
         if (!orderId) {
             showMessage('error', 'Order ID Not Found', 'Redirecting back to dashboard...', 'dashboard.html', 3000);
+        }
+
+        // Group voters by polling station
+        function groupVotersByStation(voters) {
+            const stationMap = new Map();
+            
+            voters.forEach(voter => {
+                const stationKey = voter.polling_station_value || voter.polling_station_name || 'unknown';
+                if (!stationMap.has(stationKey)) {
+                    stationMap.set(stationKey, {
+                        name: voter.polling_station_name || 'Unknown Station',
+                        value: voter.polling_station_value || stationKey,
+                        voters: []
+                    });
+                }
+                stationMap.get(stationKey).voters.push(voter);
+            });
+            
+            return Array.from(stationMap.values());
+        }
+
+        // Navigate between polling stations
+        async function navigateStation(direction) {
+            const newIndex = currentStationIndex + direction;
+            
+            if (newIndex < 0 || newIndex >= pollingStations.length) {
+                return; // Out of bounds
+            }
+            
+            currentStationIndex = newIndex;
+            await loadStationPreview(currentStationIndex);
+        }
+
+        // Load preview for specific station
+        async function loadStationPreview(stationIndex) {
+            const station = pollingStations[stationIndex];
+            
+            // Update UI
+            document.getElementById('currentStationIndex').textContent = stationIndex + 1;
+            document.getElementById('currentStationName').textContent = station.name;
+            document.getElementById('currentStationVoters').textContent = `${station.voters.length} voters`;
+            
+            // Update pagination buttons
+            document.getElementById('prevStationBtn').disabled = stationIndex === 0;
+            document.getElementById('nextStationBtn').disabled = stationIndex === pollingStations.length - 1;
+            
+            if (stationIndex === 0) {
+                document.getElementById('prevStationBtn').style.opacity = '0.5';
+                document.getElementById('prevStationBtn').style.cursor = 'not-allowed';
+            } else {
+                document.getElementById('prevStationBtn').style.opacity = '1';
+                document.getElementById('prevStationBtn').style.cursor = 'pointer';
+            }
+            
+            if (stationIndex === pollingStations.length - 1) {
+                document.getElementById('nextStationBtn').style.opacity = '0.5';
+                document.getElementById('nextStationBtn').style.cursor = 'not-allowed';
+            } else {
+                document.getElementById('nextStationBtn').style.opacity = '1';
+                document.getElementById('nextStationBtn').style.cursor = 'pointer';
+            }
+            
+            // Show loading
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = `
+                <div class="loading-preview">
+                    <div class="spinner"></div>
+                    <p>Loading station ${stationIndex + 1} of ${pollingStations.length}...</p>
+                </div>
+            `;
+            
+            try {
+                // Generate preview for this specific station
+                const slipsPerPage = orderData.customization?.slipsPerPage || 5;
+                
+                const previewResponse = await fetch('/api/slips/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        orderId: orderData.orderId || orderData._id,
+                        pollingStationValue: station.value,
+                        slipsPerPage: slipsPerPage
+                    })
+                });
+
+                if (previewResponse.ok) {
+                    const data = await previewResponse.json();
+                    
+                    // Fetch PDF and create blob URL
+                    const pdfResponse = await fetch(data.pdfUrl, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (!pdfResponse.ok) {
+                        throw new Error('Failed to fetch PDF');
+                    }
+                    
+                    const pdfBlob = await pdfResponse.blob();
+                    const pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                    
+                    // Store for cleanup
+                    if (currentStationPdfUrl) {
+                        URL.revokeObjectURL(currentStationPdfUrl);
+                    }
+                    currentStationPdfUrl = pdfBlobUrl;
+                    
+                    // Display PDF
+                    await displayPDF(pdfBlobUrl, previewContainer);
+                } else {
+                    throw new Error('Failed to generate preview');
+                }
+            } catch (error) {
+                console.error('Error loading station preview:', error);
+                previewContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>Failed to load preview for this station</p>
+                        <p style="font-size: 0.9rem; color: #666;">${error.message}</p>
+                    </div>
+                `;
+            }
         }
 
         // Update slips per page and regenerate preview
@@ -1314,6 +1515,25 @@ s0.parentNode.insertBefore(s1,s0);
                 
                 console.log('✅ Order data loaded and access verified (parallel)');
 
+                // Check if order has multiple polling stations
+                if (orderData.voters && orderData.voters.length > 0) {
+                    pollingStations = groupVotersByStation(orderData.voters);
+                    console.log(`📊 Found ${pollingStations.length} polling station(s) in order`);
+                    
+                    if (pollingStations.length > 1) {
+                        // Multiple stations - show pagination
+                        document.getElementById('stationPagination').style.display = 'block';
+                        document.getElementById('totalStations').textContent = pollingStations.length;
+                        document.getElementById('pollingStationDisplay').style.display = 'none'; // Hide single station display
+                        
+                        console.log('🔄 Multi-station order detected - enabling pagination');
+                    } else {
+                        // Single station - hide pagination
+                        document.getElementById('stationPagination').style.display = 'none';
+                        document.getElementById('pollingStationDisplay').style.display = 'block';
+                    }
+                }
+
                 // Display order info immediately - no waiting
                 document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
                 // Show Malayalam symbol name with English fallback
@@ -1362,16 +1582,38 @@ s0.parentNode.insertBefore(s1,s0);
                 // Show flat pricing (no discount)
                 const voterCount = orderData.totalVoters || orderData.voterCount || 0;
                 const amount = orderData.amount || 0;
-                const pricePerVoter = orderData.pricePerVoter || 0.50; // Use order's price or fallback to 0.50
+                const pricePerVoter = orderData.pricePerVoter !== undefined ? orderData.pricePerVoter : 0.50; // Use order's price (can be 0)
                 
-                if (voterCount > 0 && amount > 0) {
-                    document.getElementById('pricePerVoter').textContent = `₹${pricePerVoter.toFixed(2)}`;
+                if (voterCount > 0) {
+                    document.getElementById('pricePerVoter').textContent = pricePerVoter === 0 ? 'FREE' : `₹${pricePerVoter.toFixed(2)}`;
                     document.getElementById('priceBreakdown').style.display = 'block';
-                    document.getElementById('breakdownText').textContent = 
-                        `${voterCount} voters × ₹${pricePerVoter.toFixed(2)} = ₹${amount.toFixed(2)}`;
+                    document.getElementById('breakdownText').textContent = pricePerVoter === 0 
+                        ? `${voterCount} voters × FREE = ₹0.00`
+                        : `${voterCount} voters × ₹${pricePerVoter.toFixed(2)} = ₹${amount.toFixed(2)}`;
                 }
 
                 console.log('✅ Order details displayed on page');
+
+                // Check if order is FREE (pricePerVoter = 0)
+                if (pricePerVoter === 0 && orderData.paymentStatus !== 'completed') {
+                    console.log('💰 FREE order detected - auto-completing without payment');
+                    
+                    // Update UI for free order
+                    document.querySelector('.payment-title').innerHTML = 'Free Order <i class="fas fa-gift"></i>';
+                    document.querySelector('.preview-note').innerHTML = 
+                        '<strong><i class="fas fa-info-circle"></i> Free Order:</strong> This order is free. Click below to complete and download.';
+                    
+                    const paymentBtn = document.getElementById('paymentBtn');
+                    paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete & Download';
+                    paymentBtn.style.background = 'var(--kerala-green)';
+                    paymentBtn.onclick = completeOrderAsAdmin;
+                    paymentBtn.disabled = false;
+                    
+                    // Hide payment-related UI
+                    document.querySelector('.secure-badge').style.display = 'none';
+                    const paymentIcons = document.querySelector('.payment-icons');
+                    if (paymentIcons) paymentIcons.style.display = 'none';
+                }
 
                 // Check payment status early - if already paid, skip preview generation
                 if (orderData.paymentStatus === 'completed') {
@@ -1439,6 +1681,19 @@ s0.parentNode.insertBefore(s1,s0);
                     document.querySelector('.secure-badge').style.display = 'none';
                 }
 
+                // If multiple stations, load first station's preview
+                if (pollingStations.length > 1) {
+                    console.log('📄 Multi-station order - loading first station preview');
+                    await loadStationPreview(0);
+                    
+                    // Enable payment button
+                    if (!isAdmin) {
+                        document.getElementById('paymentBtn').disabled = false;
+                    }
+                    return;
+                }
+
+                // Single station or no station grouping - original preview logic
                 const previewResponse = await fetch('/api/slips/preview', {
                     method: 'POST',
                     headers: {

@@ -417,7 +417,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_localBody');
         return select && select.options.length > 1;
       },
-      { timeout: 30000 } // Increased from 15s to 30s
+      { timeout: 60000 } // Increased from 15s to 30s
     );
     
     // Force local body select to be visible
@@ -542,7 +542,43 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Click the submit button instead of using XHR in evaluate
     // This allows the page to naturally update with the response
     console.log('[CAPTCHA] Clicking submit button...');
-    await page.click('button[data-success-path="/public/voters/list"]');
+    
+    try {
+      await page.click('button[data-success-path="/public/voters/list"]');
+    } catch (clickError) {
+      console.error('[CAPTCHA] ❌ Failed to click submit button:', clickError.message);
+      
+      // Cleanup
+      await sessionManager.cleanup(sessionId);
+      const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+      if (fs.existsSync(captchaPath)) {
+        fs.unlinkSync(captchaPath);
+      }
+      
+      // Get custom error message from settings
+      let customTitle = 'SEC Website Unavailable';
+      let customMessage = 'The SEC website appears to be unavailable or experiencing issues. Please try again later.';
+      
+      try {
+        const Settings = (await import('../models/Settings.js')).default;
+        const secErrorSettings = await Settings.getSettings('secError');
+        if (secErrorSettings) {
+          customTitle = secErrorSettings.title || customTitle;
+          customMessage = secErrorSettings.message || customMessage;
+        }
+      } catch (settingsError) {
+        console.error('[CAPTCHA] Failed to load SEC error settings:', settingsError.message);
+      }
+      
+      return res.status(503).json({
+        status: 'error',
+        errorType: 'SEC_WEBSITE_ERROR',
+        message: customMessage,
+        customErrorTitle: customTitle,
+        customErrorMessage: customMessage,
+        technicalDetails: clickError.message
+      });
+    }
     
     // Wait for the page to update with the response
     // The page will update .ajxpos div with voter data and update the form
@@ -550,14 +586,93 @@ router.post('/submitWithCaptcha', async (req, res) => {
     await page.waitForTimeout(3000); // Give time for XHR response and DOM update
     
     // Get the entire page HTML after it's been updated
-    const submitResult = {
-      ok: true,
-      status: 200,
-      html: await page.content()
-    };
+    let submitResult;
+    try {
+      submitResult = {
+        ok: true,
+        status: 200,
+        html: await page.content()
+      };
+    } catch (contentError) {
+      console.error('[CAPTCHA] ❌ Failed to get page content:', contentError.message);
+      
+      // Cleanup
+      await sessionManager.cleanup(sessionId);
+      const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+      if (fs.existsSync(captchaPath)) {
+        fs.unlinkSync(captchaPath);
+      }
+      
+      // Get custom error message from settings
+      let customTitle = 'SEC Website Unavailable';
+      let customMessage = 'The SEC website appears to be unavailable or experiencing issues. Please try again later.';
+      
+      try {
+        const Settings = (await import('../models/Settings.js')).default;
+        const secErrorSettings = await Settings.getSettings('secError');
+        if (secErrorSettings) {
+          customTitle = secErrorSettings.title || customTitle;
+          customMessage = secErrorSettings.message || customMessage;
+        }
+      } catch (settingsError) {
+        console.error('[CAPTCHA] Failed to load SEC error settings:', settingsError.message);
+      }
+      
+      return res.status(503).json({
+        status: 'error',
+        errorType: 'SEC_WEBSITE_ERROR',
+        message: customMessage,
+        customErrorTitle: customTitle,
+        customErrorMessage: customMessage,
+        technicalDetails: contentError.message
+      });
+    }
 
     console.log('[CAPTCHA] Form submission result:', submitResult.status);
     console.log('[CAPTCHA] Response HTML length:', submitResult.html.length);
+    
+    // Check if the page contains error indicators from SEC website
+    const hasServerError = submitResult.html.includes('500 Internal Server Error') ||
+                          submitResult.html.includes('503 Service Unavailable') ||
+                          submitResult.html.includes('502 Bad Gateway') ||
+                          submitResult.html.includes('504 Gateway Timeout') ||
+                          submitResult.html.includes('Application Error') ||
+                          submitResult.html.includes('temporarily unavailable');
+    
+    if (hasServerError) {
+      console.error('[CAPTCHA] ❌ SEC website returned server error');
+      
+      // Get custom error message from settings
+      let customTitle = 'SEC Website Unavailable';
+      let customMessage = 'The SEC Kerala website is currently experiencing technical difficulties. Please try again after some time.';
+      
+      try {
+        const Settings = (await import('../models/Settings.js')).default;
+        const secErrorSettings = await Settings.getSettings('secError');
+        if (secErrorSettings) {
+          customTitle = secErrorSettings.title || customTitle;
+          customMessage = secErrorSettings.message || customMessage;
+        }
+      } catch (settingsError) {
+        console.error('[CAPTCHA] Failed to load SEC error settings:', settingsError.message);
+      }
+      
+      // Cleanup
+      await sessionManager.cleanup(sessionId);
+      const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+      if (fs.existsSync(captchaPath)) {
+        fs.unlinkSync(captchaPath);
+      }
+      
+      return res.status(503).json({
+        status: 'error',
+        errorType: 'SEC_WEBSITE_ERROR',
+        message: customMessage,
+        customErrorTitle: customTitle,
+        customErrorMessage: customMessage,
+        technicalDetails: 'Server error detected in response'
+      });
+    }
 
     if (!submitResult.ok) {
       // Cleanup before returning error
