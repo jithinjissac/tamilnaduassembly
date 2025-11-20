@@ -2669,7 +2669,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
                 orders.forEach(order => {
                     const district = order.location?.districtName || order.location?.district || 'Unknown';
-                    const symbol = order.customization?.symbolName || 'Unknown';
+                    const symbol = order.customization?.symbolNameMalayalam || order.customization?.symbolName || 'Unknown';
                     const voters = order.totalVoters || 0;
                     const amount = order.paymentStatus === 'completed' ? (order.amount || 0) : 0;
                     const isCompleted = order.paymentStatus === 'completed';
@@ -2819,8 +2819,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                 <span style="font-size: 1rem;">⋮⋮</span>
                                 <span>#${symbol.displayOrder || index + 1}</span>
                             </div>
-                            <img src="${symbol.imageUrl}" alt="${symbol.name}" class="symbol-image" style="pointer-events: none;">
-                            <div class="symbol-name" style="pointer-events: none;">${symbol.name}</div>
+                            <img src="${symbol.imageUrl}" alt="${symbol.nameMalayalam || symbol.name}" class="symbol-image" style="pointer-events: none;">
+                            <div class="symbol-name" style="pointer-events: none;">${symbol.nameMalayalam || symbol.name}</div>
                             ${symbol.nameMalayalam ? `<div class="symbol-name-ml" style="font-size: 0.95rem; color: #059669; margin-top: 0.25rem; direction: rtl; pointer-events: none;">${symbol.nameMalayalam}</div>` : ''}
                             <div class="symbol-category" style="pointer-events: none;">${symbol.category.replace('-', ' ')}</div>
                             <div class="symbol-actions" style="pointer-events: auto;">

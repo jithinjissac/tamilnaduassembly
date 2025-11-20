@@ -1068,12 +1068,12 @@ s0.parentNode.insertBefore(s1,s0);
                 
                 // Update UI
                 document.getElementById('selectedSymbolImage').src = symbol.imageUrl;
-                document.getElementById('selectedSymbolName').textContent = symbol.name;
+                document.getElementById('selectedSymbolName').textContent = symbol.nameMalayalam || symbol.name;
                 
-                // Display Malayalam name if available
+                // Display English name as secondary if Malayalam exists
                 const malayalamNameElement = document.getElementById('selectedSymbolNameMalayalam');
                 if (symbol.nameMalayalam && symbol.nameMalayalam.trim()) {
-                    malayalamNameElement.textContent = symbol.nameMalayalam;
+                    malayalamNameElement.textContent = symbol.name;
                     malayalamNameElement.style.display = 'block';
                 } else {
                     malayalamNameElement.style.display = 'none';
