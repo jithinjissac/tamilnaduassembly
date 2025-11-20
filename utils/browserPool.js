@@ -3,12 +3,12 @@ import { chromium } from 'playwright';
 /**
  * Browser Pool Manager
  * Manages a pool of browser instances with context isolation for concurrent users
- * - Reuses browsers efficiently (5 browsers can handle 20+ users)
+ * - Reuses browsers efficiently (20 browsers can handle 80+ users)
  * - Each user gets isolated context (no data mixing)
  * - Automatic cleanup and health checks
  */
 class BrowserPool {
-  constructor(maxBrowsers = 5) {
+  constructor(maxBrowsers = 20) {
     this.maxBrowsers = maxBrowsers;
     this.browsers = [];
     this.contextCount = new Map(); // Track contexts per browser
@@ -232,7 +232,7 @@ class BrowserPool {
 }
 
 // Singleton instance
-export const browserPool = new BrowserPool(5);
+export const browserPool = new BrowserPool(20);
 
 // Graceful shutdown
 process.on('SIGTERM', () => browserPool.shutdown());
