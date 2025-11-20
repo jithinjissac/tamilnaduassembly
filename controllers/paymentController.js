@@ -192,6 +192,13 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
 
     } catch (error) {
         logger.error('Create Cashfree order error:', error.message);
+        if (error.response) {
+            logger.error('Cashfree API Response:', JSON.stringify({
+                status: error.response.status,
+                data: error.response.data,
+                headers: error.response.headers
+            }));
+        }
         throw error;
     }
 }
