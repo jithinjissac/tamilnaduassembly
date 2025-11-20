@@ -2,12 +2,14 @@ import express from 'express';
 import { browserPool } from '../utils/browserPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { captchaQueue } from '../utils/requestQueue.js';
+import { createLogger } from '../utils/logger.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
+const logger = createLogger('Captcha');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,7 +65,7 @@ router.get('/prewarm-captcha', async (req, res) => {
         console.log('[PREWARM] Loading SEC page...');
         await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
           waitUntil: 'domcontentloaded', // Faster than 'load'
-          timeout: 30000
+          timeout: 60000
         });
         
         console.log('[PREWARM] Page loaded, minimal stabilization...');
@@ -225,7 +227,7 @@ router.get('/initCaptchaSession', async (req, res) => {
           try {
             await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
               waitUntil: 'domcontentloaded', // Much faster than 'load'
-              timeout: 30000
+              timeout: 60000
             });
             pageLoaded = true;
             const pageLoadTime = Date.now() - pageLoadStartTime;
@@ -263,7 +265,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             captchaElement = await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 5000
+              timeout: 10000
             });
             
             if (captchaElement) {

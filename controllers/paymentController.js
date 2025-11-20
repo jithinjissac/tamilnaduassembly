@@ -6,12 +6,15 @@ import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Settings from '../models/Settings.js';
 import { sendPaymentSuccessEmail, sendPDFReadyEmail } from '../utils/emailService.js';
+import { createLogger } from '../utils/logger.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const logger = createLogger('Payment');
 
 // Get active payment gateway settings
 async function getPaymentSettings() {
@@ -30,10 +33,10 @@ async function getPaymentSettings() {
             }
         }
         
-        console.log('💳 Converted payment settings:', JSON.stringify(settings, null, 2));
+        logger.debug('Payment settings loaded');
         return settings;
     } catch (error) {
-        console.error('❌ Failed to load payment settings:', error.message);
+        logger.error('Failed to load payment settings:', error.message);
         // Return defaults if settings not found
         return {
             activeGateway: 'razorpay',
@@ -60,10 +63,8 @@ export const createPaymentOrder = async (req, res) => {
 
         // Get payment settings
         const paymentSettings = await getPaymentSettings();
-        console.log('💳 Payment settings loaded:', JSON.stringify(paymentSettings, null, 2));
-        
         const activeGateway = paymentSettings.activeGateway || 'razorpay';
-        console.log('💳 Active gateway:', activeGateway);
+        logger.debug('Active gateway:', activeGateway);
 
         // Find order
         const order = await Order.findOne({ orderId, userId });
@@ -84,15 +85,13 @@ export const createPaymentOrder = async (req, res) => {
 
         // Route to appropriate gateway
         if (activeGateway === 'cashfree') {
-            console.log('💳 Using Cashfree with settings:', paymentSettings.cashfree);
             return await createCashfreeOrderInternal(req, res, order, paymentSettings.cashfree || {});
         } else {
-            console.log('💳 Using Razorpay with settings:', paymentSettings.razorpay);
             return await createRazorpayOrderInternal(req, res, order, paymentSettings.razorpay || {});
         }
 
     } catch (error) {
-        console.error('Create payment order error:', error);
+        logger.error('Create payment order error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Failed to create payment order',
@@ -104,11 +103,6 @@ export const createPaymentOrder = async (req, res) => {
 // Internal function for Cashfree order creation
 async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
     try {
-        console.log('🔧 Cashfree settings received:', {
-            hasAppId: !!cashfreeSettings.appId,
-            hasSecretKey: !!cashfreeSettings.secretKey,
-            environment: cashfreeSettings.environment
-        });
 
         // Initialize Cashfree with current settings
         const cashfree = initializeCashfree(
@@ -118,7 +112,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         );
 
         if (!cashfree) {
-            console.error('❌ Cashfree initialization failed - missing credentials');
+            logger.error('Cashfree initialization failed - missing credentials');
             return res.status(503).json({ 
                 status: 'error',
                 message: 'Cashfree not configured. Please configure in Payment Settings.' 
@@ -130,7 +124,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
 
         // Check if we already have a Cashfree session for this order
         if (order.cashfreeSessionId) {
-            console.log('♻️ Reusing existing Cashfree session:', order.cashfreeSessionId);
+            logger.debug('Reusing existing Cashfree session:', order.cashfreeSessionId);
             return res.json({
                 status: 'success',
                 gateway: 'cashfree',
@@ -174,13 +168,12 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
             }
         };
 
-        console.log('📦 Creating Cashfree order:', cashfreeOrderId);
+        logger.debug('Creating Cashfree order:', cashfreeOrderId);
 
         // For Cashfree SDK v5+, call PGCreateOrder (API version is set in Cashfree.XApiVersion)
         const response = await cashfree.PGCreateOrder(cashfreeOrderRequest);
 
-        console.log('✅ Cashfree order created successfully');
-        console.log('📄 Cashfree response:', JSON.stringify(response.data, null, 2));
+        logger.info('Cashfree order created:', order.orderId);
 
         // Update order with Cashfree session ID
         order.cashfreeOrderId = cashfreeOrderId;
@@ -198,16 +191,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         });
 
     } catch (error) {
-        console.error('❌ Create Cashfree order error:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            cashfreeSettings: {
-                hasAppId: !!cashfreeSettings.appId,
-                hasSecretKey: !!cashfreeSettings.secretKey,
-                environment: cashfreeSettings.environment
-            }
-        });
+        logger.error('Create Cashfree order error:', error.message);
         throw error;
     }
 }
@@ -251,7 +235,7 @@ async function createRazorpayOrderInternal(req, res, order, razorpaySettings) {
         });
 
     } catch (error) {
-        console.error('Create Razorpay order error:', error);
+        logger.error('Create Razorpay order error:', error.message);
         throw error;
     }
 }
@@ -314,7 +298,7 @@ export const createRazorpayOrder = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Create Razorpay order error:', error);
+        logger.error('Create Razorpay order error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Failed to create payment order',
@@ -369,19 +353,16 @@ export const verifyPayment = async (req, res) => {
         // Send payment success email
         const user = await User.findById(order.userId);
         if (user) {
-            sendPaymentSuccessEmail(user, order).catch(err => {
-                console.error('❌ Failed to send payment success email:', err.message);
+                sendPaymentSuccessEmail(user, order).catch(err => {
+                logger.error('Failed to send payment success email:', err.message);
             });
             
             // Check if PDF is already ready and send PDF ready email
             const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
             if (fs.existsSync(permanentPdfPath)) {
-                console.log(`✅ PDF already exists for ${order.orderId}, sending PDF ready email`);
                 sendPDFReadyEmail(user, order).catch(err => {
-                    console.error('❌ Failed to send PDF ready email:', err.message);
+                    logger.error('Failed to send PDF ready email:', err.message);
                 });
-            } else {
-                console.log(`⏳ PDF not ready yet for ${order.orderId}, will send email when PDF generation completes`);
             }
         }
 
@@ -400,7 +381,7 @@ export const verifyPayment = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Verify payment error:', error);
+        logger.error('Verify payment error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Payment verification failed',
@@ -447,12 +428,9 @@ export const webhook = async (req, res) => {
                 if (user) {
                     const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
                     if (fs.existsSync(permanentPdfPath)) {
-                        console.log(`✅ [Webhook] PDF exists for ${order.orderId}, sending PDF ready email`);
                         sendPDFReadyEmail(user, order).catch(err => {
-                            console.error('❌ Failed to send PDF ready email:', err.message);
+                            logger.error('Failed to send PDF ready email:', err.message);
                         });
-                    } else {
-                        console.log(`⏳ [Webhook] PDF not ready yet for ${order.orderId}`);
                     }
                 }
             }
@@ -470,7 +448,7 @@ export const webhook = async (req, res) => {
         res.json({ status: 'success' });
 
     } catch (error) {
-        console.error('Webhook error:', error);
+        logger.error('Webhook error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Webhook processing failed',
@@ -497,7 +475,7 @@ export const cashfreeWebhook = async (req, res) => {
         const order = await Order.findOne({ orderId });
         
         if (!order) {
-            console.log(`⚠️ Order not found for Cashfree webhook: ${orderId}`);
+            logger.warn('Order not found for Cashfree webhook:', orderId);
             return res.json({ status: 'success' }); // Return success to avoid retries
         }
 
@@ -508,38 +486,36 @@ export const cashfreeWebhook = async (req, res) => {
             order.paidAt = new Date();
             await order.save();
 
-            console.log(`✅ [Cashfree Webhook] Payment completed for order: ${orderId}`);
+            logger.info('Payment completed:', orderId);
 
             // Send payment success and PDF ready emails
             const user = await User.findById(order.userId);
             if (user) {
                 sendPaymentSuccessEmail(user, order).catch(err => {
-                    console.error('❌ Failed to send payment success email:', err.message);
+                    logger.error('Failed to send payment success email:', err.message);
                 });
 
                 // Check if PDF exists
                 const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
                 if (fs.existsSync(permanentPdfPath)) {
-                    console.log(`✅ [Cashfree Webhook] PDF exists, sending PDF ready email`);
                     sendPDFReadyEmail(user, order).catch(err => {
-                        console.error('❌ Failed to send PDF ready email:', err.message);
+                        logger.error('Failed to send PDF ready email:', err.message);
                     });
                 }
             }
         } else if (orderStatus === 'ACTIVE') {
-            // Payment pending
-            console.log(`⏳ [Cashfree Webhook] Payment pending for order: ${orderId}`);
+            logger.debug('Payment pending:', orderId);
         } else if (['EXPIRED', 'CANCELLED', 'FAILED'].includes(orderStatus)) {
             // Payment failed
             order.paymentStatus = 'failed';
             await order.save();
-            console.log(`❌ [Cashfree Webhook] Payment failed for order: ${orderId}, status: ${orderStatus}`);
+            logger.warn('Payment failed:', orderId, 'status:', orderStatus);
         }
 
         res.json({ status: 'success' });
 
     } catch (error) {
-        console.error('Cashfree webhook error:', error);
+        logger.error('Cashfree webhook error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Webhook processing failed',
@@ -590,12 +566,12 @@ export const verifyCashfreePayment = async (req, res) => {
             });
         }
 
-        console.log('🔍 Fetching Cashfree payment status for:', order.cashfreeOrderId);
+        logger.debug('Fetching Cashfree payment status for:', order.cashfreeOrderId);
 
         // Fetch order status from Cashfree using the Cashfree order ID
         const response = await cashfree.PGOrderFetchPayments(order.cashfreeOrderId);
         
-        console.log('📄 Cashfree payment response:', JSON.stringify(response.data, null, 2));
+        logger.debug('Cashfree payment response received');
         
         const payments = response.data;
         
@@ -613,13 +589,13 @@ export const verifyCashfreePayment = async (req, res) => {
                 const user = await User.findById(order.userId);
                 if (user) {
                     sendPaymentSuccessEmail(user, order).catch(err => {
-                        console.error('❌ Failed to send payment success email:', err.message);
+                        logger.error('Failed to send payment success email:', err.message);
                     });
 
                     const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
                     if (fs.existsSync(permanentPdfPath)) {
                         sendPDFReadyEmail(user, order).catch(err => {
-                            console.error('❌ Failed to send PDF ready email:', err.message);
+                            logger.error('Failed to send PDF ready email:', err.message);
                         });
                     }
                 }
@@ -653,7 +629,7 @@ export const verifyCashfreePayment = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Verify Cashfree payment error:', error);
+        logger.error('Verify Cashfree payment error:', error.message);
         res.status(500).json({ 
             status: 'error',
             message: 'Payment verification failed',

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
+import { requestLogger, logger } from './utils/logger.js';
 
 // ES Module imports for new modules
 import connectDB from './config/database.js';
@@ -34,6 +35,9 @@ connectDB();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Request logging middleware (throttled based on LOG_LEVEL and REQUEST_LOG_INTERVAL)
+app.use(requestLogger);
 
 // Serve static files (frontend) with cache control
 app.use(express.static(path.join(__dirname, 'frontend'), {
@@ -134,16 +138,12 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📝 Frontend available at http://localhost:${PORT}`);
-  console.log(`💵 Auth API: /api/auth/*`);
-  console.log(`📦 Orders API: /api/orders/*`);
-  console.log(`💳 Payment API: /api/payment/*`);
-  console.log(`📄 Slips API: /api/slips/*`);
-  console.log(`⚙️  Settings API: /api/settings/*`);
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Log level: ${process.env.LOG_LEVEL || 'info'}`);
+  logger.info(`Request logging: Every ${process.env.REQUEST_LOG_INTERVAL || 10}th request`);
   
   // Cleanup expired PDFs on startup
-  console.log('🧹 Running initial PDF cleanup...');
+  logger.info('Running initial PDF cleanup...');
   cleanupExpiredPDFs();
   
   // Periodic cleanup every 10 minutes
@@ -154,13 +154,13 @@ app.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down gracefully...');
+  logger.info('Shutting down gracefully...');
   await closeBrowser();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n🛑 Shutting down gracefully...');
+  logger.info('Shutting down gracefully...');
   await closeBrowser();
   process.exit(0);
 });
