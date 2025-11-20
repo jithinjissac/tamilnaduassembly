@@ -103,7 +103,88 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
       return el && el.options.length > 1;
     }, { timeout: 15000 });
 
-    // Extract options
+    // ===== NEW APPROACH: Submit initial form to get Malayalam polling stations =====
+    console.log('[PLAYWRIGHT_STATIONS] Submitting initial form to reveal Malayalam polling stations...');
+    
+    // Fill in a dummy captcha (or try to submit without it if possible)
+    try {
+      // Select first polling station option
+      const firstStation = await page.evaluate(() => {
+        const sel = document.querySelector('#view_voters_list_pollingStation');
+        if (sel && sel.options.length > 1) {
+          return sel.options[1].value; // First real option (skip empty)
+        }
+        return null;
+      });
+
+      if (firstStation) {
+        await page.selectOption('#view_voters_list_pollingStation', firstStation);
+        await page.waitForTimeout(500);
+      }
+
+      // Try to get captcha input and fill dummy value
+      const captchaInput = await page.$('#view_voters_list_captcha');
+      if (captchaInput) {
+        await page.fill('#view_voters_list_captcha', '0000'); // Dummy - will fail but triggers form processing
+      }
+
+      // Submit the form
+      const submitButton = await page.$('button[type="submit"], input[type="submit"], .btn-primary');
+      if (submitButton) {
+        await submitButton.click();
+        console.log('[PLAYWRIGHT_STATIONS] Form submitted, waiting for response...');
+        
+        // Wait for either success page or error response
+        await page.waitForTimeout(3000);
+        
+        // Check if form2 appeared or if there's new content with polling station data
+        const hasForm2 = await page.$('#form2');
+        const hasError = await page.$('.alert-danger, .error-message');
+        
+        if (hasForm2) {
+          console.log('[PLAYWRIGHT_STATIONS] Form2 detected - extracting polling stations from response');
+          
+          // Extract polling station from form2 or response headers/hidden fields
+          const pollingStationFromResponse = await page.evaluate(() => {
+            // Try multiple selectors where polling station name might appear in Malayalam
+            const selectors = [
+              '#form2 input[name="polling_station"]',
+              '#form2 input[name="pollingStation"]',
+              '#form2 .polling-station-name',
+              '.voter-details .polling-station',
+              'input[type="hidden"][name*="polling"]',
+              '.form-group:has(label:contains("Polling Station")) input'
+            ];
+            
+            for (const selector of selectors) {
+              try {
+                const el = document.querySelector(selector);
+                if (el) {
+                  const value = el.value || el.textContent?.trim();
+                  if (value && /[\u0D00-\u0D7F]/.test(value)) {
+                    return { selector, value };
+                  }
+                }
+              } catch (e) {}
+            }
+            
+            // Try to find polling station in any text content with Malayalam
+            const allText = document.body.innerText;
+            const malayalamLines = allText.split('\n')
+              .filter(line => /[\u0D00-\u0D7F]/.test(line) && line.length > 10);
+            
+            return { malayalamContent: malayalamLines.slice(0, 5) };
+          });
+          
+          console.log('[PLAYWRIGHT_STATIONS] Response data:', JSON.stringify(pollingStationFromResponse, null, 2));
+        }
+      }
+    } catch (submitError) {
+      console.log('[PLAYWRIGHT_STATIONS] Form submission for Malayalam extraction failed (expected):', submitError.message);
+    }
+    // ===== END NEW APPROACH =====
+
+    // Extract options from the dropdown (original method as fallback)
     const stations = await page.evaluate(() => {
       const sel = document.querySelector('#view_voters_list_pollingStation');
       if (!sel) return [];
