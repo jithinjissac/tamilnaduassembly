@@ -52,7 +52,7 @@ export const register = [
 
             // Generate JWT token
             const token = jwt.sign(
-                { userId: user._id },
+                { userId: user._id, role: user.role },
                 process.env.JWT_SECRET || 'your-secret-key-change-this',
                 { expiresIn: '30d' }
             );
@@ -132,7 +132,7 @@ export const login = [
 
             // Generate JWT token
             const token = jwt.sign(
-                { userId: user._id },
+                { userId: user._id, role: user.role },
                 process.env.JWT_SECRET || 'your-secret-key-change-this',
                 { expiresIn: '30d' }
             );

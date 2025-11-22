@@ -49,6 +49,65 @@ Before deploying to production:
 # Login to https://dashboard.razorpay.com/
 # Go to Settings → API Keys → Generate Live Keys
 RAZORPAY_KEY_ID=rzp_live_XXXXXXXXXX
+```
+
+---
+
+## 🔐 Protected Frontend Deployment (Updated November 2025)
+
+Railway will automatically serve the **protected/obfuscated** version of your frontend.
+
+### Automatic Protection Process:
+1. **Railway runs**: `npm install` (installs dependencies including obfuscation tools)
+2. **Railway executes**: The updated start command that includes protection
+3. **Protection runs**: `npm run protect:safe` generates obfuscated files in `frontend-protected/`
+4. **Server starts**: With `USE_PROTECTED=true` environment variable
+5. **Frontend served**: From protected directory with obfuscated JavaScript
+
+### Updated package.json Start Script:
+```json
+"start": "npm run protect:safe && cross-env USE_PROTECTED=true NODE_ENV=production node server.js"
+```
+
+### Railway Configuration (railway.json):
+```json
+{
+  "deploy": {
+    "startCommand": "npm run protect:safe && cross-env USE_PROTECTED=true NODE_ENV=production node server.js",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+### What Gets Protected:
+- All inline JavaScript in HTML files gets obfuscated
+- Variable names scrambled (business logic hidden)
+- String arrays rotated and encoded
+- Control flow remains intact (no crashes)
+- All static assets copied (CSS, images, fonts, etc.)
+
+### CSP Security:
+- Configured for all external services (payments, fonts, analytics)
+- Allows necessary blob URLs for PDF processing
+- Maintains security while enabling functionality
+
+## Deploy Commands:
+
+### Deploy to Railway:
+```bash
+git add .
+git commit -m "Deploy with protected frontend"
+git push origin main
+```
+
+### Test Locally (Production Mode):
+```bash
+npm run protect:safe
+cross-env USE_PROTECTED=true NODE_ENV=production node server.js
+```
+
+## Status: ✅ Ready for Protected Railway Deployment
 RAZORPAY_KEY_SECRET=XXXXXXXXXX
 ```
 

@@ -5,8 +5,16 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "npm run protect:safe && cross-env USE_PROTECTED=true NODE_ENV=production node server.js",
+    "start:dev": "node server.js",
+    "start:production": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
     "dev": "nodemon server.js",
+    "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
+    "protect": "node build-scripts/obfuscate-inline.cjs",
+    "protect:safe": "node build-scripts/obfuscate-safe.cjs",
+    "serve:protected": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
+    "verify:deployment": "node verify-deployment.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -42,9 +50,20 @@
     "puppeteer": "^24.29.1",
     "razorpay": "^2.9.6",
     "snappy": "^7.3.3",
-    "ua-parser-js": "^2.0.6"
+    "ua-parser-js": "^2.0.6",
+    "cross-env": "^10.1.0",
+    "javascript-obfuscator": "^4.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.5",
+    "nodemon": "^3.0.2",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-obfuscator": "^3.5.1"
   }
 }

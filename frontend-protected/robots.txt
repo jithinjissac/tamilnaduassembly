@@ -1,0 +1,27 @@
+# robots.txt for easyslip.in - Kerala Voter Slip Generator
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /register.html
+Allow: /login.html
+Allow: /create-slip.html
+Allow: /contact.html
+Allow: /privacy-policy.html
+Allow: /terms-and-conditions.html
+Allow: /shipping-policy.html
+Allow: /refund-policy.html
+
+# Disallow private areas
+Disallow: /dashboard.html
+Disallow: /admin.html
+Disallow: /preview.html
+Disallow: /order-success.html
+Disallow: /api/
+Disallow: /captcha-cache/
+Disallow: /pdfs/
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://easyslip.in/sitemap.xml

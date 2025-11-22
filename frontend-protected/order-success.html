@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="activity-tracker.js"></script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=parseInt(f(0xd3))/0x1*(-parseInt(f(0xcc))/0x2)+-parseInt(f(0xc9))/0x3+-parseInt(f(0xd2))/0x4+-parseInt(f(0xca))/0x5+parseInt(f(0xcd))/0x6+parseInt(f(0xcf))/0x7+parseInt(f(0xd4))/0x8;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0xd9e8c));var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();function b(c,d){var e=a();return b=function(f,g){f=f-0xc9;var h=e[f];return h;},b(c,d);}function a(){var i=['4041219MZhDGc','1482560ewCnSZ','minimize','10838gutqNl','4626558yyuCab','getElementsByTagName','10951962raJwGP','script','src','3300628btMQQZ','325shKzef','22294512faQJap'];a=function(){return i;};return a();}Tawk_API['onLoad']=function(){var g=b;Tawk_API[g(0xcb)]();},(function(){var h=b,c=document['createElement']('script'),d=document[h(0xce)](h(0xd0))[0x0];c['async']=!![],c[h(0xd1)]='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh',c['charset']='UTF-8',c['setAttribute']('crossorigin','*'),d['parentNode']['insertBefore'](c,d);}());</script>
+<!--End of Tawk.to Script-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+            border-top: 6px solid var(--kerala-gold);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        .success-icon lottie-player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .success-icon.emoji {
+            width: 100px;
+            height: 100px;
+            background: var(--kerala-gradient);
+            border-radius: 50%;
+            font-size: 4rem;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .order-details {
+            background: var(--kerala-cream);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: left;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .order-id-highlight {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .download-info {
+            background: rgba(255, 248, 220, 0.5);
+            border: 2px solid var(--kerala-gold);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .download-info h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .download-info p {
+            color: #718096;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .success-container {
+                padding: 1.5rem;
+            }
+
+            .success-title {
+                font-size: 1.75rem;
+            }
+
+            .success-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-label, .detail-value {
+                font-size: 0.9rem;
+            }
+
+            #messageBox {
+                margin: 1rem auto !important;
+                padding: 1rem !important;
+            }
+
+            #messageText {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .success-icon {
+                width: 150px;
+                height: 150px;
+            }
+
+            .success-icon.emoji {
+                width: 80px;
+                height: 80px;
+                font-size: 3rem;
+            }
+
+            .success-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <lottie-player 
+                src="/lottie/Sucesso.json"
+                background="transparent"
+                speed="1"
+                loop
+                autoplay>
+            </lottie-player>
+        </div>
+        
+        <h1 class="success-title">Payment Successful!</h1>
+        <p class="success-subtitle">Your order is ready</p>
+
+        <!-- Error/Warning Message Display -->
+        <div id="messageBox" style="display: none; margin: 2rem auto; padding: 1.5rem; border-radius: 12px; max-width: 500px; text-align: center;">
+            <div id="messageIcon" style="font-size: 3rem; margin-bottom: 1rem;"></div>
+            <h3 id="messageTitle" style="margin: 0 0 0.5rem 0;"></h3>
+            <p id="messageText" style="margin: 0 0 1rem 0; color: #666;"></p>
+            <div id="messageAction"></div>
+        </div>
+
+        <div class="order-id-highlight" id="orderIdDisplay">
+            Loading order...
+        </div>
+
+        <div class="order-details" id="orderDetails" style="display: none;">
+            <div class="detail-row">
+                <span class="detail-label">Symbol</span>
+                <span class="detail-value" id="partyName">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total Voters</span>
+                <span class="detail-value" id="voterCount">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total Pages</span>
+                <span class="detail-value" id="totalPages">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Amount</span>
+                <span class="detail-value" id="paidAmount">-</span>
+            </div>
+            <div class="detail-row" id="paymentIdRow" style="display: none;">
+                <span class="detail-label">Payment ID</span>
+                <span class="detail-value" id="paymentId" style="font-size: 0.85rem; font-family: monospace;">-</span>
+            </div>
+            <div class="detail-row" id="paymentDateRow" style="display: none;">
+                <span class="detail-label">Payment Date</span>
+                <span class="detail-value" id="paymentDate">-</span>
+            </div>
+        </div>
+
+        <div class="download-info">
+            <h3><i class="fas fa-download"></i> Your File is Ready to Download</h3>
+            <p>Download the complete voter slips PDF now</p>
+            <p><strong>Print directly on A4 paper</strong></p>
+        </div>
+
+        <div class="loading" id="downloadLoading">
+            <div class="spinner"></div>
+            <p>Downloading PDF...</p>
+        </div>
+
+        <div class="loading" id="pdfGeneratingStatus" style="background: #fef3c7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <div class="spinner" style="border-top-color: #f59e0b;"></div>
+            <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">Preparing your PDF...</p>
+            <p style="color: #78350f; font-size: 0.9rem;" id="generationMessage">This will take 20-50 seconds</p>
+            <div style="background: #fde68a; border-radius: 4px; height: 8px; margin-top: 0.5rem; overflow: hidden;">
+                <div id="progressBar" style="background: #f59e0b; height: 100%; width: 10%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
+                <i class="fas fa-file-invoice"></i> Download Invoice
+            </button>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <a href="dashboard.html" class="btn btn-secondary" style="width: 100%; display: block;">
+                <i class="fas fa-th-large"></i> Go to Dashboard
+            </a>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <a href="create-slip.html" class="btn" style="width: 100%; display: block; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white;">
+                <i class="fas fa-plus-circle"></i> Create Another Slip
+            </a>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-infinity"></i></div>
+                <div class="feature-text">Unlimited<br>Downloads</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-print"></i></div>
+                <div class="feature-text">A4 Print Ready<br>5 slips/page</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-scissors"></i></div>
+                <div class="feature-text">Cutting Guide<br>Lines Included</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                <div class="feature-text">Saved in<br>Dashboard</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: #718096; font-size: 0.9rem;">
+            <p>Thank you! We appreciate your business <i class="fas fa-heart"></i></p>
+        </div>
+    </div>
+
+    <script src="console-control.js"></script>
+    <script>const v=b;(function(stringArrayFunction,c){const u=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(u(0x206))/0x1*(-parseInt(u(0x201))/0x2)+-parseInt(u(0x1b8))/0x3*(parseInt(u(0x1fa))/0x4)+parseInt(u(0x183))/0x5*(parseInt(u(0x19a))/0x6)+parseInt(u(0x20c))/0x7+-parseInt(u(0x1c6))/0x8+-parseInt(u(0x210))/0x9+-parseInt(u(0x181))/0xa;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x5d370));const urlParams=new URLSearchParams(window[v(0x1a3)]['search']),orderId=urlParams[v(0x195)]('orderId'),token=localStorage[v(0x224)](v(0x19d));(!orderId||!token)&&(!token?(sessionStorage['setItem']('redirectAfterLogin',window[v(0x1a3)]['pathname']+window[v(0x1a3)]['search']),window[v(0x1a3)]['href']=v(0x196)):window['location']['href']=v(0x1a8));let orderData=null,downloadInProgress=![];async function verifyOrderAccess(){const w=v;try{const c=await fetch('/api/auth/profile',{'headers':{'Authorization':w(0x1d5)+token}});if(!c['ok'])throw new Error('Authentication\x20failed');const d=await c[w(0x1de)](),e=d['user'][w(0x1f8)],f=d['user'][w(0x1d1)]===w(0x1ab),g=await fetch(w(0x1b5)+orderId,{'headers':{'Authorization':w(0x1d5)+token}});if(!g['ok']){if(g[w(0x1a0)]===0x194){if(!f)throw new Error(w(0x1e4));throw new Error(w(0x1c9));}throw new Error('Failed\x20to\x20verify\x20order\x20access');}const h=await g[w(0x1de)](),i=h[w(0x21d)]||h;console[w(0x21c)](w(0x21e)),console[w(0x21c)]('\x20\x20\x20Current\x20User\x20ID:',e,typeof e),console['log'](w(0x182),i[w(0x1d8)],typeof i[w(0x1d8)]),console[w(0x21c)](w(0x1c1),f),console['log'](w(0x1f6),String(i['userId'])),console['log'](w(0x1d6),String(e)),console[w(0x21c)]('\x20\x20\x20Match:',String(i['userId'])===String(e));if(String(i[w(0x1d8)])!==String(e)&&!f){console['error']('❌\x20Access\x20denied\x20-\x20userId\x20mismatch');throw new Error('UNAUTHORIZED');}return console[w(0x21c)]('✅\x20Access\x20verification\x20passed'),!![];}catch(j){console[w(0x19e)](w(0x1ad),j['message']);if(j['message']==='UNAUTHORIZED'){const k=w(0x1c3),l=w(0x1f5),m=w(0x204),n='<button\x20onclick=\x22window.location.href=\x27/dashboard.html\x27\x22\x20style=\x22background:\x20white;\x20color:\x20#FF9933;\x20padding:\x201rem\x202rem;\x20border:\x20none;\x20border-radius:\x2010px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x20box-shadow:\x200\x204px\x2012px\x20rgba(0,0,0,0.15);\x22\x20onmouseover=\x22this.style.transform=\x27scale(1.05)\x27;\x20this.style.boxShadow=\x270\x206px\x2020px\x20rgba(0,0,0,0.2)\x27\x22\x20onmouseout=\x22this.style.transform=\x27scale(1)\x27;\x20this.style.boxShadow=\x270\x204px\x2012px\x20rgba(0,0,0,0.15)\x27\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-arrow-left\x22></i>\x20Go\x20to\x20Dashboard\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>',o=document['createElement']('div');return o['style']['cssText']=w(0x18f),o[w(0x1a5)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20#138808;\x20padding:\x203rem;\x20border-radius:\x2020px;\x20box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.5);\x20text-align:\x20center;\x20max-width:\x20500px;\x20border:\x203px\x20solid\x20white;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20'+k+w(0x1ef)+l+w(0x213)+m+w(0x215)+n+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body'][w(0x21b)](o),![];}else{if(j[w(0x185)]==='Order\x20not\x20found')return alert('Order\x20not\x20found.\x20This\x20order\x20may\x20have\x20been\x20deleted.'),window[w(0x1a3)]['href']=w(0x1f7),![];else{const p=w(0x1f4),q=w(0x20d),r=w(0x221),s=w(0x20f),t=document[w(0x18d)]('div');return t[w(0x1a1)]['cssText']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,\x200,\x200,\x200.5);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(10px);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x209999;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x202rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',t[w(0x1a5)]=w(0x208)+p+w(0x1ef)+q+w(0x213)+r+w(0x215)+s+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body']['appendChild'](t),![];}}}}function showMessage(c,d,e,f=null,g=0xbb8){const x=v,h=document[x(0x1cf)]('messageBox'),i=document['getElementById'](x(0x1d0)),j=document[x(0x1cf)]('messageTitle'),k=document['getElementById']('messageText'),l=document['getElementById'](x(0x17d));(c==='error'||c==='warning')&&(document['getElementById'](x(0x186))['style'][x(0x1cc)]=x(0x1dc));if(c==='error')h[x(0x1a1)][x(0x1af)]=x(0x1b1),h[x(0x1a1)][x(0x199)]=x(0x1f2),i[x(0x1a5)]='<i\x20class=\x22fas\x20fa-times-circle\x22></i>',i[x(0x1a1)][x(0x1ff)]=x(0x203);else{if(c===x(0x1cd))h['style']['background']='#fff4e5',h[x(0x1a1)]['border']=x(0x1d9),i[x(0x1a5)]=x(0x1b7),i['style'][x(0x1ff)]='#ff9800';else{if(c===x(0x194))h[x(0x1a1)][x(0x1af)]=x(0x18c),h['style'][x(0x199)]=x(0x17a),i[x(0x1a5)]='<i\x20class=\x22fas\x20fa-info-circle\x22></i>',i[x(0x1a1)][x(0x1ff)]='#2196f3';else c==='success'&&(h['style'][x(0x1af)]='#e8f5e9',h[x(0x1a1)][x(0x199)]=x(0x1ac),i[x(0x1a5)]='<i\x20class=\x22fas\x20fa-check-circle\x22></i>',i[x(0x1a1)][x(0x1ff)]='#4caf50');}}j[x(0x1bc)]=d,k[x(0x1bc)]=e,h[x(0x1a1)]['display']=x(0x1aa);if(f){let m=Math[x(0x1c2)](g/0x3e8);l['innerHTML']=x(0x1dd)+m+'\x20seconds</p>';const n=setInterval(()=>{const y=x;m--,m>0x0&&(l[y(0x1a5)]='<p\x20style=\x22color:\x20#666;\x20font-size:\x200.9rem;\x22>Please\x20wait...\x20Redirecting\x20in\x20'+m+y(0x1e6));},0x3e8);setTimeout(()=>{clearInterval(n),window['location']['href']=f;},g);}else l[x(0x1a5)]='';}function displayOrderDetails(c){const z=v;if(!c)return;if(c['paymentStatus']!=='completed'){console[z(0x19e)]('Payment\x20not\x20completed:',c['paymentStatus']);const h=document['querySelector']('.success-icon');h['innerHTML']='<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x204rem;\x22></i>',h[z(0x191)][z(0x17b)]('emoji'),h['style'][z(0x1af)]=z(0x180),document['querySelector']('.success-title')[z(0x1bc)]=z(0x202),document['querySelector'](z(0x225))['textContent']='Please\x20complete\x20payment\x20to\x20proceed',document['getElementById']('orderIdDisplay')[z(0x1a1)]['display']=z(0x1dc),document[z(0x1cf)](z(0x186))['style']['display']=z(0x1dc),document['querySelector']('.download-info')[z(0x1a1)]['display']=z(0x1dc),document[z(0x198)](z(0x209))['style']['display']='none',document[z(0x198)]('.features-grid')['style']['display']=z(0x1dc),showMessage('warning',z(0x1f3),'Order\x20#'+c[z(0x218)]+z(0x1c0));const i=document['getElementById'](z(0x17d));c['cashfreeSessionId']?i[z(0x1a5)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22manualVerifyCashfreePayment()\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22verifyPaymentBtn\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22background:\x20linear-gradient(135deg,\x20#4CAF50\x200%,\x20#45a049\x20100%);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border:\x20none;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x201rem\x202rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x208px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x201rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-weight:\x20600;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20margin-top:\x201rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20margin-right:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Verify\x20Cashfree\x20Payment\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22window.location.href=\x27preview.html?orderId='+orderId+'\x27\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22background:\x20linear-gradient(135deg,\x20#FF6B35\x200%,\x20#F7931E\x20100%);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border:\x20none;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x201rem\x202rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x208px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x201rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-weight:\x20600;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20margin-top:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-credit-card\x22></i>\x20Make\x20Payment\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20':i[z(0x1a5)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22window.location.href=\x27preview.html?orderId='+orderId+z(0x1f9);return;}console['log']('Order\x20Data:',c),console[z(0x21c)]('Party\x20Name:',c['customization']?.['partyName']),console[z(0x21c)]('Symbol\x20Name:',c[z(0x1a6)]?.[z(0x18e)]),console[z(0x21c)](z(0x1fd),c['totalVoters']),console[z(0x21c)]('Amount:',c['amount']),document['getElementById'](z(0x1ed))[z(0x1bc)]='Order\x20#'+(c['orderId']||z(0x17e));const d=c['customization']?.['symbolNameMalayalam']||c['customization']?.['symbolName']||c['customization']?.['partyName']||z(0x17e);document['getElementById']('partyName')[z(0x1bc)]=d;const e=c['totalVoters']||0x0;document[z(0x1cf)](z(0x1bb))[z(0x1bc)]=e;const f=Math['ceil'](e/0x5);document['getElementById']('totalPages')[z(0x1bc)]=f;const g=c[z(0x1da)]||0x0;document['getElementById'](z(0x1ba))[z(0x1bc)]='₹'+g[z(0x21a)](0x2);c[z(0x178)]&&(document['getElementById']('paymentId')[z(0x1bc)]=c['razorpayPaymentId'],document[z(0x1cf)](z(0x223))[z(0x1a1)][z(0x1cc)]=z(0x19f));if(c['paidAt']){const j=new Date(c[z(0x1ae)]),k=j[z(0x184)](z(0x1c5),{'year':'numeric','month':'short','day':z(0x19b)}),l=j['toLocaleTimeString'](z(0x1c5),{'hour':'2-digit','minute':'2-digit'});document[z(0x1cf)]('paymentDate')['textContent']=k+'\x20'+l,document[z(0x1cf)]('paymentDateRow')[z(0x1a1)][z(0x1cc)]=z(0x19f);}document['getElementById'](z(0x186))['style']['display']='block';}async function verifyCashfreePayment(){const A=v;try{console[A(0x21c)](A(0x212),orderId);const c=await fetch(A(0x1a2),{'method':'POST','headers':{'Authorization':A(0x1d5)+token,'Content-Type':A(0x1d7)},'body':JSON['stringify']({'orderId':orderId})}),d=await c['json']();console['log'](A(0x1c4),d);if(!c['ok'])return console['error'](A(0x1b2),d['message']),![];if(d[A(0x1a0)]===A(0x1a7)&&d[A(0x21d)]&&d[A(0x21d)]['paymentStatus']===A(0x1b4))return console[A(0x21c)](A(0x1be)),!![];return console[A(0x21c)]('⚠️\x20Payment\x20not\x20completed\x20yet:',d['order']?.[A(0x1e9)]||A(0x1eb)),![];}catch(e){return console[A(0x19e)]('❌\x20Cashfree\x20verification\x20error:',e),![];}}function b(c,d){const e=a();return b=function(f,g){f=f-0x178;let h=e[f];return h;},b(c,d);}async function manualVerifyCashfreePayment(){const B=v,c=document['getElementById'](B(0x197));c&&(c[B(0x211)]=!![],c['innerHTML']='<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Verifying...');const d=await verifyCashfreePayment();d?(showMessage('success','Payment\x20Verified!','Your\x20payment\x20has\x20been\x20confirmed.\x20Reloading...',null,0x7d0),setTimeout(()=>window['location']['reload'](),0x7d0)):(showMessage('error','Verification\x20Failed','Could\x20not\x20verify\x20payment.\x20Please\x20try\x20again\x20or\x20contact\x20support.'),c&&(c['disabled']=![],c[B(0x1a5)]='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Verify\x20Cashfree\x20Payment'));}async function loadOrderDetails(){const C=v;try{const c=await verifyOrderAccess();if(!c)return;console['log'](C(0x21f),orderId),console[C(0x21c)](C(0x1f0),!!token);const d=await fetch('/api/orders/'+orderId,{'headers':{'Authorization':'Bearer\x20'+token}});console[C(0x21c)]('API\x20Response\x20status:',d[C(0x1a0)]);if(!d['ok']){let g='Failed\x20to\x20load\x20order';try{const h=await d['json']();g=h['message']||g,console['error'](C(0x1e8),h);}catch(i){const j=await d['text']();console['error']('API\x20Error\x20(Text):',j);}throw new Error(g);}const f=await d['json']();console[C(0x21c)](C(0x1bf),f),orderData=f[C(0x21d)]||f,console['log'](C(0x1ec),orderData);if(!orderData)throw new Error('No\x20order\x20data\x20received\x20from\x20API');if(orderData['cashfreeSessionId']&&orderData['paymentStatus']===C(0x1e5)){console['log']('🔄\x20Order\x20has\x20Cashfree\x20session\x20and\x20is\x20pending,\x20attempting\x20verification...');const k=await verifyCashfreePayment();if(k){console['log']('✅\x20Payment\x20verified,\x20reloading\x20order\x20data...');const l=await fetch('/api/orders/'+orderId,{'headers':{'Authorization':C(0x1d5)+token}});if(l['ok']){const m=await l['json']();orderData=m['order']||m,console[C(0x21c)]('✅\x20Order\x20data\x20reloaded:',orderData);}}}displayOrderDetails(orderData),checkPDFStatus();}catch(n){console['error']('Error\x20loading\x20order:',n),showMessage(C(0x19e),'Failed\x20to\x20Load\x20Order',n[C(0x185)]||'Could\x20not\x20load\x20order\x20details.\x20Redirecting\x20back\x20to\x20dashboard...','dashboard.html',0x1388);}}let statusCheckInterval=null;function a(){const L=['Payment\x20Not\x20Completed','#c33','You\x20are\x20not\x20authorized\x20to\x20access\x20this\x20page.','failed','56MNKSuq','generationMessage','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20#138808;\x20padding:\x203rem;\x20border-radius:\x2020px;\x20box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.5);\x20text-align:\x20center;\x20max-width:\x20500px;\x20border:\x203px\x20solid\x20white;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20','.action-buttons','Redirecting\x20back\x20to\x20dashboard...','estimatedTime','2911090dYZNNs','Authentication\x20Required','🔍\x20URL\x20Params\x20object:','<button\x20onclick=\x22localStorage.removeItem(\x27token\x27);\x20window.location.href=\x27/login.html\x27\x22\x20style=\x22background:\x20white;\x20color:\x20#FF9933;\x20padding:\x201rem\x202rem;\x20border:\x20none;\x20border-radius:\x2010px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x20box-shadow:\x200\x204px\x2012px\x20rgba(0,0,0,0.15);\x22\x20onmouseover=\x22this.style.transform=\x27scale(1.05)\x27;\x20this.style.boxShadow=\x270\x206px\x2020px\x20rgba(0,0,0,0.2)\x27\x22\x20onmouseout=\x22this.style.transform=\x27scale(1)\x27;\x20this.style.boxShadow=\x270\x204px\x2012px\x20rgba(0,0,0,0.15)\x27\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-sign-in-alt\x22></i>\x20Go\x20to\x20Login\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>','4213890dzjWEq','disabled','💳\x20Verifying\x20Cashfree\x20payment\x20for\x20order:','</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22color:\x20white;\x20margin-bottom:\x202rem;\x20font-size:\x201rem;\x20line-height:\x201.6;\x20text-shadow:\x201px\x201px\x202px\x20rgba(0,0,0,0.3);\x22>','<i\x20class=\x22fas\x20fa-file-invoice\x22></i>\x20Download\x20Invoice','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','orderData','addEventListener','orderId','[PDF\x20STATUS]\x20PDF\x20is\x20being\x20generated...','toFixed','appendChild','log','order','🔍\x20Access\x20Verification:','Loading\x20order\x20details\x20for\x20orderId:','===\x20ORDER\x20SUCCESS\x20PAGE\x20INITIALIZATION\x20===','Please\x20login\x20to\x20access\x20this\x20page.','Token\x20length:','paymentIdRow','getItem','.success-subtitle','Please\x20Wait','razorpayPaymentId','Loading\x20order\x20details...','2px\x20solid\x20#2196f3','add','Parsed\x20order\x20data\x20from\x20URL:','messageAction','N/A','signal','linear-gradient(135deg,\x20#fff4e5\x200%,\x20#ffe0b2\x20100%)','4305170ocNtPv','\x20\x20\x20Order\x20User\x20ID:','927635DXgeXS','toLocaleDateString','message','orderDetails','Download\x20failed','<i\x20class=\x22fas\x20fa-check\x22></i>\x20Invoice\x20Downloaded!','/api/slips/pdf-status/','No\x20order\x20ID\x20provided\x20in\x20URL','Download\x20Failed','#e3f2fd','createElement','symbolName','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,\x200,\x200,\x200.5);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(10px);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x209999;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x202rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','href','classList','.pdf','search','info','get','login.html','verifyPaymentBtn','querySelector','border','24GzItfZ','numeric','Order\x20ID\x20from\x20URL:','token','error','flex','status','style','/api/payment/cashfree/verify','location','URL\x20order\x20data\x20present:','innerHTML','customization','success','/dashboard.html','fromEntries','block','admin','2px\x20solid\x20#4caf50','Order\x20access\x20verification\x20error:','paidAt','background','width','#fee','❌\x20Cashfree\x20verification\x20failed:','dashboard.html','completed','/api/orders/','progress','<i\x20class=\x22fas\x20fa-exclamation-triangle\x22></i>','708687IRuAdE','remove','paidAmount','voterCount','textContent','show','✅\x20Cashfree\x20payment\x20verified\x20successfully','API\x20Result:','\x20has\x20been\x20created,\x20but\x20payment\x20is\x20not\x20completed.\x20Please\x20complete\x20the\x20payment\x20to\x20download\x20the\x20PDF.','\x20\x20\x20Is\x20Admin:','floor','fa-lock','✅\x20Cashfree\x20verification\x20result:','en-IN','1778160BtoHYZ','<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Download\x20Complete!','body','Order\x20not\x20found','🚀\x20Loading\x20order\x20data\x20first\x20(highest\x20priority)...','Download\x20blocked\x20-\x20payment\x20not\x20completed:','display','warning','downloadBtn','getElementById','messageIcon','role','generating','headers','Falling\x20back\x20to\x20API\x20load...','Bearer\x20','\x20\x20\x20String(currentUserId):','application/json','userId','2px\x20solid\x20#ff9800','amount','📄\x20Downloading\x20invoice\x20for:','none','<p\x20style=\x22color:\x20#666;\x20font-size:\x200.9rem;\x22>Please\x20wait...\x20Redirecting\x20in\x20','json','click','URL','length','Loading\x20order\x20details\x20from\x20API...','createObjectURL','UNAUTHORIZED','pending','\x20seconds</p>','content-length','API\x20Error\x20(JSON):','paymentStatus','downloadLoading','unknown','Order\x20Data\x20extracted:','orderIdDisplay','removeChild','\x22\x20style=\x22font-size:\x204rem;\x20color:\x20white;\x20margin-bottom:\x201rem;\x20text-shadow:\x202px\x202px\x204px\x20rgba(0,0,0,0.3);\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20style=\x22color:\x20white;\x20margin-bottom:\x201rem;\x20font-size:\x201.8rem;\x20font-weight:\x20700;\x20text-shadow:\x202px\x202px\x204px\x20rgba(0,0,0,0.3);\x22>','Token\x20present:','You\x20can\x20only\x20download\x20after\x20completing\x20the\x20payment.','2px\x20solid\x20#c33','Payment\x20Required','fa-exclamation-circle','Access\x20Denied','\x20\x20\x20String(order.userId):','/admin.html','_id','\x27\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22background:\x20linear-gradient(135deg,\x20#FF6B35\x200%,\x20#F7931E\x20100%);\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border:\x20none;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x201rem\x202rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x208px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x201rem;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-weight:\x20600;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20margin-top:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-credit-card\x22></i>\x20Make\x20Payment\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','4dgFudp','Download\x20is\x20taking\x20too\x20long.\x20Please\x20try\x20again.','name','Total\x20Voters:','abort','color','content-type','20752ozLgYd'];a=function(){return L;};return a();}async function checkPDFStatus(){const D=v;try{console['log']('[PDF\x20STATUS]\x20Checking\x20PDF\x20generation\x20status...');const c=await fetch(D(0x189)+orderId,{'headers':{'Authorization':'Bearer\x20'+token}});if(!c['ok']){console['error']('[PDF\x20STATUS]\x20Failed\x20to\x20check\x20status:',c[D(0x1a0)]);return;}const d=await c['json']();console['log']('[PDF\x20STATUS]\x20Status:',d);const e=document['getElementById']('pdfGeneratingStatus'),f=document['getElementById'](D(0x1ce)),g=document[D(0x1cf)]('progressBar'),h=document[D(0x1cf)](D(0x207));if(d['pdfReady'])console[D(0x21c)]('[PDF\x20STATUS]\x20PDF\x20is\x20ready!'),e['classList'][D(0x1b9)](D(0x1bd)),f[D(0x211)]=![],f['innerHTML']='<i\x20class=\x22fas\x20fa-download\x22></i>\x20Download\x20PDF',statusCheckInterval&&(clearInterval(statusCheckInterval),statusCheckInterval=null);else{if(d[D(0x1a0)]===D(0x1d2)||d['status']===D(0x1e5))console['log'](D(0x219),d[D(0x1b6)]),e['classList']['add']('show'),f['disabled']=!![],f['innerHTML']='<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Preparing\x20PDF...',d[D(0x1b6)]&&(g[D(0x1a1)][D(0x1b0)]=d[D(0x1b6)]+'%'),d['estimatedTime']&&(h['textContent']='Estimated\x20time:\x20'+d[D(0x20b)]),!statusCheckInterval&&(statusCheckInterval=setInterval(checkPDFStatus,0x7d0));else d['status']===D(0x205)&&(console[D(0x21c)]('[PDF\x20STATUS]\x20Generation\x20failed,\x20will\x20generate\x20on-demand'),e[D(0x191)][D(0x1b9)](D(0x1bd)),f[D(0x211)]=![],f['innerHTML']='<i\x20class=\x22fas\x20fa-download\x22></i>\x20Download\x20PDF',statusCheckInterval&&(clearInterval(statusCheckInterval),statusCheckInterval=null));}}catch(i){console[D(0x19e)]('[PDF\x20STATUS]\x20Error\x20checking\x20status:',i),document[D(0x1cf)]('pdfGeneratingStatus')['classList'][D(0x1b9)]('show'),document[D(0x1cf)](D(0x1ce))['disabled']=![];}}async function downloadPDF(){const E=v;if(!orderData){showMessage(E(0x194),E(0x226),E(0x179));return;}if(orderData[E(0x1e9)]!=='completed'){console['error'](E(0x1cb),orderData['paymentStatus']),showMessage(E(0x19e),'Download\x20Not\x20Allowed',E(0x1f1)),setTimeout(()=>{const F=E;window[F(0x1a3)][F(0x190)]='preview.html?orderId='+orderId;},0x7d0);return;}if(downloadInProgress)return;try{downloadInProgress=!![];const c=document[E(0x1cf)]('downloadBtn'),d=document[E(0x1cf)](E(0x1ea));c['disabled']=!![],d[E(0x191)]['add'](E(0x1bd));const e=new AbortController(),f=setTimeout(()=>e[E(0x1fe)](),0x493e0),g=await fetch('/api/slips/download/'+orderId,{'headers':{'Authorization':'Bearer\x20'+token},'signal':e[E(0x17f)]});clearTimeout(f);if(!g['ok']){const n=g[E(0x1d3)]['get'](E(0x200));if(n&&n['includes']('application/json')){const o=await g[E(0x1de)]();throw new Error(o[E(0x185)]||E(0x187));}throw new Error('Download\x20failed');}const h=g['headers'][E(0x195)](E(0x200));if(!h||!h['includes']('application/pdf'))throw new Error('Received\x20incorrect\x20file\x20type\x20from\x20server');const i=g[E(0x1d3)]['get'](E(0x1e7)),j=parseInt(i,0xa),k=await g['blob'](),l=window['URL']['createObjectURL'](k),m=document[E(0x18d)]('a');m['href']=l,m['download']='voter-slips-'+orderId+E(0x192),m['style']['display']='none',document['body']['appendChild'](m),m[E(0x1df)](),setTimeout(()=>{const G=E;window[G(0x1e0)]['revokeObjectURL'](l),document['body'][G(0x1ee)](m);},0x64),c['innerHTML']=E(0x1c7),setTimeout(()=>{const H=E;c[H(0x1a5)]='<i\x20class=\x22fas\x20fa-download\x22></i>\x20Download\x20Again',c['disabled']=![],downloadInProgress=![];},0xbb8);}catch(p){console['error']('Download\x20error:',p),downloadInProgress=![],p[E(0x1fc)]==='AbortError'?showMessage('error','Download\x20Timeout',E(0x1fb)):showMessage('error',E(0x18b),'Please\x20try\x20again.\x20If\x20the\x20problem\x20persists,\x20contact\x20support.'),document['getElementById']('downloadBtn')['disabled']=![];}finally{document['getElementById']('downloadLoading')['classList']['remove']('show');}}async function downloadInvoice(){const I=v;try{const c=document[I(0x1cf)]('invoiceBtn'),d=c['innerHTML'];c['disabled']=!![],c[I(0x1a5)]='<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Generating\x20Invoice...',console['log'](I(0x1db),orderId);const e=await fetch(I(0x1b5)+orderId+'/invoice',{'method':'GET','headers':{'Authorization':I(0x1d5)+token}});if(!e['ok']){const i=await e['json']();throw new Error(i['message']||'Failed\x20to\x20download\x20invoice');}const f=await e['blob'](),g=window['URL'][I(0x1e3)](f),h=document['createElement']('a');h[I(0x190)]=g,h['download']='invoice-'+orderId+I(0x192),document[I(0x1c8)]['appendChild'](h),h[I(0x1df)](),setTimeout(()=>{const J=I;document[J(0x1c8)]['removeChild'](h),window['URL']['revokeObjectURL'](g);},0x64),console[I(0x21c)]('✅\x20Invoice\x20downloaded\x20successfully'),c['innerHTML']=I(0x188),setTimeout(()=>{c['innerHTML']=d,c['disabled']=![];},0x7d0);}catch(j){console['error']('Invoice\x20download\x20error:',j),showMessage(I(0x19e),'Invoice\x20Download\x20Failed',j['message']);const k=document['getElementById']('invoiceBtn');k[I(0x1a5)]=I(0x214),k['disabled']=![];}}(function init(){const K=v;console[K(0x21c)](K(0x220)),console['log'](K(0x1ca)),console[K(0x21c)](K(0x19c),orderId),console['log']('Token\x20available:',!!token),console['log'](K(0x222),token?token[K(0x1e1)]:0x0),console['log']('🔍\x20ALL\x20URL\x20PARAMS:',window[K(0x1a3)][K(0x193)]),console['log'](K(0x20e),Object[K(0x1a9)](urlParams));if(!orderId){console[K(0x19e)](K(0x18a)),showMessage('error','Order\x20ID\x20Not\x20Found',K(0x20a),K(0x1b3),0xbb8);return;}const c=urlParams['get'](K(0x216));console[K(0x21c)](K(0x1a4),!!c);if(c)try{const d=JSON['parse'](decodeURIComponent(c));orderData=d,console['log'](K(0x17c),orderData),displayOrderDetails(orderData);}catch(f){console[K(0x19e)]('Failed\x20to\x20parse\x20URL\x20order\x20data:',f),console['log'](K(0x1d4)),loadOrderDetails();}else console[K(0x21c)](K(0x1e2)),loadOrderDetails();}(),window[v(0x217)]('load',()=>{console['log']('Payment\x20successful!');}),window['addEventListener']('beforeunload',()=>{statusCheckInterval&&clearInterval(statusCheckInterval);}));</script>
+</body>
+</html>

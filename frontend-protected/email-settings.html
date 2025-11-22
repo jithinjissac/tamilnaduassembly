@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Settings - Kerala Voter Slip</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5568d3;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-group h3 {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .setting-item small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .setting-item input[type="text"],
+        .setting-item input[type="number"],
+        .setting-item input[type="email"],
+        .setting-item input[type="password"],
+        .setting-item select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .setting-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .success-message, .error-message, .info-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .info-message {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .template-preview {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .template-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .template-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .template-btn:hover {
+            border-color: #667eea;
+        }
+
+        iframe {
+            width: 100%;
+            min-height: 500px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .test-email-section {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .test-email-section h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-envelope"></i> Email Settings</h1>
+            <a href="/admin.html" class="back-btn">← Back to Admin</a>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="info-message" id="infoMessage"></div>
+
+        <div class="main-content">
+            <!-- Left Panel: Settings Form -->
+            <div class="panel">
+                <h2>⚙️ Configuration</h2>
+
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-enableEmailNotifications">
+                            <label for="email-enableEmailNotifications">
+                                <strong>Enable Email Notifications</strong>
+                                <small>Turn on/off all automated emails</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>SMTP Configuration</h3>
+                    <div class="setting-item">
+                        <label>SMTP Host</label>
+                        <input type="text" id="email-smtpHost" placeholder="smtp.gmail.com">
+                        <small>Your email provider's SMTP server</small>
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Port</label>
+                        <input type="number" id="email-smtpPort" placeholder="587">
+                        <small>Usually 587 (TLS) or 465 (SSL)</small>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-smtpSecure">
+                            <label for="email-smtpSecure">Use SSL/TLS (Port 465)</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Username</label>
+                        <input type="text" id="email-smtpUser" placeholder="your-email@gmail.com">
+                    </div>
+                    <div class="setting-item">
+                        <label>SMTP Password</label>
+                        <input type="password" id="email-smtpPassword" placeholder="App password (not regular password)">
+                        <small>For Gmail, use <a href="https://myaccount.google.com/apppasswords" target="_blank">App Password</a></small>
+                    </div>
+                    <div class="setting-item">
+                        <label>From Email</label>
+                        <input type="email" id="email-fromEmail" placeholder="noreply@yoursite.com">
+                    </div>
+                    <div class="setting-item">
+                        <label>From Name</label>
+                        <input type="text" id="email-fromName" placeholder="Kerala Voter Slip">
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Email Templates</h3>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-orderConfirmation">
+                            <label for="email-emailTemplates-orderConfirmation">Order Confirmation Email</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-paymentSuccess">
+                            <label for="email-emailTemplates-paymentSuccess">Payment Success Email</label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="email-emailTemplates-pdfReady">
+                            <label for="email-emailTemplates-pdfReady">PDF Ready Email</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+                    <button class="btn btn-secondary" onclick="resetSettings()">🔄 Reset to Defaults</button>
+                </div>
+
+                <!-- Test Email Section -->
+                <div class="test-email-section">
+                    <h3>🧪 Test Email Connection</h3>
+                    <div class="input-group">
+                        <input type="email" id="testEmailAddress" placeholder="Enter email to send test">
+                        <button class="btn btn-success" onclick="sendTestEmail()">Send Test Email</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Template Preview -->
+            <div class="panel">
+                <h2><i class="fas fa-file-alt"></i> Email Template Preview</h2>
+                
+                <div class="template-selector">
+                    <button class="template-btn active" onclick="previewTemplate('orderConfirmation')">
+                        Order Confirmation
+                    </button>
+                    <button class="template-btn" onclick="previewTemplate('paymentSuccess')">
+                        Payment Success
+                    </button>
+                    <button class="template-btn" onclick="previewTemplate('pdfReady')">
+                        PDF Ready
+                    </button>
+                </div>
+
+                <div class="template-preview">
+                    <iframe id="templatePreview"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>const y=b;(function(stringArrayFunction,c){const j=b,stringArray=stringArrayFunction();while(!![]){try{const d=parseInt(j(0x1ab))/0x1+-parseInt(j(0x1a9))/0x2+-parseInt(j(0x1a1))/0x3*(parseInt(j(0x196))/0x4)+parseInt(j(0x1af))/0x5*(parseInt(j(0x1b7))/0x6)+-parseInt(j(0x1aa))/0x7+parseInt(j(0x1b9))/0x8+parseInt(j(0x1b4))/0x9*(-parseInt(j(0x19e))/0xa);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x8013f));const API_BASE='/api/settings';function b(c,d){const e=a();return b=function(f,g){f=f-0x187;let h=e[f];return h;},b(c,d);}async function loadSettings(){const k=b;try{const c=localStorage[k(0x1a3)](k(0x193)),d=await fetch(API_BASE+'/email',{'headers':{'Authorization':k(0x19d)+c}});if(!d['ok'])throw new Error(k(0x18f));const e=await d[k(0x1b0)]();populateSettings(e[k(0x1ad)]);}catch(f){showError(k(0x1b3)+f[k(0x1a7)]);}}function populateSettings(c){const l=b;Object[l(0x197)](c)['forEach'](d=>{const m=l,e='email-'+d,f=document[m(0x198)](e);if(f){if(f[m(0x1a0)]==='checkbox')f[m(0x1a2)]=c[d];else typeof c[d]===m(0x195)&&c[d]!==null?Object['keys'](c[d])['forEach'](g=>{const n=m,h=e+'-'+g,i=document[n(0x198)](h);i&&i['type']==='checkbox'&&(i['checked']=c[d][g]);}):f['value']=c[d];}});}async function saveSettings(){const o=b;try{const c={'enableEmailNotifications':document[o(0x198)]('email-enableEmailNotifications')[o(0x1a2)],'smtpHost':document['getElementById']('email-smtpHost')['value'],'smtpPort':parseInt(document[o(0x198)]('email-smtpPort')['value']),'smtpSecure':document['getElementById']('email-smtpSecure')['checked'],'smtpUser':document['getElementById']('email-smtpUser')[o(0x190)],'smtpPassword':document[o(0x198)]('email-smtpPassword')[o(0x190)],'fromEmail':document['getElementById']('email-fromEmail')[o(0x190)],'fromName':document[o(0x198)]('email-fromName')['value'],'emailTemplates':{'orderConfirmation':document['getElementById']('email-emailTemplates-orderConfirmation')['checked'],'paymentSuccess':document['getElementById'](o(0x18c))[o(0x1a2)],'pdfReady':document['getElementById']('email-emailTemplates-pdfReady')[o(0x1a2)]}},d=localStorage[o(0x1a3)](o(0x193)),e=await fetch(API_BASE+o(0x1b1),{'method':'PUT','headers':{'Content-Type':'application/json','Authorization':o(0x19d)+d},'body':JSON[o(0x188)](c)});if(!e['ok'])throw new Error(o(0x19b));showSuccess('Email\x20settings\x20saved\x20successfully!');}catch(f){showError(o(0x1a5)+f[o(0x1a7)]);}}async function resetSettings(){const p=b;if(!confirm('Reset\x20email\x20settings\x20to\x20defaults?'))return;try{const c=localStorage['getItem'](p(0x193)),d=await fetch(API_BASE+'/reset/email',{'method':'POST','headers':{'Authorization':p(0x19d)+c}});if(!d['ok'])throw new Error('Failed\x20to\x20reset\x20settings');const e=await d[p(0x1b0)]();populateSettings(e['settings']),showSuccess('Email\x20settings\x20reset\x20to\x20defaults!');}catch(f){showError(p(0x187)+f[p(0x1a7)]);}}async function sendTestEmail(){const q=b,c=document[q(0x198)]('testEmailAddress')[q(0x190)];if(!c){showError('Please\x20enter\x20an\x20email\x20address');return;}try{showInfo(q(0x18d));const d=localStorage[q(0x1a3)]('token'),e=await fetch(API_BASE+q(0x199),{'method':q(0x191),'headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+d},'body':JSON['stringify']({'email':c})}),f=await e['json']();if(!e['ok'])throw new Error(f[q(0x1a7)]||'Failed\x20to\x20send\x20test\x20email');showSuccess(q(0x1ae)+c+'!');}catch(g){showError('Failed\x20to\x20send\x20test\x20email:\x20'+g[q(0x1a7)]);}}function previewTemplate(c){const r=b;document[r(0x1b6)]('.template-btn')['forEach'](e=>{const s=r;e[s(0x19c)]['remove'](s(0x19f));}),event[r(0x19a)][r(0x19c)][r(0x18b)](r(0x19f));const d=document[r(0x198)]('templatePreview');d['src']='/api/settings/preview-template/'+c;}function showSuccess(c){const t=b,d=document['getElementById'](t(0x1a4));d['textContent']=c,d[t(0x1b2)][t(0x194)]='block',hideOtherMessages(t(0x1a4)),setTimeout(()=>d[t(0x1b2)]['display']=t(0x1b8),0x1388);}function showError(c){const u=b,d=document[u(0x198)](u(0x1a8));d[u(0x192)]=c,d['style'][u(0x194)]='block',hideOtherMessages('errorMessage'),setTimeout(()=>d['style']['display']='none',0x1388);}function showInfo(c){const v=b,d=document['getElementById'](v(0x189));d[v(0x192)]=c,d[v(0x1b2)][v(0x194)]='block',hideOtherMessages(v(0x189));}function hideOtherMessages(c){const w=b;[w(0x1a4),w(0x1a8),'infoMessage'][w(0x1a6)](d=>{const x=w;d!==c&&(document[x(0x198)](d)['style']['display']=x(0x1b8));});}const token=localStorage[y(0x1a3)](y(0x193));function a(){const z=['display','object','1032EwBbZp','keys','getElementById','/test-email','target','Failed\x20to\x20save\x20settings','classList','Bearer\x20','10TPfxAb','active','type','4116EKdiFQ','checked','getItem','successMessage','Failed\x20to\x20save\x20settings:\x20','forEach','message','errorMessage','1730966pqKHCy','2269491XIKFjT','804922ecbMEh','location','settings','Test\x20email\x20sent\x20successfully\x20to\x20','5AutedJ','json','/email','style','Failed\x20to\x20load\x20settings:\x20','2910537XEyGUi','redirectAfterLogin','querySelectorAll','6142674prEyVh','none','4503768uxgxdM','Failed\x20to\x20reset\x20settings:\x20','stringify','infoMessage','/login.html','add','email-emailTemplates-paymentSuccess','Sending\x20test\x20email...','href','Failed\x20to\x20load\x20settings','value','POST','textContent','token'];a=function(){return z;};return a();}!token&&(sessionStorage['setItem'](y(0x1b5),window[y(0x1ac)]['pathname']),window[y(0x1ac)][y(0x18e)]=y(0x18a));loadSettings(),previewTemplate('orderConfirmation');</script>
+</body>
+</html>

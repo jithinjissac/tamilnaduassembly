@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Kerala Voter Slip</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5568d3;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .settings-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-group h3 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-item label {
+            color: #555;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .setting-item small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .setting-item input[type="text"],
+        .setting-item input[type="number"],
+        .setting-item input[type="email"],
+        .setting-item select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            width: 250px;
+            font-family: inherit;
+        }
+
+        .setting-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .success-message, .error-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ System Settings</h1>
+            <a href="/admin.html" class="back-btn">← Back to Admin</a>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="tabs">
+            <div class="tab active" data-category="pdf">PDF Generation</div>
+            <div class="tab" data-category="email">Email & Notifications</div>
+            <div class="tab" data-category="security">Security & Rate Limiting</div>
+            <div class="tab" data-category="analytics">Analytics & Monitoring</div>
+        </div>
+
+        <!-- PDF Settings Panel -->
+        <div class="settings-panel active" id="pdf-panel">
+            <div class="setting-group">
+                <h3>Preview Settings</h3>
+                <div class="setting-item">
+                    <label>
+                        Preview Voter Limit
+                        <small>Number of voters to show in preview PDF</small>
+                    </label>
+                    <input type="number" id="pdf-previewVoterLimit" min="5" max="50">
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Preview Cleanup Time (minutes)
+                        <small>Auto-delete preview PDFs after this time</small>
+                    </label>
+                    <input type="number" id="pdf-previewCleanupMinutes" min="1" max="60">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Background Generation</h3>
+                <div class="setting-item">
+                    <label>
+                        Background PDF Threshold
+                        <small>Voter count to trigger background generation</small>
+                    </label>
+                    <input type="number" id="pdf-backgroundPDFThreshold" min="100" max="10000">
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Max Concurrent PDF Jobs
+                        <small>Maximum simultaneous PDF generations</small>
+                    </label>
+                    <input type="number" id="pdf-maxConcurrentPDFJobs" min="1" max="10">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>PDF Quality</h3>
+                <div class="setting-item">
+                    <label>
+                        PDF Quality
+                        <small>Higher quality = larger file size</small>
+                    </label>
+                    <select id="pdf-pdfQuality">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Browser Timeout (ms)
+                        <small>Maximum time for browser operations</small>
+                    </label>
+                    <input type="number" id="pdf-browserTimeout" min="10000" max="120000" step="1000">
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Max Retry Attempts
+                        <small>Number of retries on PDF generation failure</small>
+                    </label>
+                    <input type="number" id="pdf-maxRetryAttempts" min="1" max="5">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('pdf')">Save PDF Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('pdf')">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Email Settings Panel -->
+        <div class="settings-panel" id="email-panel">
+            <div class="setting-group">
+                <h3>Email Configuration</h3>
+                <div class="setting-item">
+                    <label>Enable Email Notifications</label>
+                    <input type="checkbox" id="email-enableEmailNotifications">
+                </div>
+                <div class="setting-item">
+                    <label>SMTP Host</label>
+                    <input type="text" id="email-smtpHost" placeholder="smtp.gmail.com">
+                </div>
+                <div class="setting-item">
+                    <label>SMTP Port</label>
+                    <input type="number" id="email-smtpPort" placeholder="587">
+                </div>
+                <div class="setting-item">
+                    <label>SMTP Secure (TLS)</label>
+                    <input type="checkbox" id="email-smtpSecure">
+                </div>
+                <div class="setting-item">
+                    <label>SMTP Username</label>
+                    <input type="text" id="email-smtpUser" placeholder="your-email@gmail.com">
+                </div>
+                <div class="setting-item">
+                    <label>SMTP Password</label>
+                    <input type="password" id="email-smtpPassword" placeholder="app password">
+                </div>
+                <div class="setting-item">
+                    <label>From Email</label>
+                    <input type="email" id="email-fromEmail" placeholder="noreply@yoursite.com">
+                </div>
+                <div class="setting-item">
+                    <label>From Name</label>
+                    <input type="text" id="email-fromName" placeholder="Kerala Voter Slip">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Email Templates</h3>
+                <div class="setting-item">
+                    <label>Order Confirmation Email</label>
+                    <input type="checkbox" id="email-emailTemplates-orderConfirmation">
+                </div>
+                <div class="setting-item">
+                    <label>Payment Success Email</label>
+                    <input type="checkbox" id="email-emailTemplates-paymentSuccess">
+                </div>
+                <div class="setting-item">
+                    <label>PDF Ready Email</label>
+                    <input type="checkbox" id="email-emailTemplates-pdfReady">
+                </div>
+                <div class="setting-item">
+                    <label>Order Expiry Email</label>
+                    <input type="checkbox" id="email-emailTemplates-orderExpiry">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Other Notifications</h3>
+                <div class="setting-item">
+                    <label>SMS Notifications (Future)</label>
+                    <input type="checkbox" id="email-smsNotifications" disabled>
+                </div>
+                <div class="setting-item">
+                    <label>Webhook URL</label>
+                    <input type="text" id="email-webhookURL" placeholder="https://your-webhook.com">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('email')">Save Email Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('email')">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Security Settings Panel -->
+        <div class="settings-panel" id="security-panel">
+            <div class="setting-group">
+                <h3>Authentication</h3>
+                <div class="setting-item">
+                    <label>JWT Expiry (hours)</label>
+                    <input type="number" id="security-jwtExpiryHours" min="1" max="168">
+                </div>
+                <div class="setting-item">
+                    <label>Max Login Attempts</label>
+                    <input type="number" id="security-maxLoginAttempts" min="3" max="10">
+                </div>
+                <div class="setting-item">
+                    <label>Lockout Duration (minutes)</label>
+                    <input type="number" id="security-lockoutDurationMinutes" min="5" max="60">
+                </div>
+                <div class="setting-item">
+                    <label>Session Timeout (seconds)</label>
+                    <input type="number" id="security-sessionTimeout" min="300" max="7200">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Password Policy</h3>
+                <div class="setting-item">
+                    <label>Require Strong Passwords</label>
+                    <input type="checkbox" id="security-requireStrongPasswords">
+                </div>
+                <div class="setting-item">
+                    <label>Minimum Password Length</label>
+                    <input type="number" id="security-passwordMinLength" min="6" max="20">
+                </div>
+                <div class="setting-item">
+                    <label>Enable 2FA (Future)</label>
+                    <input type="checkbox" id="security-enable2FA" disabled>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Rate Limiting & CORS</h3>
+                <div class="setting-item">
+                    <label>IP Rate Limit (per minute)</label>
+                    <input type="number" id="security-ipRateLimitPerMinute" min="10" max="1000">
+                </div>
+                <div class="setting-item">
+                    <label>Enable CORS</label>
+                    <input type="checkbox" id="security-enableCORS">
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Allowed Origins
+                        <small>Comma-separated list of domains</small>
+                    </label>
+                    <input type="text" id="security-allowedOrigins" placeholder="https://example.com">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>IP Whitelist</h3>
+                <div class="setting-item">
+                    <label>Enable IP Whitelist</label>
+                    <input type="checkbox" id="security-enableIPWhitelist">
+                </div>
+                <div class="setting-item">
+                    <label>
+                        Whitelisted IPs
+                        <small>Comma-separated list</small>
+                    </label>
+                    <input type="text" id="security-whitelistedIPs" placeholder="192.168.1.1, 10.0.0.1">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('security')">Save Security Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('security')">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Analytics Settings Panel -->
+        <div class="settings-panel" id="analytics-panel">
+            <div class="setting-group">
+                <h3>Analytics Configuration</h3>
+                <div class="setting-item">
+                    <label>Enable Analytics</label>
+                    <input type="checkbox" id="analytics-enableAnalytics">
+                </div>
+                <div class="setting-item">
+                    <label>Google Analytics ID</label>
+                    <input type="text" id="analytics-googleAnalyticsID" placeholder="GA-XXXXXXX">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Tracking Options</h3>
+                <div class="setting-item">
+                    <label>Track PDF Downloads</label>
+                    <input type="checkbox" id="analytics-trackPDFDownloads">
+                </div>
+                <div class="setting-item">
+                    <label>Track Payments</label>
+                    <input type="checkbox" id="analytics-trackPayments">
+                </div>
+                <div class="setting-item">
+                    <label>Track User Activity</label>
+                    <input type="checkbox" id="analytics-trackUserActivity">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Logging & Monitoring</h3>
+                <div class="setting-item">
+                    <label>Error Logging Level</label>
+                    <select id="analytics-errorLogging">
+                        <option value="minimal">Minimal</option>
+                        <option value="verbose">Verbose</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Performance Monitoring</label>
+                    <input type="checkbox" id="analytics-performanceMonitoring">
+                </div>
+                <div class="setting-item">
+                    <label>Alert on Errors</label>
+                    <input type="checkbox" id="analytics-alertOnErrors">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>Reports</h3>
+                <div class="setting-item">
+                    <label>Daily Reports</label>
+                    <input type="checkbox" id="analytics-dailyReports">
+                </div>
+                <div class="setting-item">
+                    <label>Report Email</label>
+                    <input type="email" id="analytics-reportEmail" placeholder="admin@yoursite.com">
+                </div>
+                <div class="setting-item">
+                    <label>Data Retention (days)</label>
+                    <input type="number" id="analytics-retentionDays" min="30" max="365">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('analytics')">Save Analytics Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('analytics')">Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <script>const o=b;(function(stringArrayFunction,c){const n=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(n(0x17d))/0x1+-parseInt(n(0x194))/0x2*(-parseInt(n(0x1a1))/0x3)+parseInt(n(0x1a5))/0x4*(parseInt(n(0x17b))/0x5)+parseInt(n(0x1a6))/0x6*(-parseInt(n(0x1b1))/0x7)+parseInt(n(0x197))/0x8+parseInt(n(0x1ac))/0x9+-parseInt(n(0x18d))/0xa*(parseInt(n(0x185))/0xb);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0xa7453));const API_BASE=o(0x1a3);let currentCategory='pdf';document['querySelectorAll'](o(0x19d))[o(0x1af)](c=>{const p=o;c[p(0x1b3)](p(0x1aa),()=>{const q=p,d=c[q(0x1a9)][q(0x1a7)];currentCategory=d,document[q(0x19e)](q(0x19d))['forEach'](e=>e['classList'][q(0x19a)](q(0x182))),c[q(0x18c)]['add'](q(0x182)),document[q(0x19e)](q(0x191))[q(0x1af)](e=>e[q(0x18c)][q(0x19a)]('active')),document[q(0x17e)](d+'-panel')['classList']['add']('active'),loadSettings(d);});});async function loadSettings(c){const r=o;try{const d=localStorage[r(0x199)](r(0x1b5)),e=await fetch(API_BASE+'/'+c,{'headers':{'Authorization':r(0x18b)+d}});if(!e['ok'])throw new Error('Failed\x20to\x20load\x20settings');const f=await e[r(0x1a0)]();populateSettings(c,f['settings']);}catch(g){showError(r(0x1b2)+g[r(0x198)]);}}function populateSettings(c,d){const s=o;Object['keys'](d)[s(0x1af)](e=>{const t=s,f=c+'-'+e,g=document[t(0x17e)](f);if(g){if(g['type']===t(0x18f))g[t(0x183)]=d[e];else{if(e===t(0x184)||e===t(0x192))g['value']=Array[t(0x195)](d[e])?d[e]['join'](',\x20'):d[e];else typeof d[e]==='object'&&d[e]!==null?Object[t(0x19f)](d[e])['forEach'](h=>{const u=t,i=f+'-'+h,j=document[u(0x17e)](i);j&&(j[u(0x190)]===u(0x18f)?j[u(0x183)]=d[e][h]:j['value']=d[e][h]);}):g[t(0x1a2)]=d[e];}}});}async function saveSettings(c){const v=o;try{const d={},e=document[v(0x17e)](c+v(0x1b6)),f=e['querySelectorAll'](v(0x1ab));f[v(0x1af)](j=>{const w=v,k=j['id'][w(0x19b)](c+'-',''),l=k['split']('-');if(l[w(0x19c)]>0x1)!d[l[0x0]]&&(d[l[0x0]]={}),d[l[0x0]][l[0x1]]=j['type']==='checkbox'?j[w(0x183)]:j['value'];else{if(j['type']===w(0x18f))d[k]=j[w(0x183)];else{if(j['type']==='number')d[k]=parseInt(j[w(0x1a2)]);else k===w(0x184)||k===w(0x192)?d[k]=j[w(0x1a2)]['split'](',')['map'](m=>m['trim']())[w(0x187)](m=>m):d[k]=j['value'];}}});const g=localStorage['getItem'](v(0x1b5)),h=await fetch(API_BASE+'/'+c,{'method':v(0x186),'headers':{'Content-Type':'application/json','Authorization':v(0x18b)+g},'body':JSON['stringify'](d)});if(!h['ok'])throw new Error(v(0x18e));const i=await h['json']();showSuccess(c['toUpperCase']()+v(0x18a));}catch(j){showError(v(0x180)+j[v(0x198)]);}}function a(){const A=['checked','allowedOrigins','33rauuQv','PUT','filter','successMessage','POST','\x20settings\x20saved\x20successfully!','Bearer\x20','classList','2861710cvGzwB','Failed\x20to\x20save\x20settings','checkbox','type','.settings-panel','whitelistedIPs','/reset/','6shZzNB','isArray','Failed\x20to\x20reset\x20settings:\x20','6898160NrybSY','message','getItem','remove','replace','length','.tab','querySelectorAll','keys','json','543156bQBqRI','value','/api/settings','errorMessage','783844QQHkIu','318390nAmDHD','category','textContent','dataset','click','input,\x20select','3911949YpIgxB','none','pathname','forEach','display','77aDYeHQ','Failed\x20to\x20load\x20settings:\x20','addEventListener','Reset\x20','token','-panel','pdf','15DSTqZB','style','300603JPNdRF','getElementById','\x20settings\x20reset\x20to\x20defaults!','Failed\x20to\x20save\x20settings:\x20','block','active'];a=function(){return A;};return a();}function b(c,d){const e=a();return b=function(f,g){f=f-0x17b;let h=e[f];return h;},b(c,d);}async function resetSettings(c){const x=o;if(!confirm(x(0x1b4)+c+'\x20settings\x20to\x20defaults?'))return;try{const d=localStorage[x(0x199)]('token'),e=await fetch(API_BASE+x(0x193)+c,{'method':x(0x189),'headers':{'Authorization':'Bearer\x20'+d}});if(!e['ok'])throw new Error('Failed\x20to\x20reset\x20settings');const f=await e['json']();populateSettings(c,f['settings']),showSuccess(c['toUpperCase']()+x(0x17f));}catch(g){showError(x(0x196)+g[x(0x198)]);}}function showSuccess(c){const y=o,d=document[y(0x17e)](y(0x188));d[y(0x1a8)]=c,d[y(0x17c)]['display']='block',setTimeout(()=>d['style'][y(0x1b0)]=y(0x1ad),0x1388);}function showError(c){const z=o,d=document['getElementById'](z(0x1a4));d[z(0x1a8)]=c,d['style']['display']=z(0x181),setTimeout(()=>d['style']['display']='none',0x1388);}const token=localStorage[o(0x199)]('token');!token&&(sessionStorage['setItem']('redirectAfterLogin',window['location'][o(0x1ae)]),window['location']['href']='/login.html');loadSettings(o(0x1b7));</script>
+</body>
+</html>

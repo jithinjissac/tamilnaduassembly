@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://easyslip.in/dashboard">
+    <meta property="og:title" content="Dashboard - EasySlip | Kerala Voter Slip Generator">
+    <meta property="og:description" content="Generate professional voter slips for Kerala elections. All 14 districts covered. ₹0.50/voter. Instant PDF download.">
+    <meta property="og:image" content="https://easyslip.in/favicon/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:site_name" content="EasySlip">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">function b(c,d){var e=a();return b=function(f,g){f=f-0x18d;var h=e[f];return h;},b(c,d);}var g=b;(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=-parseInt(f(0x196))/0x1*(-parseInt(f(0x191))/0x2)+parseInt(f(0x1a2))/0x3*(parseInt(f(0x18f))/0x4)+parseInt(f(0x1a1))/0x5+-parseInt(f(0x1a0))/0x6*(parseInt(f(0x19e))/0x7)+-parseInt(f(0x19a))/0x8*(parseInt(f(0x194))/0x9)+-parseInt(f(0x18e))/0xa+parseInt(f(0x18d))/0xb;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x26b4d));function a(){var j=['1138QbzutT','onLoad','createElement','49671nELOFD','https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh','411iALuWo','src','getElementsByTagName','async','56VsXGCG','charset','crossorigin','minimize','77dxSuAG','UTF-8','33498yyWdin','31410oYHLdQ','924BBAlOK','1845096tJohIh','1637660hSwkgI','188JRFiBD','script'];a=function(){return j;};return a();}var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API[g(0x192)]=function(){var h=g;Tawk_API[h(0x19d)]();},(function(){var i=g,c=document[i(0x193)]('script'),d=document[i(0x198)](i(0x190))[0x0];c[i(0x199)]=!![],c[i(0x197)]=i(0x195),c[i(0x19b)]=i(0x19f),c['setAttribute'](i(0x19c),'*'),d['parentNode']['insertBefore'](c,d);}());</script>
+<!--End of Tawk.to Script-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .logo img.app-logo {
+            height: 80px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes logoFade { 0% { opacity:0; transform: scale(0.9);} 100% { opacity:1; transform: scale(1);} }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: inherit;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+        }
+
+        /* Action Section */
+        .action-section {
+            background: var(--kerala-gradient);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+            border-top: 4px solid var(--kerala-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .btn-create {
+            background: white;
+            color: var(--kerala-green);
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: var(--kerala-gold);
+            color: white;
+        }
+
+        /* Orders Section */
+        .orders-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #718096;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--kerala-green);
+            color: white;
+            border-color: var(--kerala-green);
+        }
+
+        /* Orders Table */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .orders-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .orders-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .orders-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-download {
+            background: #48bb78;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .btn-download:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .btn-download:hover:disabled {
+            transform: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 968px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .user-section {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-table {
+                font-size: 0.85rem;
+                min-width: 700px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .btn-download {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .action-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+                <button class="btn btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+         <!-- Action Section -->
+        <div class="action-section">
+            <h2>Create New Voter Slips</h2>
+            <p>Generate customized voter slips for your election campaign</p>
+            <br>
+            <a href="create-slip.html" class="btn btn-create">+ Create New Slip</a>
+        </div>
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="totalOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed</div>
+                <div class="stat-value" id="completedOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Voters</div>
+                <div class="stat-value" id="totalVoters">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value" id="totalAmount">₹0</div>
+            </div>
+        </div>
+
+       
+
+        <!-- Orders Section -->
+        <div class="orders-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Orders</h2>
+                <div class="filter-tabs">
+                    <button class="tab active" data-filter="all">All</button>
+                    <button class="tab" data-filter="completed">Completed</button>
+                    <button class="tab" data-filter="pending">Pending</button>
+                </div>
+            </div>
+
+            <div id="ordersContainer">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading orders...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="console-control.js"></script>
+    <script src="activity-tracker.js"></script>
+    <script>const l=b;(function(stringArrayFunction,c){const k=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(k(0x148))/0x1*(-parseInt(k(0x170))/0x2)+parseInt(k(0x173))/0x3+parseInt(k(0x16a))/0x4*(-parseInt(k(0x15a))/0x5)+-parseInt(k(0x15b))/0x6*(parseInt(k(0x134))/0x7)+-parseInt(k(0x13f))/0x8*(parseInt(k(0x158))/0x9)+-parseInt(k(0x12c))/0xa*(parseInt(k(0x15d))/0xb)+parseInt(k(0x14c))/0xc*(parseInt(k(0x13b))/0xd);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x1d637));let allOrders=[],currentFilter=l(0x124);const token=localStorage[l(0x149)]('token');!token&&(sessionStorage[l(0x122)](l(0x119),window[l(0x153)][l(0x156)]),window['location']['href']=l(0x145));let currentUserId=null;function a(){const x=['admin','getElementById','localBodyName','login.html','admin.html','forEach','1dQQIQq','getItem','Authentication\x20failed','ward','24oSWFZp','Download\x20error\x20response:','toLocaleDateString','email','active','URL','innerHTML','location','Download\x20failed.\x20Please\x20try\x20again.','revokeObjectURL','pathname','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state-icon\x22><i\x20class=\x22fas\x20fa-clipboard-list\x22></i></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3>No\x20Orders\x20Found</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Create\x20your\x20first\x20voter\x20slip</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','1818igGRsS','click','710810bbTpvw','234SUgsYW','totalAmount','44mErxhG','error','Failed\x20to\x20download\x20invoice','🚀\x20Initializing\x20dashboard\x20-\x20loading\x20data\x20first...','textContent','Using\x20cached\x20user\x20data\x20due\x20to\x20network\x20error','length','appendChild','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state-icon\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x22></i></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3>Failed\x20to\x20load\x20orders</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Please\x20try\x20again</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</strong></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','.tab','Pending','join','4cgLfMP','userName','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22table-wrapper\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22orders-table\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Order\x20ID</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Date</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Location</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Voters</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Amount</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Status</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Action</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Admin\x20user\x20detected,\x20redirecting\x20to\x20admin\x20dashboard...','userEmail','addEventListener','334660QCnYiw','status','paymentStatus','322326zejDAe','orderId','redirectAfterLogin','message','.pdf','Please\x20login\x20to\x20download\x20invoice','trackActivity','Download\x20error:','Bearer\x20',').\x20Please\x20try\x20again.','user','setItem','wardName','all','Invoice\x20download\x20error:','ordersContainer','download','Error\x20loading\x20stats:','localBody','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','\x27)\x22\x20style=\x22background:\x20#10b981;\x22><i\x20class=\x22fas\x20fa-file-invoice\x22></i>\x20Invoice</button>','5930DIxxDY','totalVoters','log','/invoice','voter-slips-','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22status-badge\x20status-','createElement','Download\x20failed\x20(','42539ATBhJJ','json','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x200.5rem;\x20flex-wrap:\x20wrap;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<a\x20href=\x22preview.html?orderId=','invoice_downloaded','pending','href','createObjectURL','2656797ijZRmY','Error\x20parsing\x20response:','_id','filter','7192wCtrDM','name','body'];a=function(){return x;};return a();}async function loadUserData(){const m=l;try{const c=await fetch('/api/auth/profile',{'headers':{'Authorization':'Bearer\x20'+token}});if(!c['ok']){if(c['status']===0x191)throw new Error('Authentication\x20failed');const e=localStorage[m(0x149)](m(0x121));if(e){const f=JSON['parse'](e);currentUserId=f[m(0x13d)],document[m(0x143)](m(0x16b))['textContent']=f[m(0x140)],document[m(0x143)](m(0x16e))[m(0x161)]=f[m(0x14f)],console['log'](m(0x162));return;}throw new Error(m(0x14a));}const d=await c['json']();currentUserId=d[m(0x121)][m(0x13d)],localStorage[m(0x122)](m(0x121),JSON['stringify'](d['user']));if(d['user']['role']===m(0x142)){console[m(0x12e)](m(0x16d)),window['location'][m(0x139)]=m(0x146);return;}document[m(0x143)]('userName')[m(0x161)]=d[m(0x121)][m(0x140)],document[m(0x143)](m(0x16e))['textContent']=d[m(0x121)][m(0x14f)];}catch(g){console[m(0x15e)]('Error\x20loading\x20user:',g),g[m(0x11a)]===m(0x14a)&&(localStorage['removeItem']('token'),localStorage['removeItem'](m(0x121)),window[m(0x153)]['href']=m(0x145));}}function b(c,d){const e=a();return b=function(f,g){f=f-0x118;let h=e[f];return h;},b(c,d);}async function loadStats(){const n=l;try{const c=await fetch('/api/orders/stats/summary',{'headers':{'Authorization':n(0x11f)+token}});if(c['ok']){const d=await c[n(0x135)]();document[n(0x143)]('totalOrders')['textContent']=d['totalOrders'],document['getElementById']('completedOrders')['textContent']=d['completedOrders'],document['getElementById'](n(0x12d))['textContent']=d[n(0x12d)],document['getElementById']('totalAmount')['textContent']='₹'+d[n(0x15c)]['toFixed'](0x2);}}catch(e){console['error'](n(0x128),e);}}async function loadOrders(){const o=l;try{const c=await fetch('/api/orders',{'headers':{'Authorization':o(0x11f)+token}});c['ok']&&(allOrders=await c[o(0x135)](),displayOrders());}catch(d){console['error']('Error\x20loading\x20orders:',d),document['getElementById']('ordersContainer')[o(0x152)]=o(0x165);}}function displayOrders(){const p=l,c=document[p(0x143)](p(0x126));let d=allOrders;if(currentFilter==='completed')d=allOrders['filter'](f=>f[p(0x172)]==='completed');else currentFilter===p(0x138)&&(d=allOrders['filter'](f=>f[p(0x172)]==='pending'));if(d[p(0x163)]===0x0){c[p(0x152)]=p(0x157);return;}const e=p(0x16c)+d['map'](f=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><strong>'+f['orderId']+p(0x166)+new Date(f['createdAt'])[p(0x14e)]('en-IN')+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:\x200.9rem;\x20line-height:\x201.4;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><strong>'+(f[p(0x153)][p(0x123)]||f['location'][p(0x14b)]||'-')+'</strong></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#666;\x20font-size:\x200.85rem;\x22>'+(f[p(0x153)][p(0x144)]||f['location'][p(0x129)]||'-')+p(0x12a)+f['voterCount']+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>₹'+f['amount']['toFixed'](0x2)+p(0x131)+f[p(0x172)]+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(f[p(0x172)]==='completed'?'Completed':f[p(0x172)]===p(0x138)?p(0x168):'Failed')+p(0x136)+f[p(0x118)]+'\x22\x20class=\x22btn\x20btn-download\x22\x20style=\x22background:\x20var(--kerala-green);\x20text-decoration:\x20none;\x20display:\x20inline-block;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-eye\x22></i>\x20View\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</a>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(f[p(0x172)]==='completed'?'<button\x20class=\x22btn\x20btn-download\x22\x20onclick=\x22downloadSlip(\x27'+f[p(0x118)]+'\x27)\x22><i\x20class=\x22fas\x20fa-download\x22></i>\x20PDF</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-download\x22\x20onclick=\x22downloadInvoice(\x27'+f[p(0x118)]+p(0x12b):'<button\x20class=\x22btn\x20btn-download\x22\x20style=\x22background:\x20var(--kerala-gold);\x22\x20onclick=\x22window.location.href=\x27preview.html?orderId='+f[p(0x118)]+'\x27\x22><i\x20class=\x22fas\x20fa-credit-card\x22></i>\x20Pay\x20Now</button>')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20')[p(0x169)]('')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';c['innerHTML']=e;}document['querySelectorAll']('.tab')[l(0x147)](c=>{const q=l;c[q(0x16f)]('click',function(){const r=q;document['querySelectorAll'](r(0x167))[r(0x147)](d=>d['classList']['remove']('active')),this['classList']['add'](r(0x150)),currentFilter=this['dataset'][r(0x13e)],displayOrders();});});async function downloadInvoice(c){const s=l;try{const d=localStorage['getItem']('token');if(!d){alert(s(0x11c)),window[s(0x153)]['href']=s(0x145);return;}const e=await fetch('/api/orders/'+c+s(0x12f),{'method':'GET','headers':{'Authorization':'Bearer\x20'+d}});if(!e['ok']){const i=await e['json']();e['status']===0x190?alert('Invoice\x20only\x20available\x20for\x20completed\x20payments'):alert(i['message']||s(0x15f));return;}const f=await e['blob'](),g=window['URL'][s(0x13a)](f),h=document['createElement']('a');h[s(0x139)]=g,h['download']='invoice-'+c+s(0x11b),document['body'][s(0x164)](h),h['click'](),window[s(0x11d)]&&window['trackActivity'](s(0x137),{'orderId':c,'fileName':'invoice-'+c+'.pdf'}),setTimeout(()=>{const t=s;document[t(0x141)]['removeChild'](h),window[t(0x151)][t(0x155)](g);},0x64);}catch(j){console['error'](s(0x125),j),alert('Failed\x20to\x20download\x20invoice.\x20Please\x20try\x20again.');}}async function downloadSlip(c){const u=l;try{if(!token){alert('Session\x20expired.\x20Please\x20login\x20again.'),window[u(0x153)][u(0x139)]=u(0x145);return;}const d=await fetch('/api/slips/download/'+c,{'headers':{'Authorization':'Bearer\x20'+token}});if(d['ok']){const e=await d['blob'](),f=window[u(0x151)][u(0x13a)](e),g=document[u(0x132)]('a');g[u(0x139)]=f,g[u(0x127)]=u(0x130)+c+u(0x11b),document[u(0x141)][u(0x164)](g),g[u(0x159)](),window['URL'][u(0x155)](f),document[u(0x141)]['removeChild'](g),window[u(0x11d)]&&window[u(0x11d)]('pdf_downloaded',{'orderId':c,'fileName':'voter-slips-'+c+u(0x11b)});}else try{const h=await d[u(0x135)]();console['error'](u(0x14d),h);if(d['status']===0x191)alert('Session\x20expired.\x20Please\x20login\x20again.'),window['location'][u(0x139)]=u(0x145);else{if(d['status']===0x193)alert(h['message']||'Download\x20not\x20allowed.\x20Please\x20complete\x20payment.');else d[u(0x171)]===0x194?alert('Order\x20not\x20found.'):alert(h['message']||u(0x154));}}catch(i){console['error'](u(0x13c),i),alert(u(0x133)+d[u(0x171)]+u(0x120));}}catch(j){console[u(0x15e)](u(0x11e),j),alert('Download\x20failed.\x20Network\x20error.\x20Please\x20try\x20again.');}}function logout(){const v=l;window[v(0x11d)]&&window['trackActivity']('logout',{'timestamp':new Date()['toISOString']()}),localStorage['removeItem']('token'),localStorage['removeItem'](v(0x121)),window['location'][v(0x139)]='login.html';}(async function initializeDashboard(){const w=l;console['log'](w(0x160)),await Promise['all']([loadUserData(),loadStats()]),console['log']('✅\x20User\x20data\x20and\x20stats\x20loaded'),loadOrders();}());</script>
+</body>
+</html>

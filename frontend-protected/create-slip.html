@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Slip - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    
+    <!-- Preload critical API endpoint for instant district loading -->
+    <link rel="preconnect" href="/api">
+    <link rel="dns-prefetch" href="/api">
+    
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://easyslip.in/create-slip">
+    <meta property="og:title" content="Create Voter Slip - EasySlip | Kerala Elections">
+    <meta property="og:description" content="Generate professional voter slips for Kerala elections. All 14 districts covered. ₹0.50/voter. Instant PDF download.">
+    <meta property="og:image" content="https://easyslip.in/favicon/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:site_name" content="EasySlip">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="symbol-picker.js"></script>
+    <script src="activity-tracker.js"></script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=-parseInt(f(0x75))/0x1+-parseInt(f(0x76))/0x2+parseInt(f(0x7f))/0x3*(parseInt(f(0x7a))/0x4)+-parseInt(f(0x72))/0x5+-parseInt(f(0x77))/0x6+parseInt(f(0x7e))/0x7+parseInt(f(0x7c))/0x8*(parseInt(f(0x74))/0x9);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x31fe7));function b(c,d){var e=a();return b=function(f,g){f=f-0x71;var h=e[f];return h;},b(c,d);}function a(){var i=['UTF-8','287930kLVaEP','minimize','9Mumgjz','281136CbMztk','75500vcyjbL','2183994QXMofj','script','src','4XhHQzr','async','3000904QcSlkM','https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh','1355550dJyCEF','1129449IVMvCB'];a=function(){return i;};return a();}var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){var g=b;Tawk_API[g(0x73)]();},(function(){var h=b,c=document['createElement'](h(0x78)),d=document['getElementsByTagName'](h(0x78))[0x0];c[h(0x7b)]=!![],c[h(0x79)]=h(0x7d),c['charset']=h(0x71),c['setAttribute']('crossorigin','*'),d['parentNode']['insertBefore'](c,d);}());</script>
+<!--End of Tawk.to Script-->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G0M40G1DK1"></script>
+<script>var g=b;function b(c,d){var e=a();return b=function(f,g){f=f-0x18a;var h=e[f];return h;},b(c,d);}(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=-parseInt(f(0x191))/0x1*(-parseInt(f(0x193))/0x2)+-parseInt(f(0x196))/0x3+-parseInt(f(0x194))/0x4+-parseInt(f(0x192))/0x5*(parseInt(f(0x195))/0x6)+parseInt(f(0x18d))/0x7+parseInt(f(0x18a))/0x8*(-parseInt(f(0x18f))/0x9)+parseInt(f(0x18c))/0xa;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0xa5947),window[g(0x18e)]=window['dataLayer']||[]);function gtag(){var h=g;dataLayer[h(0x18b)](arguments);}function a(){var i=['34DnIino','991532VeMYWU','92898VGRXLo','3254250zqDqUI','106464RchhZQ','push','22118980inkOPI','5735058DsQKap','dataLayer','693wMylIj','config','66743xjMtTz','365hWomqj'];a=function(){return i;};return a();}gtag('js',new Date()),gtag(g(0x190),'G-G0M40G1DK1');</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .logo img.app-logo { height:80px; width:auto; display:block; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        @keyframes logoFade { 0% { opacity:0; transform:scale(0.9);} 100% { opacity:1; transform:scale(1);} }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 4px;
+            background: var(--kerala-gradient);
+            z-index: 1;
+            transition: width 0.3s;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #718096;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            border-color: var(--kerala-green);
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            border-color: var(--kerala-gold);
+            background: var(--kerala-gold);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .step.active .step-label {
+            color: var(--kerala-green);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            position: relative;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .label-description {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
+        }
+
+        .file-upload-area.has-file {
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 1rem auto;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .symbol-selection-area {
+            border: 3px dashed var(--kerala-gold);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symbol-selection-area::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--kerala-green), var(--kerala-gold), var(--kerala-red));
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        #selectSymbolBtn {
+            background: var(--kerala-gradient) !important;
+            border: none !important;
+            padding: 1.5rem 3rem !important;
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4), 0 0 0 0 rgba(0, 109, 59, 0.5) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: pulse 2s ease-in-out infinite !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        #selectSymbolBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        #selectSymbolBtn::after {
+            content: '\26a1 CLICK HERE FIRST \26a1';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--kerala-red);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(224, 58, 62, 0.4);
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        #selectSymbolBtn:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(0, 109, 59, 0.5), 0 0 0 4px rgba(255, 184, 28, 0.3) !important;
+            animation: none !important;
+        }
+
+        #selectSymbolBtn:active {
+            transform: translateY(-1px) !important;
+        }
+
+        .symbol-preview {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 3px solid #48bb78;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
+        }
+
+        /* Slips per page option */
+        .slip-count-option {
+            transition: all 0.3s;
+        }
+
+        .slip-count-option:hover {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4;
+        }
+
+        .slip-count-option input[type="radio"]:checked + div {
+            color: var(--kerala-green);
+        }
+
+        .slip-count-option:has(input[type="radio"]:checked) {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--kerala-green);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-link:hover {
+            color: var(--kerala-gold);
+            text-decoration: underline;
+        }
+
+        .polling-station-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .polling-station-checkbox:hover {
+            border-color: var(--kerala-green);
+            background: #f7fafc;
+        }
+
+        .polling-station-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .polling-station-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.95rem;
+            color: #2d3748;
+        }
+
+        .polling-station-checkbox.checked {
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
+        }
+
+        .selected-count {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 245, 242, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 16px;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading.show {
+            display: flex;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .loading > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .loading > div:not(.spinner) {
+            background: #f5f5f2;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 109, 59, 0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-right: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loadingProgress {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Step 2 - Voter Extraction */
+        .voter-extraction-container {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .extraction-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .extraction-info p {
+            margin: 0;
+            color: #856404;
+        }
+
+        #captchaImage {
+            max-width: 200px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .voters-count {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .voters-count.show {
+            display: block;
+        }
+
+        .voters-count h3 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .btn-back {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .progress-steps {
+                font-size: 0.85rem;
+                gap: 0.5rem;
+            }
+
+            .step-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            input, select, textarea {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .step-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
+            </div>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-line" id="progressLine"></div>
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Customization</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Voter Data</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Preview & Payment</div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <!-- Step 1: Customization -->
+            <div class="form-section active" id="step1">
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
+                <p class="form-subtitle">Upload your symbol and details (Required for slip generation)</p>
+
+                <div class="form-group">
+                    <label>
+                        Select Symbol
+                        <span class="label-description"><i class="fas fa-exclamation-triangle"></i> Required: Choose your EC-approved election symbol first</span>
+                    </label>
+                    <div class="symbol-selection-area" id="symbolSelectionArea">
+                        <div class="symbol-preview" id="symbolPreview" style="display: none;">
+                            <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;">
+                            <div id="selectedSymbolName" style="font-weight: 700; color: #2d3748; font-size: 1.1rem; margin-bottom: 0.3rem;"></div>
+                            <div id="selectedSymbolNameMalayalam" style="font-family: 'Noto Sans Malayalam', sans-serif; font-weight: 600; color: #FFB81C; font-size: 1.2rem; margin-bottom: 0.5rem;"></div>
+                            <div style="color: #48bb78; font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Symbol Selected</div>
+                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="padding: 0.75rem 1.5rem;">
+                                <i class="fas fa-sync-alt"></i> Change Symbol
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block; margin: 0 auto;">
+                            <i class="fas fa-hand-pointer" style="margin-right: 0.5rem;"></i> SELECT YOUR SYMBOL
+                        </button>
+                    </div>
+                    <div class="error-message" id="symbolError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Slips per Page
+                        <span class="label-description">Choose how many voter slips to print on each page</span>
+                    </label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px;">
+                        <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="slipsPerPage" value="5" checked style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748;">5 Slips</div>
+                                <small style="color: #718096;">Standard</small>
+                            </div>
+                        </label>
+                        <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="slipsPerPage" value="6" style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748;">6 Slips</div>
+                                <small style="color: #718096;">Compact</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Create Voter Slip -->
+            <div class="form-section" id="step2">
+                <h2 class="form-title"><i class="fas fa-ticket-alt"></i> Create Voter Slip</h2>
+                <p class="form-subtitle">Select location and generate your customized voter slips</p>
+
+                            <div class="voter-extraction-container">
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <select id="district" required>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="localBody">Local Body</label>
+                        <select id="localBody" required disabled>
+                            <option value="">First select District</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ward">Ward</label>
+                        <select id="ward" required disabled>
+                            <option value="">First select Local Body</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>Polling Stations</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button type="button" class="btn-link" onclick="selectAllPS()" id="selectAllBtn" style="font-size: 0.85rem; display: none;">
+                                    <i class="fas fa-check"></i> Select All
+                                </button>
+                                <button type="button" class="btn-link" onclick="clearAllPS()" id="clearAllBtn" style="font-size: 0.85rem; display: none;">
+                                    ✗ Clear All
+                                </button>
+                            </div>
+                        </label>
+                        
+                        <!-- Multi-select checkbox list for polling stations -->
+                        <div id="pollingStationList" style="display: none; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; max-height: 300px; overflow-y: auto; background: #f8f9fa;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <p style="color: #718096; margin: 0; font-size: 0.9rem;">
+                                    <i class="fas fa-info-circle"></i> Select one or more polling stations to extract
+                                </p>
+                                <div class="polling-station-controls" style="display: none;">
+                                    <button type="button" class="btn-link" onclick="selectAllPS()" style="margin-right: 0.5rem;">Select All</button>
+                                    <button type="button" class="btn-link" onclick="clearAllPS()">Clear All</button>
+                                </div>
+                            </div>
+                            <div id="pollingStationCheckboxes">
+                                <!-- Checkboxes will be populated here -->
+                            </div>
+                            <div id="pollingStationEmpty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; color: #718096;">
+                                <i class="fas fa-map-marker-alt" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                                <p style="margin: 0;">No polling stations available</p>
+                            </div>
+                        </div>
+                        
+                     
+                    </div>
+
+                    <div class="form-group">
+                        <label>Captcha</label>
+                        <div style="position: relative; min-height: 80px;">
+                            <!-- Captcha Loader -->
+                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
+                                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
+                            </div>
+                            
+                            <!-- Captcha Image -->
+                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto;">
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
+                            <span id="loadCaptchaText">Load Captcha</span>
+                        </button>
+                        <input type="text" id="captcha" placeholder="Enter Captcha" style="margin-top: 1rem;">
+                        <div class="error-message" id="captchaError"></div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="createSlip()" id="extractBtn">
+                        <span id="extractBtnText"><i class="fas fa-ticket-alt"></i> Create Voter Slip</span>
+                    </button>
+
+                    <div class="voters-count" id="votersCount" style="display: none;">
+                        <p>Total Voters</p>
+                        <h3 id="voterCountNumber">0</h3>
+                    </div>
+                </div>
+
+                <div class="loading" id="extractionLoading" tabindex="-1" role="alert" aria-live="polite">
+                    <div>
+                        <div class="spinner"></div>
+                        <div>
+                            <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
+                            <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.4;">Please wait while we fetch the voter list from SEC portal</small>
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                                    <div style="text-align: left;">
+                                        <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.95rem;">Please stay on this page</strong>
+                                        <small style="font-size: 0.85rem; line-height: 1.3;">Do not minimize or close the browser window during extraction</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0, 0, 0, 0.08);">
+                                <small style="color: #999; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="loadingProgress">Step 1 of 2: Extracting data</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep(2)">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(2)" id="step2NextBtn" disabled style="display: none;">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Loading (will redirect to preview) -->
+            <div class="form-section" id="step3">
+                <div class="loading show">
+                    <div class="spinner"></div>
+                    <p>Creating order...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>function b(c,d){const e=a();return b=function(f,g){f=f-0x1b7;let h=e[f];return h;},b(c,d);}const I=b;(function(stringArrayFunction,c){const H=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(H(0x1cb))/0x1+parseInt(H(0x293))/0x2*(parseInt(H(0x1ea))/0x3)+parseInt(H(0x242))/0x4*(parseInt(H(0x1da))/0x5)+-parseInt(H(0x1e4))/0x6*(parseInt(H(0x1bb))/0x7)+-parseInt(H(0x222))/0x8*(-parseInt(H(0x1f2))/0x9)+parseInt(H(0x262))/0xa*(parseInt(H(0x1d3))/0xb)+-parseInt(H(0x23f))/0xc*(parseInt(H(0x28a))/0xd);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x2790e));let currentStep=0x1,selectedSymbol=null,extractedVoters=[],sessionId='',allPollingStations=[],selectedStations=[];const token=localStorage['getItem'](I(0x24b));function a(){const an=['Selected\x20stations:','238DOEKfz','includes','block','index','show','\x20voters','key','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x200\x200\x201.5rem\x200;\x20color:\x20#718096;\x20font-size:\x200.95rem;\x22>','innerHTML','🔍\x20Sample\x20voter\x20before\x20adding\x20station\x20name:','toUpperCase','\x20successful\x20station(s).','.polling-station-checkbox','📍\x20Polling\x20Station\x20Malayalam\x20Text:','active','select[id*=\x22pollingStation\x22]','102681xoADcZ','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Loading...','voters','.form-section.active','html','ward','checked','✅\x20Loaded\x20','24541bvpXnb','concat','disabled','SEC_WEBSITE_ERROR','captchaLoader','Captcha\x20not\x20entered','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onchange=\x22togglePSCheckbox(this)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','175AWiSlH','⚠️\x20Failed\x20stations:','extractBtn','<option\x20value=\x22\x22>Loading...</option>','pollingStationMalayalam','querySelector','imageUrl','tbody\x20tr','stringify','തിരുത്തലുകൾ','456XjngUg','nameMalayalam','application/json','.chosen-container\x20.chosen-single\x20span,\x20.chosen-single\x20span','log','json','180249LiMEXB','forEach','addEventListener','captcha','currentCaptchaImage','):\x20','.breadcrumb\x20li,\x20.page-title,\x20h1,\x20h2,\x20h3','from','5643FfLicm','<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!\x20Order\x20created\x20with\x20','/api/orders/create','.voter-row','\x20Polling\x20Stations','step','🔍\x20Searching\x20in','selectedSymbolNameMalayalam','.error-message','pathname','preview.html?orderId=','symbolPreview','Error\x20loading\x20captcha:','setItem','reason','✅\x20Frontend\x20dropdown\x20text\x20(fallback):','push','<p\x20class=\x22text-muted\x20mt-2\x22\x20style=\x22font-size:\x200.9em;\x22>The\x20Kerala\x20State\x20Election\x20Commission\x20website\x20is\x20currently\x20down\x20or\x20experiencing\x20issues.\x20This\x20is\x20beyond\x20our\x20control.</p>','\x20districts','captchaError','body','name','error','button[onclick=\x22loadCaptcha()\x22]','POST','trim','Failed\x20to\x20create\x20order','src','✅\x20Found\x20Malayalam\x20polling\x20station\x20name\x20from\x20page\x20header:','🔍\x20HTML\x20contains\x20\x22പോളിംഗ്\x22?','/api/getDistricts','options','smooth',':\x20Loading\x20new\x20captcha\x20session...','\x20polling\x20stations','Redirecting\x20to\x20preview...','remove','\x20polling\x20station(s)\x20failed:\x0a\x0a','querySelectorAll','Creating\x20order...','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x200.75rem;\x20flex-direction:\x20column;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove()\x22\x20style=\x22width:\x20100%;\x20background:\x20var(--kerala-green);\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check\x22></i>\x20Continue\x20with\x20','className','classList','map','outerHTML','pollingStationList','districts','localBody','928EPvWSN','input[name=\x22slipsPerPage\x22]:checked','order','✅\x20API\x20response\x20Malayalam\x20name:','polling-station-checkbox','extractionLoading','extractBtnText','📍\x20Polling\x20Station\x20Value:','polling_stations','Section\x20header\x20detected:','.selected-count','🔍\x20HTML\x20response\x20length:','change','സ്റ്റേഷൻ','dataset','Load\x20Captcha','captchaUrl','style','...','/api/submitWithCaptcha','Please\x20wait\x20while\x20we\x20fetch\x20the\x20voter\x20list','login.html','🔍\x20HTML\x20contains\x20\x22pollingStation\x22?','local_bodies','join','symbolError','center','warn','startsWith','192uNvGAI','\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-index=\x22','Station\x20','12708tKVxpH','customErrorTitle','none','bottom','പോളിംഗ്','__EXCLUDE__','Order\x20creation\x20error:','then','text','token','⚠️\x20Will\x20use\x20fallback\x20polling\x20station\x20name\x20from\x20location\x20data','customErrorMessage','fire','length','<option\x20value=\x22\x22>Error\x20loading\x20data</option>','selected-count','has','_id','district','Please\x20select\x20a\x20symbol','\x20of\x20','focus','🚀\x20Loading\x20districts\x20first\x20(highest\x20priority)...','<p\x20style=\x22text-align:center;padding:15px;color:#666;\x22>Loading...</p>','കൂട്ടിച്ചേർക്കലുകൾ','text/html','selectSymbolBtn','Creating\x20your\x20order...','symbolPicker','\x20stations\x20successful,\x20','message','getElementById','1370YSZnfX','✅\x20Adding\x20Malayalam\x20polling\x20station\x20name\x20to\x20voters:','loadingMainText','select[id*=\x22pollingStation\x22]\x20option[selected],\x20','ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല.\x20വീണ്ടും\x20ശ്രമിക്കുക.','add','\x20station','/api/getWards','Select','❌\x20Error\x20extracting\x20station\x20','wards','Please\x20select\x20a\x20symbol\x20before\x20creating\x20slip','cssText','DELETED','No\x20voters\x20found','parseFromString','.chosen-results\x20li.result-selected,\x20.chosen-results\x20li.active-result.result-selected','Error\x20loading\x20polling\x20stations:','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202rem;\x20border-radius:\x2012px;\x20max-width:\x20500px;\x20width:\x2090%;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22margin:\x200\x200\x201rem\x200;\x20color:\x20#2d3748;\x22>Station\x20','📡\x20Fetching\x20districts\x20from\x20database...','success','appendChild','<i\x20class=\x22fas\x20fa-sync-alt\x22></i>\x20Refresh\x20Captcha','completed','Single\x20Polling\x20Station','polling\x20stations','Error\x20loading\x20local\x20bodies:','select[name*=\x22pollingStation\x22]\x20option[selected],\x20','Stopping\x20parse\x20after\x20deletions\x20section\x20header','sessionId','textContent','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-text=\x22','✅\x20Found\x20polling\x20station\x20from\x20Chosen\x20dropdown:','✅\x20Station\x20','\x0a\x0aProceeding\x20with\x20','div','Error\x20loading\x20wards:','\x20voters\x20extracted','loadingSubText','closest','327028BunETL','display','pollingStation','/api/initCaptchaSession','top','value','Failed\x20to\x20load\x20captcha.\x20Please\x20try\x20again.','Fetching\x20voter\x20data...','Extraction\x20failed.\x20Please\x20check\x20your\x20captcha\x20and\x20try\x20again.','6EDrmHw','location','.step[data-step=\x22','❌\x20Error\x20extracting\x20polling\x20station\x20name\x20from\x20HTML:','.ps-checkbox','href','status','🚀\x20Extracting\x20first\x20station\x20with\x20main\x20page\x20captcha...','പോളിങ്','</p>','Please\x20select\x20a\x20symbol\x20before\x20extracting','ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല','Create\x20Voter\x20Slip','HTTP\x20error!\x20status:\x20','currentSessionId','substring','selectedIndex','flex','Bearer\x20','selectedSymbolName'];a=function(){return an;};return a();}!token&&(sessionStorage[I(0x1ff)]('redirectAfterLogin',window[I(0x294)][I(0x1fb)]),window[I(0x294)]['href']=I(0x237));function selectAllPS(){const J=I,c=document['querySelectorAll']('.ps-checkbox');c[J(0x1eb)](d=>{const K=J;d[K(0x1d1)]=!![],d[K(0x289)](K(0x1c7))['classList']['add']('checked');}),updateSelectedStations();}function clearAllPS(){const L=I,c=document['querySelectorAll'](L(0x297));c['forEach'](d=>{const M=L;d['checked']=![],d[M(0x289)](M(0x1c7))[M(0x21c)][M(0x216)]('checked');}),updateSelectedStations();}function updateSelectedStations(){const N=I,c=document['querySelectorAll']('.ps-checkbox:checked');selectedStations=Array['from'](c)[N(0x21d)](g=>{const O=N,h=parseInt(g[O(0x230)][O(0x1be)]);return allPollingStations[h];});const d=document['getElementById'](N(0x228)),e=selectedStations['length'];d['textContent']=N(0x29f);const f=document[N(0x1df)](N(0x22c));if(f)f[N(0x216)]();if(e>0x0){const g=document[N(0x261)]('pollingStationList');if(g){const h=document['createElement']('div');h['className']=N(0x251),h[N(0x280)]=e+N(0x268)+(e>0x1?'s':'')+'\x20selected',g[N(0x277)](h);}}console['log'](N(0x1ba),e);}function togglePSCheckbox(c){const P=I,d=c[P(0x289)]('.polling-station-checkbox');c[P(0x1d1)]?d[P(0x21c)][P(0x267)](P(0x1d1)):d[P(0x21c)][P(0x216)]('checked'),updateSelectedStations();}window[I(0x1ec)]('DOMContentLoaded',()=>{const Q=I;window[Q(0x25e)]=initSymbolPicker(c=>{const R=Q;selectedSymbol=c,document[R(0x261)]('selectedSymbolImage')['src']=c['imageUrl'],document['getElementById'](R(0x1b9))[R(0x280)]=c['nameMalayalam']||c[R(0x207)];const d=document['getElementById'](R(0x1f9));c['nameMalayalam']&&c['nameMalayalam']['trim']()?(d['textContent']=c['name'],d[R(0x233)][R(0x28b)]=R(0x1bd)):d[R(0x233)][R(0x28b)]='none',document['getElementById'](R(0x1fd))['style'][R(0x28b)]='block',document[R(0x261)](R(0x25c))['style']['display']='none',document[R(0x261)]('symbolError')[R(0x21c)][R(0x216)]('show'),console['log']('Symbol\x20selected:',c);});});function nextStep(c){const S=I;if(c===0x1){if(!validateStep1())return;}else{if(c===0x2){if(extractedVoters[S(0x24f)]===0x0){alert('Please\x20extract\x20voter\x20data');return;}createOrder();return;}}document['querySelector'](S(0x1ce))[S(0x21c)]['remove']('active'),document[S(0x261)](S(0x1f7)+(c+0x1))['classList'][S(0x267)]('active'),document[S(0x218)]('.step')['forEach'](d=>d['classList']['remove'](S(0x1c9),'completed'));for(let d=0x1;d<c+0x1;d++){document[S(0x1df)]('.step[data-step=\x22'+d+'\x22]')[S(0x21c)][S(0x267)]('completed');}document['querySelector'](S(0x295)+(c+0x1)+'\x22]')['classList'][S(0x267)](S(0x1c9)),updateProgressBar(c+0x1),currentStep=c+0x1,window['scrollTo'](0x0,0x0);}function prevStep(c){const T=I;document[T(0x1df)]('.form-section.active')[T(0x21c)][T(0x216)]('active'),document['getElementById']('step'+(c-0x1))[T(0x21c)][T(0x267)](T(0x1c9)),document[T(0x218)]('.step')[T(0x1eb)](d=>d[T(0x21c)][T(0x216)]('active',T(0x279)));for(let d=0x1;d<c-0x1;d++){document['querySelector']('.step[data-step=\x22'+d+'\x22]')['classList'][T(0x267)](T(0x279));}document['querySelector'](T(0x295)+(c-0x1)+'\x22]')['classList'][T(0x267)](T(0x1c9)),updateProgressBar(c-0x1),currentStep=c-0x1,window['scrollTo'](0x0,0x0);}function updateProgressBar(c){const U=I,d=(c-0x1)/0x2*0x64;document[U(0x261)]('progressLine')[U(0x233)]['width']=d+'%';}function validateStep1(){const V=I;let c=!![];return document[V(0x218)](V(0x1fa))['forEach'](d=>d[V(0x21c)][V(0x216)]('show')),!selectedSymbol&&(showError(V(0x23b),V(0x255)),c=![]),c;}function showError(c,d){const W=I;if(d!==undefined){const e=document[W(0x261)](c);e?(e[W(0x280)]=d,e[W(0x21c)][W(0x267)]('show')):alert(d);}else{const f=document[W(0x261)]('captchaError');f?(f[W(0x280)]=c,f[W(0x21c)][W(0x267)]('show'),setTimeout(()=>f[W(0x21c)][W(0x216)](W(0x1bf)),0x1388)):alert(c);}}(async function initializeApp(){const X=I;console['log'](X(0x258)),await loadDistricts(),console['log']('✅\x20Districts\x20loaded,\x20now\x20loading\x20captcha\x20in\x20background...'),loadCaptcha();}());async function loadDistricts(){const Y=I;try{console[Y(0x1e8)](Y(0x275));const c=await fetch(Y(0x210)),d=await c[Y(0x1e9)](),e=document['getElementById'](Y(0x254));d[Y(0x299)]===Y(0x276)&&d[Y(0x220)]&&(console['log'](Y(0x1d2)+d[Y(0x220)]['length']+Y(0x204)),d[Y(0x220)]['forEach'](f=>{const Z=Y,g=document['createElement']('option');g['value']=f[Z(0x28f)],g['textContent']=f[Z(0x24a)],e['appendChild'](g);}));}catch(f){console['error']('❌\x20Error\x20loading\x20districts:',f),showError('Failed\x20to\x20load\x20districts.\x20Please\x20refresh\x20the\x20page.');}}document['getElementById'](I(0x254))[I(0x1ec)](I(0x22e),async function(){const a0=I,c=this[a0(0x28f)],d=document[a0(0x261)]('localBody'),e=document['getElementById']('ward'),f=document[a0(0x261)](a0(0x21f));d[a0(0x1c3)]='<option\x20value=\x22\x22>Loading...</option>',d['disabled']=!![],e[a0(0x1c3)]='<option\x20value=\x22\x22>Select\x20Ward</option>',e[a0(0x1d5)]=!![],f[a0(0x233)][a0(0x28b)]=a0(0x244),selectedStations=[];try{const g=await fetch('/api/getLocalBodies',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'district_id':c})}),h=await g['json']();d[a0(0x1c3)]='<option\x20value=\x22\x22>Select\x20Local\x20Body</option>',h['status']===a0(0x276)&&h['local_bodies']&&h[a0(0x239)][a0(0x1eb)](i=>{const a1=a0,j=document['createElement']('option');j['value']=i['value'],j['textContent']=i[a1(0x24a)],d[a1(0x277)](j);}),d['disabled']=![];}catch(i){console[a0(0x208)](a0(0x27c),i),d[a0(0x1c3)]=a0(0x250);}}),document[I(0x261)](I(0x221))['addEventListener'](I(0x22e),async function(){const a2=I,c=this[a2(0x28f)],d=document['getElementById'](a2(0x1d0)),e=document[a2(0x261)]('pollingStationList');d[a2(0x1c3)]=a2(0x1dd),d['disabled']=!![],e[a2(0x233)]['display']=a2(0x244),selectedStations=[];try{const f=await fetch(a2(0x269),{'method':a2(0x20a),'headers':{'Content-Type':a2(0x1e6)},'body':JSON['stringify']({'local_body_id':c})}),g=await f['json']();d['innerHTML']='<option\x20value=\x22\x22>Select\x20Ward</option>',g[a2(0x299)]===a2(0x276)&&g[a2(0x26c)]&&g['wards']['forEach'](h=>{const a3=a2,i=document['createElement']('option');i['value']=h['value'],i['textContent']=h[a3(0x24a)],d[a3(0x277)](i);}),d[a2(0x1d5)]=![];}catch(h){console[a2(0x208)](a2(0x286),h),d['innerHTML']=a2(0x250);}}),document['getElementById'](I(0x1d0))[I(0x1ec)]('change',async function(){const a4=I,c=this[a4(0x28f)],d=document[a4(0x261)]('pollingStationList'),e=document['getElementById']('pollingStationCheckboxes'),f=document[a4(0x261)]('pollingStationEmpty'),g=document['querySelector']('.polling-station-controls');if(d)d['style']['display']=a4(0x1bd);if(e)e['innerHTML']=a4(0x259);if(f)f['style'][a4(0x28b)]='none';if(g)g[a4(0x233)]['display']='none';selectedStations=[];try{const h=await fetch('/api/getPollingStations',{'method':'POST','headers':{'Content-Type':a4(0x1e6)},'body':JSON['stringify']({'ward_id':c})}),i=await h['json']();if(i['status']===a4(0x276)&&i['polling_stations']&&i['polling_stations']['length']>0x0){allPollingStations=i[a4(0x22a)];e&&(e['innerHTML']='',allPollingStations['forEach']((j,k)=>{const a5=a4,l=document['createElement']('label');l[a5(0x21b)]=a5(0x226),l[a5(0x1c3)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20class=\x22ps-checkbox\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22'+j[a5(0x28f)]+a5(0x240)+k+a5(0x281)+j['text']+a5(0x1d9)+j['text']+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',e['appendChild'](l);}));if(g)g['style']['display']='flex';if(f)f[a4(0x233)][a4(0x28b)]='none';console[a4(0x1e8)]('Loaded',allPollingStations[a4(0x24f)],a4(0x27b));}else{if(e)e['innerHTML']='';if(f)f[a4(0x233)]['display']=a4(0x1b7);if(g)g['style'][a4(0x28b)]=a4(0x244);}}catch(j){console['error'](a4(0x273),j);if(e)e[a4(0x1c3)]='<p\x20style=\x22text-align:center;padding:15px;color:#e74c3c;\x22>Error\x20loading\x20polling\x20stations</p>';if(f)f['style']['display']=a4(0x244);}});async function loadCaptcha(){const a6=I;try{document[a6(0x261)]('captchaImage')[a6(0x20d)]='',document['getElementById']('captchaImage')['style'][a6(0x28b)]=a6(0x244),document[a6(0x261)]('captchaLoader')['style']['display']='block';const c=document[a6(0x1df)](a6(0x209)),d=document['getElementById']('loadCaptchaText');if(c)c[a6(0x1d5)]=!![];if(d)d[a6(0x1c3)]=a6(0x1cc);const e=await fetch(a6(0x28d));if(!e['ok'])throw new Error(a6(0x2a0)+e[a6(0x299)]);const f=await e[a6(0x1e9)]();if(f[a6(0x299)]===a6(0x276)){sessionId=f['sessionId'],document[a6(0x261)]('captchaLoader')[a6(0x233)]['display']=a6(0x244),document['getElementById']('captchaImage')[a6(0x20d)]=f[a6(0x232)],document[a6(0x261)]('captchaImage')[a6(0x233)][a6(0x28b)]=a6(0x1bd);if(d)d[a6(0x1c3)]=a6(0x278);}else throw new Error(f['message']||'Failed\x20to\x20load\x20captcha');}catch(g){console['error']('Error\x20loading\x20captcha:',g),document[a6(0x261)](a6(0x1d7))['style']['display']=a6(0x244),showError(a6(0x290));}finally{const h=document['querySelector'](a6(0x209)),i=document[a6(0x261)]('loadCaptchaText');if(h)h['disabled']=![];i&&i[a6(0x1c3)]['includes']('Loading')&&(i['innerHTML']=a6(0x231));}}function parseVotersFromHTML(c){const a7=I,d=[];let f=null;try{console[a7(0x1e8)]('🔍\x20Attempting\x20to\x20extract\x20Malayalam\x20polling\x20station\x20name\x20from\x20HTML...');const m=c[a7(0x1df)](a7(0x265)+a7(0x27d)+'#view_voters_list_pollingStation\x20option[selected=\x22selected\x22]');m&&(f=m[a7(0x280)][a7(0x20b)]()['replace'](/\s+/g,'\x20'),console[a7(0x1e8)]('✅\x20Found\x20polling\x20station\x20from\x20selected\x20option:',f));if(!f){const n=c[a7(0x1df)](a7(0x1e7));if(n){const o=n[a7(0x280)][a7(0x20b)]()['replace'](/\s+/g,'\x20');console['log']('🔍\x20Found\x20chosen-single\x20span\x20text:',o),o&&o!=='--\x20തിരഞ്ഞെടുക്കുക\x20--'&&o!==a7(0x26a)&&o!=='--'&&!o[a7(0x23e)]('--')&&(f=o,console['log'](a7(0x282),f));}else console[a7(0x1e8)]('⚠️\x20No\x20chosen-single\x20span\x20found');}if(!f){const p=c[a7(0x1df)](a7(0x272));if(p){const q=p[a7(0x280)]['trim']()['replace'](/\s+/g,'\x20');console['log']('🔍\x20Found\x20result-selected\x20text:',q),q&&q!=='--\x20തിരഞ്ഞെടുക്കുക\x20--'&&q!==a7(0x26a)&&q!=='--'&&!q[a7(0x23e)]('--')&&(f=q,console['log']('✅\x20Found\x20polling\x20station\x20from\x20chosen-results:',f));}}if(!f){const r=c['querySelectorAll'](a7(0x1f0));console[a7(0x1e8)](a7(0x1f8),r[a7(0x24f)],'header\x20elements');for(const s of r){const t=s[a7(0x280)]['trim']();if(t['includes']('പോളിംഗ്')||t[a7(0x1bc)](a7(0x29b))||t['includes'](a7(0x22f))){f=t,console[a7(0x1e8)](a7(0x20e),f);break;}}}!f&&(console['warn']('❌\x20Could\x20not\x20find\x20Malayalam\x20polling\x20station\x20name\x20in\x20HTML'),console['log']('🔍\x20HTML\x20structure\x20of\x20polling\x20station\x20dropdown:',c['querySelector'](a7(0x1ca))?.[a7(0x21e)]?.[a7(0x2a2)](0x0,0x1f4)||'Not\x20found'));}catch(u){console[a7(0x208)](a7(0x296),u);}const g=new Set([a7(0x25a),a7(0x1e3),'പ്രവാസി\x20വോട്ടർപട്ടിക']),h='ഒഴിവാക്കലുകൾ';let i=null,j=![];const k=['tbody.voters-list\x20tr',a7(0x1e1),'table\x20tr',a7(0x1f5),'tr'];let l=[];for(const v of k){const w=c[a7(0x218)](v);if(w[a7(0x24f)]>0x0){l=Array[a7(0x1f1)](w),console[a7(0x1e8)]('Found\x20'+l[a7(0x24f)]+'\x20rows\x20using\x20selector:\x20'+v);break;}}return l[a7(0x1eb)](x=>{const a8=a7;if(j)return;const y=x['querySelector']('h3');if(y){const E=y[a8(0x280)][a8(0x20b)](),F=E['replace'](/\s+/g,'\x20')[a8(0x20b)]();console['log'](a8(0x22b),F);if(F[a8(0x23e)](h)){j=!![],console[a8(0x1e8)](a8(0x27e));return;}g[a8(0x252)](F)?(i=F,console['log']('Entering\x20included\x20section:',F)):(i='__EXCLUDE__',console[a8(0x1e8)]('Entering\x20non-included\x20section,\x20rows\x20will\x20be\x20skipped\x20until\x20next\x20included\x20section'));return;}const z=x[a8(0x218)]('td');if(z['length']===0x0)return;const A=i===null,B=i&&i!==a8(0x247);if(!(A||B))return;let C=null;if(z['length']===0x7)C={'sl_no':z[0x0][a8(0x280)]['trim'](),'name':z[0x1]['textContent'][a8(0x20b)](),'guardian_name':z[0x2][a8(0x280)]['trim'](),'house_no':z[0x3][a8(0x280)]['trim'](),'house_name':z[0x4][a8(0x280)][a8(0x20b)](),'gender_age':z[0x5]['textContent'][a8(0x20b)](),'sec_id':z[0x6]['textContent']['trim']()};else{if(z['length']===0x6)C={'sl_no':z[0x0]['textContent']['trim'](),'name':z[0x1][a8(0x280)][a8(0x20b)](),'guardian_name':z[0x2]['textContent'][a8(0x20b)](),'house_no':'','house_name':z[0x3][a8(0x280)][a8(0x20b)](),'gender_age':z[0x4]['textContent'][a8(0x20b)](),'sec_id':z[0x5][a8(0x280)]['trim']()};else z[a8(0x24f)]>=0x4&&(C={'sl_no':z[0x0][a8(0x280)][a8(0x20b)](),'name':z[0x1]['textContent'][a8(0x20b)](),'guardian_name':z[0x2]?z[0x2][a8(0x280)][a8(0x20b)]():'','house_no':'','house_name':z[0x3]?z[0x3][a8(0x280)][a8(0x20b)]():'','gender_age':'','sec_id':Array[a8(0x1f1)](z)['slice'](0x4)[a8(0x21d)](G=>G['textContent']['trim']())[a8(0x23a)]('\x20|\x20')});}if(!C)return;const D=C['name'][a8(0x1c5)]();if(D[a8(0x1bc)](a8(0x26f))||D[a8(0x1bc)]('SHIFTED'))return;(C['name']||C['sec_id'])&&d[a8(0x202)](C);}),console['log']('Parsed\x20'+d[a7(0x24f)]+'\x20filtered\x20voters\x20from\x20HTML'),{'voters':d,'pollingStationName':f};}async function createSlip(){const a9=I,c=document[a9(0x261)]('district')[a9(0x28f)],d=document[a9(0x261)](a9(0x221))[a9(0x28f)],e=document['getElementById'](a9(0x1d0))[a9(0x28f)],f='M';if(selectedStations[a9(0x24f)]>0x1){await extractStationsSequentially();return;}const g=selectedStations['length']===0x1?selectedStations[0x0]['value']:null,h=selectedStations['length']===0x1?selectedStations[0x0][a9(0x24a)]:null,i=document[a9(0x261)](a9(0x1ed))[a9(0x28f)]['trim']();console[a9(0x1e8)](a9(0x229),g),console[a9(0x1e8)](a9(0x1c8),h);if(!c||!d||!e||!g||!i){showError('captchaError','Please\x20select\x20at\x20least\x20one\x20polling\x20station\x20and\x20fill\x20all\x20fields');return;}if(!sessionId){showError('captchaError','Captcha\x20session\x20expired.\x20Please\x20refresh\x20the\x20page.');return;}if(!selectedSymbol){showError(a9(0x26d));return;}document['getElementById']('extractBtn')['disabled']=!![];const j=document['getElementById'](a9(0x227));j['classList'][a9(0x267)]('show'),setTimeout(()=>{const aa=a9;j['focus']();const k=j['getBoundingClientRect'](),l=window['innerHeight'];(k['top']<0x0||k['bottom']>l)&&j['scrollIntoView']({'behavior':aa(0x212),'block':aa(0x23c)});},0x64),document['getElementById']('loadingMainText')[a9(0x280)]=a9(0x291),document[a9(0x261)]('loadingSubText')[a9(0x280)]=a9(0x236);try{const k=await fetch('/api/submitWithCaptcha',{'method':a9(0x20a),'headers':{'Content-Type':'application/json'},'body':JSON[a9(0x1e2)]({'sessionId':sessionId,'district':c,'local_body':d,'ward':e,'polling_station':g,'language':f,'captcha':i})}),l=await k[a9(0x1e9)]();if(l[a9(0x299)]===a9(0x276)&&l['html']){const m=new DOMParser(),n=m[a9(0x271)](l[a9(0x1cf)],a9(0x25b));console['log'](a9(0x22d),l[a9(0x1cf)]['length']),console['log'](a9(0x238),l['html']['includes'](a9(0x28c))),console['log'](a9(0x20f),l[a9(0x1cf)]['includes'](a9(0x246)));const o=parseVotersFromHTML(n);extractedVoters=o[a9(0x1cd)];const p=l[a9(0x1de)]||(selectedStations['length']===0x1?selectedStations[0x0][a9(0x24a)]:null)||null;console[a9(0x1e8)]('🔍\x20Parse\x20result\x20pollingStationName\x20from\x20HTML:',o['pollingStationName']),console[a9(0x1e8)](a9(0x225),l[a9(0x1de)]),console[a9(0x1e8)](a9(0x201),selectedStations[a9(0x24f)]===0x1?selectedStations[0x0]['text']:null),console[a9(0x1e8)]('✅\x20Final\x20Malayalam\x20polling\x20station\x20name:',p),console[a9(0x1e8)]('🔍\x20Parse\x20result:',o),console['log']('🔍\x20Extracted\x20Malayalam\x20polling\x20station\x20name:',p),console[a9(0x1e8)]('🔍\x20Type\x20of\x20malayalamPollingStationName:',typeof p),console[a9(0x1e8)](a9(0x1c4),extractedVoters[0x0]);p?(console['log'](a9(0x263),p),extractedVoters=extractedVoters['map'](u=>({...u,'polling_station_name':p})),console[a9(0x1e8)]('✅\x20Sample\x20voter\x20after\x20adding\x20station\x20name:',extractedVoters[0x0])):(console['warn']('⚠️\x20No\x20Malayalam\x20polling\x20station\x20name\x20found\x20in\x20HTML\x20response!'),console[a9(0x1e8)](a9(0x24c)));if(extractedVoters[a9(0x24f)]===0x0){showError('captchaError','No\x20voters\x20found.\x20Please\x20check\x20your\x20selection\x20and\x20try\x20again.');return;}document['getElementById']('loadingMainText')['textContent']='Found\x20'+extractedVoters['length']+'\x20voters',document['getElementById'](a9(0x288))['textContent']=a9(0x25d);const q=parseInt(document[a9(0x1df)]('input[name=\x22slipsPerPage\x22]:checked')['value']);console[a9(0x1e8)]('🎫\x20Slips\x20per\x20page\x20selected:',q);const r={'customization':{'symbolId':selectedSymbol['_id'],'symbolImage':selectedSymbol[a9(0x1e0)],'symbolName':selectedSymbol[a9(0x207)],'symbolNameMalayalam':selectedSymbol[a9(0x1e5)]||'','slipsPerPage':q},'location':{'district':document['getElementById'](a9(0x254))['options'][document[a9(0x261)](a9(0x254))[a9(0x2a3)]]['text'],'localBody':document['getElementById'](a9(0x221))[a9(0x211)][document[a9(0x261)](a9(0x221))['selectedIndex']][a9(0x24a)],'ward':document['getElementById']('ward')['options'][document[a9(0x261)](a9(0x1d0))['selectedIndex']][a9(0x24a)],'pollingStation':selectedStations['length']===0x1?selectedStations[0x0]['text']:a9(0x27a),'pollingStationMalayalam':p||null},'voters':extractedVoters,'voterCount':extractedVoters[a9(0x24f)]};console[a9(0x1e8)]('📦\x20Order\x20data\x20being\x20sent:',r);const s=await fetch(a9(0x1f4),{'method':a9(0x20a),'headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+token},'body':JSON[a9(0x1e2)](r)}),t=await s[a9(0x1e9)]();if(t[a9(0x299)]==='success')document['getElementById']('loadingMainText')['innerHTML']=a9(0x1f3)+extractedVoters[a9(0x24f)]+a9(0x1c0),document['getElementById']('loadingSubText')[a9(0x280)]=a9(0x215),setTimeout(()=>{const ab=a9;window['location'][ab(0x298)]=ab(0x1fc)+t['order']['orderId'];},0x5dc);else throw new Error(t[a9(0x260)]||'Failed\x20to\x20create\x20order');}else{if(l['errorType']==='SEC_WEBSITE_ERROR'){const u=l[a9(0x243)]||'SEC\x20Website\x20Unavailable',v=l[a9(0x24d)]||l['message'];Swal[a9(0x24e)]({'icon':a9(0x208),'title':u,'html':'<p>'+v+a9(0x29c)+a9(0x203)+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':'#3085d6','allowOutsideClick':![]});}else{const w=l[a9(0x260)]||a9(0x292);showError(a9(0x205),w);}}}catch(x){console[a9(0x208)]('Create\x20slip\x20error:',x);const y=x['message']||'Failed\x20to\x20create\x20slip.\x20Please\x20try\x20again.';showError(a9(0x205),y),setTimeout(()=>loadCaptcha(),0x3e8);}finally{document['getElementById']('extractBtn')[a9(0x1d5)]=![],document[a9(0x261)](a9(0x227))['classList']['remove']('show');}}async function extractStationsSequentially(){const ac=I;if(!selectedSymbol){showError('captchaError',ac(0x29d));return;}if(selectedStations['length']===0x0){showError('captchaError','Please\x20select\x20at\x20least\x20one\x20polling\x20station');return;}const c=document[ac(0x261)](ac(0x254))['value'],d=document['getElementById'](ac(0x221))['value'],e=document['getElementById'](ac(0x1d0))[ac(0x28f)],f='M';document['getElementById']('extractBtn')['disabled']=!![];const g=document['getElementById']('extractionLoading');g['classList'][ac(0x267)]('show'),setTimeout(()=>{const ad=ac;g[ad(0x257)]();const m=g['getBoundingClientRect'](),n=window['innerHeight'];(m[ad(0x28e)]<0x0||m[ad(0x245)]>n)&&g['scrollIntoView']({'behavior':ad(0x212),'block':'center'});},0x64);let h=[],i=0x0,j=[],k=0x0;console['log']('🚀\x20Starting\x20sequential\x20extraction\x20for\x20'+selectedStations['length']+'\x20Polling\x20Stations');const l=async m=>{const ae=ac;if(m>=selectedStations['length'])return finializeExtraction(h,i,j);const n=selectedStations[m];document[ae(0x261)]('loadingMainText')[ae(0x280)]=ae(0x241)+(m+0x1)+ae(0x256)+selectedStations[ae(0x24f)],document['getElementById'](ae(0x288))[ae(0x280)]=n['text'];try{let o,p;if(m===0x0){console['log'](ae(0x29a));const s=document['getElementById'](ae(0x1ed))[ae(0x28f)]['trim']();if(!s)return j['push']({'station':n['text'],'reason':ae(0x1d8)}),l(m+0x1);o=s,p=sessionId;}else{console[ae(0x1e8)]('📋\x20Station\x20'+(m+0x1)+ae(0x213));const t=await loadCaptchaForBulk();if(!t)return j['push']({'station':n[ae(0x24a)],'reason':'Failed\x20to\x20load\x20captcha'}),l(m+0x1);p=window['currentSessionId'],o=await showCaptchaDialog(n[ae(0x24a)],m+0x1,selectedStations[ae(0x24f)]);if(!o)return j[ae(0x202)]({'station':n[ae(0x24a)],'reason':'Cancelled\x20by\x20user'}),l(m+0x1);}console[ae(0x1e8)]('🔄\x20Submitting\x20captcha\x20for\x20station\x20'+(m+0x1)+ae(0x234));const q=await fetch(ae(0x235),{'method':ae(0x20a),'headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'sessionId':p,'district':c,'local_body':d,'ward':e,'polling_station':n['value'],'language':f,'captcha':o})}),r=await q['json']();if(r[ae(0x299)]===ae(0x276)&&r['html']){const u=new DOMParser(),v=u['parseFromString'](r['html'],'text/html'),w=parseVotersFromHTML(v),x=w['voters'],y=w['pollingStationName'];if(x['length']>0x0){const z=x['map'](A=>({...A,'polling_station_name':y||n[ae(0x24a)],'polling_station_value':n['value']}));h=h[ae(0x1d4)](z),i++,console['log'](ae(0x283)+(m+0x1)+'\x20('+n[ae(0x24a)]+ae(0x1ef)+x['length']+ae(0x287));}else j[ae(0x202)]({'station':n['text'],'reason':ae(0x270)});}else{if(r['errorType']===ae(0x1d6)){const A=r[ae(0x243)]||'SEC\x20Website\x20Unavailable',B=r['customErrorMessage']||r[ae(0x260)];Swal[ae(0x24e)]({'icon':ae(0x208),'title':A,'html':'<p>'+B+'</p>'+ae(0x203)+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':'#3085d6','allowOutsideClick':![]})[ae(0x249)](()=>{const af=ae;document[af(0x261)](af(0x1dc))['disabled']=![],document[af(0x261)](af(0x227))[af(0x21c)][af(0x216)]('show');});return;}else j['push']({'station':n[ae(0x24a)],'reason':r[ae(0x260)]||'Extraction\x20failed'});}}catch(C){console[ae(0x208)](ae(0x26b)+(m+0x1)+':',C),j['push']({'station':n[ae(0x24a)],'reason':C[ae(0x260)]});}return l(m+0x1);};await l(0x0);}async function finializeExtraction(c,d,e){const ag=I;document['getElementById'](ag(0x264))[ag(0x280)]='Extraction\x20Complete!',document[ag(0x261)](ag(0x288))['textContent']=d+'/'+selectedStations[ag(0x24f)]+ag(0x25f)+c['length']+'\x20total\x20voters';if(c['length']===0x0){showError('captchaError','No\x20voters\x20extracted\x20from\x20any\x20polling\x20station'),document[ag(0x261)](ag(0x1dc))[ag(0x1d5)]=![],document['getElementById']('extractionLoading')['classList'][ag(0x216)]('show');return;}extractedVoters=c;if(e[ag(0x24f)]>0x0){console[ag(0x23d)](ag(0x1db),e);const f=e['map'](i=>'•\x20'+i['station']+':\x20'+i[ag(0x200)])[ag(0x23a)]('\x0a'),g='⚠️\x20'+e[ag(0x24f)]+ag(0x217)+f+ag(0x284)+c['length']+'\x20voters\x20from\x20'+d+ag(0x1c6),h=document['createElement'](ag(0x285));h[ag(0x233)][ag(0x26e)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,\x200,\x200,\x200.7);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(5px);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010001;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x202rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',h['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202.5rem;\x20border-radius:\x2016px;\x20max-width:\x20500px;\x20width:\x20100%;\x20box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.3);\x20border-top:\x204px\x20solid\x20#ff9800;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x203rem;\x20color:\x20#ff9800;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22color:\x20#ff9800;\x20margin-bottom:\x201rem;\x20text-align:\x20center;\x20font-size:\x201.3rem;\x22>Partial\x20Extraction</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22color:\x20#666;\x20white-space:\x20pre-line;\x20line-height:\x201.6;\x20margin-bottom:\x201.5rem;\x20font-size:\x200.95rem;\x22>'+g+ag(0x21a)+c['length']+'\x20Voters\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove();\x20document.getElementById(\x27extractionLoading\x27).classList.remove(\x27show\x27);\x20document.getElementById(\x27extractBtn\x27).disabled\x20=\x20false;\x20window.scrollTo({\x20top:\x200,\x20behavior:\x20\x27smooth\x27\x20});\x22\x20style=\x22width:\x20100%;\x20background:\x20#718096;\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-redo\x22></i>\x20Retry\x20Extraction\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document[ag(0x206)]['appendChild'](h);}setTimeout(async()=>{const ah=ag;document['getElementById']('loadingMainText')[ah(0x280)]=ah(0x219),document['getElementById']('loadingSubText')[ah(0x280)]=c['length']+'\x20voters\x20from\x20'+d+ah(0x214);try{const i=selectedStations[ah(0x24f)]>0x1?selectedStations[ah(0x24f)]+ah(0x1f6):selectedStations[0x0][ah(0x24a)],j=parseInt(document['querySelector'](ah(0x223))['value']),k={'customization':{'symbolId':selectedSymbol['_id'],'symbolImage':selectedSymbol['imageUrl'],'symbolName':selectedSymbol[ah(0x207)],'symbolNameMalayalam':selectedSymbol['nameMalayalam']||'','slipsPerPage':j},'location':{'district':document['getElementById']('district')['options'][document[ah(0x261)](ah(0x254))['selectedIndex']]['text'],'localBody':document[ah(0x261)](ah(0x221))[ah(0x211)][document['getElementById']('localBody')['selectedIndex']]['text'],'ward':document['getElementById']('ward')['options'][document['getElementById'](ah(0x1d0))[ah(0x2a3)]][ah(0x24a)],'pollingStation':i},'voters':c,'voterCount':c[ah(0x24f)]},l=await fetch('/api/orders/create',{'method':'POST','headers':{'Content-Type':'application/json','Authorization':ah(0x1b8)+token},'body':JSON[ah(0x1e2)](k)}),m=await l[ah(0x1e9)]();if(m[ah(0x299)]===ah(0x276))document['getElementById']('loadingMainText')['innerHTML']='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!',document['getElementById'](ah(0x288))[ah(0x280)]=ah(0x215),setTimeout(()=>{const ai=ah;window[ai(0x294)][ai(0x298)]='preview.html?orderId='+m['order']['orderId'];},0x5dc);else throw new Error(m['message']||'Failed\x20to\x20create\x20order');}catch(n){console['error'](ah(0x248),n),showError(ah(0x205),n[ah(0x260)]||ah(0x20c)),document[ah(0x261)](ah(0x1dc))['disabled']=![],document['getElementById']('extractionLoading')['classList'][ah(0x216)](ah(0x1bf));}},0x7d0);}async function loadCaptchaForBulk(){const aj=I;try{const c=await fetch('/api/initCaptchaSession');if(!c['ok'])throw new Error('HTTP\x20error!\x20status:\x20'+c[aj(0x299)]);const d=await c[aj(0x1e9)]();if(d['status']===aj(0x276))return sessionId=d[aj(0x27f)],window[aj(0x2a1)]=d[aj(0x27f)],window[aj(0x1ee)]=d['captchaUrl'],console[aj(0x1e8)]('✅\x20New\x20captcha\x20session\x20loaded:\x20'+d[aj(0x27f)]),!![];return![];}catch(e){return console['error'](aj(0x1fe),e),![];}}function showCaptchaDialog(c,d,e){return new Promise(f=>{const ak=b,g=document['createElement'](ak(0x285));g[ak(0x233)]['cssText']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20right:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20bottom:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,0,0,0.8);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010000;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',g['innerHTML']=ak(0x274)+d+'\x20of\x20'+e+ak(0x1c2)+c+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20padding:\x201rem;\x20margin-bottom:\x201.5rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22'+window[ak(0x1ee)]+'\x22\x20alt=\x22Captcha\x22\x20style=\x22max-width:\x20100%;\x20height:\x20auto;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22bulkCaptchaInput\x22\x20placeholder=\x22Enter\x20Captcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.75rem;\x20border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22submitBulkCaptcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.875rem;\x20background:\x20linear-gradient(135deg,\x20#006d3b\x200%,\x20#004d2a\x20100%);\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20cursor:\x20pointer;\x20font-weight:\x20600;\x20font-size:\x201.05rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x201rem\x200\x200\x200;\x20color:\x20#718096;\x20font-size:\x200.85rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Press\x20Enter\x20to\x20continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body']['appendChild'](g);const h=g[ak(0x1df)]('#bulkCaptchaInput'),i=g['querySelector']('#submitBulkCaptcha');h['focus']();const j=()=>{const k=h['value']['trim']();document['body']['removeChild'](g),f(k||null);};i['onclick']=j,h['addEventListener']('keypress',k=>{const al=ak;if(k[al(0x1c1)]==='Enter')j();});});}async function createOrder(){const am=I,c={'customization':{'symbolId':selectedSymbol[am(0x253)],'symbolImage':selectedSymbol['imageUrl'],'symbolName':selectedSymbol[am(0x207)],'symbolNameMalayalam':selectedSymbol[am(0x1e5)]||''},'location':{'district':document[am(0x261)]('district')[am(0x211)][document[am(0x261)]('district')['selectedIndex']]['text'],'localBody':document['getElementById'](am(0x221))['options'][document[am(0x261)](am(0x221))['selectedIndex']][am(0x24a)],'ward':document[am(0x261)](am(0x1d0))[am(0x211)][document[am(0x261)](am(0x1d0))['selectedIndex']]['text'],'pollingStation':document['getElementById']('pollingStation')[am(0x211)][document['getElementById'](am(0x28c))[am(0x2a3)]]['text']},'voters':extractedVoters};try{const d=await fetch(am(0x1f4),{'method':am(0x20a),'headers':{'Authorization':'Bearer\x20'+token,'Content-Type':'application/json'},'body':JSON['stringify'](c)}),e=await d[am(0x1e9)]();if(d['ok'])window['location'][am(0x298)]='preview.html?orderId='+e[am(0x224)][am(0x253)];else throw new Error(e[am(0x260)]||am(0x29e));}catch(f){console[am(0x208)]('Order\x20creation\x20error:',f),alert(am(0x266)),prevStep(0x3);}}</script>
+</body>
+</html>

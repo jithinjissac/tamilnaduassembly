@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
@@ -40,26 +41,73 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(requestLogger);
 
 // Serve static files (frontend) with cache control
-app.use(express.static(path.join(__dirname, 'frontend'), {
+// Use protected frontend if available, otherwise fallback to original
+const frontendDir = fs.existsSync(path.join(__dirname, 'frontend-protected')) && process.env.USE_PROTECTED === 'true'
+    ? 'frontend-protected'
+    : 'frontend';
+
+console.log(`📁 Serving frontend from: ${frontendDir}`);
+
+app.use(express.static(path.join(__dirname, frontendDir), {
     setHeaders: (res, filePath) => {
         // Disable caching for HTML files to ensure users get latest access control fixes
         if (filePath.endsWith('.html')) {
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.setHeader('Pragma', 'no-cache');
             res.setHeader('Expires', '0');
+            
+            // Add development-friendly CSP for DevTools and external resources
+            if (process.env.NODE_ENV !== 'production') {
+                res.setHeader('Content-Security-Policy', 
+                    "default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                    
+                    // Allow connections to external services and blob URLs
+                    "connect-src 'self' ws: wss: http: https: blob: data: *.tawk.to *.google-analytics.com *.googletagmanager.com *.cashfree.com *.razorpay.com; " +
+                    
+                    // Allow scripts from payment gateways and external services
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: " +
+                    "https://www.googletagmanager.com " +
+                    "https://embed.tawk.to " +
+                    "https://cdnjs.cloudflare.com " +
+                    "https://cdn.jsdelivr.net " +
+                    "https://sdk.cashfree.com " +
+                    "https://checkout.razorpay.com; " +
+                    
+                    // Allow stylesheets from external services
+                    "style-src 'self' 'unsafe-inline' " +
+                    "https://fonts.googleapis.com " +
+                    "https://cdnjs.cloudflare.com " +
+                    "https://embed.tawk.to; " +
+                    
+                    // Allow fonts from external sources and blob URLs
+                    "font-src 'self' blob: data: " +
+                    "https://fonts.gstatic.com " +
+                    "https://cdnjs.cloudflare.com " +
+                    "https://embed.tawk.to; " +
+                    
+                    // Allow images from any source
+                    "img-src 'self' data: blob: https: http:; " +
+                    
+                    // Allow frames/iframes including blob URLs for PDF viewer
+                    "frame-src 'self' blob: data: https:; " +
+                    
+                    // Allow web workers for PDF.js
+                    "worker-src 'self' blob: data:;"
+                );
+            }
         }
     }
 }));
 
-// Serve SEO files
+// Serve SEO files from the active frontend directory
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    res.sendFile(path.join(__dirname, 'frontend', 'robots.txt'));
+    res.sendFile(path.join(__dirname, frontendDir, 'robots.txt'));
 });
 
 app.get('/sitemap.xml', (req, res) => {
     res.type('application/xml');
-    res.sendFile(path.join(__dirname, 'frontend', 'sitemap.xml'));
+    res.sendFile(path.join(__dirname, frontendDir, 'sitemap.xml'));
 });
 
 // Serve captcha cache directory
