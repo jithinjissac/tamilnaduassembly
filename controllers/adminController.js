@@ -710,9 +710,6 @@ export const downloadOrderPDF = async (req, res) => {
     try {
         const { orderId } = req.params;
         
-        // Import slip controller function
-        const { generateSlipHTML, getBrowser } = await import('./slipController.js');
-        
         const order = await Order.findOne({ orderId });
         
         if (!order) {
@@ -722,8 +719,33 @@ export const downloadOrderPDF = async (req, res) => {
             });
         }
         
-        console.log(`📥 ADMIN PDF DOWNLOAD: Generating full PDF for order ${orderId}`);
+        // Check if PDF already exists on disk
+        const permanentPdfDir = path.join(process.cwd(), 'public', 'pdfs');
+        const pdfFilename = `${orderId}.pdf`;
+        const pdfPath = path.join(permanentPdfDir, pdfFilename);
+        
+        console.log(`📥 ADMIN PDF DOWNLOAD: Order ${orderId}`);
         console.log(`   Total voters: ${order.voters.length}`);
+        console.log(`   Checking for existing PDF: ${pdfPath}`);
+        
+        // If PDF exists, serve it directly
+        if (fs.existsSync(pdfPath)) {
+            console.log(`✅ Found existing PDF, serving from disk`);
+            const pdfBuffer = fs.readFileSync(pdfPath);
+            
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=voter-slips-${orderId}.pdf`);
+            res.setHeader('Content-Length', pdfBuffer.length);
+            
+            return res.send(pdfBuffer);
+        }
+        
+        // If no PDF exists, generate it
+        console.log(`⚠️ No existing PDF found, generating new one...`);
+        
+        // Import slip controller function
+        const { generateSlipHTML, getBrowser } = await import('./slipController.js');
+        
         console.log(`   Calling generateSlipHTML with NO endIndex (full PDF, isPreview = false)`);
         
         // Generate HTML for ALL slips (no preview mode)
@@ -755,6 +777,13 @@ export const downloadOrderPDF = async (req, res) => {
         });
         
         await page.close();
+        
+        // Save PDF to disk for future use
+        if (!fs.existsSync(permanentPdfDir)) {
+            fs.mkdirSync(permanentPdfDir, { recursive: true });
+        }
+        fs.writeFileSync(pdfPath, pdf);
+        console.log(`💾 PDF saved to disk: ${pdfPath}`);
         
         // Set headers for download
         res.setHeader('Content-Type', 'application/pdf');
