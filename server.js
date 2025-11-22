@@ -131,6 +131,7 @@ app.use('/api/admin', adminRoutes);
 
 // Activity Tracking Routes
 import activityRoutes from './routes/activity.js';
+import { cleanupInactiveSessions } from './middleware/activityTracker.js';
 app.use('/api/activity', activityRoutes);
 
 // Media Routes (Admin only)
@@ -205,6 +206,14 @@ app.listen(PORT, () => {
   setInterval(() => {
     cleanupExpiredPDFs();
   }, 10 * 60 * 1000);
+  
+  // Cleanup inactive sessions every 5 minutes
+  setInterval(() => {
+    cleanupInactiveSessions();
+  }, 5 * 60 * 1000);
+  
+  // Run initial session cleanup
+  cleanupInactiveSessions();
 });
 
 // Graceful shutdown

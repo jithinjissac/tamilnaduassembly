@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login Test</title>
+</head>
+<body>
+    <h2>Admin Login Test</h2>
+    <form id="loginForm">
+        <div>
+            <label>Email:</label>
+            <input type="email" id="email" value="techiussolutions@gmail.com" />
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="password" />
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <button id="testUsers" style="display:none;">Test Users API</button>
+    <button id="testSessions" style="display:none;">Test Sessions API</button>
+    
+    <div id="apiResults"></div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        
+        if (token) {
+            document.getElementById('testUsers').style.display = 'block';
+            document.getElementById('testSessions').style.display = 'block';
+            document.getElementById('result').innerHTML = `<p>Already logged in! Token: ${token.substring(0,20)}...</p>`;
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                console.log('Attempting login with:', { email, password: password ? '*'.repeat(password.length) : 'empty' });
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        emailOrPhone: email,
+                        password: password
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('Login response:', result);
+                
+                if (result.status === 'success') {
+                    localStorage.setItem('token', result.token);
+                    token = result.token;
+                    document.getElementById('result').innerHTML = `<p style="color: green;">Login successful! Role: ${result.user?.role}</p>`;
+                    document.getElementById('testUsers').style.display = 'block';
+                    document.getElementById('testSessions').style.display = 'block';
+                } else {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">Login failed: ${result.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('testUsers').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                console.log('Users API response:', result);
+                document.getElementById('apiResults').innerHTML += `<h3>Users API (${response.status}):</h3><pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Users API error:', error);
+                document.getElementById('apiResults').innerHTML += `<p style="color: red;">Users API Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('testSessions').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/admin/sessions', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                console.log('Sessions API response:', result);
+                document.getElementById('apiResults').innerHTML += `<h3>Sessions API (${response.status}):</h3><pre>${JSON.stringify(result, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Sessions API error:', error);
+                document.getElementById('apiResults').innerHTML += `<p style="color: red;">Sessions API Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

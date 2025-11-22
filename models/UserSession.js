@@ -58,6 +58,18 @@ const UserSessionSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    lastHeartbeat: {
+        type: Date,
+        default: Date.now
+    },
+    isPageVisible: {
+        type: Boolean,
+        default: true
+    },
+    isPageFocused: {
+        type: Boolean,
+        default: true
+    },
     isActive: {
         type: Boolean,
         default: true

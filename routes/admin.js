@@ -24,7 +24,8 @@ import {
     getUserSessions,
     getSessionDetails,
     getAllActiveSessions,
-    getUserActivityLog
+    getUserActivityLog,
+    getRecentActivity
 } from '../controllers/adminController.js';
 import auth from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
@@ -69,5 +70,6 @@ router.get('/users/:userId/sessions', getUserSessions);
 router.get('/users/:userId/activity-log', getUserActivityLog);
 router.get('/sessions/:sessionId', getSessionDetails);
 router.get('/sessions', getAllActiveSessions);
+router.get('/activity/recent', getRecentActivity);
 
 export default router;

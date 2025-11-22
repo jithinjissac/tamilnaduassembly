@@ -3,13 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Activity Tracking - Admin Dashboard</title>
+    <title>Live User Activity Dashboard - EasySlip Admin</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="manifest" href="/favicon/site.webmanifest">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #f093fb;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --danger-color: #f56565;
+            --info-color: #4299e1;
+            --light-bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,16 +35,30 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" /></svg>');
+            opacity: 0.3;
         }
 
         .header-content {
@@ -36,67 +68,683 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
 
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0;
+        .header-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .header .subtitle {
+        .header-info .subtitle {
             opacity: 0.9;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .header-stat {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-stat .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-stat .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--success-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .nav-container {
+            background: var(--card-bg);
+            margin: -1rem 2rem 2rem 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 10;
         }
 
         .tabs {
             display: flex;
             gap: 0;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            padding: 0.5rem;
         }
 
         .tab {
-            padding: 1rem 1.5rem;
+            padding: 1rem 2rem;
             background: none;
             border: none;
             font-size: 1rem;
-            font-weight: 500;
-            color: #6b7280;
+            font-weight: 600;
+            color: var(--text-secondary);
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            border-radius: 10px;
+            transition: all 0.3s ease;
             white-space: nowrap;
             flex-shrink: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .tab:hover {
-            color: #667eea;
+            background: var(--light-bg);
+            color: var(--primary-color);
+            transform: translateY(-2px);
         }
 
         .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        .tab:not(.active) .tab-badge {
+            background: var(--primary-color);
+            color: white;
         }
 
         .container {
             max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 1rem;
-                margin: 1rem auto;
-            }
+            margin: 0 auto;
+            padding: 0 2rem 2rem 2rem;
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modern Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            position: relative;
+        }
+
+        .stat-icon.users { background: linear-gradient(135deg, var(--info-color), #3182ce); }
+        .stat-icon.sessions { background: linear-gradient(135deg, var(--success-color), #38a169); }
+        .stat-icon.activity { background: linear-gradient(135deg, var(--warning-color), #d69e2e); }
+        .stat-icon.online { background: linear-gradient(135deg, var(--danger-color), #e53e3e); }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Modern Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .table th {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--light-bg);
+            transform: scale(1.01);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn.btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn.btn-secondary {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn.btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn.btn-refresh {
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+            color: white;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.online {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+
+        .badge.offline {
+            background: rgba(113, 128, 150, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(113, 128, 150, 0.2);
+        }
+
+        .badge.mobile {
+            background: rgba(66, 153, 225, 0.1);
+            color: var(--info-color);
+        }
+
+        .badge.desktop {
+            background: rgba(237, 137, 54, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Loading and Empty States */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        /* Real-time Activity Feed */
+        .activity-feed {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .activity-item:hover {
+            background: var(--light-bg);
+        }
+
+        .activity-item.new {
+            background: rgba(72, 187, 120, 0.05);
+            border-left: 4px solid var(--success-color);
+            animation: slideInLeft 0.5s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Modal Improvements */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .close-modal {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--danger-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem 1rem 1rem;
+            }
+
+            .nav-container {
+                margin: -1rem 1rem 1rem 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-stats {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .tabs {
+                justify-content: center;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .table-container {
+                font-size: 0.85rem;
+            }
+
+            .table th,
+            .table td {
+                padding: 1rem 0.75rem;
+            }
+
+            .modal {
+                padding: 1rem;
+            }
+
+            .modal-header,
+            .modal-body {
+                padding: 1.5rem;
+            }
         }
 
         .tab-content.active {
@@ -466,58 +1114,242 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <div>
-                <h1><i class="fas fa-chart-line"></i> User Activity Tracking</h1>
-                <div class="subtitle">Monitor user sessions, device info, and activities in real-time</div>
+            <div class="header-info">
+                <h1><i class="fas fa-chart-line"></i> Live User Activity Dashboard</h1>
+                <p class="subtitle">Monitor user sessions and activity in real-time across Kerala elections</p>
             </div>
-            <button class="btn btn-logout" onclick="window.location.href='admin.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="number" id="totalUsersHeader">0</div>
+                    <div class="label">Total Users</div>
+                </div>
+                <div class="header-stat">
+                    <div class="number" id="activeSessionsHeader">0</div>
+                    <div class="label">Active Sessions</div>
+                </div>
+                <div class="header-stat">
+                    <div class="number" id="onlineUsersHeader">0</div>
+                    <div class="label">Online Now</div>
+                </div>
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    LIVE
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="nav-tabs">
-        <button class="nav-tab active" onclick="showTab('users')">
-            <i class="fas fa-users"></i> Users Overview
-        </button>
-        <button class="nav-tab" onclick="showTab('sessions')">
-            <i class="fas fa-desktop"></i> Active Sessions
-        </button>
-        <button class="nav-tab" onclick="showTab('user-detail')" id="user-detail-tab" style="display: none;">
-            <i class="fas fa-user"></i> User Details
-        </button>
     </div>
 
     <div class="container">
-        <!-- Users Overview Tab -->
-        <div id="users-tab" class="tab-content active">
-            <div class="card">
-                <div class="card-header">
-                    <span>All Users</span>
-                    <input type="text" class="search-box" placeholder="Search users..." id="userSearch" onkeyup="filterUsers()">
-                </div>
-                <div id="usersTable"></div>
+        <div class="nav-container">
+            <div class="tabs">
+                <button class="tab nav-tab active" onclick="showTab('dashboard')">
+                    <i class="fas fa-tachometer-alt tab-icon"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="tab nav-tab" onclick="showTab('users')">
+                    <i class="fas fa-users tab-icon"></i>
+                    <span>Users</span>
+                    <span class="tab-badge" id="usersBadge">0</span>
+                </button>
+                <button class="tab nav-tab" onclick="showTab('sessions')">
+                    <i class="fas fa-desktop tab-icon"></i>
+                    <span>Live Sessions</span>
+                    <span class="tab-badge" id="sessionsBadge">0</span>
+                </button>
+                <button class="tab nav-tab" onclick="showTab('activity')">
+                    <i class="fas fa-bolt tab-icon"></i>
+                    <span>Activity Feed</span>
+                    <span class="tab-badge" id="activityBadge">0</span>
+                </button>
+                <button class="tab nav-tab" id="user-detail-nav-tab" onclick="showTab('user-detail')" style="display: none;">
+                    <i class="fas fa-user-circle tab-icon"></i>
+                    <span>User Details</span>
+                </button>
             </div>
         </div>
 
-        <!-- Active Sessions Tab -->
-        <div id="sessions-tab" class="tab-content">
-            <div class="stats-grid" id="sessionStats"></div>
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="dashboardTotalUsers">0</div>
+                        <div class="stat-label">Total Registered Users</div>
+                        <div class="stat-change positive" id="usersChange">
+                            <i class="fas fa-arrow-up"></i> +0 today
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon sessions">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="dashboardActiveSessions">0</div>
+                        <div class="stat-label">Active Sessions</div>
+                        <div class="stat-change" id="sessionsChange">
+                            <i class="fas fa-minus"></i> No change
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon activity">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="dashboardTotalActivity">0</div>
+                        <div class="stat-label">Actions Today</div>
+                        <div class="stat-change positive" id="activityChange">
+                            <i class="fas fa-arrow-up"></i> +0 from yesterday
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon online">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="dashboardOnlineUsers">0</div>
+                        <div class="stat-label">Unique Users Online</div>
+                        <div class="stat-change positive" id="onlineChange">
+                            <i class="fas fa-users"></i> Consolidated
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-chart-area"></i>
+                            Recent User Activity
+                        </div>
+                        <button class="btn btn-refresh btn-small" onclick="loadRecentActivity()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentActivityChart" style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                            <i class="fas fa-chart-line" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                            <p>Activity chart will be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-globe"></i>
+                            Top Locations
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="topLocations">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                Loading location data...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span>Active Sessions</span>
-                    <button class="btn btn-secondary btn-small" onclick="loadActiveSessions()">
-                        <i class="fas fa-sync"></i> Refresh
+                    <div class="card-title">
+                        <i class="fas fa-users"></i>
+                        All Registered Users
+                    </div>
+                    <div class="search-container">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input type="text" class="search-input" placeholder="Search users by name, email, or phone..." id="userSearch" oninput="filterUsers()">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="usersTable">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading users...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Sessions Tab -->
+        <div id="sessions-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-desktop"></i>
+                        Live User Sessions
+                    </div>
+                    <button class="btn btn-refresh" onclick="loadActiveSessions()" id="refreshSessionsBtn">
+                        <i class="fas fa-sync"></i>
+                        Auto-Refresh <span id="refreshCountdown">30</span>s
                     </button>
                 </div>
-                <div id="sessionsTable"></div>
+                <div class="card-body">
+                    <div id="sessionsTable">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading active sessions...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed Tab -->
+        <div id="activity-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bolt"></i>
+                        Real-time Activity Feed
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-refresh" onclick="loadActivityFeed()" id="refreshActivityBtn">
+                            <i class="fas fa-sync"></i>
+                            Auto-Refresh <span id="activityRefreshCountdown">10</span>s
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearActivityFeed()">
+                            <i class="fas fa-trash"></i>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed" id="activityFeed">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading activity feed...
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- User Detail Tab -->
-        <div id="user-detail-tab-content" class="tab-content">
-            <button class="btn btn-secondary back-btn" onclick="backToUsers()">
+        <div id="user-detail-tab" class="tab-content">
+            <button class="btn btn-secondary" onclick="backToUsers()" style="margin-bottom: 2rem;">
                 <i class="fas fa-arrow-left"></i> Back to Users
             </button>
-            <div id="userDetailContent"></div>
+            <div id="userDetailContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading user details...
+                </div>
+            </div>
         </div>
     </div>
 
@@ -541,35 +1373,419 @@
             window.location.href = '/login.html';
         }
 
+        // Global state
         let allUsers = [];
         let currentUserId = null;
+        let refreshIntervals = {};
+        let activityBuffer = [];
+        let isRealTimeEnabled = true;
 
-        // Tab switching
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('dashboard');
+            startRealTimeUpdates();
+        });
+
+        // Tab switching with improved animations
         function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            // Remove active classes
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
 
-            if (tabName === 'users') {
-                document.getElementById('users-tab').classList.add('active');
-                document.querySelector('[onclick="showTab(\'users\')"]').classList.add('active');
-                loadUsers();
-            } else if (tabName === 'sessions') {
-                document.getElementById('sessions-tab').classList.add('active');
-                document.querySelector('[onclick="showTab(\'sessions\')"]').classList.add('active');
-                loadActiveSessions();
-            } else if (tabName === 'user-detail') {
-                document.getElementById('user-detail-tab-content').classList.add('active');
-                document.getElementById('user-detail-tab').classList.add('active');
+            // Add active class to selected tab
+            const targetTab = document.getElementById(`${tabName}-tab`);
+            const targetButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+            
+            if (targetTab) targetTab.classList.add('active');
+            if (targetButton) targetButton.classList.add('active');
+
+            // Load appropriate data
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'sessions':
+                    loadActiveSessions();
+                    break;
+                case 'activity':
+                    loadActivityFeed();
+                    break;
+                case 'user-detail':
+                    // User detail is loaded when viewing specific user
+                    break;
             }
         }
 
-        // Load all users
+        // Real-time updates system
+        function startRealTimeUpdates() {
+            // Update header stats every 10 seconds
+            refreshIntervals.headerStats = setInterval(updateHeaderStats, 10000);
+            
+            // Update active sessions every 30 seconds
+            refreshIntervals.sessions = setInterval(() => {
+                if (document.getElementById('sessions-tab').classList.contains('active')) {
+                    loadActiveSessions();
+                }
+            }, 30000);
+
+            // Update activity feed every 15 seconds for real-time data
+            refreshIntervals.activity = setInterval(() => {
+                if (document.getElementById('activity-tab').classList.contains('active')) {
+                    console.log('🔄 Refreshing real-time activity feed...');
+                    loadActivityFeed();
+                }
+            }, 15000);
+
+            // Update dashboard every 15 seconds
+            refreshIntervals.dashboard = setInterval(() => {
+                if (document.getElementById('dashboard-tab').classList.contains('active')) {
+                    loadDashboardData();
+                }
+            }, 15000);
+
+            // Start countdown timers
+            startCountdownTimers();
+            
+            // Initial data load
+            updateHeaderStats();
+        }
+
+        // Countdown timers for refresh buttons
+        function startCountdownTimers() {
+            let sessionCountdown = 30;
+            let activityCountdown = 10;
+
+            setInterval(() => {
+                sessionCountdown--;
+                if (sessionCountdown <= 0) {
+                    sessionCountdown = 30;
+                }
+                const elem = document.getElementById('refreshCountdown');
+                if (elem) elem.textContent = sessionCountdown;
+            }, 1000);
+
+            setInterval(() => {
+                activityCountdown--;
+                if (activityCountdown <= 0) {
+                    activityCountdown = 10;
+                }
+                const elem = document.getElementById('activityRefreshCountdown');
+                if (elem) elem.textContent = activityCountdown;
+            }, 1000);
+        }
+
+        // Update header statistics
+        async function updateHeaderStats() {
+            try {
+                const [usersRes, sessionsRes] = await Promise.all([
+                    fetch(`${API_URL}/admin/users`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_URL}/admin/sessions`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                if (usersRes.ok && sessionsRes.ok) {
+                    const usersData = await usersRes.json();
+                    const sessionsData = await sessionsRes.json();
+
+                    const totalUsers = usersData.users ? usersData.users.length : 0;
+                    const activeSessions = sessionsData.data ? sessionsData.data.totalActiveSessions : 0;
+                    const onlineUsers = sessionsData.data ? sessionsData.data.trulyOnlineSessions : 0;
+
+                    // Update header stats with animation
+                    animateNumber('totalUsersHeader', totalUsers);
+                    animateNumber('activeSessionsHeader', activeSessions);
+                    animateNumber('onlineUsersHeader', onlineUsers);
+
+                    // Update tab badges
+                    updateTabBadge('usersBadge', totalUsers);
+                    updateTabBadge('sessionsBadge', activeSessions);
+                }
+            } catch (error) {
+                console.error('Error updating header stats:', error);
+            }
+        }
+
+        // Animate number changes
+        function animateNumber(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const currentValue = parseInt(element.textContent) || 0;
+            const increment = targetValue > currentValue ? 1 : -1;
+            
+            if (currentValue !== targetValue) {
+                element.style.transform = 'scale(1.1)';
+                element.style.color = 'var(--primary-color)';
+                
+                setTimeout(() => {
+                    element.textContent = targetValue;
+                    element.style.transform = 'scale(1)';
+                    element.style.color = '';
+                }, 200);
+            }
+        }
+
+        // Update tab badges
+        function updateTabBadge(badgeId, value) {
+            const badge = document.getElementById(badgeId);
+            if (badge) {
+                badge.textContent = value;
+                if (value > parseInt(badge.dataset.lastValue || '0')) {
+                    badge.style.animation = 'pulse 0.5s ease';
+                    setTimeout(() => badge.style.animation = '', 500);
+                }
+                badge.dataset.lastValue = value;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const [usersRes, sessionsRes, activityRes] = await Promise.all([
+                    fetch(`${API_URL}/admin/users`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_URL}/admin/sessions`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_URL}/admin/activity/stats`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).catch(() => ({ ok: false })) // Activity stats might not exist
+                ]);
+
+                if (usersRes.ok) {
+                    const usersData = await usersRes.json();
+                    const totalUsers = usersData.users ? usersData.users.length : 0;
+                    
+                    // Update dashboard stats
+                    animateNumber('dashboardTotalUsers', totalUsers);
+                    
+                    // Calculate today's new users
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const newUsersToday = usersData.users ? 
+                        usersData.users.filter(user => new Date(user.createdAt) >= today).length : 0;
+                    
+                    updateStatChange('usersChange', newUsersToday, 'users today');
+                }
+
+                if (sessionsRes.ok) {
+                    const sessionsData = await sessionsRes.json();
+                    
+                    // Process sessions to filter truly active users and consolidate by user
+                    const processedSessions = processSessionsData(sessionsData.data ? sessionsData.data.sessions : []);
+                    const activeSessions = processedSessions.activeSessions.length;
+                    const onlineUsers = processedSessions.uniqueUsers.length;
+                    const totalSessions = processedSessions.totalSessions;
+                    
+                    animateNumber('dashboardActiveSessions', activeSessions);
+                    animateNumber('dashboardOnlineUsers', onlineUsers);
+                    
+                    // Update activity stats to show session consolidation info
+                    animateNumber('dashboardTotalActivity', totalSessions);
+                    updateStatChange('activityChange', totalSessions - onlineUsers, 'total sessions');
+                    
+                    // Update online users change text to show consolidation info
+                    updateStatChange('onlineChange', `${totalSessions - onlineUsers}`, 'duplicate sessions merged');
+                    
+                    // Load top locations using processed sessions
+                    loadTopLocations(processedSessions.activeSessions);
+                } else {
+                    // Use session-based activity data when activity endpoint isn't available
+                    const totalSessions = processedSessions ? processedSessions.totalSessions : 0;
+                    const activeSessions = processedSessions ? processedSessions.activeSessions.length : 0;
+                    animateNumber('dashboardTotalActivity', totalSessions);
+                    updateStatChange('activityChange', activeSessions, 'currently active');
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Process sessions data to filter active users and consolidate by user
+        function processSessionsData(rawSessions) {
+            const now = new Date();
+            const heartbeatThreshold = 2 * 60 * 1000; // 2 minutes for heartbeat-based online detection
+            const onlineThreshold = 30 * 60 * 1000; // 30 minutes for online status
+            
+            // Filter sessions that are truly online (with recent heartbeat AND page visible)
+            const activeSessions = rawSessions.filter(session => {
+                const lastHeartbeat = session.lastHeartbeat ? new Date(session.lastHeartbeat) : new Date(session.lastActivity);
+                const hasRecentHeartbeat = (now - lastHeartbeat) < heartbeatThreshold;
+                const isPageVisible = session.isPageVisible !== false;
+                return hasRecentHeartbeat && isPageVisible;
+            });
+
+            // Group sessions by user ID to consolidate multiple sessions per user
+            const sessionsByUser = new Map();
+            const onlineSessions = rawSessions.filter(session => {
+                const lastActivity = session.lastActivity ? new Date(session.lastActivity) : new Date(session.startTime);
+                return (now - lastActivity) < onlineThreshold;
+            });
+
+            onlineSessions.forEach(session => {
+                const userId = session.userId._id || session.userId.id || session.userId;
+                const userKey = typeof userId === 'string' ? userId : userId.toString();
+                
+                if (!sessionsByUser.has(userKey)) {
+                    sessionsByUser.set(userKey, {
+                        ...session,
+                        sessionCount: 1,
+                        devices: [session.device],
+                        locations: [session.location],
+                        isActive: activeSessions.some(activeSession => {
+                            const activeUserId = activeSession.userId._id || activeSession.userId.id || activeSession.userId;
+                            return (typeof activeUserId === 'string' ? activeUserId : activeUserId.toString()) === userKey;
+                        }),
+                        isTrulyOnline: activeSessions.some(activeSession => {
+                            const activeUserId = activeSession.userId._id || activeSession.userId.id || activeSession.userId;
+                            return (typeof activeUserId === 'string' ? activeUserId : activeUserId.toString()) === userKey;
+                        })
+                    });
+                } else {
+                    // Merge with existing session, keep the most recent activity
+                    const existing = sessionsByUser.get(userKey);
+                    const existingLastActivity = existing.lastActivity ? new Date(existing.lastActivity) : new Date(existing.startTime);
+                    const currentLastActivity = session.lastActivity ? new Date(session.lastActivity) : new Date(session.startTime);
+                    
+                    if (currentLastActivity > existingLastActivity) {
+                        existing.lastActivity = session.lastActivity;
+                        existing.location = session.location;
+                        existing.device = session.device;
+                    }
+                    
+                    existing.sessionCount += 1;
+                    existing.devices.push(session.device);
+                    existing.locations.push(session.location);
+                    existing.isActive = existing.isActive || activeSessions.some(activeSession => {
+                        const activeUserId = activeSession.userId._id || activeSession.userId.id || activeSession.userId;
+                        return (typeof activeUserId === 'string' ? activeUserId : activeUserId.toString()) === userKey;
+                    });
+                    existing.isTrulyOnline = existing.isTrulyOnline || activeSessions.some(activeSession => {
+                        const activeUserId = activeSession.userId._id || activeSession.userId.id || activeSession.userId;
+                        return (typeof activeUserId === 'string' ? activeUserId : activeUserId.toString()) === userKey;
+                    });
+                }
+            });
+
+            return {
+                activeSessions: activeSessions,
+                uniqueUsers: Array.from(sessionsByUser.values()),
+                totalSessions: rawSessions.length,
+                consolidatedSessions: Array.from(sessionsByUser.values())
+            };
+        }
+
+        // Update stat change indicators
+        function updateStatChange(elementId, value, suffix) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const isPositive = value > 0;
+            const isNegative = value < 0;
+            
+            element.className = `stat-change ${isPositive ? 'positive' : isNegative ? 'negative' : ''}`;
+            element.innerHTML = `
+                <i class="fas fa-${isPositive ? 'arrow-up' : isNegative ? 'arrow-down' : 'minus'}"></i>
+                ${isPositive ? '+' : ''}${value} ${suffix}
+            `;
+        }
+
+        // Load top locations with improved data handling
+        function loadTopLocations(sessions) {
+            if (!sessions || sessions.length === 0) {
+                document.getElementById('topLocations').innerHTML = '<div class="empty-state" style="padding: 2rem;"><i class="fas fa-globe"></i><p>No active sessions</p></div>';
+                return;
+            }
+
+            const locationCounts = {};
+            sessions.forEach(session => {
+                // Handle different location data formats
+                let locationText = 'Unknown Location';
+                if (session.location) {
+                    if (typeof session.location === 'string') {
+                        locationText = session.location;
+                    } else if (session.location.city && session.location.country) {
+                        locationText = `${session.location.city}, ${session.location.country}`;
+                    } else if (session.location.city) {
+                        locationText = session.location.city;
+                    } else if (session.location.country) {
+                        locationText = session.location.country;
+                    }
+                }
+                locationCounts[locationText] = (locationCounts[locationText] || 0) + 1;
+            });
+
+            const sortedLocations = Object.entries(locationCounts)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5);
+
+            if (sortedLocations.length === 0) {
+                document.getElementById('topLocations').innerHTML = '<div class="empty-state" style="padding: 2rem;"><i class="fas fa-globe"></i><p>No location data available</p></div>';
+                return;
+            }
+
+            const maxCount = Math.max(...Object.values(locationCounts));
+            const html = sortedLocations.map(([location, count], index) => {
+                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                const locationEmoji = getLocationEmoji(location);
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.85rem;">
+                                ${locationEmoji || (index + 1)}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${location}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary);">${count} active ${count === 1 ? 'user' : 'users'}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 50px; height: 6px; background: var(--light-bg); border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${percentage}%; height: 100%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); transition: width 0.3s ease;"></div>
+                            </div>
+                            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); min-width: 35px; text-align: right;">${Math.round(percentage)}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('topLocations').innerHTML = html;
+        }
+
+        // Get location emoji based on location name
+        function getLocationEmoji(location) {
+            if (!location) return '';
+            const loc = location.toLowerCase();
+            if (loc.includes('india') || loc.includes('kerala') || loc.includes('mumbai') || loc.includes('delhi') || loc.includes('bangalore') || loc.includes('chennai') || loc.includes('hyderabad') || loc.includes('kochi') || loc.includes('thiruvananthapuram')) return '🇮🇳';
+            if (loc.includes('usa') || loc.includes('america') || loc.includes('new york') || loc.includes('california') || loc.includes('washington')) return '🇺🇸';
+            if (loc.includes('uk') || loc.includes('london') || loc.includes('united kingdom') || loc.includes('england')) return '🇬🇧';
+            if (loc.includes('canada') || loc.includes('toronto') || loc.includes('vancouver')) return '🇨🇦';
+            if (loc.includes('australia') || loc.includes('sydney') || loc.includes('melbourne')) return '🇦🇺';
+            if (loc.includes('germany') || loc.includes('berlin') || loc.includes('munich')) return '🇩🇪';
+            if (loc.includes('france') || loc.includes('paris')) return '🇫🇷';
+            if (loc.includes('japan') || loc.includes('tokyo')) return '🇯🇵';
+            if (loc.includes('china') || loc.includes('beijing') || loc.includes('shanghai')) return '🇨🇳';
+            return '🌍'; // Default globe emoji
+        }
+
+        // Load all users with improved display
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_URL}/admin/users`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
@@ -577,13 +1793,7 @@
                 }
 
                 const result = await response.json();
-                
-                // Handle different response structures
-                if (result.status === 'success') {
-                    allUsers = result.users || [];
-                } else {
-                    allUsers = [];
-                }
+                allUsers = result.users || [];
                 
                 // Sort by last login (most recent first)
                 allUsers.sort((a, b) => {
@@ -605,32 +1815,77 @@
         }
 
         function displayUsers(users) {
+            if (users.length === 0) {
+                document.getElementById('usersTable').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No users found</p>
+                    </div>
+                `;
+                return;
+            }
+
             const html = `
                 <div class="table-container">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Last Active</th>
-                                <th>Actions</th>
+                                <th><i class="fas fa-user"></i> Name</th>
+                                <th><i class="fas fa-envelope"></i> Email</th>
+                                <th><i class="fas fa-phone"></i> Phone</th>
+                                <th><i class="fas fa-calendar"></i> Joined</th>
+                                <th><i class="fas fa-clock"></i> Last Active</th>
+                                <th><i class="fas fa-signal"></i> Status</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${users.map(user => `
-                                <tr>
-                                    <td>${user.name}</td>
-                                    <td>${user.email}</td>
-                                    <td>${user.phone}</td>
-                                    <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-small" onclick="viewUserDetails('${user._id}')">
-                                            <i class="fas fa-eye"></i> View Activity
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
+                            ${users.map(user => {
+                                const lastLogin = user.lastLogin ? new Date(user.lastLogin) : null;
+                                const joinDate = new Date(user.createdAt);
+                                const isRecentlyActive = lastLogin && (Date.now() - lastLogin.getTime()) < 24 * 60 * 60 * 1000;
+                                
+                                return `
+                                    <tr>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem;">
+                                                    ${user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight: 600; color: var(--text-primary);">${user.name}</div>
+                                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">ID: ${user._id.slice(-6)}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 500;">${user.email}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 500;">${user.phone}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 500;">${joinDate.toLocaleDateString()}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${joinDate.toLocaleTimeString()}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 500;">${lastLogin ? lastLogin.toLocaleDateString() : 'Never'}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${lastLogin ? lastLogin.toLocaleTimeString() : ''}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${isRecentlyActive ? 'online' : 'offline'}">
+                                                <i class="fas fa-circle"></i>
+                                                ${isRecentlyActive ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-small" onclick="viewUserDetails('${user._id}')">
+                                                <i class="fas fa-chart-line"></i> View Activity
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -648,10 +1903,572 @@
             displayUsers(filtered);
         }
 
+        // Load real activity feed with actual user activities
+        async function loadActivityFeed() {
+            try {
+                // Fetch both recent activities and sessions for comprehensive view
+                const [activityRes, sessionsRes] = await Promise.all([
+                    fetch(`${API_URL}/admin/activity/recent?limit=30&hours=24`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_URL}/admin/sessions`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                let realActivities = [];
+                let consolidatedUsers = [];
+                let hasRealActivityData = false;
+
+                // Get session data for user presence first
+                if (sessionsRes.ok) {
+                    const sessionsData = await sessionsRes.json();
+                    const sessions = sessionsData.data ? sessionsData.data.sessions : [];
+                    const processedData = processSessionsData(sessions);
+                    consolidatedUsers = processedData.consolidatedSessions;
+                }
+
+                // Get real activity data if available
+                if (activityRes.ok) {
+                    const activityData = await activityRes.json();
+                    if (activityData.status === 'success' && activityData.data && activityData.data.activities) {
+                        realActivities = activityData.data.activities;
+                        hasRealActivityData = realActivities.length > 0;
+                    }
+                }
+
+                // Prioritize real activity data, fallback to session-based activity
+                if (hasRealActivityData) {
+                    console.log(`📊 Showing ${realActivities.length} real activities`);
+                    displayRealActivityFeed(realActivities, consolidatedUsers);
+                    updateTabBadge('activityBadge', realActivities.length);
+                } else if (consolidatedUsers.length > 0) {
+                    console.log(`👥 Showing session-based activity for ${consolidatedUsers.length} users`);
+                    // Generate session-based activities when no real data
+                    const sessionActivities = generateSessionActivity(consolidatedUsers);
+                    if (sessionActivities.length > 0) {
+                        displayRealActivityFeed(sessionActivities, consolidatedUsers);
+                        updateTabBadge('activityBadge', sessionActivities.length);
+                    } else {
+                        displayRealUserActivity(consolidatedUsers);
+                        const activeCount = consolidatedUsers.filter(user => user.isActive).length;
+                        updateTabBadge('activityBadge', activeCount);
+                    }
+                } else {
+                    // Show empty state when no data available
+                    document.getElementById('activityFeed').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clock"></i>
+                            <p>No user activity detected</p>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                Activities will appear here when users interact with the platform
+                            </div>
+                        </div>
+                    `;
+                    updateTabBadge('activityBadge', 0);
+                }
+                
+            } catch (error) {
+                console.error('Error loading activity feed:', error);
+                // Show error message with retry option
+                document.getElementById('activityFeed').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+                        <p>Failed to load real-time activity</p>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0;">
+                            ${error.message || 'Network or server error'}
+                        </div>
+                        <button class="btn btn-sm" onclick="loadActivityFeed()" style="margin-top: 8px;">
+                            <i class="fas fa-refresh"></i> Retry
+                        </button>
+                    </div>
+                `;
+                updateTabBadge('activityBadge', 0);
+            }
+        }
+
+        // Generate session-based activity when no real activity data is available
+        function generateSessionActivity(consolidatedUsers) {
+            if (!consolidatedUsers || consolidatedUsers.length === 0) {
+                return [];
+            }
+
+            const activities = [];
+            const now = Date.now();
+
+            consolidatedUsers.forEach((userSession, index) => {
+                const user = userSession.userId;
+                const userName = user ? (user.name || user.username || 'Unknown User') : 'Unknown User';
+                const lastActivity = userSession.lastActivity ? new Date(userSession.lastActivity) : new Date(userSession.startTime);
+                const sessionDuration = now - new Date(userSession.startTime).getTime();
+                
+                // Determine activity type based on session data
+                let activityType, actionText, details;
+                
+                if (userSession.isActive) {
+                    activityType = 'session_active';
+                    actionText = 'Currently browsing platform';
+                    
+                    let deviceInfo = '';
+                    if (userSession.device) {
+                        if (userSession.device.includes('Mobile') || userSession.device.includes('Android') || userSession.device.includes('iPhone')) {
+                            deviceInfo = `📱 ${userSession.device}`;
+                        } else if (userSession.device.includes('Chrome') || userSession.device.includes('Firefox') || userSession.device.includes('Safari')) {
+                            deviceInfo = `💻 ${userSession.device}`;
+                        } else {
+                            deviceInfo = `🖥️ ${userSession.device}`;
+                        }
+                    }
+                    
+                    details = {
+                        description: `Active for ${formatDuration(sessionDuration)}`,
+                        device: userSession.device || 'Unknown device',
+                        location: userSession.location || 'Unknown location',
+                        sessionDuration: sessionDuration
+                    };
+                } else {
+                    activityType = 'session_ended';
+                    actionText = 'Session ended';
+                    details = {
+                        description: `Session lasted ${formatDuration(sessionDuration)}`,
+                        device: userSession.device || 'Unknown device', 
+                        location: userSession.location || 'Unknown location',
+                        sessionDuration: sessionDuration
+                    };
+                }
+
+                // Add additional session info if multiple sessions
+                if (userSession.sessionCount > 1) {
+                    details.multiSession = true;
+                    details.sessionCount = userSession.sessionCount;
+                    details.description += ` • ${userSession.sessionCount} concurrent sessions`;
+                }
+
+                activities.push({
+                    id: `session_${user._id || user.id}_${index}`,
+                    type: activityType,
+                    user: {
+                        id: user._id || user.id,
+                        name: userName,
+                        email: user.email || ''
+                    },
+                    action: actionText,
+                    details: details,
+                    timestamp: lastActivity,
+                    metadata: { 
+                        sessionBased: true,
+                        duration: sessionDuration
+                    }
+                });
+            });
+
+            return activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
+        }
+
+        // Format duration in milliseconds to human readable format
+        function formatDurationMs(milliseconds) {
+            if (!milliseconds) return '0ms';
+            
+            const seconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes % 60}m`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${seconds % 60}s`;
+            } else if (seconds > 0) {
+                return `${seconds}s`;
+            } else {
+                return `${milliseconds}ms`;
+            }
+        }
+
+        // Display real activity feed with actual user actions
+        function displayRealActivityFeed(activities, consolidatedUsers = []) {
+            if (!activities || activities.length === 0) {
+                document.getElementById('activityFeed').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <p>No recent activity in the last 24 hours</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create a map for quick user status lookup
+            const userStatusMap = new Map();
+            consolidatedUsers.forEach(user => {
+                const userId = user.userId._id || user.userId.id || user.userId;
+                userStatusMap.set(userId.toString(), {
+                    isActive: user.isActive,
+                    sessionCount: user.sessionCount || 1
+                });
+            });
+
+            const html = activities.map(activity => {
+                const userName = activity.user.name || 'Unknown User';
+                const userEmail = activity.user.email || '';
+                const userId = activity.user.id?.toString();
+                const userStatus = userStatusMap.get(userId) || { isActive: false, sessionCount: 0 };
+                
+                const timeAgo = getTimeAgo(new Date(activity.timestamp));
+                const actionIcon = getActionIcon(activity.type);
+                const actionColor = getActionColor(activity.type);
+                const statusColor = userStatus.isActive ? '#10b981' : '#6b7280';
+                const statusText = userStatus.isActive ? 'Active' : 'Offline';
+
+                // Enhanced details formatting with more specific information
+                let detailsText = '';
+                let additionalInfo = '';
+                
+                if (activity.details) {
+                    if (activity.metadata?.sessionBased && activity.details.description) {
+                        // Session-based activity
+                        detailsText = ` • ${activity.details.description}`;
+                    } else if (activity.type === 'button_clicked' && activity.details.buttonText) {
+                        detailsText = ` • Clicked "${activity.details.buttonText}"`;
+                        if (activity.details.buttonId) {
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Button ID: ${activity.details.buttonId}</span>`;
+                        }
+                    } else if (activity.type === 'form_submitted' && activity.details.formName) {
+                        detailsText = ` • Submitted ${activity.details.formName}`;
+                        if (activity.details.fields) {
+                            const fieldCount = Array.isArray(activity.details.fields) ? activity.details.fields.length : Object.keys(activity.details.fields).length;
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">${fieldCount} fields completed</span>`;
+                        }
+                    } else if (activity.type === 'error_occurred') {
+                        detailsText = ` • Error: ${activity.details.errorMessage || 'Unknown error'}`;
+                        if (activity.details.errorCode) {
+                            additionalInfo = `<br><span style="color: var(--danger-color); font-size: 0.75rem;">Code: ${activity.details.errorCode}</span>`;
+                        }
+                        if (activity.details.buttonClicked) {
+                            additionalInfo += `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">While clicking: ${activity.details.buttonClicked}</span>`;
+                        }
+                    } else if (activity.type === 'page_view') {
+                        const pageName = activity.page?.title || activity.page?.url?.split('/').pop() || 'Unknown Page';
+                        detailsText = ` • Viewed ${pageName}`;
+                        if (activity.page?.referrer && activity.page.referrer !== activity.page.url) {
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">From: ${activity.page.referrer.split('/').pop()}</span>`;
+                        }
+                    } else if (activity.type === 'dropdown_selected' && activity.details.selectedValue) {
+                        detailsText = ` • Selected "${activity.details.selectedValue}"`;
+                        if (activity.details.dropdownName) {
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">In: ${activity.details.dropdownName}</span>`;
+                        }
+                    } else if (activity.type === 'payment_failed') {
+                        detailsText = ` • Payment failed`;
+                        if (activity.details.amount) {
+                            detailsText += ` (₹${activity.details.amount})`;
+                        }
+                        if (activity.details.errorMessage) {
+                            additionalInfo = `<br><span style="color: var(--danger-color); font-size: 0.75rem;">Reason: ${activity.details.errorMessage}</span>`;
+                        }
+                        if (activity.details.paymentMethod) {
+                            additionalInfo += `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Method: ${activity.details.paymentMethod}</span>`;
+                        }
+                    } else if (activity.type === 'payment_success') {
+                        detailsText = ` • Payment successful`;
+                        if (activity.details.amount) {
+                            detailsText += ` (₹${activity.details.amount})`;
+                        }
+                        if (activity.details.paymentId) {
+                            additionalInfo = `<br><span style="color: var(--success-color); font-size: 0.75rem;">ID: ${activity.details.paymentId}</span>`;
+                        }
+                        if (activity.details.paymentMethod) {
+                            additionalInfo += `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Method: ${activity.details.paymentMethod}</span>`;
+                        }
+                    } else if (activity.type === 'voter_list_extracted' && activity.details.count) {
+                        detailsText = ` • Extracted ${activity.details.count} voters`;
+                        if (activity.details.pollingStation) {
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Station: ${activity.details.pollingStation}</span>`;
+                        }
+                        if (activity.details.ward) {
+                            additionalInfo += `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Ward: ${activity.details.ward}</span>`;
+                        }
+                    } else if (activity.type === 'pdf_downloaded' && activity.details.filename) {
+                        detailsText = ` • Downloaded ${activity.details.filename}`;
+                        if (activity.details.fileSize) {
+                            additionalInfo = `<br><span style="color: var(--text-secondary); font-size: 0.75rem;">Size: ${formatFileSize(activity.details.fileSize)}</span>`;
+                        }
+                    } else if (activity.details.district) {
+                        detailsText = ` • ${activity.details.district}`;
+                    } else if (activity.details.amount) {
+                        detailsText = ` • ₹${activity.details.amount}`;
+                    } else if (activity.details.count) {
+                        detailsText = ` • ${activity.details.count} items`;
+                    } else if (typeof activity.details === 'string') {
+                        detailsText = ` • ${activity.details}`;
+                    }
+                }
+
+                // Determine if this is session-based or real activity
+                const isSessionBased = activity.metadata?.sessionBased;
+                const isErrorActivity = activity.type === 'error_occurred' || activity.type === 'payment_failed';
+                const activityTypeLabel = isSessionBased ? 'Session' : 'Activity';
+                
+                let borderStyle = 'border-left: 3px solid var(--primary-color);';
+                if (isSessionBased) {
+                    borderStyle = 'border-left: 3px solid var(--info-color);';
+                } else if (isErrorActivity) {
+                    borderStyle = 'border-left: 3px solid var(--danger-color);';
+                }
+
+                return `
+                    <div class="activity-item" data-activity-id="${activity.id}" style="${borderStyle}">
+                        <div class="activity-icon" style="background: ${actionColor};">
+                            <i class="fas ${actionIcon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">
+                                ${activity.action}
+                                <span style="color: ${statusColor}; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">${statusText}</span>
+                                ${isSessionBased ? '<span style="color: var(--info-color); font-size: 0.7rem; margin-left: 8px; opacity: 0.8;">📡 Session</span>' : ''}
+                                ${isErrorActivity ? '<span style="color: var(--danger-color); font-size: 0.7rem; margin-left: 8px;">⚠️ Error</span>' : ''}
+                            </div>
+                            <div class="activity-details">
+                                <strong>${userName}</strong>${userEmail ? ` (${userEmail})` : ''}${detailsText}${additionalInfo}
+                                ${userStatus.sessionCount > 1 ? `<br><span style="color: #3b82f6; font-size: 0.75rem;">📱 ${userStatus.sessionCount} active sessions</span>` : ''}
+                            </div>
+                            <div class="activity-time">
+                                <i class="fas fa-clock"></i> ${timeAgo}
+                                ${activity.metadata?.duration ? `<span style="color: var(--text-secondary); font-size: 0.75rem; margin-left: 8px;">Duration: ${formatDurationMs(activity.metadata.duration)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background-color: ${statusColor};"></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('activityFeed').innerHTML = html;
+        }
+
+        // Format file size for display
+        function formatFileSize(bytes) {
+            if (!bytes) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Get icon for activity type
+        function getActionIcon(actionType) {
+            const iconMap = {
+                'login': 'fa-sign-in-alt',
+                'logout': 'fa-sign-out-alt',
+                'register': 'fa-user-plus',
+                'page_view': 'fa-eye',
+                'dashboard_view': 'fa-tachometer-alt',
+                'create_slip_view': 'fa-plus-circle',
+                'preview_view': 'fa-search',
+                'form_data_loaded': 'fa-database',
+                'district_selected': 'fa-map',
+                'local_body_selected': 'fa-building',
+                'ward_selected': 'fa-location-arrow',
+                'polling_station_selected': 'fa-vote-yea',
+                'voter_list_extracted': 'fa-list',
+                'symbol_selected': 'fa-star',
+                'slip_data_entered': 'fa-keyboard',
+                'preview_generated': 'fa-file-alt',
+                'order_created': 'fa-shopping-cart',
+                'payment_initiated': 'fa-credit-card',
+                'payment_success': 'fa-check-circle',
+                'payment_failed': 'fa-times-circle',
+                'pdf_downloaded': 'fa-download',
+                'profile_updated': 'fa-user-edit',
+                'contact_form_submitted': 'fa-envelope',
+                'error_occurred': 'fa-exclamation-triangle',
+                'button_clicked': 'fa-mouse-pointer',
+                'form_submitted': 'fa-paper-plane',
+                'dropdown_selected': 'fa-caret-down',
+                'input_changed': 'fa-edit',
+                'checkbox_toggled': 'fa-check-square',
+                'radio_selected': 'fa-dot-circle',
+                'search_performed': 'fa-search',
+                'file_uploaded': 'fa-cloud-upload-alt',
+                'session_active': 'fa-circle',
+                'session_ended': 'fa-circle-o'
+            };
+            return iconMap[actionType] || 'fa-circle';
+        }
+
+        // Get color for activity type
+        function getActionColor(actionType) {
+            const colorMap = {
+                'login': '#10b981',
+                'logout': '#6b7280',
+                'register': '#3b82f6',
+                'payment_success': '#10b981',
+                'payment_failed': '#ef4444',
+                'pdf_downloaded': '#8b5cf6',
+                'order_created': '#f59e0b',
+                'error_occurred': '#ef4444',
+                'preview_generated': '#06b6d4',
+                'voter_list_extracted': '#84cc16',
+                'button_clicked': '#3b82f6',
+                'form_submitted': '#10b981',
+                'dropdown_selected': '#f59e0b',
+                'input_changed': '#8b5cf6',
+                'checkbox_toggled': '#06b6d4',
+                'radio_selected': '#ec4899',
+                'search_performed': '#14b8a6',
+                'file_uploaded': '#f97316',
+                'session_active': '#10b981',
+                'session_ended': '#6b7280',
+                'page_view': '#6366f1'
+            };
+            return colorMap[actionType] || '#6b7280';
+        }
+
+        // Display real user activity from consolidated sessions
+        function displayRealUserActivity(consolidatedUsers) {
+            if (!consolidatedUsers || consolidatedUsers.length === 0) {
+                document.getElementById('activityFeed').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No user activity found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by most recent activity and prioritize active users
+            const sortedUsers = consolidatedUsers.sort((a, b) => {
+                // Active users first
+                if (a.isActive && !b.isActive) return -1;
+                if (!a.isActive && b.isActive) return 1;
+                
+                // Then by most recent activity
+                const timeA = a.lastActivity ? new Date(a.lastActivity) : new Date(a.startTime);
+                const timeB = b.lastActivity ? new Date(b.lastActivity) : new Date(b.startTime);
+                return timeB - timeA;
+            }).slice(0, 20); // Show top 20 users
+
+            const html = sortedUsers.map(userSession => {
+                const user = userSession.userId;
+                const userName = user ? (user.name || user.username || 'Unknown User') : 'Unknown User';
+                const userEmail = user ? (user.email || '') : '';
+                const device = userSession.device || 'Unknown Device';
+                const location = userSession.location || 'Unknown Location';
+                const lastActivity = userSession.lastActivity ? new Date(userSession.lastActivity) : new Date(userSession.startTime);
+                const now = new Date();
+                const timeDiff = now - lastActivity;
+                const isActive = userSession.isActive;
+                const isOnline = timeDiff < 30 * 60 * 1000;
+                const sessionCount = userSession.sessionCount || 1;
+
+                // Get unique devices and locations
+                const uniqueDevices = [...new Set(userSession.devices || [device])].filter(Boolean);
+                const uniqueLocations = [...new Set(userSession.locations || [location])].filter(Boolean);
+
+                const isTrulyOnline = userSession.isTrulyOnline || false;
+                const statusColor = isTrulyOnline ? '#10b981' : isOnline ? '#f59e0b' : '#6b7280';
+                const statusText = isTrulyOnline ? 'Online' : isOnline ? 'Away' : 'Offline';
+                const timeAgo = isTrulyOnline ? 'Actively browsing now' : `Last seen ${getTimeAgo(lastActivity)}`;
+
+                return `
+                    <div class="activity-item" data-user-id="${user ? user._id || user.id : 'unknown'}">
+                        <div class="activity-icon" style="background: ${statusColor};">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">
+                                ${userName}
+                                <span style="color: ${statusColor}; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">${statusText}</span>
+                                ${sessionCount > 1 ? `<span style="color: #3b82f6; font-size: 0.75rem; font-weight: 600; margin-left: 4px;">[${sessionCount} sessions]</span>` : ''}
+                            </div>
+                            <div class="activity-details">
+                                ${userEmail ? `📧 ${userEmail}<br>` : ''}
+                                💻 ${uniqueDevices.slice(0, 2).join(', ')}${uniqueDevices.length > 2 ? ` +${uniqueDevices.length - 2}` : ''}<br>
+                                📍 ${uniqueLocations.slice(0, 2).join(', ')}${uniqueLocations.length > 2 ? ` +${uniqueLocations.length - 2}` : ''}
+                            </div>
+                            <div class="activity-time">
+                                <i class="fas fa-clock"></i> ${timeAgo}
+                            </div>
+                        </div>
+                        <div style="position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background-color: ${statusColor};"></div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('activityFeed').innerHTML = html;
+        }
+
+        // Display activity feed (fallback for mock data)
+        function displayActivityFeed(activities) {
+            if (activities.length === 0) {
+                document.getElementById('activityFeed').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bolt"></i>
+                        <p>No recent activity</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = activities.map(activity => {
+                const timeAgo = getTimeAgo(activity.timestamp);
+                return `
+                    <div class="activity-item" data-activity-id="${activity.id}">
+                        <div class="activity-icon" style="background: ${activity.color};">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.action}</div>
+                            <div class="activity-details">
+                                <strong>${activity.user}</strong> • ${activity.details}
+                            </div>
+                            <div class="activity-time">
+                                <i class="fas fa-clock"></i> ${timeAgo}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('activityFeed').innerHTML = html;
+        }
+
+        // Get time ago string
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diff = Math.floor((now - timestamp) / 1000);
+
+            if (diff < 60) return `${diff} seconds ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+            return `${Math.floor(diff / 86400)} days ago`;
+        }
+
+        // Clear activity feed
+        function clearActivityFeed() {
+            document.getElementById('activityFeed').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-broom"></i>
+                    <p>Activity feed cleared</p>
+                </div>
+            `;
+            updateTabBadge('activityBadge', 0);
+        }
+
+        // Load recent activity for dashboard
+        function loadRecentActivity() {
+            // This would typically load chart data
+            // For now, we'll just update the chart placeholder
+            document.getElementById('recentActivityChart').innerHTML = `
+                <div style="text-align: center; color: var(--text-secondary);">
+                    <i class="fas fa-chart-area" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>Activity chart data loaded</p>
+                    <small>Chart integration with Chart.js or similar library would go here</small>
+                </div>
+            `;
+        }
+
         // View user details
         async function viewUserDetails(userId) {
             currentUserId = userId;
-            document.getElementById('user-detail-tab').style.display = 'block';
+            document.getElementById('user-detail-nav-tab').style.display = 'block';
             showTab('user-detail');
 
             document.getElementById('userDetailContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading user details...</div>';
@@ -895,56 +2712,132 @@
         }
 
         function displayActiveSessions(data) {
-            const sessions = data.sessions;
+            const sessions = data.sessions || [];
 
-            // Update stats
-            const statsHtml = `
-                <div class="stat-card">
-                    <i class="fas fa-users icon"></i>
-                    <div class="label">Active Sessions</div>
-                    <div class="value">${data.totalActiveSessions}</div>
+            if (sessions.length === 0) {
+                document.getElementById('sessionsTable').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-desktop"></i>
+                        <p>No active sessions</p>
+                        <small style="color: var(--text-secondary);">Users will appear here when they log in</small>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHtml = `
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> User</th>
+                                <th><i class="fas fa-laptop"></i> Device & Browser</th>
+                                <th><i class="fas fa-map-marker-alt"></i> Location</th>
+                                <th><i class="fas fa-clock"></i> Session Start</th>
+                                <th><i class="fas fa-hourglass-half"></i> Duration</th>
+                                <th><i class="fas fa-pause"></i> Idle Time</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sessions.map(session => {
+                                const startTime = new Date(session.startTime);
+                                const isNewSession = (Date.now() - startTime.getTime()) < 5 * 60 * 1000; // Less than 5 minutes
+                                const deviceIcon = getDeviceIcon(session.device.device.deviceType);
+                                const countryFlag = getCountryFlag(session.location.country);
+                                
+                                return `
+                                    <tr ${isNewSession ? 'style="background: rgba(72, 187, 120, 0.05); border-left: 4px solid var(--success-color);"' : ''}>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--info-color), #3182ce); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem;">
+                                                    ${session.userId.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight: 600; color: var(--text-primary);">${session.userId.name}</div>
+                                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${session.userId.email}</div>
+                                                    ${isNewSession ? '<div style="font-size: 0.7rem; color: var(--success-color); font-weight: 700;">🟢 NEW SESSION</div>' : ''}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span class="badge ${session.device.device.deviceType.toLowerCase()}">
+                                                    <i class="fas ${deviceIcon}"></i>
+                                                    ${session.device.device.deviceType}
+                                                </span>
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                                ${session.device.browser.name} ${session.device.browser.version}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="font-size: 1.2rem;">${countryFlag}</span>
+                                                <div>
+                                                    <div style="font-weight: 600;">${session.location.city}</div>
+                                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${session.location.country}</div>
+                                                </div>
+                                            </div>
+                                            <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                                IP: ${session.location.ip}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 500;">${startTime.toLocaleDateString()}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${startTime.toLocaleTimeString()}</div>
+                                        </td>
+                                        <td>
+                                            <span style="font-weight: 600; color: var(--primary-color);">
+                                                ${session.duration.formatted || '0m'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span style="font-weight: 600; color: var(--text-secondary);">
+                                                ${session.idleTime.formatted || '0m'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-small" onclick="viewSessionDetails('${session.sessionId}')">
+                                                <i class="fas fa-info-circle"></i> Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
                 </div>
             `;
-            document.getElementById('sessionStats').innerHTML = statsHtml;
-
-            // Display sessions table
-            const tableHtml = sessions.length > 0 ? `
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Device</th>
-                            <th>Location</th>
-                            <th>Started</th>
-                            <th>Duration</th>
-                            <th>Idle Time</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${sessions.map(session => `
-                            <tr>
-                                <td>${session.userId.name}<br><small>${session.userId.email}</small></td>
-                                <td>
-                                    <span class="badge ${session.device.device.deviceType.toLowerCase()}">${session.device.device.deviceType}</span>
-                                    ${session.device.browser.name}
-                                </td>
-                                <td>${session.location.city}, ${session.location.country}</td>
-                                <td>${new Date(session.startTime).toLocaleString()}</td>
-                                <td>${session.duration.formatted}</td>
-                                <td>${session.idleTime.formatted}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-small" onclick="viewSessionDetails('${session.sessionId}')">
-                                        <i class="fas fa-info-circle"></i> Details
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            ` : '<div class="empty-state"><i class="fas fa-desktop"></i><p>No active sessions</p></div>';
 
             document.getElementById('sessionsTable').innerHTML = tableHtml;
+        }
+
+        // Helper functions
+        function getDeviceIcon(deviceType) {
+            switch(deviceType.toLowerCase()) {
+                case 'mobile': return 'fa-mobile-alt';
+                case 'tablet': return 'fa-tablet-alt';
+                case 'desktop': return 'fa-desktop';
+                default: return 'fa-laptop';
+            }
+        }
+
+        function getCountryFlag(country) {
+            // Simple country to flag emoji mapping
+            const flagMap = {
+                'India': '🇮🇳',
+                'United States': '🇺🇸',
+                'United Kingdom': '🇬🇧',
+                'Canada': '🇨🇦',
+                'Australia': '🇦🇺',
+                'Germany': '🇩🇪',
+                'France': '🇫🇷',
+                'Japan': '🇯🇵',
+                'China': '🇨🇳',
+                'Singapore': '🇸🇬'
+            };
+            return flagMap[country] || '🌍';
         }
 
         function closeModal() {
@@ -952,7 +2845,7 @@
         }
 
         function backToUsers() {
-            document.getElementById('user-detail-tab').style.display = 'none';
+            document.getElementById('user-detail-nav-tab').style.display = 'none';
             showTab('users');
         }
 
@@ -964,8 +2857,100 @@
             }
         }
 
-        // Initialize
-        loadUsers();
+        // Cleanup function
+        function cleanup() {
+            Object.values(refreshIntervals).forEach(interval => {
+                if (interval) clearInterval(interval);
+            });
+        }
+
+        // Handle page visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Pause updates when tab is not visible
+                Object.values(refreshIntervals).forEach(interval => {
+                    if (interval) clearInterval(interval);
+                });
+            } else {
+                // Resume updates when tab becomes visible
+                startRealTimeUpdates();
+            }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', cleanup);
+
+        // Add loading states to buttons
+        function setButtonLoading(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = button.innerHTML.replace(/fa-sync/, 'fa-spinner fa-spin');
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.innerHTML.replace(/fa-spinner fa-spin/, 'fa-sync');
+            }
+        }
+
+        // Enhanced error handling
+        function showError(message, duration = 5000) {
+            // Create or update error notification
+            let errorDiv = document.getElementById('error-notification');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error-notification';
+                errorDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--danger-color);
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 10px;
+                    box-shadow: var(--shadow-lg);
+                    z-index: 2000;
+                    max-width: 400px;
+                    opacity: 0;
+                    transform: translateX(100%);
+                    transition: all 0.3s ease;
+                `;
+                document.body.appendChild(errorDiv);
+            }
+
+            errorDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">×</button>
+                </div>
+            `;
+
+            // Show notification
+            setTimeout(() => {
+                errorDiv.style.opacity = '1';
+                errorDiv.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Auto-hide after duration
+            setTimeout(() => {
+                if (errorDiv.parentElement) {
+                    errorDiv.style.opacity = '0';
+                    errorDiv.style.transform = 'translateX(100%)';
+                    setTimeout(() => errorDiv.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // Initialize with error handling
+        try {
+            // Start with dashboard tab
+            showTab('dashboard');
+        } catch (error) {
+            console.error('Initialization error:', error);
+            showError('Failed to initialize dashboard');
+        }
     </script>
 </body>
 </html>

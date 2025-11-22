@@ -244,6 +244,39 @@ export const endSession = async (sessionId) => {
     }
 };
 
+// Cleanup inactive sessions (sessions without heartbeat for more than 10 minutes)
+export const cleanupInactiveSessions = async () => {
+    try {
+        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+        
+        const result = await UserSession.updateMany(
+            { 
+                isActive: true,
+                $or: [
+                    { lastHeartbeat: { $lt: tenMinutesAgo } },
+                    { 
+                        lastHeartbeat: { $exists: false },
+                        lastActivity: { $lt: tenMinutesAgo }
+                    }
+                ]
+            },
+            { 
+                endTime: new Date(),
+                isActive: false
+            }
+        );
+        
+        if (result.modifiedCount > 0) {
+            console.log(`🧹 Cleaned up ${result.modifiedCount} inactive sessions`);
+        }
+        
+        return result.modifiedCount;
+    } catch (error) {
+        console.error('❌ Error cleaning up sessions:', error.message);
+        return 0;
+    }
+};
+
 export default {
     trackActivity,
     trackPageView,

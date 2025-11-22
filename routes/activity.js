@@ -98,6 +98,48 @@ router.post('/track-single', auth, trackSession, async (req, res) => {
     }
 });
 
+// Heartbeat endpoint for accurate online detection
+router.post('/heartbeat', auth, async (req, res) => {
+    try {
+        const { sessionId, isVisible, isFocused } = req.body;
+        
+        // Update session heartbeat
+        const session = await UserSession.findOneAndUpdate(
+            { 
+                sessionId: sessionId || req.headers['x-session-id'],
+                userId: req.user._id,
+                isActive: true 
+            },
+            { 
+                lastHeartbeat: new Date(),
+                lastActivity: new Date(),
+                isPageVisible: isVisible !== false,
+                isPageFocused: isFocused !== false
+            },
+            { new: true }
+        );
+
+        if (!session) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Session not found'
+            });
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Heartbeat recorded'
+        });
+
+    } catch (error) {
+        console.error('Heartbeat error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to record heartbeat'
+        });
+    }
+});
+
 // End session
 router.post('/end-session', async (req, res) => {
     try {

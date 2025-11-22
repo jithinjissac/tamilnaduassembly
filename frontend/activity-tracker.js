@@ -24,6 +24,9 @@ class ActivityTracker {
         // Setup activity listeners
         this.setupListeners();
         
+        // Setup heartbeat system for accurate online detection
+        this.setupHeartbeat();
+        
         // Process queue periodically
         setInterval(() => this.processQueue(), 5000);
         
@@ -223,6 +226,9 @@ class ActivityTracker {
     }
 
     endSession() {
+        // Stop heartbeat
+        this.stopHeartbeat();
+        
         this.processQueue();
         navigator.sendBeacon(`${this.apiUrl}/api/activity/end-session`, JSON.stringify({
             sessionId: this.sessionId
@@ -242,9 +248,91 @@ class ActivityTracker {
         });
     }
 
+    setupHeartbeat() {
+        let isPageVisible = true;
+        
+        // Monitor page visibility
+        document.addEventListener('visibilitychange', () => {
+            isPageVisible = !document.hidden;
+            
+            if (isPageVisible) {
+                // Page became visible - start heartbeat
+                this.startHeartbeat();
+                this.track('page_focus');
+            } else {
+                // Page became hidden - stop heartbeat
+                this.stopHeartbeat();
+                this.track('page_blur');
+            }
+        });
+        
+        // Monitor window focus/blur
+        window.addEventListener('focus', () => {
+            if (!isPageVisible) isPageVisible = true;
+            this.startHeartbeat();
+            this.track('window_focus');
+        });
+        
+        window.addEventListener('blur', () => {
+            this.track('window_blur');
+            // Don't stop heartbeat on blur - user might still be looking at the page
+        });
+        
+        // Start initial heartbeat if page is visible
+        if (!document.hidden) {
+            this.startHeartbeat();
+        }
+    }
+    
+    startHeartbeat() {
+        if (this.heartbeatInterval) return; // Already running
+        
+        // Send heartbeat every 30 seconds while page is visible
+        this.heartbeatInterval = setInterval(() => {
+            if (!document.hidden && this.token) {
+                this.sendHeartbeat();
+            }
+        }, 30000);
+    }
+    
+    stopHeartbeat() {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+    }
+    
+    async sendHeartbeat() {
+        if (!this.token) return;
+        
+        try {
+            await fetch(`${this.apiUrl}/api/activity/heartbeat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`,
+                    'x-session-id': this.sessionId
+                },
+                body: JSON.stringify({
+                    sessionId: this.sessionId,
+                    timestamp: new Date().toISOString(),
+                    isVisible: !document.hidden,
+                    isFocused: document.hasFocus()
+                })
+            });
+        } catch (error) {
+            console.error('Heartbeat failed:', error);
+        }
+    }
+
     setToken(token) {
         this.token = token;
         localStorage.setItem('token', token);
+        
+        // Start heartbeat when token is set
+        if (token && !document.hidden) {
+            this.startHeartbeat();
+        }
     }
 }
 

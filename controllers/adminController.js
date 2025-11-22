@@ -1344,15 +1344,31 @@ export const getSessionDetails = async (req, res) => {
 // Get all active sessions
 export const getAllActiveSessions = async (req, res) => {
     try {
-        const sessions = await UserSession.find({ isActive: true })
-            .populate('userId', 'name email role')
-            .sort({ lastActivity: -1 })
-            .lean();
+        // Get recent sessions (within last 30 minutes)
+        const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        
+        const recentSessions = await UserSession.find({ 
+            isActive: true,
+            $or: [
+                { lastHeartbeat: { $gte: thirtyMinutesAgo } },
+                { lastActivity: { $gte: thirtyMinutesAgo } }
+            ]
+        })
+        .populate('userId', 'name email role')
+        .sort({ lastHeartbeat: -1, lastActivity: -1 })
+        .lean();
 
-        // Calculate durations
-        const sessionsWithInfo = sessions.map(session => {
+        const sessionsWithInfo = recentSessions.map(session => {
             const duration = Math.floor((new Date() - session.startTime) / 1000);
-            const idleTime = Math.floor((new Date() - session.lastActivity) / 1000);
+            const lastHeartbeat = session.lastHeartbeat || session.lastActivity;
+            const timeSinceHeartbeat = Math.floor((new Date() - lastHeartbeat) / 1000);
+            
+            // User is truly online if:
+            // 1. They have a recent heartbeat (within 2 minutes)
+            // 2. Their page is visible (not just background tab)
+            const isTrulyOnline = lastHeartbeat >= twoMinutesAgo && 
+                                session.isPageVisible !== false;
             
             return {
                 ...session,
@@ -1361,17 +1377,33 @@ export const getAllActiveSessions = async (req, res) => {
                     formatted: formatDuration(duration)
                 },
                 idleTime: {
-                    seconds: idleTime,
-                    formatted: formatDuration(idleTime)
-                }
+                    seconds: timeSinceHeartbeat,
+                    formatted: formatDuration(timeSinceHeartbeat)
+                },
+                isTrulyOnline,
+                onlineStatus: isTrulyOnline ? 'online' : 'away'
             };
         });
+
+        // Only return sessions that have some recent activity
+        const activeSessions = sessionsWithInfo.filter(session => {
+            const lastHeartbeat = session.lastHeartbeat || session.lastActivity;
+            return lastHeartbeat >= thirtyMinutesAgo;
+        });
+
+        // Separate truly online vs away sessions
+        const onlineSessions = activeSessions.filter(s => s.isTrulyOnline);
+        const awaySessions = activeSessions.filter(s => !s.isTrulyOnline);
 
         res.json({
             status: 'success',
             data: {
-                sessions: sessionsWithInfo,
-                totalActiveSessions: sessions.length
+                sessions: activeSessions,
+                onlineSessions,
+                awaySessions,
+                totalActiveSessions: activeSessions.length,
+                trulyOnlineSessions: onlineSessions.length,
+                awaySessions: awaySessions.length
             }
         });
 
@@ -1384,6 +1416,103 @@ export const getAllActiveSessions = async (req, res) => {
         });
     }
 };
+
+// Get recent activity feed for admin dashboard
+export const getRecentActivity = async (req, res) => {
+    try {
+        const { limit = 50, hours = 24 } = req.query;
+        
+        // Get activities from the last N hours
+        const hoursAgo = new Date(Date.now() - (parseInt(hours) * 60 * 60 * 1000));
+        
+        // Import UserActivity model
+        const { default: UserActivity } = await import('../models/UserActivity.js');
+        
+        const activities = await UserActivity.find({
+            timestamp: { $gte: hoursAgo }
+        })
+        .populate('userId', 'name email username')
+        .sort({ timestamp: -1 })
+        .limit(parseInt(limit))
+        .lean();
+
+        // Format activities for the frontend
+        const formattedActivities = activities.map(activity => ({
+            id: activity._id,
+            type: activity.action,
+            user: {
+                id: activity.userId?._id,
+                name: activity.userId?.name || activity.userId?.username || 'Unknown User',
+                email: activity.userId?.email || ''
+            },
+            action: getActionLabel(activity.action),
+            details: activity.details || {},
+            page: activity.page || {},
+            timestamp: activity.timestamp,
+            metadata: activity.metadata || {},
+            sessionId: activity.sessionId
+        }));
+
+        res.json({
+            status: 'success',
+            data: {
+                activities: formattedActivities,
+                totalActivities: formattedActivities.length,
+                timeRange: `Last ${hours} hours`
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching recent activity:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch recent activity',
+            error: error.message
+        });
+    }
+};
+
+// Helper function to get user-friendly action labels
+function getActionLabel(action) {
+    const actionLabels = {
+        'login': 'Logged in',
+        'logout': 'Logged out',
+        'register': 'Registered account',
+        'page_view': 'Viewed page',
+        'dashboard_view': 'Viewed dashboard',
+        'create_slip_view': 'Opened slip creator',
+        'preview_view': 'Previewed slip',
+        'form_data_loaded': 'Loaded form data',
+        'district_selected': 'Selected district',
+        'local_body_selected': 'Selected local body',
+        'ward_selected': 'Selected ward',
+        'polling_station_selected': 'Selected polling station',
+        'voter_list_extracted': 'Extracted voter list',
+        'symbol_selected': 'Selected symbol',
+        'slip_data_entered': 'Entered slip data',
+        'preview_generated': 'Generated preview',
+        'order_created': 'Created order',
+        'payment_initiated': 'Initiated payment',
+        'payment_success': 'Payment successful',
+        'payment_failed': 'Payment failed',
+        'pdf_downloaded': 'Downloaded PDF',
+        'profile_updated': 'Updated profile',
+        'contact_form_submitted': 'Submitted contact form',
+        'error_occurred': 'Encountered error',
+        'button_clicked': 'Clicked button',
+        'form_submitted': 'Submitted form',
+        'dropdown_selected': 'Selected option',
+        'input_changed': 'Modified input',
+        'checkbox_toggled': 'Toggled checkbox',
+        'radio_selected': 'Selected radio option',
+        'search_performed': 'Performed search',
+        'file_uploaded': 'Uploaded file',
+        'export_data': 'Exported data',
+        'filter_applied': 'Applied filter'
+    };
+    
+    return actionLabels[action] || action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
 
 // Helper function to format duration
 function formatDuration(seconds) {
