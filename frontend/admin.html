@@ -2659,7 +2659,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
                 showSuccess('Regenerating PDF... Please wait. This may take a minute.');
                 
-                const response = await fetch(`${API_BASE}/admin/orders/${orderId}/regenerate-pdf`, {
+                const response = await fetch(`${API_BASE}/orders/${orderId}/regenerate-pdf`, {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${token}`,
