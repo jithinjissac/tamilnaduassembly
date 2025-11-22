@@ -61,7 +61,7 @@ export const createOrder = [
 
             // Calculate amount
             const totalVoters = voters.length;
-            const pricePerVoter = user.pricePerVoter || 0.50; // Use user's custom price
+            const pricePerVoter = user.pricePerVoter !== undefined ? user.pricePerVoter : 0.50; // Use user's custom price, including 0
             const originalAmount = totalVoters * pricePerVoter;
             const amount = Math.round(originalAmount * 100) / 100; // Final amount (same as original, no discount)
 

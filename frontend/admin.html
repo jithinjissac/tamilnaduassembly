@@ -891,6 +891,8 @@
                                     </th>
                                     <th>Order ID</th>
                                     <th>User</th>
+                                    <th>Phone</th>
+                                    <th>Symbol</th>
                                     <th>Location</th>
                                     <th>Voters</th>
                                     <th>Amount</th>
@@ -901,7 +903,7 @@
                             </thead>
                             <tbody id="ordersTable">
                                 <tr>
-                                    <td colspan="9" class="empty-state">
+                                    <td colspan="11" class="empty-state">
                                         <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                         <p>No orders found</p>
                                     </td>
@@ -2405,7 +2407,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 if (!data.orders || data.orders.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="9" class="empty-state">
+                            <td colspan="11" class="empty-state">
                                 <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                 <p>No orders found</p>
                             </td>
@@ -2425,6 +2427,12 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                     <div><strong>${order.userId?.name || 'N/A'}</strong></div>
                                     <div style="color: #666; font-size: 0.85rem;">${order.userId?.email || 'N/A'}</div>
                                 </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.9rem;">${order.userId?.phone || 'N/A'}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.85rem;">${order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-'}</div>
                             </td>
                             <td>
                                 <div style="font-size: 0.85rem; line-height: 1.4;">
@@ -2530,6 +2538,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             </div>
                             <div>
                                 <strong>Created:</strong><br>${new Date(order.createdAt).toLocaleString('en-IN')}
+                            </div>
+                            <div>
+                                <strong>Downloads:</strong><br>${order.downloadCount || 0}
                             </div>
                         </div>
 

@@ -620,7 +620,17 @@ export const createOrderWithoutPayment = async (req, res) => {
 
         const orderId = generateOrderId();
         const totalVoters = voters.length;
-        const pricePerVoter = 0.50; // Fixed price
+        
+        // Fetch user to get their pricePerVoter
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+        
+        const pricePerVoter = user.pricePerVoter !== undefined ? user.pricePerVoter : 0.50; // Use user's custom price, including 0
         const amount = Math.round(totalVoters * pricePerVoter * 100) / 100;
 
         // Create order with completed status
