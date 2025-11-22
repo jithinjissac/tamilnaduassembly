@@ -2624,9 +2624,10 @@ Login to https://easyslip.in to download your PDF.</textarea>
         // Download order PDF (admin)
         async function downloadOrderPDF(orderId) {
             try {
-                showSuccess('Generating PDF... Please wait.');
+                showSuccess('Downloading PDF... Please wait.');
                 
-                const response = await fetch(`${API_BASE}/orders/${orderId}/download`, {
+                // Use the same endpoint as regular users (supports admin access)
+                const response = await fetch(`/api/slips/download/${orderId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
