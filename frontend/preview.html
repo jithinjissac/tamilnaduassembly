@@ -443,6 +443,62 @@ s0.parentNode.insertBefore(s1,s0);
             margin-bottom: 0;
         }
 
+        /* Sticky floating payment button for mobile */
+        .mobile-payment-float {
+            display: none;
+        }
+
+        /* Scroll reminder notification */
+        #scrollReminder {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+            z-index: 1000;
+            animation: slideUpBounce 0.5s ease-out, pulse 2s ease-in-out infinite;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        #scrollReminder i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            animation: arrowBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes slideUpBounce {
+            0% { bottom: -100px; opacity: 0; }
+            70% { bottom: 110px; opacity: 1; }
+            85% { bottom: 95px; }
+            100% { bottom: 100px; }
+        }
+
+        @keyframes slideDown {
+            0% { bottom: 100px; opacity: 1; }
+            100% { bottom: -100px; opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5); }
+            50% { box-shadow: 0 6px 35px rgba(255, 107, 53, 0.8); }
+        }
+
+        @keyframes arrowBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3); }
+            50% { transform: scale(1.03); box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5); }
+        }
+
         @media (max-width: 968px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -453,16 +509,59 @@ s0.parentNode.insertBefore(s1,s0);
             .payment-section {
                 position: static;
                 order: 2;
+                margin-top: 2rem;
+                /* Add visual attention */
+                border: 3px solid #FF6B35;
+                border-radius: 16px;
+                padding: 1rem;
+                background: linear-gradient(to bottom, #FFF9F6 0%, white 20%);
+                box-shadow: 0 8px 30px rgba(255, 107, 53, 0.2);
             }
 
             .preview-section {
                 order: 1;
             }
 
-            /* Show pay button right after preview on mobile */
-            .btn-payment {
-                order: 1.5;
-                margin: 1.5rem 0;
+            /* Mobile floating payment button */
+            .mobile-payment-float {
+                display: block;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 999;
+                border-top: 3px solid #FF6B35;
+            }
+
+            .mobile-payment-float .btn-payment {
+                width: 100%;
+                margin: 0;
+                animation: buttonPulse 2s ease-in-out infinite;
+                font-size: 1.1rem;
+                padding: 1.1rem;
+            }
+
+            .mobile-payment-float .payment-summary {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
+                padding: 0.5rem;
+                background: #f8f9fa;
+                border-radius: 8px;
+            }
+
+            .mobile-payment-float .payment-summary span {
+                font-weight: 600;
+                color: #2d3748;
+            }
+
+            .mobile-payment-float .payment-summary .amount {
+                font-size: 1.3rem;
+                color: #FF6B35;
             }
 
             /* Reorder payment card children on mobile */
@@ -471,13 +570,17 @@ s0.parentNode.insertBefore(s1,s0);
                 flex-direction: column;
             }
 
-            .payment-card .btn-payment {
-                order: -1; /* Move button to top */
-                margin-bottom: 1.5rem;
-            }
-
             .payment-card .payment-title {
                 order: 1;
+                font-size: 1.5rem;
+                text-align: center;
+                margin-bottom: 1rem;
+                color: #FF6B35;
+            }
+
+            .payment-card .payment-title::before {
+                content: "👇 ";
+                font-size: 1.3rem;
             }
 
             .payment-card .order-summary {
@@ -488,20 +591,27 @@ s0.parentNode.insertBefore(s1,s0);
                 order: 3;
             }
 
-            .payment-card .secure-badge {
+            .payment-card .btn-payment {
                 order: 4;
+                margin: 1.5rem 0;
+                animation: buttonPulse 2s ease-in-out infinite;
             }
 
-            .payment-card .payment-icons {
+            .payment-card .secure-badge {
                 order: 5;
             }
 
-            .payment-card .features-list {
+            .payment-card .payment-icons {
                 order: 6;
+            }
+
+            .payment-card .features-list {
+                order: 7;
             }
 
             .container {
                 padding: 1rem;
+                padding-bottom: 90px; /* Space for floating button */
             }
         }
 
@@ -603,6 +713,23 @@ s0.parentNode.insertBefore(s1,s0);
     </style>
 </head>
 <body>
+    <!-- Scroll Reminder Notification (Mobile Only) -->
+    <div id="scrollReminder" style="display: none;">
+        <i class="fas fa-arrow-down"></i>
+        <strong>Scroll down to complete payment</strong>
+    </div>
+
+    <!-- Mobile Floating Payment Button -->
+    <div class="mobile-payment-float" id="mobilePaymentFloat" style="display: none;">
+        <div class="payment-summary">
+            <span>Total: <span class="amount" id="floatAmount">₹0.00</span></span>
+            <span style="font-size: 0.85rem; color: #718096;"><span id="floatVoters">0</span> voters</span>
+        </div>
+        <button class="btn btn-payment" id="floatPaymentBtn" onclick="scrollToPayment()">
+            <i class="fas fa-lock"></i> <span id="floatBtnText">Complete Payment</span>
+        </button>
+    </div>
+
     <!-- Header -->
     <header>
         <div class="header-container">
@@ -712,7 +839,7 @@ s0.parentNode.insertBefore(s1,s0);
             </div>
 
             <!-- Payment Section -->
-            <div class="payment-section">
+            <div class="payment-section" id="paymentSection">
                 <div class="payment-card">
                     <h3 class="payment-title">Order Summary</h3>
 
@@ -1446,6 +1573,67 @@ s0.parentNode.insertBefore(s1,s0);
                 renderPage(newPage);
             }
         }
+
+        // Scroll to payment section
+        function scrollToPayment() {
+            const paymentSection = document.getElementById('paymentSection');
+            if (paymentSection) {
+                paymentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Hide scroll reminder after clicking
+                hideScrollReminder();
+            }
+        }
+
+        // Show scroll reminder on mobile after preview loads
+        function showScrollReminder() {
+            const isMobile = window.innerWidth <= 968;
+            if (isMobile && orderData && orderData.paymentStatus !== 'completed') {
+                const reminder = document.getElementById('scrollReminder');
+                if (reminder) {
+                    setTimeout(() => {
+                        reminder.style.display = 'block';
+                        // Auto-hide after 8 seconds
+                        setTimeout(hideScrollReminder, 8000);
+                    }, 3000); // Show 3 seconds after preview loads
+                }
+            }
+        }
+
+        // Hide scroll reminder
+        function hideScrollReminder() {
+            const reminder = document.getElementById('scrollReminder');
+            if (reminder) {
+                reminder.style.animation = 'slideDown 0.3s ease-out';
+                setTimeout(() => {
+                    reminder.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Show/hide mobile floating button based on scroll
+        function handleMobilePaymentFloat() {
+            const isMobile = window.innerWidth <= 968;
+            const floatBtn = document.getElementById('mobilePaymentFloat');
+            const paymentSection = document.getElementById('paymentSection');
+            
+            if (!isMobile || !floatBtn || !paymentSection) return;
+            
+            // Only show for unpaid orders
+            if (orderData && orderData.paymentStatus === 'completed') {
+                floatBtn.style.display = 'none';
+                return;
+            }
+
+            const paymentRect = paymentSection.getBoundingClientRect();
+            const isPaymentVisible = paymentRect.top < window.innerHeight && paymentRect.bottom > 0;
+            
+            // Show float button when payment section is not visible
+            floatBtn.style.display = isPaymentVisible ? 'none' : 'block';
+        }
+
+        // Setup mobile payment tracking
+        window.addEventListener('scroll', handleMobilePaymentFloat);
+        window.addEventListener('resize', handleMobilePaymentFloat);
         
         // Fallback: Show download-only option if PDF can't be displayed
         function showPDFDownloadOnly(pdfBlobUrl, container) {
@@ -1563,6 +1751,26 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('totalVoters').textContent = orderData.totalVoters || orderData.voterCount || '-';
                 document.getElementById('totalAmount').textContent = orderData.amount ? `₹${orderData.amount.toFixed(2)}` : '₹0.00';
 
+                // Calculate order details once for all uses
+                const voterCount = orderData.totalVoters || orderData.voterCount || 0;
+                const amount = orderData.amount || 0;
+                const pricePerVoter = orderData.pricePerVoter !== undefined ? orderData.pricePerVoter : 0.50;
+                
+                // Update floating button with order details immediately
+                const floatAmount = document.getElementById('floatAmount');
+                const floatVoters = document.getElementById('floatVoters');
+                const floatBtnText = document.getElementById('floatBtnText');
+                
+                if (floatAmount) {
+                    floatAmount.textContent = amount === 0 ? 'FREE' : `₹${amount.toFixed(2)}`;
+                }
+                if (floatVoters) {
+                    floatVoters.textContent = voterCount;
+                }
+                if (floatBtnText) {
+                    floatBtnText.textContent = pricePerVoter === 0 ? 'Complete & Download' : 'Complete Payment';
+                }
+
                 // Set initial radio button based on order's slipsPerPage
                 const slipsPerPage = orderData.customization?.slipsPerPage || 5;
                 console.log('🎫 Order slipsPerPage:', slipsPerPage);
@@ -1579,11 +1787,7 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('previewNote').innerHTML = 
                     `<strong>Note:</strong> This is a preview of the first ${totalPreviewSlips} slips (2 pages with ${slipsPerPage} slips/page). Download the complete PDF after payment.`;
 
-                // Show flat pricing (no discount)
-                const voterCount = orderData.totalVoters || orderData.voterCount || 0;
-                const amount = orderData.amount || 0;
-                const pricePerVoter = orderData.pricePerVoter !== undefined ? orderData.pricePerVoter : 0.50; // Use order's price (can be 0)
-                
+                // Show flat pricing (no discount) - using variables declared above
                 if (voterCount > 0) {
                     document.getElementById('pricePerVoter').textContent = pricePerVoter === 0 ? 'FREE' : `₹${pricePerVoter.toFixed(2)}`;
                     document.getElementById('priceBreakdown').style.display = 'block';
@@ -1608,6 +1812,19 @@ s0.parentNode.insertBefore(s1,s0);
                     paymentBtn.style.background = 'var(--kerala-green)';
                     paymentBtn.onclick = completeOrderAsAdmin;
                     paymentBtn.disabled = false;
+                    
+                    // Update floating button for free order
+                    const floatBtn = document.getElementById('floatPaymentBtn');
+                    if (floatBtn) {
+                        floatBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete & Download';
+                        floatBtn.style.background = 'var(--kerala-green)';
+                        floatBtn.onclick = function() {
+                            scrollToPayment();
+                            // Trigger the complete action after scroll
+                            setTimeout(completeOrderAsAdmin, 500);
+                        };
+                        floatBtn.disabled = false;
+                    }
                     
                     // Hide payment-related UI
                     document.querySelector('.secure-badge').style.display = 'none';
@@ -1677,6 +1894,18 @@ s0.parentNode.insertBefore(s1,s0);
                     paymentBtn.onclick = completeOrderAsAdmin;
                     paymentBtn.disabled = false;
                     
+                    // Update floating button for admin
+                    const floatBtn = document.getElementById('floatPaymentBtn');
+                    if (floatBtn) {
+                        floatBtn.innerHTML = '<i class="fas fa-user-shield"></i> Admin: Complete Order';
+                        floatBtn.style.background = 'var(--kerala-green)';
+                        floatBtn.onclick = function() {
+                            scrollToPayment();
+                            setTimeout(completeOrderAsAdmin, 500);
+                        };
+                        floatBtn.disabled = false;
+                    }
+                    
                     // Hide Razorpay badge
                     document.querySelector('.secure-badge').style.display = 'none';
                 }
@@ -1735,7 +1964,20 @@ s0.parentNode.insertBefore(s1,s0);
                     // Enable payment button for regular users (admin already handled above)
                     if (!isAdmin) {
                         document.getElementById('paymentBtn').disabled = false;
+                        // Also enable floating button
+                        const floatBtn = document.getElementById('floatPaymentBtn');
+                        if (floatBtn) {
+                            floatBtn.disabled = false;
+                            // For regular payment, scroll to payment section (user can then click the main button)
+                            floatBtn.onclick = scrollToPayment;
+                        }
                     }
+
+                    // Show scroll reminder on mobile
+                    showScrollReminder();
+                    
+                    // Initialize mobile float button visibility
+                    handleMobilePaymentFloat();
                     
                     // Setup cleanup on page unload
                     window.addEventListener('beforeunload', () => {

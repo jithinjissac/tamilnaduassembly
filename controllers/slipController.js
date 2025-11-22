@@ -328,6 +328,9 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .station-name { font-weight: bold; flex: 1; }
         .station-count { min-width: 35mm; text-align: right; font-weight: 600; }
         
+        .preview-payment-slip { background: transparent !important; border: none !important; }
+        .preview-payment-slip::after { display: none !important; }
+        
         @media print { @page { size: A4; margin: 0; } }
     </style>
 </head>
@@ -378,6 +381,69 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             htmlParts.push('<div class="page">');
             const pageVoters = arr.slice(i, i + slipsPerPage);
             pageVoters.forEach((voter, index) => {
+            // Check if this is the last slip in preview
+            const isLastSlipInPreview = isPreview && (i + index === arr.length - 1);
+            
+            // Replace last slip with payment message
+            if (isLastSlipInPreview) {
+                htmlParts.push(`
+                <div class="voter-slip preview-payment-slip">
+                    <div style="width: 100%; height: 100%; display: grid; grid-template-columns: 35% 65%; gap: 3mm; padding: 3mm; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 3px solid #006D3B; border-radius: 2mm;">
+                        
+                        <!-- Left Column: Visual Elements -->
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-right: 2px solid #e2e8f0; padding-right: 2mm;">
+                            <!-- Lock Icon -->
+                            <div style="width: 18mm; height: 18mm; background: linear-gradient(135deg, #006D3B 0%, #005a30 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2mm;">
+                                <span style="font-size: 22pt;">🔒</span>
+                            </div>
+                            
+                            <!-- Amount Button -->
+                            <div style="background: linear-gradient(135deg, #006D3B 0%, #005a30 100%); color: white; padding: 2mm 3mm; border-radius: 2mm; font-size: 11pt; font-weight: 800; margin-bottom: 2mm; width: 100%;">
+                                ₹${(order.amount || 0).toFixed(2)}
+                            </div>
+                            
+                            <!-- Preview Badge -->
+                            <div style="background: #FFF3CD; border: 1px solid #FFC107; border-radius: 2mm; padding: 1.5mm; width: 100%;">
+                                <div style="font-size: 7pt; font-weight: 600; color: #856404;">
+                                    ⚠️ Preview Only
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: Text Content -->
+                        <div style="display: flex; flex-direction: column; justify-content: center; padding-left: 2mm;">
+                            <!-- Main Heading -->
+                            <div style="font-size: 14pt; font-weight: 800; color: #E53E3E; margin-bottom: 2mm; line-height: 1.1;">
+                                Complete Payment to Access Full PDF
+                            </div>
+                            
+                            <!-- Voter Count -->
+                            <div style="font-size: 10pt; font-weight: 600; color: #1a202c; margin-bottom: 1mm;">
+                                Complete PDF Contains:
+                            </div>
+                            <div style="font-size: 16pt; font-weight: 800; color: #006D3B; margin-bottom: 2mm;">
+                                ${order.voters.length} Voter Slips
+                            </div>
+                            
+                            <!-- Call to Action -->
+                            <div style="font-size: 8pt; color: #4a5568; margin-bottom: 2mm; line-height: 1.3;">
+                                This preview shows only first 2 pages. Complete payment now for instant download of all voter slips.
+                            </div>
+                            
+                            <!-- Benefits -->
+                            <div style="font-size: 7pt; color: #718096; line-height: 1.4;">
+                                ✓ Instant Download<br>
+                                ✓ All ${order.voters.length} Slips<br>
+                                ✓ Secure Payment
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                `);
+                return; // Skip rendering actual voter data
+            }
+            
             // Use original serial number from SEC data, NOT recalculated
             const serialNo = voter.sl_no || (startIndex + i + index + 1);
             
