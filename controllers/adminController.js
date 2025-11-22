@@ -722,8 +722,15 @@ export const downloadOrderPDF = async (req, res) => {
             });
         }
         
-        // Generate HTML for all slips
-        const html = await generateSlipHTML(order);
+        console.log(`📥 ADMIN PDF DOWNLOAD: Generating full PDF for order ${orderId}`);
+        console.log(`   Total voters: ${order.voters.length}`);
+        console.log(`   Calling generateSlipHTML with NO endIndex (full PDF, isPreview = false)`);
+        
+        // Generate HTML for ALL slips (no preview mode)
+        // Pass startIndex=0, endIndex=null to ensure isPreview=false
+        const html = await generateSlipHTML(order, 0, null);
+        
+        console.log(`✅ HTML generated successfully (full PDF mode)`);
         
         // Generate PDF using browser
         const browser = await getBrowser();
@@ -761,6 +768,99 @@ export const downloadOrderPDF = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to download PDF',
+            error: error.message
+        });
+    }
+};
+
+// Regenerate order PDF (admin only) - Forces fresh generation
+export const regenerateOrderPDF = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        
+        console.log(`🔄 ADMIN REGENERATE PDF: Starting for order ${orderId}`);
+        
+        const order = await Order.findOne({ orderId });
+        
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found'
+            });
+        }
+        
+        // Delete existing PDF file if it exists
+        const permanentPdfDir = path.join(process.cwd(), 'public', 'pdfs');
+        const pdfFilename = `${orderId}.pdf`;
+        const pdfPath = path.join(permanentPdfDir, pdfFilename);
+        
+        if (fs.existsSync(pdfPath)) {
+            console.log(`🗑️ Deleting existing PDF: ${pdfFilename}`);
+            fs.unlinkSync(pdfPath);
+        }
+        
+        // Import necessary functions
+        const { generateSlipHTML, getBrowser } = await import('./slipController.js');
+        
+        console.log(`📄 Generating fresh HTML for ${order.voters.length} voters`);
+        
+        // Generate HTML for ALL slips (no preview mode)
+        const html = await generateSlipHTML(order, 0, null);
+        
+        console.log(`✅ HTML generated, creating PDF...`);
+        
+        // Generate PDF using browser
+        const browser = await getBrowser();
+        const page = await browser.newPage();
+        
+        await page.setContent(html, { 
+            waitUntil: 'domcontentloaded',
+            timeout: 300000
+        });
+        
+        await page.waitForSelector('.symbol-image', { visible: true, timeout: 30000 }).catch(() => {
+            console.log('⚠️ Symbol image wait timeout - continuing anyway');
+        });
+        
+        const pdf = await page.pdf({
+            format: 'A4',
+            printBackground: true,
+            margin: { top: 0, bottom: 0, left: 0, right: 0 },
+            preferCSSPageSize: false,
+            displayHeaderFooter: false,
+            timeout: 300000
+        });
+        
+        await page.close();
+        
+        console.log(`✅ PDF generated (${(pdf.length / 1024 / 1024).toFixed(2)} MB)`);
+        
+        // Save the new PDF
+        if (!fs.existsSync(permanentPdfDir)) {
+            fs.mkdirSync(permanentPdfDir, { recursive: true });
+        }
+        
+        fs.writeFileSync(pdfPath, pdf);
+        console.log(`💾 PDF saved to: ${pdfPath}`);
+        
+        // Update order with regeneration timestamp
+        order.pdfGeneratedAt = new Date();
+        await order.save();
+        
+        console.log(`🎉 PDF regeneration complete for order ${orderId}`);
+        
+        res.json({
+            status: 'success',
+            message: 'PDF regenerated successfully',
+            filename: pdfFilename,
+            size: `${(pdf.length / 1024 / 1024).toFixed(2)} MB`
+        });
+        
+    } catch (error) {
+        console.error('❌ Admin regenerate PDF error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to regenerate PDF',
             error: error.message
         });
     }

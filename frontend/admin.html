@@ -2453,6 +2453,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                         <button class="btn btn-success btn-small" onclick="downloadOrderPDF('${order.orderId}')" title="Download PDF">
                                             <i class="fas fa-download"></i>
                                         </button>
+                                        <button class="btn btn-primary btn-small" onclick="regenerateOrderPDF('${order.orderId}')" title="Regenerate PDF">
+                                            <i class="fas fa-sync"></i>
+                                        </button>
                                     ` : `
                                         <button class="btn btn-success btn-small" onclick="generateSlipWithoutPayment('${order.orderId}')" title="Generate Slip">
                                             <i class="fas fa-file-pdf"></i> Generate
@@ -2644,6 +2647,41 @@ Login to https://easyslip.in to download your PDF.</textarea>
             } catch (error) {
                 console.error('Error downloading PDF:', error);
                 showError('Failed to download PDF');
+            }
+        }
+
+        // Regenerate order PDF (admin) - Forces fresh generation
+        async function regenerateOrderPDF(orderId) {
+            try {
+                const confirmed = confirm(`Regenerate PDF for order ${orderId}?\n\nThis will:\n• Delete the existing PDF file\n• Generate a fresh PDF with current settings\n• Update the order record\n\nContinue?`);
+                
+                if (!confirmed) return;
+
+                showSuccess('Regenerating PDF... Please wait. This may take a minute.');
+                
+                const response = await fetch(`${API_BASE}/admin/orders/${orderId}/regenerate-pdf`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to regenerate PDF');
+                }
+
+                const data = await response.json();
+                
+                showSuccess(`PDF regenerated successfully! ${data.message || ''}`);
+                
+                // Reload orders to show updated info
+                loadAllOrders();
+
+            } catch (error) {
+                console.error('Error regenerating PDF:', error);
+                showError('Failed to regenerate PDF: ' + error.message);
             }
         }
 

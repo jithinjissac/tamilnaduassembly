@@ -15,6 +15,7 @@ import {
     createOrderWithoutPayment,
     markOrderCompleted,
     downloadOrderPDF,
+    regenerateOrderPDF,
     getAnalytics,
     deleteOrder,
     deleteOrders,
@@ -56,6 +57,7 @@ router.post('/orders/delete-bulk', deleteOrders);  // ← Must be before :orderI
 router.get('/orders/:orderId', getOrderDetails);
 router.patch('/orders/:orderId/complete', markOrderCompleted);
 router.get('/orders/:orderId/download', downloadOrderPDF);
+router.post('/orders/:orderId/regenerate-pdf', regenerateOrderPDF);
 router.delete('/orders/:orderId', deleteOrder);
 
 // Analytics
