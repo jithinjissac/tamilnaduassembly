@@ -730,7 +730,7 @@ export const downloadOrderPDF = async (req, res) => {
         }
         
         // Check if PDF already exists on disk
-        const permanentPdfDir = path.join(process.cwd(), 'public', 'pdfs');
+        const permanentPdfDir = path.join(process.cwd(), 'public', 'permanent-pdfs');
         const pdfFilename = `${orderId}.pdf`;
         const pdfPath = path.join(permanentPdfDir, pdfFilename);
         
@@ -829,7 +829,7 @@ export const regenerateOrderPDF = async (req, res) => {
         }
         
         // Delete existing PDF file if it exists
-        const permanentPdfDir = path.join(process.cwd(), 'public', 'pdfs');
+        const permanentPdfDir = path.join(process.cwd(), 'public', 'permanent-pdfs');
         const pdfFilename = `${orderId}.pdf`;
         const pdfPath = path.join(permanentPdfDir, pdfFilename);
         

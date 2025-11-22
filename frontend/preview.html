@@ -2037,6 +2037,63 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
+        // Complete order as admin (for free users or admin bypass)
+        async function completeOrderAsAdmin() {
+            if (!confirm('Complete this order without payment? This will mark the order as completed and generate the full PDF.')) {
+                return;
+            }
+
+            try {
+                showMessage('info', 'Processing...', 'Marking order as completed...');
+                
+                // Mark order as completed
+                const markResponse = await fetch(`/api/admin/orders/${orderData.orderId}/complete`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!markResponse.ok) {
+                    throw new Error('Failed to mark order as completed');
+                }
+
+                showMessage('success', 'Order Completed!', 'PDF is being generated. Download will start shortly...');
+
+                // Wait a moment for PDF generation to complete
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Download the PDF
+                const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to download PDF');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderData.orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showMessage('success', 'Success!', 'PDF downloaded successfully. Redirecting to dashboard...', 'dashboard.html', 2000);
+
+            } catch (error) {
+                console.error('Error completing order:', error);
+                showMessage('error', 'Failed', error.message || 'Could not complete order. Please try again.');
+                
+                // Re-enable button on error
+                document.getElementById('paymentBtn').disabled = false;
+            }
+        }
+
         async function initiatePayment() {
             try {
                 document.getElementById('paymentBtn').disabled = true;
