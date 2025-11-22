@@ -24,6 +24,11 @@ router.get('/:orderId', auth, orderController.getOrder);
 // @access  Private
 router.patch('/:orderId/update-slips-per-page', auth, orderController.updateSlipsPerPage);
 
+// @route   PATCH /api/orders/:orderId/complete
+// @desc    Complete free order (amount = 0)
+// @access  Private
+router.patch('/:orderId/complete', auth, orderController.completeFreeOrder);
+
 // @route   GET /api/orders/stats
 // @desc    Get order statistics
 // @access  Private

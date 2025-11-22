@@ -2046,8 +2046,13 @@ s0.parentNode.insertBefore(s1,s0);
             try {
                 showMessage('info', 'Processing...', 'Marking order as completed...');
                 
+                // Use different endpoints based on user role
+                const endpoint = isAdmin 
+                    ? `/api/admin/orders/${orderData.orderId}/complete`
+                    : `/api/orders/${orderData.orderId}/complete`;
+                
                 // Mark order as completed
-                const markResponse = await fetch(`/api/admin/orders/${orderData.orderId}/complete`, {
+                const markResponse = await fetch(endpoint, {
                     method: 'PATCH',
                     headers: { 
                         'Authorization': `Bearer ${token}`,
@@ -2056,7 +2061,8 @@ s0.parentNode.insertBefore(s1,s0);
                 });
 
                 if (!markResponse.ok) {
-                    throw new Error('Failed to mark order as completed');
+                    const errorData = await markResponse.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to mark order as completed');
                 }
 
                 showMessage('success', 'Order Completed!', 'PDF is being generated. Download will start shortly...');

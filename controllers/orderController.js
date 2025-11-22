@@ -456,3 +456,71 @@ export const downloadInvoice = async (req, res) => {
         });
     }
 };
+
+// Complete free order (for orders with amount = 0)
+export const completeFreeOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.userId;
+        
+        console.log(`🎁 FREE ORDER COMPLETION: ${orderId} by user ${userId}`);
+        
+        // Find order by orderId and verify ownership
+        const order = await Order.findOne({ orderId, userId });
+        
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found or you do not have permission to complete this order'
+            });
+        }
+        
+        // Verify this is actually a free order (amount = 0)
+        if (order.amount > 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'This order requires payment. Amount due: ₹' + order.amount.toFixed(2)
+            });
+        }
+        
+        // Check if already completed
+        if (order.paymentStatus === 'completed') {
+            return res.json({
+                status: 'success',
+                message: 'Order already completed',
+                order: {
+                    orderId: order.orderId,
+                    paymentStatus: order.paymentStatus
+                }
+            });
+        }
+        
+        // Mark as completed without payment (free order)
+        order.paymentStatus = 'completed';
+        order.paidAt = new Date();
+        order.razorpayPaymentId = 'FREE_ORDER';
+        order.razorpayOrderId = 'FREE_ORDER';
+        
+        await order.save();
+        
+        console.log(`✅ Free order marked as completed: ${orderId}`);
+        
+        res.json({
+            status: 'success',
+            message: 'Order completed successfully. PDF is being generated.',
+            order: {
+                orderId: order.orderId,
+                paymentStatus: order.paymentStatus,
+                paidAt: order.paidAt
+            }
+        });
+        
+    } catch (error) {
+        console.error('Complete free order error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to complete order',
+            error: error.message
+        });
+    }
+};
