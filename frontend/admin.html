@@ -3330,7 +3330,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             content.style.display = 'none';
 
             try {
-                const response = await fetch(`${API_BASE}/system/stats`, {
+                const response = await fetch('/api/system/stats', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

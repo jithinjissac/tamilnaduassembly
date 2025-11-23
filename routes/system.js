@@ -3,8 +3,13 @@ import os from 'os';
 import { browserPool } from '../utils/browserPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { getAllQueueStats } from '../utils/requestQueue.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// All system routes require admin authentication
+router.use(authenticateToken);
+router.use(requireAdmin);
 
 /**
  * GET /api/system/stats
