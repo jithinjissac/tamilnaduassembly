@@ -501,4 +501,59 @@
         }
     </script>
 </body>
+</body>
+    <!-- Popup Modal System -->
+    <div id="welcome-popup-overlay" style="display: none;"></div>
+    <div id="welcome-popup-modal" style="display: none;"></div>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        async function loadAndShowPopup() {
+            try {
+                const response = await fetch(`${API_BASE}/settings/popup`);
+                if (!response.ok) return;
+                const result = await response.json();
+                const settings = result.settings || result;
+                if (!settings.enabled) return;
+                if (settings.showOnce) {
+                    const hasShown = localStorage.getItem('popup-shown');
+                    if (hasShown) return;
+                }
+                const delay = settings.delay || 1000;
+                setTimeout(() => { showPopup(settings); }, delay);
+            } catch (error) { console.error('Error loading popup:', error); }
+        }
+        function showPopup(settings) {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.cssText = `position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.7);z-index: 9998;display: block;animation: fadeIn 0.3s ease;`;
+            modal.innerHTML = `<div style=\"position: relative;\"><button onclick=\"closePopup()\" style=\"position: absolute;top: -15px;right: -15px;background: white;border: 2px solid #ddd;color: #666;width: 40px;height: 40px;border-radius: 50%;cursor: pointer;font-size: 24px;line-height: 1;transition: all 0.3s ease;box-shadow: 0 2px 10px rgba(0,0,0,0.2);z-index: 10001;\" onmouseover=\"this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';\" onmouseout=\"this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';\">×</button><div style=\"background: white;border-radius: 12px;max-width: 600px;width: 90%;max-height: 80vh;overflow-y: auto;box-shadow: 0 20px 60px rgba(0,0,0,0.3);position: relative;animation: slideIn 0.3s ease;\"><div style=\"background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);color: white;padding: 20px;border-radius: 12px 12px 0 0;\"><h2 style=\"margin: 0; font-size: 24px;\">${settings.title || 'Announcement'}</h2></div><div style=\"padding: 30px;\">${settings.content || ''}</div></div></div>`;
+            modal.style.cssText = `position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 10000;display: block;`;
+            const responsiveStyle = `@media (max-width: 640px) {#welcome-popup-modal > div > div {width: 95% !important;max-height: 90vh !important;}#welcome-popup-modal > div > div > div:first-child {padding: 15px !important;}#welcome-popup-modal > div > div > div:first-child h2 {font-size: 18px !important;}#welcome-popup-modal > div > div > div:last-child {padding: 20px !important;}#welcome-popup-modal > div > button {width: 35px !important;height: 35px !important;font-size: 20px !important;top: -12px !important;right: -12px !important;}}`;
+            if (!document.querySelector('#popup-responsive-styles')) {
+                const styleElem = document.createElement('style');
+                styleElem.id = 'popup-responsive-styles';
+                styleElem.textContent = responsiveStyle;
+                document.head.appendChild(styleElem);
+            }
+            overlay.onclick = closePopup;
+            if (settings.showOnce) { localStorage.setItem('popup-shown', 'true'); }
+            if (!document.querySelector('#popup-animations')) {
+                const style = document.createElement('style');
+                style.id = 'popup-animations';
+                style.textContent = `@keyframes fadeIn {from { opacity: 0; }to { opacity: 1; }}@keyframes slideIn {from {opacity: 0;transform: translateY(-30px);}to {opacity: 1;transform: translateY(0);}}`;
+                document.head.appendChild(style);
+            }
+        }
+        function closePopup() {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadAndShowPopup);
+        } else {
+            loadAndShowPopup();
+        }
+    </script>
 </html>
