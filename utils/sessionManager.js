@@ -253,6 +253,25 @@ class SessionManager {
   }
 
   /**
+   * Get age of oldest active session in seconds
+   */
+  getOldestSessionAge() {
+    const now = Date.now();
+    let oldest = 0;
+
+    for (const session of this.sessions.values()) {
+      if (now <= session.expiresAt) {
+        const age = Math.floor((now - session.createdAt) / 1000);
+        if (age > oldest) {
+          oldest = age;
+        }
+      }
+    }
+
+    return oldest > 0 ? `${oldest}s` : null;
+  }
+
+  /**
    * Cleanup all sessions and stop scheduler
    */
   async shutdown() {

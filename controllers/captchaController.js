@@ -189,12 +189,32 @@ router.get('/initCaptchaSession', async (req, res) => {
     // Queue the request to prevent overload
     const result = await captchaQueue.add(async () => {
       const contextStartTime = Date.now();
-      // Get isolated context from browser pool
-      const context = await browserPool.getBrowserContext(sessionId);
+      
+      let context;
+      try {
+        // Get isolated context from browser pool
+        context = await browserPool.getBrowserContext(sessionId);
+      } catch (contextError) {
+        console.error(`❌ Failed to get browser context:`, contextError.message);
+        throw new Error('Browser pool unavailable. Please try again.');
+      }
+      
       const contextTime = Date.now() - contextStartTime;
       console.log(`[CAPTCHA] ⏱️  Browser context acquired in ${contextTime}ms`);
       
-      const page = await context.newPage();
+      let page;
+      try {
+        page = await context.newPage();
+      } catch (pageError) {
+        console.error(`❌ Failed to create new page:`, pageError.message);
+        // Clean up context before throwing
+        try {
+          await browserPool.releaseContext(context);
+        } catch (cleanupError) {
+          console.error(`⚠️ Error during context cleanup:`, cleanupError.message);
+        }
+        throw new Error('Failed to initialize browser page. Please try again.');
+      }
       
       // Set higher default timeout for slow government website
       page.setDefaultTimeout(90000); // 90 seconds
@@ -356,10 +376,21 @@ router.get('/initCaptchaSession', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Error initializing captcha session:', error);
-    res.status(500).json({ 
+    
+    // Check if error is due to shutdown
+    const isShutdownError = error.message && (
+      error.message.includes('shutting down') || 
+      error.message.includes('has been closed') ||
+      error.message.includes('Target page, context or browser')
+    );
+    
+    res.status(isShutdownError ? 503 : 500).json({ 
       status: 'error', 
-      message: 'Failed to initialize captcha session',
-      error: error.message 
+      message: isShutdownError 
+        ? 'Service is temporarily unavailable. Please try again in a moment.'
+        : 'Failed to initialize captcha session',
+      error: error.message,
+      retryable: isShutdownError
     });
   }
 });

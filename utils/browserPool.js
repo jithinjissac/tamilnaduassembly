@@ -14,6 +14,7 @@ class BrowserPool {
     this.contextCount = new Map(); // Track contexts per browser
     this.launching = false;
     this.launchPromise = null;
+    this.shuttingDown = false; // Flag to prevent new contexts during shutdown
     
     console.log(`🏊 Browser Pool initialized (max: ${maxBrowsers} browsers)`);
   }
@@ -24,6 +25,11 @@ class BrowserPool {
    * @returns {Object} { context, browserId }
    */
   async getBrowserContext(userId) {
+    // Check if shutting down
+    if (this.shuttingDown) {
+      throw new Error('Browser pool is shutting down. Please try again later.');
+    }
+    
     // Ensure we have at least one browser
     if (this.browsers.length === 0) {
       await this.ensureBrowser();
@@ -50,6 +56,10 @@ class BrowserPool {
 
     // If still no browser (shouldn't happen), create one
     if (!selectedBrowser || !selectedBrowser.isConnected()) {
+      // Double-check we're not shutting down
+      if (this.shuttingDown) {
+        throw new Error('Browser pool is shutting down. No browsers available.');
+      }
       selectedBrowser = await this.ensureBrowser();
     }
 
@@ -212,6 +222,12 @@ class BrowserPool {
    */
   async shutdown() {
     console.log('🛑 Shutting down browser pool...');
+    
+    // Set shutdown flag to prevent new contexts
+    this.shuttingDown = true;
+    
+    // Wait a moment for in-flight requests to complete
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     for (let i = 0; i < this.browsers.length; i++) {
       const browser = this.browsers[i];

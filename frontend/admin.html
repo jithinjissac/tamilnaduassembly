@@ -695,6 +695,7 @@
             <button class="tab" onclick="window.location.href='admin-user-tracking.html'"><i class="fas fa-chart-line"></i> User Activity</button>
             <button class="tab" onclick="switchTab('orders')"><i class="fas fa-shopping-cart"></i> Orders</button>
             <button class="tab" onclick="switchTab('reports')"><i class="fas fa-chart-bar"></i> Reports</button>
+            <button class="tab" onclick="switchTab('resources')"><i class="fas fa-server"></i> Resources</button>
             <button class="tab" onclick="switchTab('symbols')"><i class="fas fa-flag"></i> Symbols</button>
             <button class="tab" onclick="switchTab('upload')"><i class="fas fa-upload"></i> Upload Symbol</button>
             <button class="tab" onclick="switchTab('slip-settings')"><i class="fas fa-file-alt"></i> Slip Settings</button>
@@ -984,6 +985,207 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources-tab" class="tab-content">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;"><i class="fas fa-server"></i> System Resource Monitor</h2>
+                <p style="margin: 0; opacity: 0.9;">Real-time monitoring of browsers, sessions, queues, and system resources</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="margin: 0;">Resource Overview</h3>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span id="resourcesRefreshCounter" style="font-size: 0.85rem; opacity: 0.7;">Auto-refresh in <span id="resourcesCountdown">10</span>s</span>
+                        <button class="btn btn-primary" onclick="loadResources()"><i class="fas fa-sync-alt"></i> Refresh Now</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="resourcesLoading">
+                    <div class="spinner"></div>
+                    <p>Loading resource stats...</p>
+                </div>
+
+                <div id="resourcesContent" style="display: none;">
+                    <!-- Browser Pool Section -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.1rem; margin: 0;"><i class="fas fa-window-maximize"></i> Browser Pool</h3>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Active Browsers</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #667eea;"><span id="browserActive">0</span> / <span id="browserMax">0</span></div>
+                                </div>
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Total Contexts</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #10b981;" id="browserContexts">0</div>
+                                </div>
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Utilization</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #f59e0b;" id="browserUtilization">0%</div>
+                                </div>
+                            </div>
+                            <div id="browserDetails"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sessions Section -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.1rem; margin: 0;"><i class="fas fa-clock"></i> Active Sessions</h3>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Active Sessions</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #667eea;" id="sessionsActive">0</div>
+                                </div>
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Expired Sessions</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #ef4444;" id="sessionsExpired">0</div>
+                                </div>
+                                <div class="stat-card" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.25rem;">Oldest Session</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: #64748b;" id="sessionsOldest">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Request Queues Section -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.1rem; margin: 0;"><i class="fas fa-list"></i> Request Queues</h3>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+                                    <div style="font-weight: 600; margin-bottom: 0.75rem; color: #667eea;"><i class="fas fa-camera"></i> Captcha Queue</div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Running:</span>
+                                        <span style="font-weight: 600;" id="queueCaptchaRunning">0</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Queued:</span>
+                                        <span style="font-weight: 600;" id="queueCaptchaQueued">0</span>
+                                    </div>
+                                </div>
+                                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+                                    <div style="font-weight: 600; margin-bottom: 0.75rem; color: #10b981;"><i class="fas fa-file-pdf"></i> PDF Queue</div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Running:</span>
+                                        <span style="font-weight: 600;" id="queuePdfRunning">0</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Queued:</span>
+                                        <span style="font-weight: 600;" id="queuePdfQueued">0</span>
+                                    </div>
+                                </div>
+                                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+                                    <div style="font-weight: 600; margin-bottom: 0.75rem; color: #f59e0b;"><i class="fas fa-receipt"></i> Slip Queue</div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Running:</span>
+                                        <span style="font-weight: 600;" id="queueSlipRunning">0</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: #64748b; font-size: 0.9rem;">Queued:</span>
+                                        <span style="font-weight: 600;" id="queueSlipQueued">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Resources Section -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.1rem; margin: 0;"><i class="fas fa-microchip"></i> System Resources</h3>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <!-- Memory Section -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #64748b;"><i class="fas fa-memory"></i> Memory Usage</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">Process RSS</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #667eea;" id="memProcessRss">0 MB</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">Heap Used</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #10b981;" id="memHeapUsed">0 MB</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">Heap Total</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #64748b;" id="memHeapTotal">0 MB</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">System Used</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #f59e0b;" id="memSystemUsed">0 GB</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">System Free</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #10b981;" id="memSystemFree">0 GB</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CPU Section -->
+                            <div>
+                                <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: #64748b;"><i class="fas fa-microchip"></i> CPU Information</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">CPU Cores</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #667eea;" id="cpuCores">0</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">System Uptime</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #10b981;" id="cpuUptime">0 min</div>
+                                    </div>
+                                    <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                        <div style="font-size: 0.8rem; color: #64748b;">Process Uptime</div>
+                                        <div style="font-size: 1.2rem; font-weight: 600; color: #64748b;" id="processUptime">0 min</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.75rem; padding: 0.75rem; background: #f8fafc; border-radius: 6px;">
+                                    <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.25rem;">CPU Model</div>
+                                    <div style="font-size: 0.9rem; color: #334155;" id="cpuModel">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process Information -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 style="font-size: 1.1rem; margin: 0;"><i class="fas fa-info-circle"></i> Process Information</h3>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                    <div style="font-size: 0.8rem; color: #64748b;">Process ID</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: #667eea;" id="processPid">-</div>
+                                </div>
+                                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                    <div style="font-size: 0.8rem; color: #64748b;">Node Version</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: #10b981;" id="processNodeVersion">-</div>
+                                </div>
+                                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                    <div style="font-size: 0.8rem; color: #64748b;">Platform</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: #64748b;" id="processPlatform">-</div>
+                                </div>
+                                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 6px;">
+                                    <div style="font-size: 0.8rem; color: #64748b;">Architecture</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: #64748b;" id="processArch">-</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2379,6 +2581,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
     <script>
         const API_BASE = '/api/admin';
         let token = localStorage.getItem('token');
+        let currentTab = 'analytics'; // Track current active tab
 
         // Check admin authentication on load
         async function checkAuth() {
@@ -3115,6 +3318,125 @@ Login to https://easyslip.in to download your PDF.</textarea>
             }
         }
 
+        // Load resources (system stats)
+        let resourcesRefreshInterval;
+        let resourcesCountdownInterval;
+        
+        async function loadResources() {
+            const loading = document.getElementById('resourcesLoading');
+            const content = document.getElementById('resourcesContent');
+            
+            loading.classList.add('active');
+            content.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/system/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load resource stats');
+
+                const data = await response.json();
+                console.log('Resource stats:', data);
+
+                const stats = data.stats;
+
+                // Browser Pool Stats
+                document.getElementById('browserActive').textContent = stats.browserPool.connectedBrowsers || 0;
+                document.getElementById('browserMax').textContent = stats.browserPool.maxBrowsers || 20;
+                document.getElementById('browserContexts').textContent = stats.browserPool.totalContexts || 0;
+                document.getElementById('browserUtilization').textContent = (stats.browserPool.utilizationPercent || 0) + '%';
+
+                // Browser Details
+                const browserDetails = document.getElementById('browserDetails');
+                if (stats.browserPool.browsers && stats.browserPool.browsers.length > 0) {
+                    browserDetails.innerHTML = `
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+                            <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 500;">Browser Instances:</div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem;">
+                                ${stats.browserPool.browsers.map(b => `
+                                    <div style="background: ${b.connected ? '#ecfdf5' : '#fef2f2'}; border: 1px solid ${b.connected ? '#d1fae5' : '#fecaca'}; padding: 0.5rem; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 0.75rem; color: #64748b;">Browser #${b.id}</div>
+                                        <div style="font-size: 1.1rem; font-weight: 600; color: ${b.connected ? '#10b981' : '#ef4444'};">${b.contexts}</div>
+                                        <div style="font-size: 0.7rem; color: ${b.connected ? '#10b981' : '#ef4444'};">${b.connected ? 'Active' : 'Disconnected'}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Sessions Stats
+                document.getElementById('sessionsActive').textContent = stats.sessions.active || 0;
+                document.getElementById('sessionsExpired').textContent = stats.sessions.expired || 0;
+                document.getElementById('sessionsOldest').textContent = stats.sessions.oldestAge || '-';
+
+                // Queue Stats
+                document.getElementById('queueCaptchaRunning').textContent = stats.queues.captcha.running || 0;
+                document.getElementById('queueCaptchaQueued').textContent = stats.queues.captcha.queued || 0;
+                document.getElementById('queuePdfRunning').textContent = stats.queues.pdf.running || 0;
+                document.getElementById('queuePdfQueued').textContent = stats.queues.pdf.queued || 0;
+                document.getElementById('queueSlipRunning').textContent = stats.queues.slip.running || 0;
+                document.getElementById('queueSlipQueued').textContent = stats.queues.slip.queued || 0;
+
+                // Memory Stats
+                document.getElementById('memProcessRss').textContent = stats.memory.process.rss + ' MB';
+                document.getElementById('memHeapUsed').textContent = stats.memory.process.heapUsed + ' MB';
+                document.getElementById('memHeapTotal').textContent = stats.memory.process.heapTotal + ' MB';
+                document.getElementById('memSystemUsed').textContent = stats.memory.system.used + ' GB';
+                document.getElementById('memSystemFree').textContent = stats.memory.system.free + ' GB';
+
+                // CPU Stats
+                document.getElementById('cpuCores').textContent = stats.cpu.cores || 0;
+                document.getElementById('cpuUptime').textContent = stats.cpu.uptime + ' min';
+                document.getElementById('cpuModel').textContent = stats.cpu.model || 'Unknown';
+
+                // Process Stats
+                document.getElementById('processUptime').textContent = stats.process.uptime + ' min';
+                document.getElementById('processPid').textContent = stats.process.pid || '-';
+                document.getElementById('processNodeVersion').textContent = stats.process.nodeVersion || '-';
+                document.getElementById('processPlatform').textContent = stats.process.platform || '-';
+                document.getElementById('processArch').textContent = stats.process.arch || '-';
+
+                loading.classList.remove('active');
+                content.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading resources:', error);
+                showError('Failed to load resource stats');
+                loading.classList.remove('active');
+            }
+        }
+
+        function startResourcesAutoRefresh() {
+            // Clear any existing intervals
+            if (resourcesRefreshInterval) clearInterval(resourcesRefreshInterval);
+            if (resourcesCountdownInterval) clearInterval(resourcesCountdownInterval);
+
+            // Auto-refresh every 10 seconds
+            resourcesRefreshInterval = setInterval(() => {
+                loadResources();
+            }, 10000);
+
+            // Countdown timer
+            let countdown = 10;
+            resourcesCountdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    countdown = 10;
+                }
+                const countdownEl = document.getElementById('resourcesCountdown');
+                if (countdownEl) {
+                    countdownEl.textContent = countdown;
+                }
+            }, 1000);
+        }
+
+        function stopResourcesAutoRefresh() {
+            if (resourcesRefreshInterval) clearInterval(resourcesRefreshInterval);
+            if (resourcesCountdownInterval) clearInterval(resourcesCountdownInterval);
+        }
+
         // Load symbols
         async function loadSymbols() {
             const loading = document.getElementById('symbolsLoading');
@@ -3562,6 +3884,11 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
         // Switch tabs
         function switchTab(tabName) {
+            // Stop resources auto-refresh if leaving that tab
+            if (currentTab === 'resources') {
+                stopResourcesAutoRefresh();
+            }
+            
             // Update tab buttons
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
@@ -3569,6 +3896,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
             // Update tab contents
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Remember current tab
+            currentTab = tabName;
 
             // Load data for the active tab
             if (tabName === 'analytics') {
@@ -3579,6 +3909,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 loadAllOrders();
             } else if (tabName === 'reports') {
                 loadReports();
+            } else if (tabName === 'resources') {
+                loadResources();
+                startResourcesAutoRefresh();
             } else if (tabName === 'symbols') {
                 loadSymbols();
             } else if (tabName === 'media-manager') {

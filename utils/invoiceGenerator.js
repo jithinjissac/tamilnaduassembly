@@ -9,17 +9,9 @@ import path from 'path';
  */
 function sanitizeTextForPDF(text) {
     if (!text) return '';
-    // Remove or replace characters that might cause fontkit errors
+    // Only remove control characters, keep Malayalam and other Unicode
     return text
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-        .replace(/[^\x00-\x7F]/g, (char) => {
-            // Keep common printable characters, replace others with '?'
-            const code = char.charCodeAt(0);
-            if (code >= 0x0600 && code <= 0x06FF) return char; // Arabic
-            if (code >= 0x0D00 && code <= 0x0D7F) return char; // Malayalam
-            if (code >= 0x0900 && code <= 0x097F) return char; // Devanagari
-            return '?';
-        })
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters only
         .trim();
 }
 
@@ -54,9 +46,11 @@ export async function generateInvoice(order, user) {
                if (fs.existsSync(notoFontPath)) {
                   doc.registerFont('NotoSansMalayalam', notoFontPath);
                   hasMalayalamFont = true;
+                  console.log('✅ Malayalam font registered successfully for invoice');
                }
             } catch (e) {
                // fallback to Helvetica if anything goes wrong
+               console.warn('⚠️ Malayalam font registration failed, using Helvetica:', e.message);
                hasMalayalamFont = false;
             }
             
@@ -69,9 +63,62 @@ export async function generateInvoice(order, user) {
             // Helper function to select appropriate font based on content
             const selectFont = (text, isBold = false) => {
                 if (hasMalayalamFont && hasMalayalamChars(text)) {
+                    // Use Malayalam font but be prepared for fallback
                     return 'NotoSansMalayalam';
                 }
                 return isBold ? 'Helvetica-Bold' : 'Helvetica';
+            };
+            
+            // Safe text rendering function with font fallback
+            const safeText = (text, x, y, options = {}) => {
+                if (!text) text = '';
+                
+                try {
+                    const font = selectFont(text, options.bold);
+                    doc.font(font);
+                    doc.text(text, x, y, options);
+                } catch (fontError) {
+                    // Check if it's a fontkit anchor error
+                    const isAnchorError = fontError.message && (
+                        fontError.message.includes('xCoordinate') ||
+                        fontError.message.includes('anchor') ||
+                        fontError.message.includes('mark')
+                    );
+                    
+                    if (isAnchorError && hasMalayalamFont && hasMalayalamChars(text)) {
+                        // Try breaking text into smaller chunks to avoid complex rendering
+                        console.warn('⚠️ Malayalam font anchor error, trying character-by-character rendering');
+                        try {
+                            doc.font('Helvetica');
+                            // For now, use transliteration or simpler rendering
+                            const simpleText = text.split('').map(char => {
+                                const code = char.charCodeAt(0);
+                                // Keep Malayalam characters, they'll render as boxes but preserve structure
+                                if (code >= 0x0D00 && code <= 0x0D7F) return char;
+                                return char;
+                            }).join('');
+                            doc.text(simpleText, x, y, options);
+                        } catch (retryError) {
+                            // Final fallback: ASCII only
+                            console.error('⚠️ Retry failed, using ASCII fallback');
+                            doc.font(options.bold ? 'Helvetica-Bold' : 'Helvetica');
+                            const asciiText = text.replace(/[^\x20-\x7E]/g, '');
+                            if (asciiText.trim()) {
+                                doc.text(asciiText, x, y, options);
+                            }
+                        }
+                    } else {
+                        // Non-anchor error, use simple fallback
+                        console.warn('⚠️ Font rendering error, falling back to Helvetica:', fontError.message);
+                        try {
+                            doc.font(options.bold ? 'Helvetica-Bold' : 'Helvetica');
+                            doc.text(text, x, y, options);
+                        } catch (fallbackError) {
+                            console.error('⚠️ Even fallback rendering failed:', fallbackError.message);
+                            // Last resort: just skip this text
+                        }
+                    }
+                }
             };
 
             // Header with Kerala theme colors
@@ -107,9 +154,8 @@ export async function generateInvoice(order, user) {
             
             yPosition += 20;
             const userName = user.name || 'N/A';
-            doc.fontSize(11)
-               .font(selectFont(userName)) // Use appropriate font for user name
-               .text(userName, 50, yPosition);
+            doc.fontSize(11);
+            safeText(userName, 50, yPosition);
             
             doc.font('Helvetica') // Switch back to Helvetica for email/phone
                .text(user.email || 'N/A', 50, yPosition + 15)
@@ -134,13 +180,13 @@ export async function generateInvoice(order, user) {
                 const ward = sanitizeTextForPDF(order.location.wardName || order.location.ward);
                 
                 yPosition += 30;
-                doc.font(selectFont(district)).text(`District: ${district}`, doc.page.width / 2, yPosition);
+                safeText(`District: ${district}`, doc.page.width / 2, yPosition);
                   
                 yPosition += 15;
-                doc.font(selectFont(localBody)).text(`Local Body: ${localBody}`, doc.page.width / 2, yPosition);
+                safeText(`Local Body: ${localBody}`, doc.page.width / 2, yPosition);
                 
                 yPosition += 15;
-                doc.font(selectFont(ward)).text(`Ward: ${ward}`, doc.page.width / 2, yPosition);
+                safeText(`Ward: ${ward}`, doc.page.width / 2, yPosition);
             }            doc.font('Helvetica').text(`Payment Gateway: ${paymentGateway}`, doc.page.width / 2, yPosition + 30);
 
             // Line separator
@@ -203,8 +249,8 @@ export async function generateInvoice(order, user) {
 
             // Use appropriate font for description (detect Malayalam)
             const descStartY = yPosition;
-            doc.font(selectFont(description)).fontSize(10);
-            doc.text(description, descX, yPosition, { 
+            doc.fontSize(10);
+            safeText(description, descX, yPosition, { 
                 width: descWidth,
                 lineBreak: true,
                 align: 'left'

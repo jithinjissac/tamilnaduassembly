@@ -1,4 +1,5 @@
 import express from 'express';
+import os from 'os';
 import { browserPool } from '../utils/browserPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { getAllQueueStats } from '../utils/requestQueue.js';
@@ -14,10 +15,60 @@ const router = express.Router();
  */
 router.get('/stats', (req, res) => {
   try {
+    const browserStats = browserPool.getStats();
+    const sessionStats = sessionManager.getStats();
+    const queueStats = getAllQueueStats();
+    
+    // Memory usage
+    const memUsage = process.memoryUsage();
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    
     const stats = {
-      browserPool: browserPool.getStats(),
-      sessions: sessionManager.getStats(),
-      queues: getAllQueueStats(),
+      browserPool: {
+        ...browserStats,
+        maxBrowsers: browserPool.maxBrowsers,
+        utilizationPercent: Math.round((browserStats.totalContexts / (browserStats.totalBrowsers * 4)) * 100) // Assuming 4 contexts per browser is good utilization
+      },
+      sessions: {
+        ...sessionStats,
+        capacity: 'unlimited',
+        oldestAge: sessionStats.active > 0 ? sessionManager.getOldestSessionAge() : null
+      },
+      queues: {
+        ...queueStats,
+        totalRunning: queueStats.captcha.running + queueStats.pdf.running + queueStats.slip.running,
+        totalQueued: queueStats.captcha.queued + queueStats.pdf.queued + queueStats.slip.queued
+      },
+      memory: {
+        process: {
+          rss: Math.round(memUsage.rss / 1024 / 1024), // MB
+          heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024), // MB
+          heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024), // MB
+          external: Math.round(memUsage.external / 1024 / 1024), // MB
+          arrayBuffers: Math.round(memUsage.arrayBuffers / 1024 / 1024) // MB
+        },
+        system: {
+          total: Math.round(totalMem / 1024 / 1024 / 1024 * 10) / 10, // GB
+          used: Math.round(usedMem / 1024 / 1024 / 1024 * 10) / 10, // GB
+          free: Math.round(freeMem / 1024 / 1024 / 1024 * 10) / 10, // GB
+          percentUsed: Math.round((usedMem / totalMem) * 100)
+        }
+      },
+      cpu: {
+        cores: os.cpus().length,
+        model: os.cpus()[0]?.model || 'Unknown',
+        loadAverage: os.loadavg().map(load => Math.round(load * 100) / 100),
+        uptime: Math.floor(os.uptime() / 60) // minutes
+      },
+      process: {
+        pid: process.pid,
+        uptime: Math.floor(process.uptime() / 60), // minutes
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: process.arch
+      },
       timestamp: new Date().toISOString()
     };
 
