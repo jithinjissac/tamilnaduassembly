@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
  * - Closes idle browsers after 5 minutes of inactivity to save memory
  */
 class BrowserPool {
-  constructor(maxBrowsers = 20, idleTimeout = 5 * 60 * 1000) {
+  constructor(maxBrowsers = 50, idleTimeout = 5 * 60 * 1000) {
     this.maxBrowsers = maxBrowsers;
     this.idleTimeout = idleTimeout; // 5 minutes default
     this.browsers = [];
@@ -107,9 +107,17 @@ class BrowserPool {
       }
     }
 
-    // If all browsers are heavily loaded and we can add more, do so
-    if (minContexts > 3 && this.browsers.length < this.maxBrowsers) {
+    // Better load balancing: Create new browser if existing ones are getting full
+    // Max 4 contexts per browser, but allow up to 20 browsers
+    const shouldCreateNewBrowser = (
+      this.browsers.length < this.maxBrowsers && // Not at max limit
+      minContexts >= 4 // Least loaded browser already has 4+ contexts
+    );
+    
+    if (shouldCreateNewBrowser) {
+      console.log(`⚖️ Load balancing: All browsers have ${minContexts}+ contexts, launching new browser #${this.browsers.length} (total: ${this.browsers.length + 1}/${this.maxBrowsers})`);
       selectedBrowser = await this.ensureBrowser();
+      minContexts = 0; // New browser has 0 contexts
     }
 
     // If still no browser (shouldn't happen), create one
@@ -332,7 +340,9 @@ class BrowserPool {
 }
 
 // Singleton instance
-export const browserPool = new BrowserPool(20);
+// Optimized for 32 vCPU / 32 GB RAM server
+// Each browser uses ~400-500 MB RAM, 50 browsers = ~25 GB max
+export const browserPool = new BrowserPool(50);
 
 // Graceful shutdown
 process.on('SIGTERM', () => browserPool.shutdown());

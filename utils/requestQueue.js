@@ -124,9 +124,10 @@ class RequestQueue {
 }
 
 // Create queue instances for different operations
-export const captchaQueue = new RequestQueue('Captcha', 40);
-export const pdfQueue = new RequestQueue('PDF', 20);
-export const slipQueue = new RequestQueue('Slip', 30);
+// Optimized for 32 vCPU / 32 GB RAM server
+export const captchaQueue = new RequestQueue('Captcha', 100);
+export const pdfQueue = new RequestQueue('PDF', 50);
+export const slipQueue = new RequestQueue('Slip', 80);
 
 // Export stats endpoint helper
 export function getAllQueueStats() {
