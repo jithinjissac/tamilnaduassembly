@@ -2903,6 +2903,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
 നിങ്ങളുടെ ഓർഡർ {orderId} പൂർത്തിയാക്കാൻ ബാക്കിയുണ്ട്.
 
 📊 വിവരങ്ങൾ:
+▫️ ചിഹ്നം: {symbol}
 ▫️ വോട്ടർമാർ: {voters}
 ▫️ തുക: ₹{amount}
 ▫️ സ്ഥലം: {location}
@@ -2926,9 +2927,14 @@ Login to https://easyslip.in to download your PDF.</textarea>
         function generateWhatsAppMessage(order) {
             const template = getWhatsAppTemplate();
             
+            const symbolName = order.customization?.symbolFree 
+                ? 'ചിഹ്നം രഹിതം (Symbol Free)' 
+                : (order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-');
+            
             return template
                 .replace(/{name}/g, order.userId?.name || 'Customer')
                 .replace(/{orderId}/g, order.orderId)
+                .replace(/{symbol}/g, symbolName)
                 .replace(/{voters}/g, order.voterCount || order.totalVoters || 0)
                 .replace(/{amount}/g, (order.amount || 0).toFixed(2))
                 .replace(/{location}/g, `${order.location?.wardName || order.location?.ward || ''}, ${order.location?.localBodyName || order.location?.localBody || ''}`)
@@ -2959,6 +2965,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                 <div style="color: #1b5e20; font-size: 0.9rem; line-height: 1.6;">
                                     <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{name}</code> - Customer name</div>
                                     <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{orderId}</code> - Order ID</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{symbol}</code> - Symbol name (Malayalam/English)</div>
                                     <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{voters}</code> - Number of voters</div>
                                     <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{amount}</code> - Order amount</div>
                                     <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{location}</code> - Ward and Local Body</div>
@@ -2972,7 +2979,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             <textarea id="whatsappTemplateTextarea" style="width: 100%; min-height: 300px; padding: 1rem; border: 2px solid #ddd; border-radius: 8px; font-family: 'Noto Sans Malayalam', Arial, sans-serif; font-size: 0.95rem; line-height: 1.6; resize: vertical;" placeholder="Enter your WhatsApp message template...">${template}</textarea>
                             
                             <div style="margin-top: 1rem; color: #666; font-size: 0.85rem;">
-                                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i> <strong>Tip:</strong> Use variables like {name}, {orderId}, etc. They will be replaced with actual values.
+                                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i> <strong>Tip:</strong> Use variables like {name}, {orderId}, {symbol}, etc. They will be replaced with actual values.
                             </div>
                             
                             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
