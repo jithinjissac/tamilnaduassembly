@@ -1291,7 +1291,7 @@ export const downloadSlip = async (req, res) => {
 
         // ✅ DOUBLE-CHECK: Verify permanent PDF doesn't exist on disk before generating
         // (getPDFFilePath might return null if pdfJobs cache was cleared but file still exists)
-        const permanentPdfDir = path.join(process.cwd(), 'public', 'permanent-pdfs');
+        const permanentPdfDir = path.join(__dirname, '..', 'public', 'permanent-pdfs');
         const permanentPdfPath = path.join(permanentPdfDir, `${orderId}.pdf`);
         
         if (fs.existsSync(permanentPdfPath)) {
@@ -1648,54 +1648,62 @@ export const getPDFStatus = async (req, res) => {
         console.log(`[PDF STATUS] Job status:`, jobStatus);
 
         // Check if permanent PDF exists on disk
-        const permanentPdfPath = path.join(process.cwd(), 'public', 'permanent-pdfs', `${orderId}.pdf`);
+        const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${orderId}.pdf`);
         const pdfExists = fs.existsSync(permanentPdfPath);
-        console.log(`[PDF STATUS] PDF exists on disk: ${pdfExists}`);
+        console.log(`[PDF STATUS] PDF exists on disk: ${pdfExists}, path: ${permanentPdfPath}`);
 
         if (pdfExists) {
             // PDF is ready for download
-            return res.json({
+            const response = {
                 status: 'ready',
                 message: 'PDF is ready for download',
                 isPaid: true,
                 pdfReady: true,
                 progress: 100,
                 downloadCount: order.downloadCount || 0
-            });
+            };
+            console.log(`[PDF STATUS] ✅ Returning pdfReady=true for ${orderId}:`, response);
+            return res.json(response);
         }
 
         // Check job status
         if (jobStatus.status === 'generating') {
-            return res.json({
+            const response = {
                 status: 'generating',
                 message: 'PDF is being generated in background',
                 isPaid: true,
                 pdfReady: false,
                 progress: jobStatus.progress || 50,
                 estimatedTime: '20-50 seconds'
-            });
+            };
+            console.log(`[PDF STATUS] ⏳ Returning status='generating' for ${orderId}:`, response);
+            return res.json(response);
         }
 
         if (jobStatus.status === 'failed') {
-            return res.json({
+            const response = {
                 status: 'failed',
                 message: 'PDF generation failed, will generate on download',
                 isPaid: true,
                 pdfReady: false,
                 progress: 0,
                 error: jobStatus.error
-            });
+            };
+            console.log(`[PDF STATUS] ❌ Returning status='failed' for ${orderId}:`, response);
+            return res.json(response);
         }
 
         // No job status and no PDF = not started yet or still in queue
-        return res.json({
+        const response = {
             status: 'pending',
             message: 'PDF generation will start shortly',
             isPaid: true,
             pdfReady: false,
             progress: 10,
             estimatedTime: '20-50 seconds'
-        });
+        };
+        console.log(`[PDF STATUS] ⏸️ Returning status='pending' for ${orderId}:`, response);
+        return res.json(response);
 
     } catch (error) {
         console.error('❌ Get PDF status error:', error);

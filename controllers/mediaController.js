@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // Get PDF storage directories
 const getPDFDirectory = () => {
-    return path.join(process.cwd(), 'public', 'permanent-pdfs');
+    return path.join(__dirname, '..', 'public', 'permanent-pdfs');
 };
 
 const getTempPDFDirectory = () => {

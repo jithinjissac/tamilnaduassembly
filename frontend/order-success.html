@@ -947,10 +947,13 @@ s0.parentNode.insertBefore(s1,s0);
         }
 
         let statusCheckInterval = null;
+        let statusCheckCount = 0;
+        const MAX_STATUS_CHECKS = 5; // 5 checks * 2 seconds = 10 seconds
 
         async function checkPDFStatus() {
             try {
                 console.log('[PDF STATUS] Checking PDF generation status...');
+                statusCheckCount++;
                 
                 const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
                     headers: {
@@ -984,6 +987,21 @@ s0.parentNode.insertBefore(s1,s0);
                         statusCheckInterval = null;
                     }
                 } else if (status.status === 'generating' || status.status === 'pending') {
+                    // Check if we've been waiting too long
+                    if (statusCheckCount >= MAX_STATUS_CHECKS) {
+                        console.log('[PDF STATUS] Timeout reached, enabling on-demand generation');
+                        generatingStatus.classList.remove('show');
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF (Generate Now)';
+                        
+                        // Stop checking
+                        if (statusCheckInterval) {
+                            clearInterval(statusCheckInterval);
+                            statusCheckInterval = null;
+                        }
+                        return;
+                    }
+                    
                     // PDF is being generated - show progress
                     console.log('[PDF STATUS] PDF is being generated...', status.progress);
                     generatingStatus.classList.add('show');
