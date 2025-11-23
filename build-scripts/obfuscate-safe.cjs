@@ -22,11 +22,47 @@ const safeObfuscatorOptions = {
     transformObjectKeys: false, // Disabled to prevent object issues
     unicodeEscapeSequence: false,
     target: 'browser',
+    // Disable property mangling to prevent breaking DOM API access
+    identifierNamesCache: {},
+    seed: 0,
     reservedNames: [
         // Preserve important globals that shouldn't be renamed
         'window', 'document', 'console', 'localStorage', 'sessionStorage',
         'fetch', 'XMLHttpRequest', 'Promise', 'Array', 'Object', 'JSON',
-        'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'
+        'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval',
+        // DOM methods and properties
+        'getElementById', 'querySelector', 'querySelectorAll',
+        'getElementsByClassName', 'getElementsByTagName',
+        'createElement', 'appendChild', 'removeChild', 'addEventListener',
+        'removeEventListener', 'innerHTML', 'textContent', 'value',
+        'classList', 'className', 'style', 'dataset', 'getAttribute',
+        'setAttribute', 'removeAttribute', 'hasAttribute',
+        'parentNode', 'childNodes', 'firstChild', 'lastChild',
+        'nextSibling', 'previousSibling', 'closest', 'matches',
+        // Form and input methods
+        'submit', 'reset', 'focus', 'blur', 'click', 'select',
+        'checkValidity', 'reportValidity', 'setCustomValidity',
+        // Common event handlers
+        'onclick', 'onsubmit', 'onchange', 'oninput', 'onload',
+        'onunload', 'onbeforeunload', 'onkeydown', 'onkeyup',
+        // Fetch and HTTP
+        'then', 'catch', 'finally', 'json', 'text', 'blob',
+        'headers', 'status', 'statusText', 'ok', 'body',
+        // Storage
+        'getItem', 'setItem', 'removeItem', 'clear', 'key',
+        // Array methods
+        'map', 'filter', 'reduce', 'forEach', 'find', 'findIndex',
+        'some', 'every', 'includes', 'indexOf', 'slice', 'splice',
+        'push', 'pop', 'shift', 'unshift', 'sort', 'reverse',
+        // Object methods
+        'keys', 'values', 'entries', 'assign', 'freeze', 'seal',
+        'hasOwnProperty', 'toString', 'valueOf',
+        // String methods
+        'substring', 'substr', 'trim', 'toLowerCase', 'toUpperCase',
+        'replace', 'split', 'join', 'match', 'search',
+        // Common globals
+        'Math', 'Date', 'Number', 'String', 'Boolean', 'RegExp',
+        'Error', 'TypeError', 'ReferenceError', 'SyntaxError'
     ]
 };
 

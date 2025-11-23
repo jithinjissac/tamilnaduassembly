@@ -242,6 +242,7 @@
 
         <div class="tabs">
             <div class="tab active" data-category="pdf">PDF Generation</div>
+            <div class="tab" data-category="slip">Slip Design</div>
             <div class="tab" data-category="email">Email & Notifications</div>
             <div class="tab" data-category="security">Security & Rate Limiting</div>
             <div class="tab" data-category="analytics">Analytics & Monitoring</div>
@@ -317,6 +318,246 @@
             <div class="actions">
                 <button class="btn btn-primary" onclick="saveSettings('pdf')">Save PDF Settings</button>
                 <button class="btn btn-secondary" onclick="resetSettings('pdf')">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Slip Design Panel -->
+        <div class="settings-panel" id="slip-panel">
+            <div class="setting-group">
+                <h3>5 Slips Per Page (With Symbol)</h3>
+                <div class="setting-item">
+                    <label>Symbol Header Font Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolHeader" placeholder="8pt">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Image Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolImage" placeholder="24mm">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Name Font Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolName" placeholder="9.5pt">
+                </div>
+                <div class="setting-item">
+                    <label>Slip Number Font Size</label>
+                    <input type="text" id="slip-fiveSlips-slipNumber" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-fiveSlips-secId" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-fiveSlips-voterName" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-fiveSlips-infoRow" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-fiveSlips-infoLabel" placeholder="17mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-fiveSlips-pollingStation" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-wardMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-headerMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-voterNameMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-infoRowMarginBottom" placeholder="0.8mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>6 Slips Per Page (With Symbol)</h3>
+                <div class="setting-item">
+                    <label>Symbol Header Font Size</label>
+                    <input type="text" id="slip-sixSlips-symbolHeader" placeholder="7pt">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Image Size</label>
+                    <input type="text" id="slip-sixSlips-symbolImage" placeholder="20mm">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Name Font Size</label>
+                    <input type="text" id="slip-sixSlips-symbolName" placeholder="8.5pt">
+                </div>
+                <div class="setting-item">
+                    <label>Slip Number Font Size</label>
+                    <input type="text" id="slip-sixSlips-slipNumber" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-sixSlips-secId" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-sixSlips-voterName" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-sixSlips-infoRow" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-sixSlips-infoLabel" placeholder="16mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-sixSlips-pollingStation" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-wardMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-headerMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-voterNameMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-infoRowMarginBottom" placeholder="0.6mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>5 Slips Per Page (Symbol-Free)</h3>
+                <div class="setting-item">
+                    <label>Serial Number Label Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-slipNumberLabel" placeholder="12pt">
+                </div>
+                <div class="setting-item">
+                    <label>Serial Number Value Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-slipNumberValue" placeholder="20pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-secId" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-voterName" placeholder="13pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoRow" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoLabel" placeholder="18mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-pollingStation" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Info Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardInfo" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardMarginBottom" placeholder="0mm">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Padding</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardPadding" placeholder="0mm 0 0.2mm 0">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-headerMarginBottom" placeholder="0.5mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Top</label>
+                    <input type="text" id="slip-fiveSlipsFree-headerMarginTop" placeholder="0.5mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-voterNameMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoRowMarginBottom" placeholder="0.6mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>6 Slips Per Page (Symbol-Free)</h3>
+                <div class="setting-item">
+                    <label>Serial Number Label Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-slipNumberLabel" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Serial Number Value Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-slipNumberValue" placeholder="18pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-secId" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-voterName" placeholder="12pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-infoRow" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-sixSlipsFree-infoLabel" placeholder="16mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-pollingStation" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Info Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-wardInfo" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-wardMarginBottom" placeholder="0mm">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Padding</label>
+                    <input type="text" id="slip-sixSlipsFree-wardPadding" placeholder="0mm 0 0.2mm 0">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-headerMarginBottom" placeholder="0.4mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Top</label>
+                    <input type="text" id="slip-sixSlipsFree-headerMarginTop" placeholder="0.4mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-voterNameMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-infoRowMarginBottom" placeholder="0.5mm">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('slip')">Save Slip Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('slip')">Reset to Defaults</button>
             </div>
         </div>
 

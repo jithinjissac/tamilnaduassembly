@@ -1175,10 +1175,10 @@
                             <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
                                 <div style="margin-bottom: 1rem;">
                                     <span style="font-weight: 600; color: #667eea; font-size: 0.9rem;">
-                                        <i class="fas fa-eye"></i> Live Preview (Single Slip - Actual Size)
+                                        <i class="fas fa-eye"></i> Live Preview (Exact PDF Size: 210mm × 56.4mm)
                                     </span>
                                 </div>
-                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd;">
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd; overflow: hidden;">
                                     <div id="fiveSlipsPreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
                                         <!-- Preview will be generated here -->
                                     </div>
@@ -1222,6 +1222,37 @@
                                     <label style="font-weight: 500;">Polling Station:</label>
                                     <input type="text" name="fiveSlips.pollingStation" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
                                 </div>
+                                
+                                <!-- Margin Controls -->
+                                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed #ddd;">
+                                    <h4 style="color: #667eea; margin-bottom: 1rem;"><i class="fas fa-arrows-alt-v"></i> Margin Controls</h4>
+                                    <div style="display: grid; gap: 1rem;">
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Margin Bottom:</label>
+                                            <input type="text" name="fiveSlips.wardMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Padding:</label>
+                                            <input type="text" name="fiveSlips.wardPadding" value="0mm 0mm 0mm 0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Bottom:</label>
+                                            <input type="text" name="fiveSlips.headerMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Top:</label>
+                                            <input type="text" name="fiveSlips.headerMarginTop" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Voter Name Margin Bottom:</label>
+                                            <input type="text" name="fiveSlips.voterNameMarginBottom" value="0.5mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Info Row Margin Bottom:</label>
+                                            <input type="text" name="fiveSlips.infoRowMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1235,10 +1266,10 @@
                             <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
                                 <div style="margin-bottom: 1rem;">
                                     <span style="font-weight: 600; color: #667eea; font-size: 0.9rem;">
-                                        <i class="fas fa-eye"></i> Live Preview (Single Slip - Actual Size)
+                                        <i class="fas fa-eye"></i> Live Preview (Exact PDF Size: 210mm × 47mm)
                                     </span>
                                 </div>
-                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd;">
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd; overflow: hidden;">
                                     <div id="sixSlipsPreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
                                         <!-- Preview will be generated here -->
                                     </div>
@@ -1281,6 +1312,227 @@
                                 <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
                                     <label style="font-weight: 500;">Polling Station:</label>
                                     <input type="text" name="sixSlips.pollingStation" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                
+                                <!-- Margin Controls -->
+                                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed #ddd;">
+                                    <h4 style="color: #667eea; margin-bottom: 1rem;"><i class="fas fa-arrows-alt-v"></i> Margin Controls</h4>
+                                    <div style="display: grid; gap: 1rem;">
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Margin Bottom:</label>
+                                            <input type="text" name="sixSlips.wardMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Padding:</label>
+                                            <input type="text" name="sixSlips.wardPadding" value="0mm 0mm 0mm 0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Bottom:</label>
+                                            <input type="text" name="sixSlips.headerMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Top:</label>
+                                            <input type="text" name="sixSlips.headerMarginTop" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Voter Name Margin Bottom:</label>
+                                            <input type="text" name="sixSlips.voterNameMarginBottom" value="0.5mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Info Row Margin Bottom:</label>
+                                            <input type="text" name="sixSlips.infoRowMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5 Slips Per Page Settings (Symbol-Free) -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-file"></i> 5 Slips Per Page (Symbol-Free)
+                            </h3>
+                            
+                            <!-- A4 Preview for 5 Slips Free -->
+                            <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600; color: #10b981; font-size: 0.9rem;">
+                                        <i class="fas fa-eye"></i> Live Preview (Exact PDF Size: 210mm × 56.4mm)
+                                    </span>
+                                </div>
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd; overflow: hidden;">
+                                    <div id="fiveSlipsFreePreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
+                                        <!-- Preview will be generated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Header:</label>
+                                    <input type="text" name="fiveSlipsFree.symbolHeader" value="8pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Image:</label>
+                                    <input type="text" name="fiveSlipsFree.symbolImage" value="24mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Name:</label>
+                                    <input type="text" name="fiveSlipsFree.symbolName" value="9.5pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Serial Number:</label>
+                                    <input type="text" name="fiveSlipsFree.slipNumber" value="20pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">SEC ID:</label>
+                                    <input type="text" name="fiveSlipsFree.secId" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Voter Name:</label>
+                                    <input type="text" name="fiveSlipsFree.voterName" value="11pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Row:</label>
+                                    <input type="text" name="fiveSlipsFree.infoRow" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Label:</label>
+                                    <input type="text" name="fiveSlipsFree.infoLabel" value="17mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Polling Station:</label>
+                                    <input type="text" name="fiveSlipsFree.pollingStation" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Ward Info:</label>
+                                    <input type="text" name="fiveSlipsFree.wardInfo" value="10pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                
+                                <!-- Margin Controls -->
+                                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed #ddd;">
+                                    <h4 style="color: #10b981; margin-bottom: 1rem;"><i class="fas fa-arrows-alt-v"></i> Margin Controls</h4>
+                                    <div style="display: grid; gap: 1rem;">
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Margin Bottom:</label>
+                                            <input type="text" name="fiveSlipsFree.wardMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Padding:</label>
+                                            <input type="text" name="fiveSlipsFree.wardPadding" value="0mm 0mm 0mm 0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Bottom:</label>
+                                            <input type="text" name="fiveSlipsFree.headerMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Top:</label>
+                                            <input type="text" name="fiveSlipsFree.headerMarginTop" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Voter Name Margin Bottom:</label>
+                                            <input type="text" name="fiveSlipsFree.voterNameMarginBottom" value="0.5mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Info Row Margin Bottom:</label>
+                                            <input type="text" name="fiveSlipsFree.infoRowMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6 Slips Per Page Settings (Symbol-Free) -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <i class="fas fa-file"></i> 6 Slips Per Page (Symbol-Free)
+                            </h3>
+                            
+                            <!-- A4 Preview for 6 Slips Free -->
+                            <div style="margin-bottom: 2rem; text-align: center; background: #f8f9fa; padding: 2rem; border-radius: 8px;">
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="font-weight: 600; color: #10b981; font-size: 0.9rem;">
+                                        <i class="fas fa-eye"></i> Live Preview (Exact PDF Size: 210mm × 47mm)
+                                    </span>
+                                </div>
+                                <div style="display: inline-block; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #ddd; overflow: hidden;">
+                                    <div id="sixSlipsFreePreview" style="font-family: 'Noto Sans Malayalam', sans-serif;">
+                                        <!-- Preview will be generated here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Header:</label>
+                                    <input type="text" name="sixSlipsFree.symbolHeader" value="7pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Image:</label>
+                                    <input type="text" name="sixSlipsFree.symbolImage" value="20mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Symbol Name:</label>
+                                    <input type="text" name="sixSlipsFree.symbolName" value="8.5pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Serial Number:</label>
+                                    <input type="text" name="sixSlipsFree.slipNumber" value="18pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">SEC ID:</label>
+                                    <input type="text" name="sixSlipsFree.secId" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Voter Name:</label>
+                                    <input type="text" name="sixSlipsFree.voterName" value="11pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Row:</label>
+                                    <input type="text" name="sixSlipsFree.infoRow" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Info Label:</label>
+                                    <input type="text" name="sixSlipsFree.infoLabel" value="16mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Polling Station:</label>
+                                    <input type="text" name="sixSlipsFree.pollingStation" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                    <label style="font-weight: 500;">Ward Info:</label>
+                                    <input type="text" name="sixSlipsFree.wardInfo" value="9pt" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                </div>
+                                
+                                <!-- Margin Controls -->
+                                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed #ddd;">
+                                    <h4 style="color: #10b981; margin-bottom: 1rem;"><i class="fas fa-arrows-alt-v"></i> Margin Controls</h4>
+                                    <div style="display: grid; gap: 1rem;">
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Margin Bottom:</label>
+                                            <input type="text" name="sixSlipsFree.wardMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Ward Padding:</label>
+                                            <input type="text" name="sixSlipsFree.wardPadding" value="0mm 0mm 0mm 0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Bottom:</label>
+                                            <input type="text" name="sixSlipsFree.headerMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Header Margin Top:</label>
+                                            <input type="text" name="sixSlipsFree.headerMarginTop" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Voter Name Margin Bottom:</label>
+                                            <input type="text" name="sixSlipsFree.voterNameMarginBottom" value="0.5mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 1rem; align-items: center;">
+                                            <label style="font-weight: 500;">Info Row Margin Bottom:</label>
+                                            <input type="text" name="sixSlipsFree.infoRowMarginBottom" value="0mm" class="slip-input" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3846,7 +4098,13 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 voterName: formData.get('fiveSlips.voterName'),
                 infoRow: formData.get('fiveSlips.infoRow'),
                 infoLabel: formData.get('fiveSlips.infoLabel'),
-                pollingStation: formData.get('fiveSlips.pollingStation')
+                pollingStation: formData.get('fiveSlips.pollingStation'),
+                wardMarginBottom: formData.get('fiveSlips.wardMarginBottom') || '0mm',
+                wardPadding: formData.get('fiveSlips.wardPadding') || '0mm 0mm 0mm 0mm',
+                headerMarginBottom: formData.get('fiveSlips.headerMarginBottom') || '0mm',
+                headerMarginTop: formData.get('fiveSlips.headerMarginTop') || '0mm',
+                voterNameMarginBottom: formData.get('fiveSlips.voterNameMarginBottom') || '0.5mm',
+                infoRowMarginBottom: formData.get('fiveSlips.infoRowMarginBottom') || '0mm'
             };
 
             // Get settings for 6 slips
@@ -3859,7 +4117,53 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 voterName: formData.get('sixSlips.voterName'),
                 infoRow: formData.get('sixSlips.infoRow'),
                 infoLabel: formData.get('sixSlips.infoLabel'),
-                pollingStation: formData.get('sixSlips.pollingStation')
+                pollingStation: formData.get('sixSlips.pollingStation'),
+                wardMarginBottom: formData.get('sixSlips.wardMarginBottom') || '0mm',
+                wardPadding: formData.get('sixSlips.wardPadding') || '0mm 0mm 0mm 0mm',
+                headerMarginBottom: formData.get('sixSlips.headerMarginBottom') || '0mm',
+                headerMarginTop: formData.get('sixSlips.headerMarginTop') || '0mm',
+                voterNameMarginBottom: formData.get('sixSlips.voterNameMarginBottom') || '0.5mm',
+                infoRowMarginBottom: formData.get('sixSlips.infoRowMarginBottom') || '0mm'
+            };
+
+            // Get settings for 5 slips free
+            const fiveSlipsFreeSettings = {
+                symbolHeader: formData.get('fiveSlipsFree.symbolHeader'),
+                symbolImage: formData.get('fiveSlipsFree.symbolImage'),
+                symbolName: formData.get('fiveSlipsFree.symbolName'),
+                slipNumber: formData.get('fiveSlipsFree.slipNumber'),
+                secId: formData.get('fiveSlipsFree.secId'),
+                voterName: formData.get('fiveSlipsFree.voterName'),
+                infoRow: formData.get('fiveSlipsFree.infoRow'),
+                infoLabel: formData.get('fiveSlipsFree.infoLabel'),
+                pollingStation: formData.get('fiveSlipsFree.pollingStation'),
+                wardInfo: formData.get('fiveSlipsFree.wardInfo'),
+                wardMarginBottom: formData.get('fiveSlipsFree.wardMarginBottom') || '0mm',
+                wardPadding: formData.get('fiveSlipsFree.wardPadding') || '0mm 0mm 0mm 0mm',
+                headerMarginBottom: formData.get('fiveSlipsFree.headerMarginBottom') || '0mm',
+                headerMarginTop: formData.get('fiveSlipsFree.headerMarginTop') || '0mm',
+                voterNameMarginBottom: formData.get('fiveSlipsFree.voterNameMarginBottom') || '0.5mm',
+                infoRowMarginBottom: formData.get('fiveSlipsFree.infoRowMarginBottom') || '0mm'
+            };
+
+            // Get settings for 6 slips free
+            const sixSlipsFreeSettings = {
+                symbolHeader: formData.get('sixSlipsFree.symbolHeader'),
+                symbolImage: formData.get('sixSlipsFree.symbolImage'),
+                symbolName: formData.get('sixSlipsFree.symbolName'),
+                slipNumber: formData.get('sixSlipsFree.slipNumber'),
+                secId: formData.get('sixSlipsFree.secId'),
+                voterName: formData.get('sixSlipsFree.voterName'),
+                infoRow: formData.get('sixSlipsFree.infoRow'),
+                infoLabel: formData.get('sixSlipsFree.infoLabel'),
+                pollingStation: formData.get('sixSlipsFree.pollingStation'),
+                wardInfo: formData.get('sixSlipsFree.wardInfo'),
+                wardMarginBottom: formData.get('sixSlipsFree.wardMarginBottom') || '0mm',
+                wardPadding: formData.get('sixSlipsFree.wardPadding') || '0mm 0mm 0mm 0mm',
+                headerMarginBottom: formData.get('sixSlipsFree.headerMarginBottom') || '0mm',
+                headerMarginTop: formData.get('sixSlipsFree.headerMarginTop') || '0mm',
+                voterNameMarginBottom: formData.get('sixSlipsFree.voterNameMarginBottom') || '0.5mm',
+                infoRowMarginBottom: formData.get('sixSlipsFree.infoRowMarginBottom') || '0mm'
             };
 
             // Generate 5 slips per page preview
@@ -3867,41 +4171,45 @@ Login to https://easyslip.in to download your PDF.</textarea>
             
             // Generate 6 slips per page preview
             generateSixSlipsPreview(sixSlipsSettings);
+            
+            // Generate symbol-free previews
+            generateFiveSlipsFreePreview(fiveSlipsFreeSettings);
+            generateSixSlipsFreePreview(sixSlipsFreeSettings);
         }
 
         function generateFiveSlipsPreview(settings) {
             const container = document.getElementById('fiveSlipsPreview');
             if (!container) return;
 
-            // Generate single slip exactly as PDF
+            // 5 slips = 52mm height (matches PDF slipHeight)
             const html = `
-                <div style="width: 210mm; height: 56.4mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
-                    <div style="width: 38mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center;">
-                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 1mm;">നമ്മുടെ ചിഹ്നം</div>
-                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 1mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #999;">🏵️</div>
-                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">കമലം</div>
+                <div style="width: 210mm; height: 52mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box; position: relative;">
+                    <div style="width: 38mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0;">
+                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1;">നമ്മുടെ ചിഹ്നം</div>
+                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #999;">🏵️</div>
+                        <div style="font-size: ${settings.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm;">കമലം</div>
                     </div>
-                    <div style="flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="font-size: ${settings.slipNumber}; font-weight: bold; margin-bottom: 1mm; padding: 1mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; gap: 1mm;">
-                            <div style="font-weight: bold; font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
-                            <div style="font-weight: bold; font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                    <div style="flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0;">
+                        <div style="font-size: 10pt; font-weight: bold; margin-bottom: ${settings.wardMarginBottom || '1mm'}; padding: ${settings.wardPadding || '0mm 0mm 0mm 0mm'}; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${settings.headerMarginBottom || '1mm'}; margin-top: ${settings.headerMarginTop || '0mm'}; font-size: 10pt; gap: 1mm; overflow: hidden;">
+                            <div style="font-weight: bold; font-size: ${settings.slipNumber}; white-space: nowrap;">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
+                            <div style="font-weight: bold; font-size: ${settings.secId}; white-space: nowrap;">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
                         </div>
-                        <div style="flex: 1;">
-                            <div style="margin-bottom: 0.8mm; font-size: ${settings.voterName}; display: flex; font-weight: bold;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">പേര്:</span>
-                                <span style="flex: 1;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                        <div style="flex: 1; overflow: hidden; min-height: 0;">
+                            <div style="margin-bottom: ${settings.voterNameMarginBottom || '1mm'}; font-size: ${settings.voterName}; font-weight: bold; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">പേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
                             </div>
-                            <div style="margin-bottom: 0.8mm; font-size: ${settings.infoRow}; display: flex;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">വീട്ടുപേര്:</span>
-                                <span style="flex: 1;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.8mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">വീട്ടുപേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
                             </div>
-                            <div style="margin-bottom: 0.8mm; font-size: ${settings.infoRow}; display: flex;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">രക്ഷിതാവ്:</span>
-                                <span style="flex: 1;">${sampleVoter.guardian_name}</span>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.8mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.guardian_name}</span>
                             </div>
                         </div>
-                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; font-weight: 600;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
                     </div>
                 </div>
             `;
@@ -3912,35 +4220,113 @@ Login to https://easyslip.in to download your PDF.</textarea>
             const container = document.getElementById('sixSlipsPreview');
             if (!container) return;
 
-            // Generate single slip exactly as PDF
+            // 6 slips = 42mm height (matches PDF slipHeight)
             const html = `
-                <div style="width: 210mm; height: 47mm; border: 2px solid #000; display: flex; padding: 1.8mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
-                    <div style="width: 35mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.2mm; margin-right: 2mm; text-align: center;">
-                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm;">നമ്മുടെ ചിഹ്നം</div>
-                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 9pt; color: #999;">🏵️</div>
-                        <div style="font-size: ${settings.symbolName}; font-weight: bold;">കമലം</div>
+                <div style="width: 210mm; height: 42mm; border: 2px solid #000; display: flex; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box; position: relative;">
+                    <div style="width: 38mm; border-right: 2px dotted #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0;">
+                        <div style="font-size: ${settings.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1;">നമ്മുടെ ചിഹ്നം</div>
+                        <div style="width: ${settings.symbolImage}; height: ${settings.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 9pt; color: #999;">🏵️</div>
+                        <div style="font-size: ${settings.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm;">കമലം</div>
                     </div>
-                    <div style="flex: 1; padding: 1.2mm 2mm; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="font-size: ${settings.slipNumber}; font-weight: bold; margin-bottom: 0.8mm; padding: 0.8mm 0; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8mm; gap: 0.8mm;">
-                            <div style="font-weight: bold; font-size: ${settings.slipNumber};">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
-                            <div style="font-weight: bold; font-size: ${settings.secId};">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                    <div style="flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0;">
+                        <div style="font-size: 10pt; font-weight: bold; margin-bottom: ${settings.wardMarginBottom || '0.8mm'}; padding: ${settings.wardPadding || '0mm 0mm 0mm 0mm'}; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${settings.headerMarginBottom || '0.8mm'}; margin-top: ${settings.headerMarginTop || '0mm'}; font-size: 10pt; gap: 1mm; overflow: hidden;">
+                            <div style="font-weight: bold; font-size: ${settings.slipNumber}; white-space: nowrap;">ക്രമ നമ്പർ: ${sampleVoter.sl_no}</div>
+                            <div style="font-weight: bold; font-size: ${settings.secId}; white-space: nowrap;">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
                         </div>
-                        <div style="flex: 1;">
-                            <div style="margin-bottom: 0.6mm; font-size: ${settings.voterName}; display: flex; font-weight: bold;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">പേര്:</span>
-                                <span style="flex: 1;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                        <div style="flex: 1; overflow: hidden; min-height: 0;">
+                            <div style="margin-bottom: ${settings.voterNameMarginBottom || '0.8mm'}; font-size: ${settings.voterName}; font-weight: bold; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">പേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
                             </div>
-                            <div style="margin-bottom: 0.6mm; font-size: ${settings.infoRow}; display: flex;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">വീട്ടുപേര്:</span>
-                                <span style="flex: 1;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.6mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">വീട്ടുപേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
                             </div>
-                            <div style="margin-bottom: 0.6mm; font-size: ${settings.infoRow}; display: flex;">
-                                <span style="font-weight: bold; min-width: ${settings.infoLabel};">രക്ഷിതാവ്:</span>
-                                <span style="flex: 1;">${sampleVoter.guardian_name}</span>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.6mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.guardian_name}</span>
                             </div>
                         </div>
-                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.6mm; margin-top: 0.5mm; font-weight: 600;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                        <div style="font-size: ${settings.pollingStation}; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+        
+        function generateFiveSlipsFreePreview(settings) {
+            const container = document.getElementById('fiveSlipsFreePreview');
+            if (!container) return;
+
+            // 5 slips = 52mm height (matches PDF slipHeight) - symbol-free grid layout
+            const html = `
+                <div style="width: 210mm; height: 52mm; border: 2px solid #000; display: grid; grid-template-columns: 35mm 1fr; gap: 0; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
+                    <div style="display: flex !important; width: 35mm; border-right: 2px solid #000; background: #fff; margin-right: 0; padding: 2mm;">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                            <div style="font-size: ${settings.slipNumber ? '12pt' : '12pt'}; font-weight: 700; color: #000; margin-bottom: 1mm; text-align: center; line-height: 1.2;">ക്രമ നമ്പർ</div>
+                            <div style="font-size: ${settings.slipNumber}; font-weight: 800; color: #000; text-align: center; line-height: 1;">${sampleVoter.sl_no}</div>
+                        </div>
+                    </div>
+                    <div style="margin-left: 0; padding: 1mm 2mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0;">
+                        <div style="font-size: ${settings.wardInfo || '11pt'}; font-weight: bold; margin-bottom: ${settings.wardMarginBottom || '0mm'}; padding: ${settings.wardPadding || '0mm 0 0.2mm 0'}; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${settings.headerMarginBottom || '0.5mm'}; margin-top: ${settings.headerMarginTop || '0.5mm'}; font-size: 10pt; gap: 1mm; overflow: hidden;">
+                            <div style="font-weight: bold; font-size: ${settings.secId}; white-space: nowrap;">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                        </div>
+                        <div style="flex: 1; overflow: hidden; min-height: 0;">
+                            <div style="margin-bottom: ${settings.voterNameMarginBottom || '1mm'}; font-size: ${settings.voterName}; font-weight: bold; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">പേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                            </div>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.6mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">വീട്ടുപേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            </div>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.6mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.guardian_name}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: ${settings.pollingStation}; min-height: 8mm; display: flex; align-items: center; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+        
+        function generateSixSlipsFreePreview(settings) {
+            const container = document.getElementById('sixSlipsFreePreview');
+            if (!container) return;
+
+            // 6 slips = 42mm height (matches PDF slipHeight) - symbol-free grid layout
+            const html = `
+                <div style="width: 210mm; height: 42mm; border: 2px solid #000; display: grid; grid-template-columns: 35mm 1fr; gap: 0; padding: 2mm; font-family: 'Noto Sans Malayalam', Arial, sans-serif; background: white; box-sizing: border-box;">
+                    <div style="display: flex !important; width: 35mm; border-right: 2px solid #000; background: #fff; margin-right: 0; padding: 2mm;">
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                            <div style="font-size: ${settings.slipNumber ? '10pt' : '10pt'}; font-weight: 700; color: #000; margin-bottom: 1mm; text-align: center; line-height: 1.2;">ക്രമ നമ്പർ</div>
+                            <div style="font-size: ${settings.slipNumber}; font-weight: 800; color: #000; text-align: center; line-height: 1;">${sampleVoter.sl_no}</div>
+                        </div>
+                    </div>
+                    <div style="margin-left: 0; padding: 1mm 2mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0;">
+                        <div style="font-size: ${settings.wardInfo || '10pt'}; font-weight: bold; margin-bottom: ${settings.wardMarginBottom || '0mm'}; padding: ${settings.wardPadding || '0mm 0 0.2mm 0'}; border-bottom: 1px solid #000; text-align: center;">വാര്‍ഡ്: ${sampleVoter.ward}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${settings.headerMarginBottom || '0.4mm'}; margin-top: ${settings.headerMarginTop || '0.4mm'}; font-size: 10pt; gap: 1mm; overflow: hidden;">
+                            <div style="font-weight: bold; font-size: ${settings.secId}; white-space: nowrap;">കാർഡ് നമ്പർ: ${sampleVoter.sec_id}</div>
+                        </div>
+                        <div style="flex: 1; overflow: hidden; min-height: 0;">
+                            <div style="margin-bottom: ${settings.voterNameMarginBottom || '0.8mm'}; font-size: ${settings.voterName}; font-weight: bold; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">പേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.name} (${sampleVoter.gender_age})</span>
+                            </div>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.5mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">വീട്ടുപേര്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.house_name} (${sampleVoter.house_no})</span>
+                            </div>
+                            <div style="margin-bottom: ${settings.infoRowMarginBottom || '0.5mm'}; font-size: ${settings.infoRow}; display: flex; line-height: 1.25; overflow: hidden;">
+                                <span style="font-weight: bold; min-width: ${settings.infoLabel}; flex-shrink: 0;">രക്ഷിതാവ്:</span>
+                                <span style="flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0;">${sampleVoter.guardian_name}</span>
+                            </div>
+                        </div>
+                        <div style="font-size: ${settings.pollingStation}; min-height: 8mm; display: flex; align-items: center; border-top: 1px solid #000; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word;">പോളിംഗ് സ്റ്റേഷൻ: ${sampleVoter.polling_station_name}</div>
                     </div>
                 </div>
             `;
@@ -3964,11 +4350,14 @@ Login to https://easyslip.in to download your PDF.</textarea>
                     const formData = new FormData(slipForm);
                     const settings = {
                         fiveSlips: {},
-                        sixSlips: {}
+                        sixSlips: {},
+                        fiveSlipsFree: {},
+                        sixSlipsFree: {}
                     };
 
                     for (let [key, value] of formData.entries()) {
                         const [category, field] = key.split('.');
+                        if (!settings[category]) settings[category] = {};
                         settings[category][field] = value;
                     }
 

@@ -82,6 +82,22 @@ body {
     position: relative;
 }
 
+/* 6 slips per page layout */
+.six-per-page .voter-slip {
+    height: 45mm;
+    padding: 2mm 2mm 2mm 2mm;
+}
+
+.six-per-page .polling-station-info {
+    font-size: 10pt;
+    border-top: 1px solid #ccc;
+    padding-top: 0.5mm;
+    min-height: 12mm;
+    white-space: pre-line;
+    word-break: break-word;
+    line-height: 1.2;
+}
+
 .voter-slip::after {
     content: '';
     position: absolute;
@@ -160,9 +176,17 @@ body {
     display: flex;
 }
 
+
 .info-label {
     font-weight: bold;
-    min-width: 20mm;
+    min-width: 10mm;
+    white-space: normal;
+}
+
+.info-value {
+    flex: 1;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .info-value {

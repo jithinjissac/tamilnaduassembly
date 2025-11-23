@@ -94,27 +94,31 @@ function loadVoterData() {
 function generateSlips() {
     const slipsContainer = document.getElementById('slipsContainer');
     slipsContainer.innerHTML = '';
-    
-    const slipsPerPage = 5;
+
+    // Check for 6 slips per page mode (e.g., from sessionStorage or a setting)
+    let slipsPerPage = 5;
+    if (sessionStorage.getItem('slipsPerPage') === '6') {
+        slipsPerPage = 6;
+    }
     const totalPages = Math.ceil(voterData.length / slipsPerPage);
-    
+
     for (let pageNum = 0; pageNum < totalPages; pageNum++) {
         const page = document.createElement('div');
-        page.className = 'page';
-        
+        page.className = 'page' + (slipsPerPage === 6 ? ' six-per-page' : '');
+
         const startIdx = pageNum * slipsPerPage;
         const endIdx = Math.min(startIdx + slipsPerPage, voterData.length);
-        
+
         for (let i = startIdx; i < endIdx; i++) {
             const voter = voterData[i];
             createVoterSlipAsync(voter, i + 1).then(slip => {
                 page.appendChild(slip);
             });
         }
-        
+
         slipsContainer.appendChild(page);
     }
-    
+
     console.log(`Generated ${totalPages} pages with ${voterData.length} slips`);
 }
 

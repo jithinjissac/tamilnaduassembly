@@ -28,26 +28,43 @@ const calculateAmount = (totalVoters) => {
 
 // Create new order
 export const createOrder = [
+
     // Validation
     body('customization').notEmpty().withMessage('Customization is required'),
-    body('customization.symbolImage').notEmpty().withMessage('Symbol image is required'),
-    body('customization.symbolName').notEmpty().withMessage('Symbol name is required'),
     body('location').notEmpty().withMessage('Location is required'),
     body('voters').isArray({ min: 1 }).withMessage('Voters array is required'),
-    
+
     async (req, res) => {
         try {
-            // Check validation errors
+            // Custom validation for symbol fields if not symbolFree
+            let { customization } = req.body;
             const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ 
+            let validationErrors = errors.array();
+            if (!customization?.symbolFree) {
+                if (!customization?.symbolImage) {
+                    validationErrors.push({
+                        msg: 'Symbol image is required',
+                        param: 'customization.symbolImage',
+                        location: 'body'
+                    });
+                }
+                if (!customization?.symbolName) {
+                    validationErrors.push({
+                        msg: 'Symbol name is required',
+                        param: 'customization.symbolName',
+                        location: 'body'
+                    });
+                }
+            }
+            if (validationErrors.length > 0) {
+                return res.status(400).json({
                     status: 'error',
                     message: 'Validation failed',
-                    errors: errors.array() 
+                    errors: validationErrors
                 });
             }
 
-            const { customization, location, voters } = req.body;
+            const { location, voters } = req.body;
             const userId = req.userId;
 
             // Get user's custom price per voter
@@ -68,9 +85,31 @@ export const createOrder = [
             // Generate order ID
             const orderId = generateOrderId();
 
-            // Ensure slipsPerPage is set (default to 5 if not provided)
+            // Ensure customization is an object and slipsPerPage is set (default to 5 if not provided)
+            if (typeof customization !== 'object' || customization === null) {
+                customization = {};
+            }
             if (!customization.slipsPerPage) {
                 customization.slipsPerPage = 5;
+            }
+
+            // Debug: Log customization before symbol-free handling
+            console.log('[DEBUG] Customization received:', JSON.stringify(customization));
+
+            // If symbol-free mode is enabled, ensure symbolFree is explicitly true
+            // and DON'T set symbolId/symbolImage/symbolName (Mongoose will skip validation)
+            if (customization.symbolFree) {
+                customization.symbolFree = true; // Ensure it's explicitly boolean true
+                // Set defaults for slip rendering (don't send to DB if not needed)
+                if (!customization.symbolName) {
+                    customization.symbolName = 'No Symbol';
+                }
+                if (!customization.symbolNameMalayalam) {
+                    customization.symbolNameMalayalam = '';
+                }
+                // DON'T set symbolId or symbolImage at all - let Mongoose skip validation
+                delete customization.symbolId;
+                delete customization.symbolImage;
             }
 
             // Create order
@@ -128,10 +167,11 @@ export const createOrder = [
 
         } catch (error) {
             console.error('Create order error:', error);
+            console.error(error.stack);
             res.status(500).json({ 
                 status: 'error',
                 message: 'Failed to create order',
-                error: error.message 
+                error: error.message
             });
         }
     }

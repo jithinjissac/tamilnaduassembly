@@ -12,18 +12,34 @@ const OrderSchema = new mongoose.Schema({
         unique: true
     },
     customization: {
+        symbolFree: {
+            type: Boolean,
+            default: false
+        },
         symbolId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Symbol',
-            required: true
+            required: function() { 
+                // Access the root document's customization.symbolFree
+                const doc = this.ownerDocument();
+                return !doc.customization || !doc.customization.symbolFree;
+            }
         },
         symbolImage: {
             type: String, // URL to symbol image
-            required: true
+            required: function() { 
+                // Access the root document's customization.symbolFree
+                const doc = this.ownerDocument();
+                return !doc.customization || !doc.customization.symbolFree;
+            }
         },
         symbolName: {
             type: String,
-            required: true
+            required: function() { 
+                // Access the root document's customization.symbolFree
+                const doc = this.ownerDocument();
+                return !doc.customization || !doc.customization.symbolFree;
+            }
         },
         symbolNameMalayalam: {
             type: String,

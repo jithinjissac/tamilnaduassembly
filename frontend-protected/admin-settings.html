@@ -242,6 +242,7 @@
 
         <div class="tabs">
             <div class="tab active" data-category="pdf">PDF Generation</div>
+            <div class="tab" data-category="slip">Slip Design</div>
             <div class="tab" data-category="email">Email & Notifications</div>
             <div class="tab" data-category="security">Security & Rate Limiting</div>
             <div class="tab" data-category="analytics">Analytics & Monitoring</div>
@@ -317,6 +318,246 @@
             <div class="actions">
                 <button class="btn btn-primary" onclick="saveSettings('pdf')">Save PDF Settings</button>
                 <button class="btn btn-secondary" onclick="resetSettings('pdf')">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Slip Design Panel -->
+        <div class="settings-panel" id="slip-panel">
+            <div class="setting-group">
+                <h3>5 Slips Per Page (With Symbol)</h3>
+                <div class="setting-item">
+                    <label>Symbol Header Font Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolHeader" placeholder="8pt">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Image Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolImage" placeholder="24mm">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Name Font Size</label>
+                    <input type="text" id="slip-fiveSlips-symbolName" placeholder="9.5pt">
+                </div>
+                <div class="setting-item">
+                    <label>Slip Number Font Size</label>
+                    <input type="text" id="slip-fiveSlips-slipNumber" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-fiveSlips-secId" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-fiveSlips-voterName" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-fiveSlips-infoRow" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-fiveSlips-infoLabel" placeholder="17mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-fiveSlips-pollingStation" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-wardMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-headerMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-voterNameMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlips-infoRowMarginBottom" placeholder="0.8mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>6 Slips Per Page (With Symbol)</h3>
+                <div class="setting-item">
+                    <label>Symbol Header Font Size</label>
+                    <input type="text" id="slip-sixSlips-symbolHeader" placeholder="7pt">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Image Size</label>
+                    <input type="text" id="slip-sixSlips-symbolImage" placeholder="20mm">
+                </div>
+                <div class="setting-item">
+                    <label>Symbol Name Font Size</label>
+                    <input type="text" id="slip-sixSlips-symbolName" placeholder="8.5pt">
+                </div>
+                <div class="setting-item">
+                    <label>Slip Number Font Size</label>
+                    <input type="text" id="slip-sixSlips-slipNumber" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-sixSlips-secId" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-sixSlips-voterName" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-sixSlips-infoRow" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-sixSlips-infoLabel" placeholder="16mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-sixSlips-pollingStation" placeholder="9pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-wardMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-headerMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-voterNameMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-sixSlips-infoRowMarginBottom" placeholder="0.6mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>5 Slips Per Page (Symbol-Free)</h3>
+                <div class="setting-item">
+                    <label>Serial Number Label Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-slipNumberLabel" placeholder="12pt">
+                </div>
+                <div class="setting-item">
+                    <label>Serial Number Value Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-slipNumberValue" placeholder="20pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-secId" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-voterName" placeholder="13pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoRow" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoLabel" placeholder="18mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-pollingStation" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Info Font Size</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardInfo" placeholder="11pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardMarginBottom" placeholder="0mm">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Padding</label>
+                    <input type="text" id="slip-fiveSlipsFree-wardPadding" placeholder="0mm 0 0.2mm 0">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-headerMarginBottom" placeholder="0.5mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Top</label>
+                    <input type="text" id="slip-fiveSlipsFree-headerMarginTop" placeholder="0.5mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-voterNameMarginBottom" placeholder="1mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-fiveSlipsFree-infoRowMarginBottom" placeholder="0.6mm">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h3>6 Slips Per Page (Symbol-Free)</h3>
+                <div class="setting-item">
+                    <label>Serial Number Label Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-slipNumberLabel" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Serial Number Value Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-slipNumberValue" placeholder="18pt">
+                </div>
+                <div class="setting-item">
+                    <label>SEC ID Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-secId" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-voterName" placeholder="12pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-infoRow" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Info Label Width</label>
+                    <input type="text" id="slip-sixSlipsFree-infoLabel" placeholder="16mm">
+                </div>
+                <div class="setting-item">
+                    <label>Polling Station Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-pollingStation" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Info Font Size</label>
+                    <input type="text" id="slip-sixSlipsFree-wardInfo" placeholder="10pt">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-wardMarginBottom" placeholder="0mm">
+                </div>
+                <div class="setting-item">
+                    <label>Ward Padding</label>
+                    <input type="text" id="slip-sixSlipsFree-wardPadding" placeholder="0mm 0 0.2mm 0">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-headerMarginBottom" placeholder="0.4mm">
+                </div>
+                <div class="setting-item">
+                    <label>Header Margin Top</label>
+                    <input type="text" id="slip-sixSlipsFree-headerMarginTop" placeholder="0.4mm">
+                </div>
+                <div class="setting-item">
+                    <label>Voter Name Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-voterNameMarginBottom" placeholder="0.8mm">
+                </div>
+                <div class="setting-item">
+                    <label>Info Row Margin Bottom</label>
+                    <input type="text" id="slip-sixSlipsFree-infoRowMarginBottom" placeholder="0.5mm">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('slip')">Save Slip Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('slip')">Reset to Defaults</button>
             </div>
         </div>
 
@@ -546,6 +787,188 @@
         </div>
     </div>
 
-    <script>const o=b;(function(stringArrayFunction,c){const n=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(n(0x1a0))/0x1*(parseInt(n(0x186))/0x2)+parseInt(n(0x18f))/0x3*(-parseInt(n(0x17b))/0x4)+parseInt(n(0x188))/0x5*(parseInt(n(0x19e))/0x6)+parseInt(n(0x181))/0x7+parseInt(n(0x185))/0x8+parseInt(n(0x19c))/0x9*(-parseInt(n(0x18b))/0xa)+parseInt(n(0x18e))/0xb;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x2702b));const API_BASE=o(0x19a);let currentCategory='pdf';document['querySelectorAll'](o(0x171))['forEach'](c=>{const p=o;c[p(0x175)]('click',()=>{const q=p,d=c[q(0x17a)]['category'];currentCategory=d,document['querySelectorAll']('.tab')[q(0x195)](e=>e[q(0x190)][q(0x176)]('active')),c[q(0x190)]['add']('active'),document['querySelectorAll']('.settings-panel')[q(0x195)](e=>e[q(0x190)]['remove']('active')),document['getElementById'](d+q(0x174))['classList'][q(0x1a2)](q(0x18a)),loadSettings(d);});});async function loadSettings(c){const r=o;try{const d=localStorage[r(0x192)]('token'),e=await fetch(API_BASE+'/'+c,{'headers':{'Authorization':'Bearer\x20'+d}});if(!e['ok'])throw new Error(r(0x173));const f=await e['json']();populateSettings(c,f['settings']);}catch(g){showError(r(0x183)+g['message']);}}function a(){const A=['classList','input,\x20select','getItem','none','Bearer\x20','forEach','isArray','checkbox','map','getElementById','/api/settings','checked','711gpnKqZ','Failed\x20to\x20reset\x20settings:\x20','6MHINut','\x20settings\x20to\x20defaults?','156119ObDcGQ','href','add','display','pathname','object','value','\x20settings\x20saved\x20successfully!','/reset/','token','POST','settings','.tab','replace','Failed\x20to\x20load\x20settings','-panel','addEventListener','remove','location','keys','\x20settings\x20reset\x20to\x20defaults!','dataset','4wRrzva','block','errorMessage','style','split','message','2057433rCEorq','Failed\x20to\x20save\x20settings','Failed\x20to\x20load\x20settings:\x20','Reset\x20','1037072JqvYCn','2rmBXBf','querySelectorAll','679775cIHuAO','type','active','20910dOpMuL','redirectAfterLogin','Failed\x20to\x20save\x20settings:\x20','601986QQeUrH','399417xLFgxB'];a=function(){return A;};return a();}function populateSettings(c,d){const s=o;Object[s(0x178)](d)['forEach'](e=>{const t=s,f=c+'-'+e,g=document['getElementById'](f);if(g){if(g[t(0x189)]==='checkbox')g['checked']=d[e];else{if(e==='allowedOrigins'||e==='whitelistedIPs')g['value']=Array[t(0x196)](d[e])?d[e]['join'](',\x20'):d[e];else typeof d[e]===t(0x16a)&&d[e]!==null?Object[t(0x178)](d[e])[t(0x195)](h=>{const u=t,i=f+'-'+h,j=document['getElementById'](i);j&&(j[u(0x189)]==='checkbox'?j[u(0x19b)]=d[e][h]:j[u(0x16b)]=d[e][h]);}):g[t(0x16b)]=d[e];}}});}async function saveSettings(c){const v=o;try{const d={},e=document[v(0x199)](c+'-panel'),f=e[v(0x187)](v(0x191));f['forEach'](j=>{const w=v,k=j['id'][w(0x172)](c+'-',''),l=k[w(0x17f)]('-');if(l['length']>0x1)!d[l[0x0]]&&(d[l[0x0]]={}),d[l[0x0]][l[0x1]]=j['type']==='checkbox'?j[w(0x19b)]:j[w(0x16b)];else{if(j[w(0x189)]===w(0x197))d[k]=j['checked'];else{if(j['type']==='number')d[k]=parseInt(j[w(0x16b)]);else k==='allowedOrigins'||k==='whitelistedIPs'?d[k]=j['value'][w(0x17f)](',')[w(0x198)](m=>m['trim']())['filter'](m=>m):d[k]=j['value'];}}});const g=localStorage['getItem'](v(0x16e)),h=await fetch(API_BASE+'/'+c,{'method':'PUT','headers':{'Content-Type':'application/json','Authorization':v(0x194)+g},'body':JSON['stringify'](d)});if(!h['ok'])throw new Error(v(0x182));const i=await h['json']();showSuccess(c['toUpperCase']()+v(0x16c));}catch(j){showError(v(0x18d)+j['message']);}}async function resetSettings(c){const x=o;if(!confirm(x(0x184)+c+x(0x19f)))return;try{const d=localStorage['getItem']('token'),e=await fetch(API_BASE+x(0x16d)+c,{'method':x(0x16f),'headers':{'Authorization':x(0x194)+d}});if(!e['ok'])throw new Error('Failed\x20to\x20reset\x20settings');const f=await e['json']();populateSettings(c,f[x(0x170)]),showSuccess(c['toUpperCase']()+x(0x179));}catch(g){showError(x(0x19d)+g[x(0x180)]);}}function b(c,d){const e=a();return b=function(f,g){f=f-0x16a;let h=e[f];return h;},b(c,d);}function showSuccess(c){const y=o,d=document[y(0x199)]('successMessage');d['textContent']=c,d['style'][y(0x1a3)]=y(0x17c),setTimeout(()=>d['style'][y(0x1a3)]='none',0x1388);}function showError(c){const z=o,d=document['getElementById'](z(0x17d));d['textContent']=c,d['style'][z(0x1a3)]='block',setTimeout(()=>d[z(0x17e)]['display']=z(0x193),0x1388);}const token=localStorage['getItem']('token');!token&&(sessionStorage['setItem'](o(0x18c),window[o(0x177)][o(0x1a4)]),window['location'][o(0x1a1)]='/login.html');loadSettings('pdf');</script>
+    <script>
+        const API_BASE = '/api/settings';
+        let currentCategory = 'pdf';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const category = tab.dataset.category;
+                currentCategory = category;
+                
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active panel
+                document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(`${category}-panel`).classList.add('active');
+                
+                // Load settings for this category
+                loadSettings(category);
+            });
+        });
+
+        // Load all settings on page load
+        async function loadSettings(category) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/${category}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load settings');
+                }
+
+                const data = await response.json();
+                populateSettings(category, data.settings);
+            } catch (error) {
+                showError('Failed to load settings: ' + error.message);
+            }
+        }
+
+        // Populate form with settings
+        function populateSettings(category, settings) {
+            Object.keys(settings).forEach(key => {
+                const elementId = `${category}-${key}`;
+                const element = document.getElementById(elementId);
+                
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = settings[key];
+                    } else if (key === 'allowedOrigins' || key === 'whitelistedIPs') {
+                        // Arrays to comma-separated strings
+                        element.value = Array.isArray(settings[key]) ? settings[key].join(', ') : settings[key];
+                    } else if (typeof settings[key] === 'object' && settings[key] !== null) {
+                        // Handle nested objects like emailTemplates
+                        Object.keys(settings[key]).forEach(subKey => {
+                            const subElementId = `${elementId}-${subKey}`;
+                            const subElement = document.getElementById(subElementId);
+                            if (subElement) {
+                                if (subElement.type === 'checkbox') {
+                                    subElement.checked = settings[key][subKey];
+                                } else {
+                                    subElement.value = settings[key][subKey];
+                                }
+                            }
+                        });
+                    } else {
+                        element.value = settings[key];
+                    }
+                }
+            });
+        }
+
+        // Save settings
+        async function saveSettings(category) {
+            try {
+                const settings = {};
+                const panel = document.getElementById(`${category}-panel`);
+                const inputs = panel.querySelectorAll('input, select');
+                
+                inputs.forEach(input => {
+                    const key = input.id.replace(`${category}-`, '');
+                    const keys = key.split('-');
+                    
+                    if (keys.length > 1) {
+                        // Nested object (e.g., emailTemplates.orderConfirmation)
+                        if (!settings[keys[0]]) {
+                            settings[keys[0]] = {};
+                        }
+                        settings[keys[0]][keys[1]] = input.type === 'checkbox' ? input.checked : input.value;
+                    } else {
+                        // Top-level setting
+                        if (input.type === 'checkbox') {
+                            settings[key] = input.checked;
+                        } else if (input.type === 'number') {
+                            settings[key] = parseInt(input.value);
+                        } else if (key === 'allowedOrigins' || key === 'whitelistedIPs') {
+                            // Convert comma-separated to array
+                            settings[key] = input.value.split(',').map(s => s.trim()).filter(s => s);
+                        } else {
+                            settings[key] = input.value;
+                        }
+                    }
+                });
+
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/${category}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save settings');
+                }
+
+                const data = await response.json();
+                showSuccess(`${category.toUpperCase()} settings saved successfully!`);
+            } catch (error) {
+                showError('Failed to save settings: ' + error.message);
+            }
+        }
+
+        // Reset settings to defaults
+        async function resetSettings(category) {
+            if (!confirm(`Reset ${category} settings to defaults?`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/reset/${category}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to reset settings');
+                }
+
+                const data = await response.json();
+                populateSettings(category, data.settings);
+                showSuccess(`${category.toUpperCase()} settings reset to defaults!`);
+            } catch (error) {
+                showError('Failed to reset settings: ' + error.message);
+            }
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+            window.location.href = '/login.html';
+        }
+
+        // Load initial settings
+        loadSettings('pdf');
+    </script>
 </body>
 </html>

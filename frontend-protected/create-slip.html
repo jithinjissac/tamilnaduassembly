@@ -30,11 +30,30 @@
     <script src="symbol-picker.js"></script>
     <script src="activity-tracker.js"></script>
     <!--Start of Tawk.to Script-->
-<script type="text/javascript">(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=-parseInt(f(0x8f))/0x1*(-parseInt(f(0x8e))/0x2)+parseInt(f(0x99))/0x3+-parseInt(f(0x90))/0x4*(-parseInt(f(0x92))/0x5)+parseInt(f(0x98))/0x6+parseInt(f(0x8d))/0x7*(-parseInt(f(0x8c))/0x8)+parseInt(f(0x88))/0x9*(parseInt(f(0x94))/0xa)+-parseInt(f(0x86))/0xb;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x2f602));var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){var g=b;Tawk_API[g(0x91)]();},(function(){var h=b,c=document[h(0x95)](h(0x8b)),d=document[h(0x8a)]('script')[0x0];c['async']=!![],c['src']=h(0x97),c[h(0x9a)]='UTF-8',c[h(0x96)](h(0x87),'*'),d[h(0x93)][h(0x89)](c,d);}());function b(c,d){var e=a();return b=function(f,g){f=f-0x86;var h=e[f];return h;},b(c,d);}function a(){var i=['1266831iHIGwz','insertBefore','getElementsByTagName','script','117592sGBkFN','21yAATLy','2BwgDKh','204086MQQrnA','4cFxjVT','minimize','1014615AjGpLN','parentNode','20HPqWcW','createElement','setAttribute','https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh','637350lMvRle','250452eJeWDc','charset','7040979XfuPZn','crossorigin'];a=function(){return i;};return a();}</script>
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.onLoad = function(){
+    Tawk_API.minimize();
+};
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
 <!--End of Tawk.to Script-->
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-G0M40G1DK1"></script>
-<script>var h=b;function b(c,d){var e=a();return b=function(f,g){f=f-0x74;var h=e[f];return h;},b(c,d);}(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=parseInt(f(0x78))/0x1*(-parseInt(f(0x7a))/0x2)+-parseInt(f(0x80))/0x3*(parseInt(f(0x75))/0x4)+parseInt(f(0x82))/0x5*(-parseInt(f(0x7f))/0x6)+parseInt(f(0x83))/0x7*(-parseInt(f(0x81))/0x8)+parseInt(f(0x74))/0x9*(-parseInt(f(0x79))/0xa)+-parseInt(f(0x76))/0xb*(parseInt(f(0x7c))/0xc)+parseInt(f(0x7b))/0xd*(parseInt(f(0x7e))/0xe);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0xf02d3),window['dataLayer']=window['dataLayer']||[]);function gtag(){var g=b;dataLayer[g(0x7d)](arguments);}function a(){var i=['push','742ebaFkK','10452966MjiNYi','2094744fDckNu','330664TCZuTW','5IEcqEd','154ZXPJbP','2354751BpcMxQ','4ZqABBX','1397zzuUpP','G-G0M40G1DK1','22VBaJVx','60wcQFCm','76354DECiAO','1994759bGhvft','131268beKPIg'];a=function(){return i;};return a();}gtag('js',new Date()),gtag('config',h(0x77));</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-G0M40G1DK1');
+</script>
     <style>
         * {
             margin: 0;
@@ -51,6 +70,45 @@
             font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
             background: var(--kerala-cream);
             color: #333;
+        }
+
+        /* Symbol-Free Mode Card Styles */
+        #noSymbolText #selectSymbolLink {
+            white-space: nowrap;
+        }
+        
+        #noSymbolText #selectSymbolLink:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            background: #f7fafc !important;
+        }
+
+        #noSymbolText #selectSymbolLink:active {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 640px) {
+            #noSymbolText > div > div > div:first-child {
+                flex-direction: row !important;
+                align-items: center !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                width: auto !important;
+                display: inline-block !important;
+                align-self: flex-end;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #noSymbolText > div > div {
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                margin-left: 2rem;
+                flex-shrink: 0;
+            }
         }
 
         /* Header */
@@ -809,6 +867,9 @@
                         <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block; margin: 0 auto;">
                             <i class="fas fa-hand-pointer" style="margin-right: 0.5rem;"></i> SELECT YOUR SYMBOL
                         </button>
+                        <div style="text-align:center; margin-top:1rem;">
+                            <a href="#" id="continueWithoutSymbol" style="color:#2c5282; text-decoration:underline; font-weight:600; cursor:pointer;">Continue without any symbols</a>
+                        </div>
                     </div>
                     <div class="error-message" id="symbolError"></div>
                 </div>
@@ -974,6 +1035,1387 @@
         </div>
     </div>
 
-    <script>const I=b;(function(stringArrayFunction,c){const H=b,stringArray=stringArrayFunction();while(!![]){try{const d=parseInt(H(0x151))/0x1*(-parseInt(H(0x11a))/0x2)+-parseInt(H(0x103))/0x3+parseInt(H(0x169))/0x4+parseInt(H(0x104))/0x5*(-parseInt(H(0x14a))/0x6)+parseInt(H(0x141))/0x7*(parseInt(H(0x166))/0x8)+parseInt(H(0x193))/0x9*(-parseInt(H(0x19c))/0xa)+-parseInt(H(0x154))/0xb*(-parseInt(H(0x1c0))/0xc);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x3b07d));let currentStep=0x1,selectedSymbol=null,extractedVoters=[],sessionId='',allPollingStations=[],selectedStations=[];function a(){const an=['__EXCLUDE__','33CTkdSk','loadingMainText','includes','has','--\x20തിരഞ്ഞെടുക്കുക\x20--','querySelectorAll','pollingStationName','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x200\x200\x201.5rem\x200;\x20color:\x20#718096;\x20font-size:\x200.95rem;\x22>','src','✅\x20Frontend\x20dropdown\x20text\x20(fallback):','_id','getElementById','<p>','orderId','errorType','</p>','order','nameMalayalam','30680bbPdAE','Captcha\x20not\x20entered','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-text=\x22','324772IGaigL','progressLine','Please\x20select\x20a\x20symbol\x20before\x20extracting','fire','.form-section.active','SHIFTED','location','text','ward','⚠️\x20No\x20chosen-single\x20span\x20found','Entering\x20included\x20section:','🔍\x20Found\x20result-selected\x20text:','Please\x20select\x20a\x20symbol','Extraction\x20failed.\x20Please\x20check\x20your\x20captcha\x20and\x20try\x20again.','stringify','districts','.breadcrumb\x20li,\x20.page-title,\x20h1,\x20h2,\x20h3','pollingStationMalayalam','add','selected-count','Bearer\x20','customErrorTitle','cssText','\x20polling\x20stations','selectedIndex','Error\x20loading\x20local\x20bodies:','Single\x20Polling\x20Station','redirectAfterLogin','style','✅\x20Found\x20Malayalam\x20polling\x20station\x20name\x20from\x20page\x20header:','preview.html?orderId=','display','pathname','🔍\x20HTML\x20contains\x20\x22pollingStation\x22?','\x20filtered\x20voters\x20from\x20HTML','.error-message','parseFromString','/api/orders/create','forEach','✅\x20Found\x20polling\x20station\x20from\x20Chosen\x20dropdown:','innerHTML','🔍\x20Type\x20of\x20malayalamPollingStationName:','472329QqcWmx','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x200.75rem;\x20flex-direction:\x20column;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove()\x22\x20style=\x22width:\x20100%;\x20background:\x20var(--kerala-green);\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check\x22></i>\x20Continue\x20with\x20','/api/getWards','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onchange=\x22togglePSCheckbox(this)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','/api/initCaptchaSession','loadingSubText','message','log','captchaImage','70dLdyaX','selectedSymbolName','getItem','POST','checked','\x20polling\x20station(s)\x20failed:\x0a\x0a','✅\x20API\x20response\x20Malayalam\x20name:','Redirecting\x20to\x20preview...','Please\x20select\x20at\x20least\x20one\x20polling\x20station\x20and\x20fill\x20all\x20fields','option','extractBtn','scrollTo','പ്രവാസി\x20വോട്ടർപട്ടിക','🔄\x20Submitting\x20captcha\x20for\x20station\x20','Failed\x20to\x20load\x20captcha.\x20Please\x20try\x20again.','Found\x20','href','classList','/api/getPollingStations','bottom','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Loading...','Failed\x20to\x20load\x20districts.\x20Please\x20refresh\x20the\x20page.','):\x20','Creating\x20order...','സ്റ്റേഷൻ','captchaUrl','⚠️\x20Will\x20use\x20fallback\x20polling\x20station\x20name\x20from\x20location\x20data','Section\x20header\x20detected:','select[id*=\x22pollingStation\x22]','localBody','<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!','✅\x20Adding\x20Malayalam\x20polling\x20station\x20name\x20to\x20voters:','Entering\x20non-included\x20section,\x20rows\x20will\x20be\x20skipped\x20until\x20next\x20included\x20section',':\x20Loading\x20new\x20captcha\x20session...','change','token','4248084IbhCpT','symbolError','pollingStation','addEventListener','dataset','pollingStationList','\x20station','completed','🔍\x20Found\x20chosen-single\x20span\x20text:','<p\x20class=\x22text-muted\x20mt-2\x22\x20style=\x22font-size:\x200.9em;\x22>The\x20Kerala\x20State\x20Election\x20Commission\x20website\x20is\x20currently\x20down\x20or\x20experiencing\x20issues.\x20This\x20is\x20beyond\x20our\x20control.</p>','Enter','className','\x20successful\x20station(s).','tbody\x20tr','slice','disabled','createElement','remove','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','querySelector','Parsed\x20','loadCaptchaText','application/json','HTTP\x20error!\x20status:\x20','textContent','കൂട്ടിച്ചേർക്കലുകൾ','login.html','step','scrollIntoView','extractionLoading','✅\x20Districts\x20loaded,\x20now\x20loading\x20captcha\x20in\x20background...','map','show','#view_voters_list_pollingStation\x20option[selected=\x22selected\x22]','focus','✅\x20Found\x20polling\x20station\x20from\x20selected\x20option:','sessionId','status','.polling-station-controls','ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല.\x20വീണ്ടും\x20ശ്രമിക്കുക.','voters','startsWith','district','success','No\x20voters\x20found','543216AQctSh','1830805XtkSmx','imageUrl','input[name=\x22slipsPerPage\x22]:checked','.step[data-step=\x22','പോളിംഗ്','ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല','getBoundingClientRect','.polling-station-checkbox','value','തിരുത്തലുകൾ','\x20rows\x20using\x20selector:\x20','Please\x20select\x20at\x20least\x20one\x20polling\x20station','✅\x20Final\x20Malayalam\x20polling\x20station\x20name:','Select','Extraction\x20Complete!','block','json','error','table\x20tr','captchaLoader','Failed\x20to\x20load\x20captcha','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202rem;\x20border-radius:\x2012px;\x20max-width:\x20500px;\x20width:\x2090%;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22margin:\x200\x200\x201rem\x200;\x20color:\x20#2d3748;\x22>Station\x20','71030WonDjX','🔍\x20Searching\x20in','index','📦\x20Order\x20data\x20being\x20sent:','⚠️\x20','✅\x20Sample\x20voter\x20after\x20adding\x20station\x20name:','name','.ps-checkbox','from','appendChild','❌\x20Could\x20not\x20find\x20Malayalam\x20polling\x20station\x20name\x20in\x20HTML','🔍\x20Parse\x20result:','.chosen-container\x20.chosen-single\x20span,\x20.chosen-single\x20span','none','station','✅\x20Loaded\x20','Failed\x20to\x20create\x20slip.\x20Please\x20try\x20again.','#3085d6','Error\x20loading\x20polling\x20stations:','options','.selected-count','center','Order\x20creation\x20error:','captchaError','text/html','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,\x200,\x200,\x200.7);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(5px);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010001;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x202rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Fetching\x20voter\x20data...','trim','active','innerHeight','❌\x20Error\x20extracting\x20station\x20','div','outerHTML','reason','replace','polling-station-checkbox','warn','<option\x20value=\x22\x22>Select\x20Ward</option>','\x20total\x20voters','413dOvfnF','polling_stations','🚀\x20Loading\x20districts\x20first\x20(highest\x20priority)...','currentCaptchaImage','closest','<p\x20style=\x22text-align:center;padding:15px;color:#666;\x22>Loading...</p>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20class=\x22ps-checkbox\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22','\x20Voters\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove();\x20document.getElementById(\x27extractionLoading\x27).classList.remove(\x27show\x27);\x20document.getElementById(\x27extractBtn\x27).disabled\x20=\x20false;\x20window.scrollTo({\x20top:\x200,\x20behavior:\x20\x27smooth\x27\x20});\x22\x20style=\x22width:\x20100%;\x20background:\x20#718096;\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-redo\x22></i>\x20Retry\x20Extraction\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','currentSessionId','6CsEIkc','selectedSymbolImage','html','<option\x20value=\x22\x22>Select\x20Local\x20Body</option>','length','captcha','removeChild','6XRGHwK','<i\x20class=\x22fas\x20fa-sync-alt\x22></i>\x20Refresh\x20Captcha'];a=function(){return an;};return a();}const token=localStorage[I(0x19e)](I(0x1bf));!token&&(sessionStorage['setItem'](I(0x184),window['location'][I(0x189)]),window['location']['href']=I(0xf0));function selectAllPS(){const J=I,c=document[J(0x159)](J(0x121));c['forEach'](d=>{const K=J;d[K(0x1a0)]=!![],d['closest']('.polling-station-checkbox')['classList']['add'](K(0x1a0));}),updateSelectedStations();}function clearAllPS(){const L=I,c=document[L(0x159)]('.ps-checkbox');c[L(0x18f)](d=>{const M=L;d[M(0x1a0)]=![],d[M(0x145)]('.polling-station-checkbox')['classList'][M(0xe7)]('checked');}),updateSelectedStations();}function updateSelectedStations(){const N=I,c=document[N(0x159)]('.ps-checkbox:checked');selectedStations=Array['from'](c)[N(0xf5)](g=>{const O=N,h=parseInt(g[O(0x1c4)][O(0x11c)]);return allPollingStations[h];});const d=document[N(0x15f)]('extractBtnText'),e=selectedStations['length'];d['textContent']='Create\x20Voter\x20Slip';const f=document[N(0xe9)](N(0x12e));if(f)f[N(0xe7)]();if(e>0x0){const g=document[N(0x15f)]('pollingStationList');if(g){const h=document[N(0xe6)](N(0x139));h['className']=N(0x17c),h[N(0xee)]=e+N(0x1c6)+(e>0x1?'s':'')+'\x20selected',g['appendChild'](h);}}console[N(0x19a)]('Selected\x20stations:',e);}function togglePSCheckbox(c){const P=I,d=c['closest'](P(0x10b));c['checked']?d[P(0x1ad)]['add']('checked'):d['classList'][P(0xe7)](P(0x1a0)),updateSelectedStations();}function b(c,d){const e=a();return b=function(f,g){f=f-0xe5;let h=e[f];return h;},b(c,d);}window[I(0x1c3)]('DOMContentLoaded',()=>{window['symbolPicker']=initSymbolPicker(c=>{const Q=b;selectedSymbol=c,document['getElementById'](Q(0x14b))['src']=c[Q(0x105)],document['getElementById'](Q(0x19d))['textContent']=c['nameMalayalam']||c['name'];const d=document[Q(0x15f)]('selectedSymbolNameMalayalam');c['nameMalayalam']&&c[Q(0x165)][Q(0x135)]()?(d['textContent']=c[Q(0x120)],d['style'][Q(0x188)]='block'):d[Q(0x185)]['display']='none',document[Q(0x15f)]('symbolPreview')[Q(0x185)][Q(0x188)]='block',document[Q(0x15f)]('selectSymbolBtn')[Q(0x185)][Q(0x188)]='none',document['getElementById'](Q(0x1c1))[Q(0x1ad)][Q(0xe7)]('show'),console[Q(0x19a)]('Symbol\x20selected:',c);});});function nextStep(c){const R=I;if(c===0x1){if(!validateStep1())return;}else{if(c===0x2){if(extractedVoters[R(0x14e)]===0x0){alert('Please\x20extract\x20voter\x20data');return;}createOrder();return;}}document[R(0xe9)]('.form-section.active')[R(0x1ad)][R(0xe7)]('active'),document['getElementById'](R(0xf1)+(c+0x1))[R(0x1ad)][R(0x17b)](R(0x136)),document['querySelectorAll']('.step')[R(0x18f)](d=>d['classList'][R(0xe7)]('active','completed'));for(let d=0x1;d<c+0x1;d++){document['querySelector']('.step[data-step=\x22'+d+'\x22]')[R(0x1ad)]['add']('completed');}document['querySelector'](R(0x107)+(c+0x1)+'\x22]')['classList']['add'](R(0x136)),updateProgressBar(c+0x1),currentStep=c+0x1,window[R(0x1a7)](0x0,0x0);}function prevStep(c){const S=I;document[S(0xe9)](S(0x16d))['classList']['remove'](S(0x136)),document['getElementById']('step'+(c-0x1))[S(0x1ad)][S(0x17b)](S(0x136)),document['querySelectorAll']('.step')['forEach'](d=>d['classList']['remove'](S(0x136),S(0x1c7)));for(let d=0x1;d<c-0x1;d++){document[S(0xe9)]('.step[data-step=\x22'+d+'\x22]')['classList']['add']('completed');}document['querySelector'](S(0x107)+(c-0x1)+'\x22]')[S(0x1ad)]['add']('active'),updateProgressBar(c-0x1),currentStep=c-0x1,window[S(0x1a7)](0x0,0x0);}function updateProgressBar(c){const T=I,d=(c-0x1)/0x2*0x64;document[T(0x15f)](T(0x16a))[T(0x185)]['width']=d+'%';}function validateStep1(){const U=I;let c=!![];return document['querySelectorAll'](U(0x18c))[U(0x18f)](d=>d['classList'][U(0xe7)](U(0xf6))),!selectedSymbol&&(showError('symbolError',U(0x175)),c=![]),c;}function showError(c,d){const V=I;if(d!==undefined){const e=document[V(0x15f)](c);e?(e['textContent']=d,e[V(0x1ad)][V(0x17b)]('show')):alert(d);}else{const f=document['getElementById']('captchaError');f?(f[V(0xee)]=c,f['classList']['add'](V(0xf6)),setTimeout(()=>f['classList'][V(0xe7)](V(0xf6)),0x1388)):alert(c);}}(async function initializeApp(){const W=I;console['log'](W(0x143)),await loadDistricts(),console[W(0x19a)](W(0xf4)),loadCaptcha();}());async function loadDistricts(){const X=I;try{console[X(0x19a)]('📡\x20Fetching\x20districts\x20from\x20database...');const c=await fetch('/api/getDistricts'),d=await c['json'](),e=document['getElementById'](X(0x100));d[X(0xfb)]===X(0x101)&&d[X(0x178)]&&(console[X(0x19a)](X(0x129)+d['districts']['length']+'\x20districts'),d[X(0x178)]['forEach'](f=>{const Y=X,g=document[Y(0xe6)]('option');g['value']=f['value'],g['textContent']=f['text'],e['appendChild'](g);}));}catch(f){console[X(0x115)]('❌\x20Error\x20loading\x20districts:',f),showError(X(0x1b1));}}document['getElementById'](I(0x100))[I(0x1c3)](I(0x1be),async function(){const Z=I,c=this[Z(0x10c)],d=document[Z(0x15f)]('localBody'),e=document['getElementById']('ward'),f=document['getElementById'](Z(0x1c5));d[Z(0x191)]='<option\x20value=\x22\x22>Loading...</option>',d[Z(0xe5)]=!![],e[Z(0x191)]=Z(0x13f),e[Z(0xe5)]=!![],f['style']['display']='none',selectedStations=[];try{const g=await fetch('/api/getLocalBodies',{'method':'POST','headers':{'Content-Type':Z(0xec)},'body':JSON[Z(0x177)]({'district_id':c})}),h=await g['json']();d['innerHTML']=Z(0x14d),h['status']==='success'&&h['local_bodies']&&h['local_bodies'][Z(0x18f)](i=>{const a0=Z,j=document[a0(0xe6)](a0(0x1a5));j['value']=i['value'],j[a0(0xee)]=i[a0(0x170)],d[a0(0x123)](j);}),d['disabled']=![];}catch(i){console['error'](Z(0x182),i),d['innerHTML']='<option\x20value=\x22\x22>Error\x20loading\x20data</option>';}}),document[I(0x15f)](I(0x1b9))['addEventListener']('change',async function(){const a1=I,c=this[a1(0x10c)],d=document[a1(0x15f)](a1(0x171)),e=document['getElementById']('pollingStationList');d['innerHTML']='<option\x20value=\x22\x22>Loading...</option>',d[a1(0xe5)]=!![],e[a1(0x185)][a1(0x188)]=a1(0x127),selectedStations=[];try{const f=await fetch(a1(0x195),{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON[a1(0x177)]({'local_body_id':c})}),g=await f[a1(0x114)]();d['innerHTML']='<option\x20value=\x22\x22>Select\x20Ward</option>',g['status']===a1(0x101)&&g['wards']&&g['wards']['forEach'](h=>{const a2=a1,i=document[a2(0xe6)]('option');i['value']=h[a2(0x10c)],i[a2(0xee)]=h['text'],d['appendChild'](i);}),d['disabled']=![];}catch(h){console[a1(0x115)]('Error\x20loading\x20wards:',h),d['innerHTML']='<option\x20value=\x22\x22>Error\x20loading\x20data</option>';}}),document['getElementById']('ward')['addEventListener']('change',async function(){const a3=I,c=this['value'],d=document[a3(0x15f)](a3(0x1c5)),e=document[a3(0x15f)]('pollingStationCheckboxes'),f=document['getElementById']('pollingStationEmpty'),g=document['querySelector'](a3(0xfc));if(d)d[a3(0x185)]['display']='block';if(e)e[a3(0x191)]=a3(0x146);if(f)f['style'][a3(0x188)]='none';if(g)g[a3(0x185)][a3(0x188)]=a3(0x127);selectedStations=[];try{const h=await fetch(a3(0x1ae),{'method':a3(0x19f),'headers':{'Content-Type':'application/json'},'body':JSON[a3(0x177)]({'ward_id':c})}),i=await h[a3(0x114)]();if(i[a3(0xfb)]==='success'&&i[a3(0x142)]&&i[a3(0x142)][a3(0x14e)]>0x0){allPollingStations=i[a3(0x142)];e&&(e[a3(0x191)]='',allPollingStations['forEach']((j,k)=>{const a4=a3,l=document[a4(0xe6)]('label');l[a4(0x1cb)]=a4(0x13d),l[a4(0x191)]=a4(0x147)+j['value']+'\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-index=\x22'+k+a4(0x168)+j[a4(0x170)]+a4(0x196)+j['text']+a4(0xe8),e['appendChild'](l);}));if(g)g['style']['display']='flex';if(f)f['style'][a3(0x188)]='none';console[a3(0x19a)]('Loaded',allPollingStations['length'],'polling\x20stations');}else{if(e)e[a3(0x191)]='';if(f)f[a3(0x185)][a3(0x188)]='flex';if(g)g[a3(0x185)][a3(0x188)]=a3(0x127);}}catch(j){console[a3(0x115)](a3(0x12c),j);if(e)e[a3(0x191)]='<p\x20style=\x22text-align:center;padding:15px;color:#e74c3c;\x22>Error\x20loading\x20polling\x20stations</p>';if(f)f[a3(0x185)]['display']=a3(0x127);}});async function loadCaptcha(){const a5=I;try{document[a5(0x15f)](a5(0x19b))['src']='',document[a5(0x15f)](a5(0x19b))['style']['display']=a5(0x127),document['getElementById'](a5(0x117))[a5(0x185)][a5(0x188)]='block';const c=document['querySelector']('button[onclick=\x22loadCaptcha()\x22]'),d=document['getElementById'](a5(0xeb));if(c)c['disabled']=!![];if(d)d[a5(0x191)]=a5(0x1b0);const e=await fetch(a5(0x197));if(!e['ok'])throw new Error(a5(0xed)+e['status']);const f=await e[a5(0x114)]();if(f[a5(0xfb)]===a5(0x101)){sessionId=f[a5(0xfa)],document['getElementById'](a5(0x117))[a5(0x185)][a5(0x188)]='none',document['getElementById']('captchaImage')[a5(0x15c)]=f['captchaUrl'],document[a5(0x15f)]('captchaImage')['style']['display']=a5(0x113);if(d)d[a5(0x191)]=a5(0x152);}else throw new Error(f[a5(0x199)]||a5(0x118));}catch(g){console[a5(0x115)]('Error\x20loading\x20captcha:',g),document['getElementById'](a5(0x117))['style'][a5(0x188)]='none',showError(a5(0x1aa));}finally{const h=document['querySelector']('button[onclick=\x22loadCaptcha()\x22]'),i=document['getElementById'](a5(0xeb));if(h)h['disabled']=![];i&&i['innerHTML'][a5(0x156)]('Loading')&&(i['innerHTML']='Load\x20Captcha');}}function parseVotersFromHTML(c){const a6=I,d=[];let f=null;try{console['log']('🔍\x20Attempting\x20to\x20extract\x20Malayalam\x20polling\x20station\x20name\x20from\x20HTML...');const m=c[a6(0xe9)]('select[id*=\x22pollingStation\x22]\x20option[selected],\x20'+'select[name*=\x22pollingStation\x22]\x20option[selected],\x20'+a6(0xf7));m&&(f=m[a6(0xee)]['trim']()['replace'](/\s+/g,'\x20'),console['log'](a6(0xf9),f));if(!f){const n=c['querySelector'](a6(0x126));if(n){const o=n[a6(0xee)]['trim']()['replace'](/\s+/g,'\x20');console[a6(0x19a)](a6(0x1c8),o),o&&o!=='--\x20തിരഞ്ഞെടുക്കുക\x20--'&&o!==a6(0x111)&&o!=='--'&&!o['startsWith']('--')&&(f=o,console['log'](a6(0x190),f));}else console['log'](a6(0x172));}if(!f){const p=c[a6(0xe9)]('.chosen-results\x20li.result-selected,\x20.chosen-results\x20li.active-result.result-selected');if(p){const q=p['textContent']['trim']()[a6(0x13c)](/\s+/g,'\x20');console[a6(0x19a)](a6(0x174),q),q&&q!==a6(0x158)&&q!==a6(0x111)&&q!=='--'&&!q[a6(0xff)]('--')&&(f=q,console['log']('✅\x20Found\x20polling\x20station\x20from\x20chosen-results:',f));}}if(!f){const r=c[a6(0x159)](a6(0x179));console['log'](a6(0x11b),r['length'],'header\x20elements');for(const s of r){const t=s[a6(0xee)]['trim']();if(t['includes']('പോളിംഗ്')||t['includes']('പോളിങ്')||t[a6(0x156)](a6(0x1b4))){f=t,console[a6(0x19a)](a6(0x186),f);break;}}}!f&&(console['warn'](a6(0x124)),console['log']('🔍\x20HTML\x20structure\x20of\x20polling\x20station\x20dropdown:',c['querySelector'](a6(0x1b8))?.[a6(0x13a)]?.['substring'](0x0,0x1f4)||'Not\x20found'));}catch(u){console[a6(0x115)]('❌\x20Error\x20extracting\x20polling\x20station\x20name\x20from\x20HTML:',u);}const g=new Set([a6(0xef),a6(0x10d),a6(0x1a8)]),h='ഒഴിവാക്കലുകൾ';let i=null,j=![];const k=['tbody.voters-list\x20tr',a6(0x1cd),a6(0x116),'.voter-row','tr'];let l=[];for(const v of k){const w=c[a6(0x159)](v);if(w['length']>0x0){l=Array['from'](w),console['log'](a6(0x1ab)+l[a6(0x14e)]+a6(0x10e)+v);break;}}return l[a6(0x18f)](x=>{const a7=a6;if(j)return;const y=x['querySelector']('h3');if(y){const E=y['textContent']['trim'](),F=E['replace'](/\s+/g,'\x20')['trim']();console['log'](a7(0x1b7),F);if(F['startsWith'](h)){j=!![],console['log']('Stopping\x20parse\x20after\x20deletions\x20section\x20header');return;}g[a7(0x157)](F)?(i=F,console['log'](a7(0x173),F)):(i=a7(0x153),console['log'](a7(0x1bc)));return;}const z=x[a7(0x159)]('td');if(z[a7(0x14e)]===0x0)return;const A=i===null,B=i&&i!==a7(0x153);if(!(A||B))return;let C=null;if(z['length']===0x7)C={'sl_no':z[0x0]['textContent'][a7(0x135)](),'name':z[0x1]['textContent'][a7(0x135)](),'guardian_name':z[0x2][a7(0xee)][a7(0x135)](),'house_no':z[0x3]['textContent']['trim'](),'house_name':z[0x4][a7(0xee)]['trim'](),'gender_age':z[0x5][a7(0xee)]['trim'](),'sec_id':z[0x6][a7(0xee)]['trim']()};else{if(z[a7(0x14e)]===0x6)C={'sl_no':z[0x0]['textContent']['trim'](),'name':z[0x1][a7(0xee)]['trim'](),'guardian_name':z[0x2][a7(0xee)][a7(0x135)](),'house_no':'','house_name':z[0x3]['textContent'][a7(0x135)](),'gender_age':z[0x4][a7(0xee)][a7(0x135)](),'sec_id':z[0x5]['textContent'][a7(0x135)]()};else z[a7(0x14e)]>=0x4&&(C={'sl_no':z[0x0]['textContent'][a7(0x135)](),'name':z[0x1][a7(0xee)]['trim'](),'guardian_name':z[0x2]?z[0x2][a7(0xee)]['trim']():'','house_no':'','house_name':z[0x3]?z[0x3]['textContent'][a7(0x135)]():'','gender_age':'','sec_id':Array[a7(0x122)](z)[a7(0x1ce)](0x4)[a7(0xf5)](G=>G['textContent'][a7(0x135)]())['join']('\x20|\x20')});}if(!C)return;const D=C[a7(0x120)]['toUpperCase']();if(D[a7(0x156)]('DELETED')||D['includes'](a7(0x16e)))return;(C[a7(0x120)]||C['sec_id'])&&d['push'](C);}),console[a6(0x19a)](a6(0xea)+d['length']+a6(0x18b)),{'voters':d,'pollingStationName':f};}async function createSlip(){const a8=I,c=document[a8(0x15f)](a8(0x100))[a8(0x10c)],d=document['getElementById'](a8(0x1b9))[a8(0x10c)],e=document[a8(0x15f)]('ward')['value'],f='M';if(selectedStations['length']>0x1){await extractStationsSequentially();return;}const g=selectedStations['length']===0x1?selectedStations[0x0]['value']:null,h=selectedStations[a8(0x14e)]===0x1?selectedStations[0x0]['text']:null,i=document[a8(0x15f)]('captcha')[a8(0x10c)][a8(0x135)]();console[a8(0x19a)]('📍\x20Polling\x20Station\x20Value:',g),console['log']('📍\x20Polling\x20Station\x20Malayalam\x20Text:',h);if(!c||!d||!e||!g||!i){showError('captchaError',a8(0x1a4));return;}if(!sessionId){showError(a8(0x131),'Captcha\x20session\x20expired.\x20Please\x20refresh\x20the\x20page.');return;}if(!selectedSymbol){showError('Please\x20select\x20a\x20symbol\x20before\x20creating\x20slip');return;}document['getElementById'](a8(0x1a6))[a8(0xe5)]=!![];const j=document[a8(0x15f)]('extractionLoading');j['classList']['add'](a8(0xf6)),setTimeout(()=>{const a9=a8;j[a9(0xf8)]();const k=j[a9(0x10a)](),l=window['innerHeight'];(k['top']<0x0||k[a9(0x1af)]>l)&&j['scrollIntoView']({'behavior':'smooth','block':a9(0x12f)});},0x64),document['getElementById']('loadingMainText')['textContent']=a8(0x134),document['getElementById'](a8(0x198))[a8(0xee)]='Please\x20wait\x20while\x20we\x20fetch\x20the\x20voter\x20list';try{const k=await fetch('/api/submitWithCaptcha',{'method':a8(0x19f),'headers':{'Content-Type':a8(0xec)},'body':JSON['stringify']({'sessionId':sessionId,'district':c,'local_body':d,'ward':e,'polling_station':g,'language':f,'captcha':i})}),l=await k['json']();if(l['status']===a8(0x101)&&l[a8(0x14c)]){const m=new DOMParser(),n=m[a8(0x18d)](l['html'],a8(0x132));console[a8(0x19a)]('🔍\x20HTML\x20response\x20length:',l[a8(0x14c)]['length']),console[a8(0x19a)](a8(0x18a),l[a8(0x14c)]['includes']('pollingStation')),console[a8(0x19a)]('🔍\x20HTML\x20contains\x20\x22പോളിംഗ്\x22?',l['html'][a8(0x156)](a8(0x108)));const o=parseVotersFromHTML(n);extractedVoters=o[a8(0xfe)];const p=l[a8(0x17a)]||(selectedStations['length']===0x1?selectedStations[0x0][a8(0x170)]:null)||null;console[a8(0x19a)]('🔍\x20Parse\x20result\x20pollingStationName\x20from\x20HTML:',o[a8(0x15a)]),console['log'](a8(0x1a2),l[a8(0x17a)]),console[a8(0x19a)](a8(0x15d),selectedStations[a8(0x14e)]===0x1?selectedStations[0x0][a8(0x170)]:null),console[a8(0x19a)](a8(0x110),p),console[a8(0x19a)](a8(0x125),o),console[a8(0x19a)]('🔍\x20Extracted\x20Malayalam\x20polling\x20station\x20name:',p),console['log'](a8(0x192),typeof p),console[a8(0x19a)]('🔍\x20Sample\x20voter\x20before\x20adding\x20station\x20name:',extractedVoters[0x0]);p?(console['log'](a8(0x1bb),p),extractedVoters=extractedVoters['map'](u=>({...u,'polling_station_name':p})),console[a8(0x19a)](a8(0x11f),extractedVoters[0x0])):(console['warn']('⚠️\x20No\x20Malayalam\x20polling\x20station\x20name\x20found\x20in\x20HTML\x20response!'),console[a8(0x19a)](a8(0x1b6)));if(extractedVoters[a8(0x14e)]===0x0){showError(a8(0x131),'No\x20voters\x20found.\x20Please\x20check\x20your\x20selection\x20and\x20try\x20again.');return;}document['getElementById']('loadingMainText')['textContent']='Found\x20'+extractedVoters['length']+'\x20voters',document[a8(0x15f)](a8(0x198))['textContent']='Creating\x20your\x20order...';const q=parseInt(document['querySelector']('input[name=\x22slipsPerPage\x22]:checked')['value']);console['log']('🎫\x20Slips\x20per\x20page\x20selected:',q);const r={'customization':{'symbolId':selectedSymbol['_id'],'symbolImage':selectedSymbol['imageUrl'],'symbolName':selectedSymbol[a8(0x120)],'symbolNameMalayalam':selectedSymbol['nameMalayalam']||'','slipsPerPage':q},'location':{'district':document[a8(0x15f)](a8(0x100))[a8(0x12d)][document['getElementById'](a8(0x100))[a8(0x181)]][a8(0x170)],'localBody':document[a8(0x15f)]('localBody')[a8(0x12d)][document[a8(0x15f)]('localBody')['selectedIndex']]['text'],'ward':document[a8(0x15f)](a8(0x171))['options'][document[a8(0x15f)](a8(0x171))['selectedIndex']]['text'],'pollingStation':selectedStations['length']===0x1?selectedStations[0x0]['text']:a8(0x183),'pollingStationMalayalam':p||null},'voters':extractedVoters,'voterCount':extractedVoters['length']};console[a8(0x19a)](a8(0x11d),r);const s=await fetch('/api/orders/create',{'method':'POST','headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+token},'body':JSON['stringify'](r)}),t=await s['json']();if(t[a8(0xfb)]===a8(0x101))document['getElementById'](a8(0x155))['innerHTML']='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!\x20Order\x20created\x20with\x20'+extractedVoters[a8(0x14e)]+'\x20voters',document[a8(0x15f)](a8(0x198))[a8(0xee)]='Redirecting\x20to\x20preview...',setTimeout(()=>{const aa=a8;window[aa(0x16f)][aa(0x1ac)]=aa(0x187)+t['order'][aa(0x161)];},0x5dc);else throw new Error(t['message']||'Failed\x20to\x20create\x20order');}else{if(l[a8(0x162)]==='SEC_WEBSITE_ERROR'){const u=l[a8(0x17e)]||'SEC\x20Website\x20Unavailable',v=l['customErrorMessage']||l['message'];Swal[a8(0x16c)]({'icon':a8(0x115),'title':u,'html':a8(0x160)+v+'</p>'+'<p\x20class=\x22text-muted\x20mt-2\x22\x20style=\x22font-size:\x200.9em;\x22>The\x20Kerala\x20State\x20Election\x20Commission\x20website\x20is\x20currently\x20down\x20or\x20experiencing\x20issues.\x20This\x20is\x20beyond\x20our\x20control.</p>'+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':a8(0x12b),'allowOutsideClick':![]});}else{const w=l['message']||a8(0x176);showError(a8(0x131),w);}}}catch(x){console[a8(0x115)]('Create\x20slip\x20error:',x);const y=x['message']||a8(0x12a);showError('captchaError',y),setTimeout(()=>loadCaptcha(),0x3e8);}finally{document['getElementById']('extractBtn')['disabled']=![],document[a8(0x15f)](a8(0xf3))[a8(0x1ad)]['remove'](a8(0xf6));}}async function extractStationsSequentially(){const ab=I;if(!selectedSymbol){showError(ab(0x131),ab(0x16b));return;}if(selectedStations[ab(0x14e)]===0x0){showError(ab(0x131),ab(0x10f));return;}const c=document[ab(0x15f)](ab(0x100))[ab(0x10c)],d=document[ab(0x15f)]('localBody')['value'],e=document['getElementById']('ward')['value'],f='M';document['getElementById']('extractBtn')['disabled']=!![];const g=document[ab(0x15f)]('extractionLoading');g[ab(0x1ad)]['add']('show'),setTimeout(()=>{const ac=ab;g[ac(0xf8)]();const m=g['getBoundingClientRect'](),n=window[ac(0x137)];(m['top']<0x0||m[ac(0x1af)]>n)&&g[ac(0xf2)]({'behavior':'smooth','block':'center'});},0x64);let h=[],i=0x0,j=[],k=0x0;console[ab(0x19a)]('🚀\x20Starting\x20sequential\x20extraction\x20for\x20'+selectedStations['length']+'\x20Polling\x20Stations');const l=async m=>{const ad=ab;if(m>=selectedStations[ad(0x14e)])return finializeExtraction(h,i,j);const n=selectedStations[m];document[ad(0x15f)]('loadingMainText')[ad(0xee)]='Station\x20'+(m+0x1)+'\x20of\x20'+selectedStations[ad(0x14e)],document[ad(0x15f)]('loadingSubText')['textContent']=n['text'];try{let o,p;if(m===0x0){console['log']('🚀\x20Extracting\x20first\x20station\x20with\x20main\x20page\x20captcha...');const s=document['getElementById'](ad(0x14f))['value']['trim']();if(!s)return j['push']({'station':n[ad(0x170)],'reason':ad(0x167)}),l(m+0x1);o=s,p=sessionId;}else{console['log']('📋\x20Station\x20'+(m+0x1)+ad(0x1bd));const t=await loadCaptchaForBulk();if(!t)return j['push']({'station':n['text'],'reason':'Failed\x20to\x20load\x20captcha'}),l(m+0x1);p=window['currentSessionId'],o=await showCaptchaDialog(n[ad(0x170)],m+0x1,selectedStations['length']);if(!o)return j['push']({'station':n[ad(0x170)],'reason':'Cancelled\x20by\x20user'}),l(m+0x1);}console[ad(0x19a)](ad(0x1a9)+(m+0x1)+'...');const q=await fetch('/api/submitWithCaptcha',{'method':ad(0x19f),'headers':{'Content-Type':'application/json'},'body':JSON[ad(0x177)]({'sessionId':p,'district':c,'local_body':d,'ward':e,'polling_station':n['value'],'language':f,'captcha':o})}),r=await q['json']();if(r['status']==='success'&&r[ad(0x14c)]){const u=new DOMParser(),v=u[ad(0x18d)](r[ad(0x14c)],ad(0x132)),w=parseVotersFromHTML(v),x=w[ad(0xfe)],y=w['pollingStationName'];if(x['length']>0x0){const z=x['map'](A=>({...A,'polling_station_name':y||n[ad(0x170)],'polling_station_value':n[ad(0x10c)]}));h=h['concat'](z),i++,console['log']('✅\x20Station\x20'+(m+0x1)+'\x20('+n['text']+ad(0x1b2)+x[ad(0x14e)]+'\x20voters\x20extracted');}else j['push']({'station':n[ad(0x170)],'reason':ad(0x102)});}else{if(r[ad(0x162)]==='SEC_WEBSITE_ERROR'){const A=r[ad(0x17e)]||'SEC\x20Website\x20Unavailable',B=r['customErrorMessage']||r['message'];Swal['fire']({'icon':'error','title':A,'html':'<p>'+B+ad(0x163)+ad(0x1c9)+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':ad(0x12b),'allowOutsideClick':![]})['then'](()=>{const ae=ad;document['getElementById'](ae(0x1a6))['disabled']=![],document[ae(0x15f)]('extractionLoading')[ae(0x1ad)]['remove'](ae(0xf6));});return;}else j['push']({'station':n[ad(0x170)],'reason':r['message']||'Extraction\x20failed'});}}catch(C){console[ad(0x115)](ad(0x138)+(m+0x1)+':',C),j['push']({'station':n['text'],'reason':C[ad(0x199)]});}return l(m+0x1);};await l(0x0);}async function finializeExtraction(c,d,e){const af=I;document['getElementById']('loadingMainText')[af(0xee)]=af(0x112),document['getElementById']('loadingSubText')['textContent']=d+'/'+selectedStations['length']+'\x20stations\x20successful,\x20'+c[af(0x14e)]+af(0x140);if(c[af(0x14e)]===0x0){showError('captchaError','No\x20voters\x20extracted\x20from\x20any\x20polling\x20station'),document['getElementById']('extractBtn')[af(0xe5)]=![],document['getElementById']('extractionLoading')[af(0x1ad)]['remove'](af(0xf6));return;}extractedVoters=c;if(e[af(0x14e)]>0x0){console[af(0x13e)]('⚠️\x20Failed\x20stations:',e);const f=e['map'](i=>'•\x20'+i[af(0x128)]+':\x20'+i[af(0x13b)])['join']('\x0a'),g=af(0x11e)+e[af(0x14e)]+af(0x1a1)+f+'\x0a\x0aProceeding\x20with\x20'+c['length']+'\x20voters\x20from\x20'+d+af(0x1cc),h=document['createElement']('div');h['style']['cssText']=af(0x133),h[af(0x191)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202.5rem;\x20border-radius:\x2016px;\x20max-width:\x20500px;\x20width:\x20100%;\x20box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.3);\x20border-top:\x204px\x20solid\x20#ff9800;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x203rem;\x20color:\x20#ff9800;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22color:\x20#ff9800;\x20margin-bottom:\x201rem;\x20text-align:\x20center;\x20font-size:\x201.3rem;\x22>Partial\x20Extraction</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22color:\x20#666;\x20white-space:\x20pre-line;\x20line-height:\x201.6;\x20margin-bottom:\x201.5rem;\x20font-size:\x200.95rem;\x22>'+g+af(0x194)+c[af(0x14e)]+af(0x148),document['body']['appendChild'](h);}setTimeout(async()=>{const ag=af;document['getElementById']('loadingMainText')[ag(0xee)]=ag(0x1b3),document[ag(0x15f)](ag(0x198))[ag(0xee)]=c['length']+'\x20voters\x20from\x20'+d+ag(0x180);try{const i=selectedStations[ag(0x14e)]>0x1?selectedStations['length']+'\x20Polling\x20Stations':selectedStations[0x0][ag(0x170)],j=parseInt(document[ag(0xe9)](ag(0x106))['value']),k={'customization':{'symbolId':selectedSymbol[ag(0x15e)],'symbolImage':selectedSymbol[ag(0x105)],'symbolName':selectedSymbol['name'],'symbolNameMalayalam':selectedSymbol[ag(0x165)]||'','slipsPerPage':j},'location':{'district':document[ag(0x15f)](ag(0x100))['options'][document[ag(0x15f)](ag(0x100))['selectedIndex']][ag(0x170)],'localBody':document[ag(0x15f)](ag(0x1b9))['options'][document['getElementById'](ag(0x1b9))['selectedIndex']][ag(0x170)],'ward':document['getElementById'](ag(0x171))['options'][document['getElementById']('ward')[ag(0x181)]]['text'],'pollingStation':i},'voters':c,'voterCount':c['length']},l=await fetch(ag(0x18e),{'method':'POST','headers':{'Content-Type':ag(0xec),'Authorization':'Bearer\x20'+token},'body':JSON['stringify'](k)}),m=await l[ag(0x114)]();if(m[ag(0xfb)]===ag(0x101))document['getElementById'](ag(0x155))[ag(0x191)]=ag(0x1ba),document['getElementById'](ag(0x198))[ag(0xee)]=ag(0x1a3),setTimeout(()=>{const ah=ag;window['location'][ah(0x1ac)]=ah(0x187)+m[ah(0x164)]['orderId'];},0x5dc);else throw new Error(m['message']||'Failed\x20to\x20create\x20order');}catch(n){console['error'](ag(0x130),n),showError('captchaError',n['message']||'Failed\x20to\x20create\x20order'),document[ag(0x15f)]('extractBtn')[ag(0xe5)]=![],document['getElementById'](ag(0xf3))['classList'][ag(0xe7)]('show');}},0x7d0);}async function loadCaptchaForBulk(){const ai=I;try{const c=await fetch('/api/initCaptchaSession');if(!c['ok'])throw new Error('HTTP\x20error!\x20status:\x20'+c[ai(0xfb)]);const d=await c['json']();if(d['status']===ai(0x101))return sessionId=d['sessionId'],window[ai(0x149)]=d['sessionId'],window[ai(0x144)]=d[ai(0x1b5)],console['log']('✅\x20New\x20captcha\x20session\x20loaded:\x20'+d[ai(0xfa)]),!![];return![];}catch(e){return console['error']('Error\x20loading\x20captcha:',e),![];}}function showCaptchaDialog(c,d,e){return new Promise(f=>{const aj=b,g=document['createElement'](aj(0x139));g[aj(0x185)][aj(0x17f)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20right:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20bottom:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,0,0,0.8);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010000;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',g['innerHTML']=aj(0x119)+d+'\x20of\x20'+e+aj(0x15b)+c+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20padding:\x201rem;\x20margin-bottom:\x201.5rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22'+window[aj(0x144)]+'\x22\x20alt=\x22Captcha\x22\x20style=\x22max-width:\x20100%;\x20height:\x20auto;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22bulkCaptchaInput\x22\x20placeholder=\x22Enter\x20Captcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.75rem;\x20border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22submitBulkCaptcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.875rem;\x20background:\x20linear-gradient(135deg,\x20#006d3b\x200%,\x20#004d2a\x20100%);\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20cursor:\x20pointer;\x20font-weight:\x20600;\x20font-size:\x201.05rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x201rem\x200\x200\x200;\x20color:\x20#718096;\x20font-size:\x200.85rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Press\x20Enter\x20to\x20continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body']['appendChild'](g);const h=g['querySelector']('#bulkCaptchaInput'),i=g[aj(0xe9)]('#submitBulkCaptcha');h[aj(0xf8)]();const j=()=>{const ak=aj,k=h['value'][ak(0x135)]();document['body'][ak(0x150)](g),f(k||null);};i['onclick']=j,h['addEventListener']('keypress',k=>{const al=aj;if(k['key']===al(0x1ca))j();});});}async function createOrder(){const am=I,c={'customization':{'symbolId':selectedSymbol['_id'],'symbolImage':selectedSymbol[am(0x105)],'symbolName':selectedSymbol['name'],'symbolNameMalayalam':selectedSymbol[am(0x165)]||''},'location':{'district':document['getElementById']('district')[am(0x12d)][document['getElementById']('district')['selectedIndex']][am(0x170)],'localBody':document['getElementById']('localBody')[am(0x12d)][document['getElementById'](am(0x1b9))[am(0x181)]]['text'],'ward':document[am(0x15f)]('ward')[am(0x12d)][document['getElementById']('ward')[am(0x181)]][am(0x170)],'pollingStation':document[am(0x15f)](am(0x1c2))['options'][document['getElementById']('pollingStation')['selectedIndex']][am(0x170)]},'voters':extractedVoters};try{const d=await fetch('/api/orders/create',{'method':'POST','headers':{'Authorization':am(0x17d)+token,'Content-Type':'application/json'},'body':JSON['stringify'](c)}),e=await d['json']();if(d['ok'])window['location']['href']=am(0x187)+e['order'][am(0x15e)];else throw new Error(e['message']||am(0x109));}catch(f){console[am(0x115)](am(0x130),f),alert(am(0xfd)),prevStep(0x3);}}</script>
+    <script>
+        let currentStep = 1;
+        let selectedSymbol = null;
+        let symbolFreeMode = false;
+        let extractedVoters = [];
+        let sessionId = '';
+        let allPollingStations = []; // Store all stations
+        let selectedStations = []; // Store user-selected stations
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+            window.location.href = 'login.html';
+        }
+
+        // Select/deselect all polling stations
+        function selectAllPS() {
+            const checkboxes = document.querySelectorAll('.ps-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                cb.closest('.polling-station-checkbox').classList.add('checked');
+            });
+            updateSelectedStations();
+        }
+
+        function clearAllPS() {
+            const checkboxes = document.querySelectorAll('.ps-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.closest('.polling-station-checkbox').classList.remove('checked');
+            });
+            updateSelectedStations();
+        }
+
+        // Update selected polling stations array and button text
+        function updateSelectedStations() {
+            const checkboxes = document.querySelectorAll('.ps-checkbox:checked');
+            selectedStations = Array.from(checkboxes).map(cb => {
+                const index = parseInt(cb.dataset.index);
+                return allPollingStations[index];
+            });
+            
+            const btnText = document.getElementById('extractBtnText');
+            const count = selectedStations.length;
+            
+            // Keep button text constant
+            btnText.textContent = 'Create Voter Slip';
+            
+            // Show selected count badge
+            const existingBadge = document.querySelector('.selected-count');
+            if (existingBadge) existingBadge.remove();
+            
+            if (count > 0) {
+                const psList = document.getElementById('pollingStationList');
+                if (psList) {
+                    const badge = document.createElement('div');
+                    badge.className = 'selected-count';
+                    badge.textContent = `${count} station${count > 1 ? 's' : ''} selected`;
+                    psList.appendChild(badge);
+                }
+            }
+            
+            console.log('Selected stations:', count);
+        }
+
+        // Toggle single checkbox
+        function togglePSCheckbox(checkbox) {
+            const parent = checkbox.closest('.polling-station-checkbox');
+            if (checkbox.checked) {
+                parent.classList.add('checked');
+            } else {
+                parent.classList.remove('checked');
+            }
+            updateSelectedStations();
+        }
+
+        // Initialize symbol picker
+        window.addEventListener('DOMContentLoaded', () => {
+            window.symbolPicker = initSymbolPicker((symbol) => {
+                // Callback when symbol is selected
+                selectedSymbol = symbol;
+                symbolFreeMode = false;
+                // Update UI
+                document.getElementById('selectedSymbolImage').src = symbol.imageUrl;
+                document.getElementById('selectedSymbolName').textContent = symbol.nameMalayalam || symbol.name;
+                // Display English name as secondary if Malayalam exists
+                const malayalamNameElement = document.getElementById('selectedSymbolNameMalayalam');
+                if (symbol.nameMalayalam && symbol.nameMalayalam.trim()) {
+                    malayalamNameElement.textContent = symbol.name;
+                    malayalamNameElement.style.display = 'block';
+                } else {
+                    malayalamNameElement.style.display = 'none';
+                }
+                document.getElementById('symbolPreview').style.display = 'block';
+                document.getElementById('selectSymbolBtn').style.display = 'none';
+                // Restore the continue link if previously changed
+                const continueLink = document.getElementById('continueWithoutSymbol');
+                if (continueLink) {
+                    continueLink.textContent = 'Continue without any symbols';
+                    continueLink.style.color = '#2c5282';
+                    continueLink.style.pointerEvents = 'auto';
+                }
+                // Clear error
+                document.getElementById('symbolError').classList.remove('show');
+                console.log('Symbol selected:', symbol);
+            });
+        });
+
+        // Step navigation
+        function nextStep(step) {
+            if (step === 1) {
+                if (!validateStep1()) return;
+            } else if (step === 2) {
+                if (extractedVoters.length === 0) {
+                    alert('Please extract voter data');
+                    return;
+                }
+                createOrder();
+                return;
+            }
+
+            document.querySelector('.form-section.active').classList.remove('active');
+            document.getElementById(`step${step + 1}`).classList.add('active');
+
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
+            for (let i = 1; i < step + 1; i++) {
+                document.querySelector(`.step[data-step="${i}"]`).classList.add('completed');
+            }
+            document.querySelector(`.step[data-step="${step + 1}"]`).classList.add('active');
+
+            updateProgressBar(step + 1);
+            currentStep = step + 1;
+            window.scrollTo(0, 0);
+        }
+
+        function prevStep(step) {
+            document.querySelector('.form-section.active').classList.remove('active');
+            document.getElementById(`step${step - 1}`).classList.add('active');
+
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
+            for (let i = 1; i < step - 1; i++) {
+                document.querySelector(`.step[data-step="${i}"]`).classList.add('completed');
+            }
+            document.querySelector(`.step[data-step="${step - 1}"]`).classList.add('active');
+
+            updateProgressBar(step - 1);
+            currentStep = step - 1;
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgressBar(step) {
+            const progress = ((step - 1) / 2) * 100;
+            document.getElementById('progressLine').style.width = progress + '%';
+        }
+
+        function validateStep1() {
+            let valid = true;
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            if (!selectedSymbol && !symbolFreeMode) {
+                showError('symbolError', 'Please select a symbol or continue without any symbols');
+                valid = false;
+            }
+            return valid;
+        }
+
+        function showError(messageOrElementId, optionalMessage) {
+            // If called with 2 params: showError(elementId, message)
+            if (optionalMessage !== undefined) {
+                const errorElement = document.getElementById(messageOrElementId);
+                if (errorElement) {
+                    errorElement.textContent = optionalMessage;
+                    errorElement.classList.add('show');
+                } else {
+                    alert(optionalMessage);
+                }
+            } 
+            // If called with 1 param: showError(message) - show as alert or in captchaError
+            else {
+                const captchaErrorElement = document.getElementById('captchaError');
+                if (captchaErrorElement) {
+                    captchaErrorElement.textContent = messageOrElementId;
+                    captchaErrorElement.classList.add('show');
+                    setTimeout(() => captchaErrorElement.classList.remove('show'), 5000);
+                } else {
+                    alert(messageOrElementId);
+                }
+            }
+        }
+
+        // CRITICAL: Load districts FIRST before anything else
+        // This ensures dropdowns are populated immediately when page loads
+        (async function initializeApp() {
+            console.log('🚀 Loading districts first (highest priority)...');
+            
+            // Load districts immediately - blocking operation
+            await loadDistricts();
+            
+            console.log('✅ Districts loaded, now loading captcha in background...');
+            
+            // Load captcha in background after districts
+            loadCaptcha();
+        })();
+
+        async function loadDistricts() {
+            try {
+                console.log('📡 Fetching districts from database...');
+                const response = await fetch('/api/getDistricts');
+                const data = await response.json();
+                const select = document.getElementById('district');
+                
+                if (data.status === 'success' && data.districts) {
+                    console.log(`✅ Loaded ${data.districts.length} districts`);
+                    data.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.value;
+                        option.textContent = district.text;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error loading districts:', error);
+                showError('Failed to load districts. Please refresh the page.');
+            }
+        }
+
+        document.getElementById('district').addEventListener('change', async function() {
+            const districtId = this.value;
+            const localBodySelect = document.getElementById('localBody');
+            const wardSelect = document.getElementById('ward');
+            const psList = document.getElementById('pollingStationList');
+            
+            localBodySelect.innerHTML = '<option value="">Loading...</option>';
+            localBodySelect.disabled = true;
+            wardSelect.innerHTML = '<option value="">Select Ward</option>';
+            wardSelect.disabled = true;
+            psList.style.display = 'none'; // Hide polling stations
+            selectedStations = [];
+
+            try {
+                const response = await fetch('/api/getLocalBodies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ district_id: districtId })
+                });
+                const data = await response.json();
+                localBodySelect.innerHTML = '<option value="">Select Local Body</option>';
+                
+                if (data.status === 'success' && data.local_bodies) {
+                    data.local_bodies.forEach(lb => {
+                        const option = document.createElement('option');
+                        option.value = lb.value;
+                        option.textContent = lb.text;
+                        localBodySelect.appendChild(option);
+                    });
+                }
+                localBodySelect.disabled = false;
+            } catch (error) {
+                console.error('Error loading local bodies:', error);
+                localBodySelect.innerHTML = '<option value="">Error loading data</option>';
+            }
+        });
+
+        document.getElementById('localBody').addEventListener('change', async function() {
+            const localBodyId = this.value;
+            const wardSelect = document.getElementById('ward');
+            const psList = document.getElementById('pollingStationList');
+            
+            wardSelect.innerHTML = '<option value="">Loading...</option>';
+            wardSelect.disabled = true;
+            psList.style.display = 'none'; // Hide polling stations
+            selectedStations = [];
+
+            try {
+                const response = await fetch('/api/getWards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ local_body_id: localBodyId })
+                });
+                const data = await response.json();
+                wardSelect.innerHTML = '<option value="">Select Ward</option>';
+                
+                if (data.status === 'success' && data.wards) {
+                    data.wards.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.value;
+                        option.textContent = ward.text;
+                        wardSelect.appendChild(option);
+                    });
+                }
+                wardSelect.disabled = false;
+            } catch (error) {
+                console.error('Error loading wards:', error);
+                wardSelect.innerHTML = '<option value="">Error loading data</option>';
+            }
+        });
+
+        document.getElementById('ward').addEventListener('change', async function() {
+            const wardId = this.value;
+            const psList = document.getElementById('pollingStationList');
+            const psCheckboxes = document.getElementById('pollingStationCheckboxes');
+            const psEmpty = document.getElementById('pollingStationEmpty');
+            const psControls = document.querySelector('.polling-station-controls');
+            
+            // Show the polling station list container
+            if (psList) psList.style.display = 'block';
+            
+            // Clear previous state
+            if (psCheckboxes) psCheckboxes.innerHTML = '<p style="text-align:center;padding:15px;color:#666;">Loading...</p>';
+            if (psEmpty) psEmpty.style.display = 'none';
+            if (psControls) psControls.style.display = 'none';
+            selectedStations = [];
+
+            try {
+                const response = await fetch('/api/getPollingStations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ward_id: wardId })
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.polling_stations && data.polling_stations.length > 0) {
+        // Store all polling stations
+                    allPollingStations = data.polling_stations;
+                    
+                    // Populate checkbox list
+                    if (psCheckboxes) {
+                        psCheckboxes.innerHTML = '';
+                        allPollingStations.forEach((ps, index) => {
+                            const item = document.createElement('label');
+                            item.className = 'polling-station-checkbox';
+                            item.innerHTML = `
+                                <input type="checkbox" class="ps-checkbox" 
+                                       value="${ps.value}" 
+                                       data-index="${index}"
+                                       data-text="${ps.text}"
+                                       onchange="togglePSCheckbox(this)">
+                                <span>${ps.text}</span>
+                            `;
+                            psCheckboxes.appendChild(item);
+                        });
+                    }
+                    
+                    // Show controls and hide empty state
+                    if (psControls) psControls.style.display = 'flex';
+                    if (psEmpty) psEmpty.style.display = 'none';
+                    
+                    console.log('Loaded', allPollingStations.length, 'polling stations');
+                } else {
+                    if (psCheckboxes) psCheckboxes.innerHTML = '';
+                    if (psEmpty) psEmpty.style.display = 'flex';
+                    if (psControls) psControls.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading polling stations:', error);
+                if (psCheckboxes) psCheckboxes.innerHTML = '<p style="text-align:center;padding:15px;color:#e74c3c;">Error loading polling stations</p>';
+                if (psEmpty) psEmpty.style.display = 'none';
+            }
+        });
+
+        async function loadCaptcha() {
+            try {
+                // Hide captcha image and show loader
+                document.getElementById('captchaImage').src = '';
+                document.getElementById('captchaImage').style.display = 'none';
+                document.getElementById('captchaLoader').style.display = 'block';
+                
+                // Disable button and show loading text
+                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+                const loadBtnText = document.getElementById('loadCaptchaText');
+                if (loadBtn) loadBtn.disabled = true;
+                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                
+                const response = await fetch('/api/initCaptchaSession');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    sessionId = data.sessionId;
+                    
+                    // Hide loader and show captcha image
+                    document.getElementById('captchaLoader').style.display = 'none';
+                    document.getElementById('captchaImage').src = data.captchaUrl;
+                    document.getElementById('captchaImage').style.display = 'block';
+                    
+                    // Update button text
+                    if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                } else {
+                    throw new Error(data.message || 'Failed to load captcha');
+                }
+            } catch (error) {
+                console.error('Error loading captcha:', error);
+                
+                // Hide loader
+                document.getElementById('captchaLoader').style.display = 'none';
+                
+                showError('Failed to load captcha. Please try again.');
+            } finally {
+                // Re-enable button
+                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+                const loadBtnText = document.getElementById('loadCaptchaText');
+                if (loadBtn) loadBtn.disabled = false;
+                if (loadBtnText && loadBtnText.innerHTML.includes('Loading')) {
+                    loadBtnText.innerHTML = 'Load Captcha';
+                }
+            }
+        }
+
+        function parseVotersFromHTML(doc) {
+            const voters = [];
+            let pollingStationName = null;
+
+            // Try to extract Malayalam polling station name from the HTML
+            // The SEC website shows it in the selected dropdown option after form submission
+            try {
+                console.log('🔍 Attempting to extract Malayalam polling station name from HTML...');
+                
+                // PRIORITY 1: Try to find it in the selected option text (most accurate)
+                const selectedOption = doc.querySelector(
+                    'select[id*="pollingStation"] option[selected], ' +
+                    'select[name*="pollingStation"] option[selected], ' +
+                    '#view_voters_list_pollingStation option[selected="selected"]'
+                );
+                if (selectedOption) {
+                    // Get text content and clean up HTML entities
+                    pollingStationName = selectedOption.textContent
+                        .trim()
+                        .replace(/\s+/g, ' '); // Normalize multiple spaces
+                    console.log('✅ Found polling station from selected option:', pollingStationName);
+                }
+
+                // PRIORITY 2: Try the chosen-single span (for Chosen.js dropdown)
+                if (!pollingStationName) {
+                    const chosenSpan = doc.querySelector('.chosen-container .chosen-single span, .chosen-single span');
+                    if (chosenSpan) {
+                        const text = chosenSpan.textContent
+                            .trim()
+                            .replace(/\s+/g, ' '); // Normalize multiple spaces
+                        console.log('🔍 Found chosen-single span text:', text);
+                        if (text && text !== '-- തിരഞ്ഞെടുക്കുക --' && text !== 'Select' && text !== '--' && !text.startsWith('--')) {
+                            pollingStationName = text;
+                            console.log('✅ Found polling station from Chosen dropdown:', pollingStationName);
+                        }
+                    } else {
+                        console.log('⚠️ No chosen-single span found');
+                    }
+                }
+
+                // PRIORITY 3: Try chosen-results list item that is selected
+                if (!pollingStationName) {
+                    const resultSelected = doc.querySelector('.chosen-results li.result-selected, .chosen-results li.active-result.result-selected');
+                    if (resultSelected) {
+                        const text = resultSelected.textContent
+                            .trim()
+                            .replace(/\s+/g, ' '); // Normalize multiple spaces
+                        console.log('🔍 Found result-selected text:', text);
+                        if (text && text !== '-- തിരഞ്ഞെടുക്കുക --' && text !== 'Select' && text !== '--' && !text.startsWith('--')) {
+                            pollingStationName = text;
+                            console.log('✅ Found polling station from chosen-results:', pollingStationName);
+                        }
+                    }
+                }
+
+                // PRIORITY 4: Try to find polling station name in breadcrumb or title
+                if (!pollingStationName) {
+                    const breadcrumbs = doc.querySelectorAll('.breadcrumb li, .page-title, h1, h2, h3');
+                    console.log('🔍 Searching in', breadcrumbs.length, 'header elements');
+                    for (const elem of breadcrumbs) {
+                        const text = elem.textContent.trim();
+                        // Look for text containing "പോളിംഗ്" or similar patterns
+                        if (text.includes('പോളിംഗ്') || text.includes('പോളിങ്') || text.includes('സ്റ്റേഷൻ')) {
+                            pollingStationName = text;
+                            console.log('✅ Found Malayalam polling station name from page header:', pollingStationName);
+                            break;
+                        }
+                    }
+                }
+                
+                if (!pollingStationName) {
+                    console.warn('❌ Could not find Malayalam polling station name in HTML');
+                    // Debug: Log the HTML structure to see what we're working with
+                    console.log('🔍 HTML structure of polling station dropdown:', 
+                        doc.querySelector('select[id*="pollingStation"]')?.outerHTML?.substring(0, 500) || 'Not found');
+                }
+            } catch (e) {
+                console.error('❌ Error extracting polling station name from HTML:', e);
+            }
+
+            // Section handling
+            const INCLUDE_SECTIONS = new Set([
+                'കൂട്ടിച്ചേർക്കലുകൾ',      // Additions
+                'തിരുത്തലുകൾ',          // Corrections
+                'പ്രവാസി വോട്ടർപട്ടിക'    // NRI / Overseas voters
+            ]);
+            const EXCLUDE_AFTER_SECTION = 'ഒഴിവാക്കലുകൾ'; // Deletions section - stop parsing beyond this
+
+            let currentIncludedSection = null; // null means base original list (include by default)
+            let stopParsing = false;
+
+            // Try multiple selectors to find voter table rows
+            const selectors = [
+                'tbody.voters-list tr',
+                'tbody tr',
+                'table tr',
+                '.voter-row',
+                'tr'
+            ];
+
+            let rows = [];
+            for (const selector of selectors) {
+                const foundRows = doc.querySelectorAll(selector);
+                if (foundRows.length > 0) {
+                    rows = Array.from(foundRows);
+                    console.log(`Found ${rows.length} rows using selector: ${selector}`);
+                    break;
+                }
+            }
+
+            rows.forEach(row => {
+                if (stopParsing) return; // We've reached deletions section
+
+                // Detect section header rows with <h3>
+                const header = row.querySelector('h3');
+                if (header) {
+                    const title = header.textContent.trim();
+                    // Normalize by removing trailing spaces
+                    const normalized = title.replace(/\s+/g, ' ').trim();
+                    console.log('Section header detected:', normalized);
+
+                    if (normalized.startsWith(EXCLUDE_AFTER_SECTION)) {
+                        // Stop parsing further rows entirely
+                        stopParsing = true;
+                        console.log('Stopping parse after deletions section header');
+                        return;
+                    }
+
+                    // Update current section inclusion state
+                    if (INCLUDE_SECTIONS.has(normalized)) {
+                        currentIncludedSection = normalized; // mark that following rows belong to an included section
+                        console.log('Entering included section:', normalized);
+                    } else {
+                        // Non-target section header - treat as not included (skip rows until next included section)
+                        currentIncludedSection = '__EXCLUDE__';
+                        console.log('Entering non-included section, rows will be skipped until next included section');
+                    }
+                    return; // Do not process header row as voter
+                }
+
+                const cols = row.querySelectorAll('td');
+                if (cols.length === 0) return; // skip empty rows
+
+                // Determine if we should collect this row
+                const inBaseList = currentIncludedSection === null; // before any h3 section encountered
+                const inIncludedSection = currentIncludedSection && currentIncludedSection !== '__EXCLUDE__';
+                if (!(inBaseList || inIncludedSection)) {
+                    return; // skip rows in excluded sections
+                }
+
+                // Build voter object based on column count
+                let voter = null;
+                if (cols.length === 7) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2].textContent.trim(),
+                        house_no: cols[3].textContent.trim(),
+                        house_name: cols[4].textContent.trim(),
+                        gender_age: cols[5].textContent.trim(),
+                        sec_id: cols[6].textContent.trim()
+                    };
+                } else if (cols.length === 6) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2].textContent.trim(),
+                        house_no: '',
+                        house_name: cols[3].textContent.trim(),
+                        gender_age: cols[4].textContent.trim(),
+                        sec_id: cols[5].textContent.trim()
+                    };
+                } else if (cols.length >= 4) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2] ? cols[2].textContent.trim() : '',
+                        house_no: '',
+                        house_name: cols[3] ? cols[3].textContent.trim() : '',
+                        gender_age: '',
+                        sec_id: Array.from(cols).slice(4).map(c => c.textContent.trim()).join(' | ')
+                    };
+                }
+
+                if (!voter) return;
+
+                // Filter out rows where name contains DELETED or SHIFTED (case-insensitive)
+                const upperName = voter.name.toUpperCase();
+                if (upperName.includes('DELETED') || upperName.includes('SHIFTED')) {
+                    return; // skip
+                }
+
+                // Basic validity check
+                if (voter.name || voter.sec_id) {
+                    voters.push(voter);
+                }
+            });
+
+            console.log(`Parsed ${voters.length} filtered voters from HTML`);
+            return { voters, pollingStationName };
+        }
+
+        async function createSlip() {
+            const district = document.getElementById('district').value;
+            const localBody = document.getElementById('localBody').value;
+            const ward = document.getElementById('ward').value;
+            const language = 'M'; // Default to Malayalam
+
+            // Check if multiple polling stations selected
+            if (selectedStations.length > 1) {
+                // For multiple polling stations, start with first station extraction
+                // Then allow adding more polling stations one by one
+                await extractStationsSequentially();
+                return;
+            }
+
+            // Single station mode
+            const pollingStation = selectedStations.length === 1 ? selectedStations[0].value : null;
+            const pollingStationMalayalamText = selectedStations.length === 1 ? selectedStations[0].text : null;
+            const captcha = document.getElementById('captcha').value.trim();
+
+            console.log('📍 Polling Station Value:', pollingStation);
+            console.log('📍 Polling Station Malayalam Text:', pollingStationMalayalamText);
+
+            // Validation
+            if (!district || !localBody || !ward || !pollingStation || !captcha) {
+                showError('captchaError', 'Please select at least one polling station and fill all fields');
+                return;
+            }
+
+            if (!sessionId) {
+                showError('captchaError', 'Captcha session expired. Please refresh the page.');
+                return;
+            }
+
+            // Get customization data from step 1
+            if (!selectedSymbol && !symbolFreeMode) {
+                showError('symbolError', 'Please select a symbol or continue without any symbols');
+                return;
+            }
+
+            document.getElementById('extractBtn').disabled = true;
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('extractionLoading');
+            loadingOverlay.classList.add('show');
+            
+            // IMPORTANT: Focus on loading overlay and ensure it's visible
+            // Use setTimeout to ensure overlay is rendered before scrolling
+            setTimeout(() => {
+                loadingOverlay.focus();
+                
+                // Get overlay position and viewport height
+                const rect = loadingOverlay.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // Only scroll if overlay is not fully visible in viewport
+                if (rect.top < 0 || rect.bottom > viewportHeight) {
+                    loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+            
+            // Update loader text
+            document.getElementById('loadingMainText').textContent = 'Fetching voter data...';
+            document.getElementById('loadingSubText').textContent = 'Please wait while we fetch the voter list';
+
+            try {
+                // Step 1: Extract voters using captcha
+                const extractResponse = await fetch('/api/submitWithCaptcha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        district,
+                        local_body: localBody,
+                        ward,
+                        polling_station: pollingStation,
+                        language,
+                        captcha
+                    })
+                });
+
+                const extractData = await extractResponse.json();
+
+                if (extractData.status === 'success' && extractData.html) {
+                    // Parse the HTML to extract voters
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(extractData.html, 'text/html');
+                    
+                    // DEBUG: Log HTML to see if polling station dropdown is present
+                    console.log('🔍 HTML response length:', extractData.html.length);
+                    console.log('🔍 HTML contains "pollingStation"?', extractData.html.includes('pollingStation'));
+                    console.log('🔍 HTML contains "പോളിംഗ്"?', extractData.html.includes('പോളിംഗ്'));
+                    
+                    // Extract voter data from the HTML table
+                    const parseResult = parseVotersFromHTML(doc);
+                    extractedVoters = parseResult.voters;
+                    
+                    // ✅ USE POLLING STATION TEXT FROM API RESPONSE (Malayalam) OR FRONTEND DROPDOWN (fallback)
+                    // Priority: 1. API response (Malayalam), 2. Frontend dropdown text, 3. null
+                    const malayalamPollingStationName = 
+                        extractData.pollingStationMalayalam || 
+                        (selectedStations.length === 1 ? selectedStations[0].text : null) || 
+                        null;
+                    
+                    console.log('🔍 Parse result pollingStationName from HTML:', parseResult.pollingStationName);
+                    console.log('✅ API response Malayalam name:', extractData.pollingStationMalayalam);
+                    console.log('✅ Frontend dropdown text (fallback):', selectedStations.length === 1 ? selectedStations[0].text : null);
+                    console.log('✅ Final Malayalam polling station name:', malayalamPollingStationName);
+                    
+                    console.log('🔍 Parse result:', parseResult);
+                    console.log('🔍 Extracted Malayalam polling station name:', malayalamPollingStationName);
+                    console.log('🔍 Type of malayalamPollingStationName:', typeof malayalamPollingStationName);
+                    console.log('🔍 Sample voter before adding station name:', extractedVoters[0]);
+                    
+                    // Add Malayalam polling station name to each voter
+                    if (malayalamPollingStationName) {
+                        console.log('✅ Adding Malayalam polling station name to voters:', malayalamPollingStationName);
+                        extractedVoters = extractedVoters.map(voter => ({
+                            ...voter,
+                            polling_station_name: malayalamPollingStationName
+                        }));
+                        console.log('✅ Sample voter after adding station name:', extractedVoters[0]);
+                    } else {
+                        console.warn('⚠️ No Malayalam polling station name found in HTML response!');
+                        console.log('⚠️ Will use fallback polling station name from location data');
+                    }
+                    
+                    if (extractedVoters.length === 0) {
+                        showError('captchaError', 'No voters found. Please check your selection and try again.');
+                        return;
+                    }
+
+                    // Update loader with extraction success
+                    document.getElementById('loadingMainText').textContent = `Found ${extractedVoters.length} voters`;
+                    document.getElementById('loadingSubText').textContent = 'Creating your order...';
+
+                    // Step 2: Create order with the extracted data
+                    const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+                    console.log('🎫 Slips per page selected:', slipsPerPage);
+                    
+                    let customization;
+                    if (symbolFreeMode || !selectedSymbol) {
+                        customization = { symbolFree: true, slipsPerPage };
+                    } else {
+                        customization = {
+                            symbolId: selectedSymbol._id,
+                            symbolImage: selectedSymbol.imageUrl,
+                            symbolName: selectedSymbol.name,
+                            symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                            slipsPerPage: slipsPerPage
+                        };
+                    }
+                    const orderData = {
+                        customization,
+                        location: {
+                            district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
+                            localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
+                            ward: document.getElementById('ward').options[document.getElementById('ward').selectedIndex].text,
+                            pollingStation: selectedStations.length === 1 ? selectedStations[0].text : 'Single Polling Station',
+                            pollingStationMalayalam: malayalamPollingStationName || null
+                        },
+                        voters: extractedVoters,
+                        voterCount: extractedVoters.length
+                    };
+                    
+                    console.log('📦 Order data being sent:', orderData);
+
+                    const orderResponse = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    const orderResult = await orderResponse.json();
+
+                    if (orderResult.status === 'success') {
+                        // Update loader with success message
+                        document.getElementById('loadingMainText').innerHTML = `<i class="fas fa-check-circle"></i> Success! Order created with ${extractedVoters.length} voters`;
+                        document.getElementById('loadingSubText').textContent = 'Redirecting to preview...';
+                        
+                        // Redirect to preview page with order ID after a short delay
+                        setTimeout(() => {
+                            window.location.href = `preview.html?orderId=${orderResult.order.orderId}`;
+                        }, 1500);
+                    } else {
+                        throw new Error(orderResult.message || 'Failed to create order');
+                    }
+                } else {
+                    // Check if this is a SEC website error
+                    if (extractData.errorType === 'SEC_WEBSITE_ERROR') {
+                        // Fetch custom error message from settings (or use fallback)
+                        const errorTitle = extractData.customErrorTitle || 'SEC Website Unavailable';
+                        const errorMessage = extractData.customErrorMessage || extractData.message;
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: errorTitle,
+                            html: `<p>${errorMessage}</p>` +
+                                  `<p class="text-muted mt-2" style="font-size: 0.9em;">The Kerala State Election Commission website is currently down or experiencing issues. This is beyond our control.</p>` +
+                                  `<p class="text-muted mt-1" style="font-size: 0.9em;">Please try again after some time.</p>`,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                    } else {
+                        const errorMsg = extractData.message || 'Extraction failed. Please check your captcha and try again.';
+                        showError('captchaError', errorMsg);
+                    }
+                }
+            } catch (error) {
+                console.error('Create slip error:', error);
+                const errorMsg = error.message || 'Failed to create slip. Please try again.';
+                showError('captchaError', errorMsg);
+                // Reload captcha on error
+                setTimeout(() => loadCaptcha(), 1000);
+            } finally {
+                document.getElementById('extractBtn').disabled = false;
+                document.getElementById('extractionLoading').classList.remove('show');
+            }
+        }
+
+        // Sequential extraction for multiple polling stations - one at a time
+        async function extractStationsSequentially() {
+            if (!selectedSymbol) {
+                showError('captchaError', 'Please select a symbol before extracting');
+                return;
+            }
+
+            if (selectedStations.length === 0) {
+                showError('captchaError', 'Please select at least one polling station');
+                return;
+            }
+
+            const district = document.getElementById('district').value;
+            const localBody = document.getElementById('localBody').value;
+            const ward = document.getElementById('ward').value;
+            const language = 'M';
+
+            document.getElementById('extractBtn').disabled = true;
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('extractionLoading');
+            loadingOverlay.classList.add('show');
+            
+            // Focus on loading overlay and ensure it's visible
+            setTimeout(() => {
+                loadingOverlay.focus();
+                
+                // Get overlay position and viewport height
+                const rect = loadingOverlay.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // Only scroll if overlay is not fully visible in viewport
+                if (rect.top < 0 || rect.bottom > viewportHeight) {
+                    loadingOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+            
+            let allVoters = [];
+            let successCount = 0;
+            let failedStations = [];
+            let stationIndex = 0;
+
+            console.log(`🚀 Starting sequential extraction for ${selectedStations.length} Polling Stations`);
+
+            // Helper function to extract one station
+            const extractOneStation = async (index) => {
+                if (index >= selectedStations.length) {
+                    // All stations extracted
+                    return finializeExtraction(allVoters, successCount, failedStations);
+                }
+
+                const station = selectedStations[index];
+                
+                // Update progress
+                document.getElementById('loadingMainText').textContent = `Station ${index + 1} of ${selectedStations.length}`;
+                document.getElementById('loadingSubText').textContent = station.text;
+
+                try {
+                    let captchaInput;
+                    let stationSessionId;
+
+                    if (index === 0) {
+                        // First station: Use the captcha from the main form
+                        console.log('🚀 Extracting first station with main page captcha...');
+                        const captchaValue = document.getElementById('captcha').value.trim();
+                        
+                        if (!captchaValue) {
+                            failedStations.push({ station: station.text, reason: 'Captcha not entered' });
+                            return extractOneStation(index + 1);
+                        }
+                        
+                        captchaInput = captchaValue;
+                        stationSessionId = sessionId;
+                    } else {
+                        // Additional stations: Load new captcha and get user input
+                        console.log(`📋 Station ${index + 1}: Loading new captcha session...`);
+                        const captchaLoaded = await loadCaptchaForBulk();
+                        
+                        if (!captchaLoaded) {
+                            failedStations.push({ station: station.text, reason: 'Failed to load captcha' });
+                            return extractOneStation(index + 1);
+                        }
+                        
+                        stationSessionId = window.currentSessionId;
+                        
+                        // Show modal for captcha input
+                        captchaInput = await showCaptchaDialog(station.text, index + 1, selectedStations.length);
+                        
+                        if (!captchaInput) {
+                            failedStations.push({ station: station.text, reason: 'Cancelled by user' });
+                            return extractOneStation(index + 1);
+                        }
+                    }
+
+                    // Extract voters for this station
+                    console.log(`🔄 Submitting captcha for station ${index + 1}...`);
+                    const extractResponse = await fetch('/api/submitWithCaptcha', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sessionId: stationSessionId,
+                            district,
+                            local_body: localBody,
+                            ward,
+                            polling_station: station.value,
+                            language,
+                            captcha: captchaInput
+                        })
+                    });
+
+                    const extractData = await extractResponse.json();
+
+                    if (extractData.status === 'success' && extractData.html) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(extractData.html, 'text/html');
+                        const parseResult = parseVotersFromHTML(doc);
+                        const voters = parseResult.voters;
+                        const malayalamStationName = parseResult.pollingStationName;
+                        
+                        if (voters.length > 0) {
+                            // Add polling station metadata to each voter (use Malayalam name if available)
+                            const votersWithStation = voters.map(voter => ({
+                                ...voter,
+                                polling_station_name: malayalamStationName || station.text,
+                                polling_station_value: station.value
+                            }));
+                            
+                            allVoters = allVoters.concat(votersWithStation);
+                            successCount++;
+                            console.log(`✅ Station ${index + 1} (${station.text}): ${voters.length} voters extracted`);
+                        } else {
+                            failedStations.push({ station: station.text, reason: 'No voters found' });
+                        }
+                    } else {
+                        // Check if this is a SEC website error
+                        if (extractData.errorType === 'SEC_WEBSITE_ERROR') {
+                            // Stop the entire extraction process
+                            const errorTitle = extractData.customErrorTitle || 'SEC Website Unavailable';
+                            const errorMessage = extractData.customErrorMessage || extractData.message;
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: errorTitle,
+                                html: `<p>${errorMessage}</p>` +
+                                      `<p class="text-muted mt-2" style="font-size: 0.9em;">The Kerala State Election Commission website is currently down or experiencing issues. This is beyond our control.</p>` +
+                                      `<p class="text-muted mt-1" style="font-size: 0.9em;">Please try again after some time.</p>`,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6',
+                                allowOutsideClick: false
+                            }).then(() => {
+                                // Hide loading and reset
+                                document.getElementById('extractBtn').disabled = false;
+                                document.getElementById('extractionLoading').classList.remove('show');
+                            });
+                            return; // Stop extraction
+                        } else {
+                            failedStations.push({ station: station.text, reason: extractData.message || 'Extraction failed' });
+                        }
+                    }
+
+                } catch (error) {
+                    console.error(`❌ Error extracting station ${index + 1}:`, error);
+                    failedStations.push({ station: station.text, reason: error.message });
+                }
+
+                // Move to next station
+                return extractOneStation(index + 1);
+            };
+
+            // Start extraction from first station
+            await extractOneStation(0);
+        }
+
+        // Finalize extraction and create order
+        async function finializeExtraction(allVoters, successCount, failedStations) {
+            // Show summary
+            document.getElementById('loadingMainText').textContent = `Extraction Complete!`;
+            document.getElementById('loadingSubText').textContent = `${successCount}/${selectedStations.length} stations successful, ${allVoters.length} total voters`;
+
+            if (allVoters.length === 0) {
+                showError('captchaError', 'No voters extracted from any polling station');
+                document.getElementById('extractBtn').disabled = false;
+                document.getElementById('extractionLoading').classList.remove('show');
+                return;
+            }
+
+            // Store extracted voters
+            extractedVoters = allVoters;
+
+            // Show failed stations warning to user if any
+            if (failedStations.length > 0) {
+                console.warn('⚠️ Failed stations:', failedStations);
+                
+                // Create warning message
+                const failedList = failedStations.map(f => `• ${f.station}: ${f.reason}`).join('\n');
+                const warningMsg = `⚠️ ${failedStations.length} polling station(s) failed:\n\n${failedList}\n\nProceeding with ${allVoters.length} voters from ${successCount} successful station(s).`;
+                
+                // Show warning overlay
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    backdrop-filter: blur(5px);
+                    z-index: 10001;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 2rem;
+                `;
+                
+                overlay.innerHTML = `
+                    <div style="background: white; padding: 2.5rem; border-radius: 16px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border-top: 4px solid #ff9800;">
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800;"></i>
+                        </div>
+                        <h3 style="color: #ff9800; margin-bottom: 1rem; text-align: center; font-size: 1.3rem;">Partial Extraction</h3>
+                        <p style="color: #666; white-space: pre-line; line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.95rem;">${warningMsg}</p>
+                        <div style="display: flex; gap: 0.75rem; flex-direction: column;">
+                            <button onclick="this.closest('[style*=\\'position: fixed\\']').remove()" style="width: 100%; background: var(--kerala-green); color: white; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                                <i class="fas fa-check"></i> Continue with ${allVoters.length} Voters
+                            </button>
+                            <button onclick="this.closest('[style*=\\'position: fixed\\']').remove(); document.getElementById('extractionLoading').classList.remove('show'); document.getElementById('extractBtn').disabled = false; window.scrollTo({ top: 0, behavior: 'smooth' });" style="width: 100%; background: #718096; color: white; padding: 1rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                                <i class="fas fa-redo"></i> Retry Extraction
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(overlay);
+            }
+
+            // Wait 2 seconds then create order
+            setTimeout(async () => {
+                document.getElementById('loadingMainText').textContent = 'Creating order...';
+                document.getElementById('loadingSubText').textContent = `${allVoters.length} voters from ${successCount} polling stations`;
+
+                try {
+                    const pollingStationLabel = selectedStations.length > 1 
+                        ? `${selectedStations.length} Polling Stations` 
+                        : selectedStations[0].text;
+                    
+                    const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+                    
+                    const orderData = {
+                        customization: {
+                            symbolId: selectedSymbol._id,
+                            symbolImage: selectedSymbol.imageUrl,
+                            symbolName: selectedSymbol.name,
+                            symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                            slipsPerPage: slipsPerPage
+                        },
+                        location: {
+                            district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
+                            localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
+                            ward: document.getElementById('ward').options[document.getElementById('ward').selectedIndex].text,
+                            pollingStation: pollingStationLabel
+                        },
+                        voters: allVoters,
+                        voterCount: allVoters.length
+                    };
+
+                    const orderResponse = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    const orderResult = await orderResponse.json();
+
+                    if (orderResult.status === 'success') {
+                        document.getElementById('loadingMainText').innerHTML = `<i class="fas fa-check-circle"></i> Success!`;
+                        document.getElementById('loadingSubText').textContent = 'Redirecting to preview...';
+                        
+                        setTimeout(() => {
+                            window.location.href = `preview.html?orderId=${orderResult.order.orderId}`;
+                        }, 1500);
+                    } else {
+                        throw new Error(orderResult.message || 'Failed to create order');
+                    }
+                } catch (error) {
+                    console.error('Order creation error:', error);
+                    showError('captchaError', error.message || 'Failed to create order');
+                    document.getElementById('extractBtn').disabled = false;
+                    document.getElementById('extractionLoading').classList.remove('show');
+                }
+            }, 2000);
+        }
+
+        // Load captcha for bulk extraction (without displaying)
+        async function loadCaptchaForBulk() {
+            try {
+                const response = await fetch('/api/initCaptchaSession');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Store both globally and in window for access by other functions
+                    sessionId = data.sessionId;
+                    window.currentSessionId = data.sessionId;
+                    // Store captcha image URL for dialog
+                    window.currentCaptchaImage = data.captchaUrl;
+                    console.log(`✅ New captcha session loaded: ${data.sessionId}`);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error loading captcha:', error);
+                return false;
+            }
+        }
+
+        // Show captcha dialog for user input
+        function showCaptchaDialog(stationName, current, total) {
+            return new Promise((resolve) => {
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%;">
+                        <h3 style="margin: 0 0 1rem 0; color: #2d3748;">Station ${current} of ${total}</h3>
+                        <p style="margin: 0 0 1.5rem 0; color: #718096; font-size: 0.95rem;">${stationName}</p>
+                        
+                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
+                            <img src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto;">
+                        </div>
+                        
+                        <input type="text" id="bulkCaptchaInput" placeholder="Enter Captcha" 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <button id="submitBulkCaptcha" 
+                                style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05rem;">
+                            Continue
+                        </button>
+                        
+                        <p style="margin: 1rem 0 0 0; color: #718096; font-size: 0.85rem; text-align: center;">
+                            Press Enter to continue
+                        </p>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                const input = modal.querySelector('#bulkCaptchaInput');
+                const submitBtn = modal.querySelector('#submitBulkCaptcha');
+                
+                input.focus();
+
+                const submit = () => {
+                    const value = input.value.trim();
+                    document.body.removeChild(modal);
+                    resolve(value || null);
+                };
+
+                submitBtn.onclick = submit;
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') submit();
+                });
+            });
+        }
+
+        async function createOrder() {
+            const orderData = {
+                customization: symbolFreeMode ? { symbolFree: true } : {
+                    symbolId: selectedSymbol._id,
+                    symbolImage: selectedSymbol.imageUrl,
+                    symbolName: selectedSymbol.name,
+                    symbolNameMalayalam: selectedSymbol.nameMalayalam || ''
+                },
+                location: {
+                    district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
+                    localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
+                    ward: document.getElementById('ward').options[document.getElementById('ward').selectedIndex].text,
+                    pollingStation: document.getElementById('pollingStation').options[document.getElementById('pollingStation').selectedIndex].text
+                },
+                voters: extractedVoters
+            };
+
+            try {
+                const response = await fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirect to preview page
+                    window.location.href = `preview.html?orderId=${data.order._id}`;
+                } else {
+                    throw new Error(data.message || 'ഓർഡർ സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല');
+                }
+            } catch (error) {
+                console.error('Order creation error:', error);
+                alert('ഓർഡർ സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല. വീണ്ടും ശ്രമിക്കുക.');
+                prevStep(3);
+            }
+        }
+
+        // Handle continue without symbol (top-level, not inside any function)
+        window.addEventListener('DOMContentLoaded', function() {
+            var continueLink = document.getElementById('continueWithoutSymbol');
+            if (continueLink) {
+                continueLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    symbolFreeMode = true;
+                    selectedSymbol = null;
+                    document.getElementById('symbolPreview').style.display = 'none';
+                    // Change the select symbol button to a text saying No Symbol
+                    var selectBtn = document.getElementById('selectSymbolBtn');
+                    if (selectBtn) {
+                        selectBtn.style.display = 'none';
+                        // Insert a "No Symbol" text with "Select Symbol" link
+                        let noSymbolText = document.getElementById('noSymbolText');
+                        if (!noSymbolText) {
+                            noSymbolText = document.createElement('div');
+                            noSymbolText.id = 'noSymbolText';
+                            noSymbolText.innerHTML = `
+                                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);">
+                                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: stretch;">
+                                        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                </svg>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="color: white; font-weight: 700; font-size: clamp(1rem, 3vw, 1.25rem); margin-bottom: 0.25rem;">Create Without Symbol</div>
+                                                <div style="color: rgba(255,255,255,0.9); font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Slips will be generated without election symbols</div>
+                                            </div>
+                                        </div>
+                                        <a href="#" id="selectSymbolLink" style="color: white; text-decoration: underline; font-size: clamp(0.85rem, 2.5vw, 0.95rem); transition: opacity 0.3s ease; display: inline-block; margin-top: 0.5rem; opacity: 0.9;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+                                         I want to select a symbol
+                                        </a>
+                                    </div>
+                            `;
+                            noSymbolText.style.cssText = 'margin: 1.5rem 0;';
+                            selectBtn.parentNode.insertBefore(noSymbolText, selectBtn.nextSibling);
+                            
+                            // Add click handler to select symbol link
+                            document.getElementById('selectSymbolLink').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                symbolFreeMode = false;
+                                window.symbolFreeMode = false;
+                                selectBtn.style.display = 'inline-flex';
+                                noSymbolText.style.display = 'none';
+                                continueLink.style.display = '';
+                                // Trigger symbol picker
+                                selectBtn.click();
+                            });
+                        } else {
+                            noSymbolText.style.display = 'block';
+                        }
+                    }
+                    document.getElementById('symbolError').classList.remove('show');
+                    // Visually indicate symbol-free mode
+                    continueLink.style.display = 'none';
+                    // Ensure all validations and UI respect symbolFreeMode
+                    window.symbolFreeMode = true;
+                });
+            }
+        });
+    </script>
+    <!-- Popup Modal System -->
+    <div id="welcome-popup-overlay" style="display: none;"></div>
+    <div id="welcome-popup-modal" style="display: none;"></div>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        async function loadAndShowPopup() {
+            try {
+                const response = await fetch(`${API_BASE}/settings/popup`);
+                if (!response.ok) return;
+                const result = await response.json();
+                const settings = result.settings || result;
+                if (!settings.enabled) return;
+                if (settings.showOnce) {
+                    const hasShown = localStorage.getItem('popup-shown');
+                    if (hasShown) return;
+                }
+                const delay = settings.delay || 1000;
+                setTimeout(() => { showPopup(settings); }, delay);
+            } catch (error) { console.error('Error loading popup:', error); }
+        }
+        function showPopup(settings) {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.cssText = `position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.7);z-index: 9998;display: block;animation: fadeIn 0.3s ease;`;
+            modal.innerHTML = `<div style=\"position: relative;\"><button onclick=\"closePopup()\" style=\"position: absolute;top: -15px;right: -15px;background: white;border: 2px solid #ddd;color: #666;width: 40px;height: 40px;border-radius: 50%;cursor: pointer;font-size: 24px;line-height: 1;transition: all 0.3s ease;box-shadow: 0 2px 10px rgba(0,0,0,0.2);z-index: 10001;\" onmouseover=\"this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';\" onmouseout=\"this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';\">×</button><div style=\"background: white;border-radius: 12px;max-width: 600px;width: 90%;max-height: 80vh;overflow-y: auto;box-shadow: 0 20px 60px rgba(0,0,0,0.3);position: relative;animation: slideIn 0.3s ease;\"><div style=\"background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);color: white;padding: 20px;border-radius: 12px 12px 0 0;\"><h2 style=\"margin: 0; font-size: 24px;\">${settings.title || 'Announcement'}</h2></div><div style=\"padding: 30px;\">${settings.content || ''}</div></div></div>`;
+            modal.style.cssText = `position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 10000;display: block;`;
+            const responsiveStyle = `@media (max-width: 640px) {#welcome-popup-modal > div > div {width: 95% !important;max-height: 90vh !important;}#welcome-popup-modal > div > div > div:first-child {padding: 15px !important;}#welcome-popup-modal > div > div > div:first-child h2 {font-size: 18px !important;}#welcome-popup-modal > div > div > div:last-child {padding: 20px !important;}#welcome-popup-modal > div > button {width: 35px !important;height: 35px !important;font-size: 20px !important;top: -12px !important;right: -12px !important;}}`;
+            if (!document.querySelector('#popup-responsive-styles')) {
+                const styleElem = document.createElement('style');
+                styleElem.id = 'popup-responsive-styles';
+                styleElem.textContent = responsiveStyle;
+                document.head.appendChild(styleElem);
+            }
+            overlay.onclick = closePopup;
+            if (settings.showOnce) { localStorage.setItem('popup-shown', 'true'); }
+            if (!document.querySelector('#popup-animations')) {
+                const style = document.createElement('style');
+                style.id = 'popup-animations';
+                style.textContent = `@keyframes fadeIn {from { opacity: 0; }to { opacity: 1; }}@keyframes slideIn {from {opacity: 0;transform: translateY(-30px);}to {opacity: 1;transform: translateY(0);}}`;
+                document.head.appendChild(style);
+            }
+        }
+        function closePopup() {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadAndShowPopup);
+        } else {
+            loadAndShowPopup();
+        }
+    </script>
 </body>
 </html>

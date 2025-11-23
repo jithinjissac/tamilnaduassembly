@@ -40,6 +40,9 @@ router.get('/prewarm-captcha', async (req, res) => {
     captchaQueue.add(async () => {
       const context = await browserPool.getBrowserContext(sessionId);
       const page = await context.newPage();
+      
+      // Set higher default timeout for slow government website
+      page.setDefaultTimeout(90000); // 90 seconds
 
       // Block unnecessary resources
       await page.route('**/*', (route) => {
@@ -192,6 +195,9 @@ router.get('/initCaptchaSession', async (req, res) => {
       console.log(`[CAPTCHA] ⏱️  Browser context acquired in ${contextTime}ms`);
       
       const page = await context.newPage();
+      
+      // Set higher default timeout for slow government website
+      page.setDefaultTimeout(90000); // 90 seconds
 
       // Block unnecessary resources for faster loading (like ad blockers)
       await page.route('**/*', (route) => {
@@ -366,10 +372,21 @@ router.post('/submitWithCaptcha', async (req, res) => {
   try {
     const { sessionId, district, local_body, ward, polling_station, language, captcha } = req.body;
 
+    console.log('[CAPTCHA SUBMIT] Request body:', {
+      sessionId,
+      district,
+      local_body,
+      ward,
+      polling_station,
+      language,
+      captchaLength: captcha?.length
+    });
+
     // Get session from session manager
     const session = sessionManager.get(sessionId);
     
     if (!session) {
+      console.error('[CAPTCHA SUBMIT] Session not found:', sessionId);
       return res.status(400).json({
         status: 'error',
         message: 'Invalid or expired session. Please refresh captcha.'
@@ -417,7 +434,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_localBody');
         return select && select.options.length > 1;
       },
-      { timeout: 60000 } // Increased from 15s to 30s
+      { timeout: 90000 } // Increased to 90s for slow government website
     );
     
     // Force local body select to be visible
@@ -442,7 +459,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_ward');
         return select && select.options.length > 1;
       },
-      { timeout: 30000 } // Increased from 15s to 30s
+      { timeout: 90000 } // Increased to 90s for slow government website
     );
     
     // Force ward select to be visible
@@ -467,7 +484,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
         const select = document.querySelector('#view_voters_list_pollingStation');
         return select && select.options.length > 1;
       },
-      { timeout: 30000 } // Increased from 15s to 30s
+      { timeout: 90000 } // Increased to 90s for slow government website
     );
     
     // Force polling station select to be visible
@@ -749,11 +766,17 @@ router.post('/submitWithCaptcha', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error submitting with captcha:', error);
+    console.error('❌ Error submitting with captcha:', error);
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Send detailed error for debugging
     res.status(500).json({
       status: 'error',
       message: 'Failed to submit form',
-      error: error.message
+      error: error.message,
+      errorType: error.constructor.name
     });
   }
 });

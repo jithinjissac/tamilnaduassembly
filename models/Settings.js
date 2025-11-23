@@ -109,7 +109,7 @@ Login to https://easyslip.in to download your PDF.`
         webhookURL: ''
     },
     slip: {
-        // Font sizes for 5 slips per page
+        // Font sizes for 5 slips per page (with symbol)
         fiveSlips: {
             symbolHeader: '8pt',
             symbolImage: '24mm',
@@ -119,9 +119,14 @@ Login to https://easyslip.in to download your PDF.`
             voterName: '11pt',
             infoRow: '10pt',
             infoLabel: '17mm',
-            pollingStation: '10pt'
+            pollingStation: '10pt',
+            // Margins
+            wardMarginBottom: '1mm',
+            headerMarginBottom: '1mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.8mm'
         },
-        // Font sizes for 6 slips per page
+        // Font sizes for 6 slips per page (with symbol)
         sixSlips: {
             symbolHeader: '7pt',
             symbolImage: '20mm',
@@ -131,7 +136,48 @@ Login to https://easyslip.in to download your PDF.`
             voterName: '11pt',
             infoRow: '9pt',
             infoLabel: '16mm',
-            pollingStation: '9pt'
+            pollingStation: '9pt',
+            // Margins
+            wardMarginBottom: '0.8mm',
+            headerMarginBottom: '0.8mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.6mm'
+        },
+        // Font sizes for 5 slips per page (symbol-free)
+        fiveSlipsFree: {
+            slipNumberLabel: '12pt',
+            slipNumberValue: '20pt',
+            secId: '11pt',
+            voterName: '13pt',
+            infoRow: '11pt',
+            infoLabel: '18mm',
+            pollingStation: '11pt',
+            wardInfo: '11pt',
+            // Margins
+            wardMarginBottom: '0mm',
+            wardPadding: '0mm 0 0.2mm 0',
+            headerMarginBottom: '0.5mm',
+            headerMarginTop: '0.5mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.6mm'
+        },
+        // Font sizes for 6 slips per page (symbol-free)
+        sixSlipsFree: {
+            slipNumberLabel: '10pt',
+            slipNumberValue: '18pt',
+            secId: '10pt',
+            voterName: '12pt',
+            infoRow: '10pt',
+            infoLabel: '16mm',
+            pollingStation: '10pt',
+            wardInfo: '10pt',
+            // Margins
+            wardMarginBottom: '0mm',
+            wardPadding: '0mm 0 0.2mm 0',
+            headerMarginBottom: '0.4mm',
+            headerMarginTop: '0.4mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.5mm'
         }
     },
     popup: {

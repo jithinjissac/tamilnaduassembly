@@ -8,7 +8,7 @@
     "start": "npm run protect:safe && cross-env USE_PROTECTED=true NODE_ENV=production node server.js",
     "start:dev": "node server.js",
     "start:production": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
-    "dev": "nodemon server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
     "build": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
     "protect": "node build-scripts/obfuscate-inline.cjs",

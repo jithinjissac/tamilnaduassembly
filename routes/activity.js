@@ -99,11 +99,11 @@ router.post('/track-single', auth, trackSession, async (req, res) => {
 });
 
 // Heartbeat endpoint for accurate online detection
-router.post('/heartbeat', auth, async (req, res) => {
+router.post('/heartbeat', auth, trackSession, async (req, res) => {
     try {
         const { sessionId, isVisible, isFocused } = req.body;
         
-        // Update session heartbeat
+        // Update session heartbeat (trackSession middleware ensures session exists)
         const session = await UserSession.findOneAndUpdate(
             { 
                 sessionId: sessionId || req.headers['x-session-id'],
@@ -116,10 +116,27 @@ router.post('/heartbeat', auth, async (req, res) => {
                 isPageVisible: isVisible !== false,
                 isPageFocused: isFocused !== false
             },
-            { new: true }
+            { new: true, upsert: false }
         );
 
+        // If session still not found after trackSession middleware, it means
+        // the session was just created and we can use req.userSession
+        if (!session && req.userSession) {
+            // Update the newly created session
+            req.userSession.lastHeartbeat = new Date();
+            req.userSession.isPageVisible = isVisible !== false;
+            req.userSession.isPageFocused = isFocused !== false;
+            await req.userSession.save();
+            
+            return res.json({
+                status: 'success',
+                message: 'Heartbeat recorded (new session)'
+            });
+        }
+
         if (!session) {
+            // This should rarely happen now with trackSession middleware
+            console.warn('[HEARTBEAT] Session not found even after trackSession middleware');
             return res.status(404).json({
                 status: 'error',
                 message: 'Session not found'
@@ -133,6 +150,7 @@ router.post('/heartbeat', auth, async (req, res) => {
 
     } catch (error) {
         console.error('Heartbeat error:', error);
+        console.error('Stack:', error.stack);
         res.status(500).json({
             status: 'error',
             message: 'Failed to record heartbeat'

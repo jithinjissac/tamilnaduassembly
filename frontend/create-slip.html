@@ -72,6 +72,45 @@ s0.parentNode.insertBefore(s1,s0);
             color: #333;
         }
 
+        /* Symbol-Free Mode Card Styles */
+        #noSymbolText #selectSymbolLink {
+            white-space: nowrap;
+        }
+        
+        #noSymbolText #selectSymbolLink:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            background: #f7fafc !important;
+        }
+
+        #noSymbolText #selectSymbolLink:active {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 640px) {
+            #noSymbolText > div > div > div:first-child {
+                flex-direction: row !important;
+                align-items: center !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                width: auto !important;
+                display: inline-block !important;
+                align-self: flex-end;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #noSymbolText > div > div {
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                margin-left: 2rem;
+                flex-shrink: 0;
+            }
+        }
+
         /* Header */
         header {
             background: var(--kerala-gradient);
@@ -828,6 +867,9 @@ s0.parentNode.insertBefore(s1,s0);
                         <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block; margin: 0 auto;">
                             <i class="fas fa-hand-pointer" style="margin-right: 0.5rem;"></i> SELECT YOUR SYMBOL
                         </button>
+                        <div style="text-align:center; margin-top:1rem;">
+                            <a href="#" id="continueWithoutSymbol" style="color:#2c5282; text-decoration:underline; font-weight:600; cursor:pointer;">Continue without any symbols</a>
+                        </div>
                     </div>
                     <div class="error-message" id="symbolError"></div>
                 </div>
@@ -996,6 +1038,7 @@ s0.parentNode.insertBefore(s1,s0);
     <script>
         let currentStep = 1;
         let selectedSymbol = null;
+        let symbolFreeMode = false;
         let extractedVoters = [];
         let sessionId = '';
         let allPollingStations = []; // Store all stations
@@ -1074,11 +1117,10 @@ s0.parentNode.insertBefore(s1,s0);
             window.symbolPicker = initSymbolPicker((symbol) => {
                 // Callback when symbol is selected
                 selectedSymbol = symbol;
-                
+                symbolFreeMode = false;
                 // Update UI
                 document.getElementById('selectedSymbolImage').src = symbol.imageUrl;
                 document.getElementById('selectedSymbolName').textContent = symbol.nameMalayalam || symbol.name;
-                
                 // Display English name as secondary if Malayalam exists
                 const malayalamNameElement = document.getElementById('selectedSymbolNameMalayalam');
                 if (symbol.nameMalayalam && symbol.nameMalayalam.trim()) {
@@ -1087,13 +1129,17 @@ s0.parentNode.insertBefore(s1,s0);
                 } else {
                     malayalamNameElement.style.display = 'none';
                 }
-                
                 document.getElementById('symbolPreview').style.display = 'block';
                 document.getElementById('selectSymbolBtn').style.display = 'none';
-                
+                // Restore the continue link if previously changed
+                const continueLink = document.getElementById('continueWithoutSymbol');
+                if (continueLink) {
+                    continueLink.textContent = 'Continue without any symbols';
+                    continueLink.style.color = '#2c5282';
+                    continueLink.style.pointerEvents = 'auto';
+                }
                 // Clear error
                 document.getElementById('symbolError').classList.remove('show');
-                
                 console.log('Symbol selected:', symbol);
             });
         });
@@ -1148,12 +1194,10 @@ s0.parentNode.insertBefore(s1,s0);
         function validateStep1() {
             let valid = true;
             document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
-
-            if (!selectedSymbol) {
-                showError('symbolError', 'Please select a symbol');
+            if (!selectedSymbol && !symbolFreeMode) {
+                showError('symbolError', 'Please select a symbol or continue without any symbols');
                 valid = false;
             }
-
             return valid;
         }
 
@@ -1639,8 +1683,8 @@ s0.parentNode.insertBefore(s1,s0);
             }
 
             // Get customization data from step 1
-            if (!selectedSymbol) {
-                showError('Please select a symbol before creating slip');
+            if (!selectedSymbol && !symbolFreeMode) {
+                showError('symbolError', 'Please select a symbol or continue without any symbols');
                 return;
             }
 
@@ -1744,14 +1788,20 @@ s0.parentNode.insertBefore(s1,s0);
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
                     console.log('🎫 Slips per page selected:', slipsPerPage);
                     
-                    const orderData = {
-                        customization: {
+                    let customization;
+                    if (symbolFreeMode || !selectedSymbol) {
+                        customization = { symbolFree: true, slipsPerPage };
+                    } else {
+                        customization = {
                             symbolId: selectedSymbol._id,
                             symbolImage: selectedSymbol.imageUrl,
                             symbolName: selectedSymbol.name,
                             symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
                             slipsPerPage: slipsPerPage
-                        },
+                        };
+                    }
+                    const orderData = {
+                        customization,
                         location: {
                             district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
                             localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
@@ -2207,7 +2257,7 @@ s0.parentNode.insertBefore(s1,s0);
 
         async function createOrder() {
             const orderData = {
-                customization: {
+                customization: symbolFreeMode ? { symbolFree: true } : {
                     symbolId: selectedSymbol._id,
                     symbolImage: selectedSymbol.imageUrl,
                     symbolName: selectedSymbol.name,
@@ -2246,6 +2296,72 @@ s0.parentNode.insertBefore(s1,s0);
                 prevStep(3);
             }
         }
+
+        // Handle continue without symbol (top-level, not inside any function)
+        window.addEventListener('DOMContentLoaded', function() {
+            var continueLink = document.getElementById('continueWithoutSymbol');
+            if (continueLink) {
+                continueLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    symbolFreeMode = true;
+                    selectedSymbol = null;
+                    document.getElementById('symbolPreview').style.display = 'none';
+                    // Change the select symbol button to a text saying No Symbol
+                    var selectBtn = document.getElementById('selectSymbolBtn');
+                    if (selectBtn) {
+                        selectBtn.style.display = 'none';
+                        // Insert a "No Symbol" text with "Select Symbol" link
+                        let noSymbolText = document.getElementById('noSymbolText');
+                        if (!noSymbolText) {
+                            noSymbolText = document.createElement('div');
+                            noSymbolText.id = 'noSymbolText';
+                            noSymbolText.innerHTML = `
+                                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);">
+                                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: stretch;">
+                                        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                </svg>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="color: white; font-weight: 700; font-size: clamp(1rem, 3vw, 1.25rem); margin-bottom: 0.25rem;">Create Without Symbol</div>
+                                                <div style="color: rgba(255,255,255,0.9); font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Slips will be generated without election symbols</div>
+                                            </div>
+                                        </div>
+                                        <a href="#" id="selectSymbolLink" style="color: white; text-decoration: underline; font-size: clamp(0.85rem, 2.5vw, 0.95rem); transition: opacity 0.3s ease; display: inline-block; margin-top: 0.5rem; opacity: 0.9;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+                                         I want to select a symbol
+                                        </a>
+                                    </div>
+                            `;
+                            noSymbolText.style.cssText = 'margin: 1.5rem 0;';
+                            selectBtn.parentNode.insertBefore(noSymbolText, selectBtn.nextSibling);
+                            
+                            // Add click handler to select symbol link
+                            document.getElementById('selectSymbolLink').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                symbolFreeMode = false;
+                                window.symbolFreeMode = false;
+                                selectBtn.style.display = 'inline-flex';
+                                noSymbolText.style.display = 'none';
+                                continueLink.style.display = '';
+                                // Trigger symbol picker
+                                selectBtn.click();
+                            });
+                        } else {
+                            noSymbolText.style.display = 'block';
+                        }
+                    }
+                    document.getElementById('symbolError').classList.remove('show');
+                    // Visually indicate symbol-free mode
+                    continueLink.style.display = 'none';
+                    // Ensure all validations and UI respect symbolFreeMode
+                    window.symbolFreeMode = true;
+                });
+            }
+        });
     </script>
     <!-- Popup Modal System -->
     <div id="welcome-popup-overlay" style="display: none;"></div>

@@ -171,8 +171,25 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         console.log(`📍 Sample station name: "${votersWithStation[0].polling_station_name}"`);
     }
     
-    // Use slipsPerPage from order customization, default to 5
-    const slipsPerPage = order.customization?.slipsPerPage || 5;
+    // Ensure customization object exists and set safe defaults so older orders
+    // or symbol-free orders don't cause runtime errors in template generation.
+    if (!order.customization || typeof order.customization !== 'object') {
+        order.customization = {};
+    }
+    if (typeof order.customization.symbolFree !== 'boolean') {
+        order.customization.symbolFree = false;
+    }
+    if (typeof order.customization.slipsPerPage !== 'number') {
+        order.customization.slipsPerPage = 5;
+    }
+    if (typeof order.customization.symbolImage !== 'string') {
+        order.customization.symbolImage = '';
+    }
+    if (typeof order.customization.symbolName !== 'string') {
+        order.customization.symbolName = order.customization.symbolFree ? 'No Symbol' : 'Symbol';
+    }
+
+    const slipsPerPage = order.customization.slipsPerPage || 5;
     console.log(`\n📄 ========== GENERATE SLIP HTML ==========`);
     console.log(`📄 Using ${slipsPerPage} slips per page (from order.customization.slipsPerPage: ${order.customization?.slipsPerPage})`);
     console.log(`📄 Voter range: ${startIndex} to ${endIndex || 'end'} (${voters.length} voters will be rendered)`);
@@ -218,7 +235,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     }
     
     // Load font settings from database
-    let fontSize;
+    let fontSize, fontSizeFree;
     try {
         const Settings = (await import('../models/Settings.js')).default;
         const slipSettingsMap = await Settings.getSettings('slip');
@@ -238,8 +255,36 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             const sixSlips = slipSettings.sixSlips instanceof Map 
                 ? Object.fromEntries(slipSettings.sixSlips)
                 : slipSettings.sixSlips;
+            
+            // Handle symbol-free settings with fallback
+            let fiveSlipsFree, sixSlipsFree;
+            if (slipSettings.fiveSlipsFree) {
+                fiveSlipsFree = slipSettings.fiveSlipsFree instanceof Map 
+                    ? Object.fromEntries(slipSettings.fiveSlipsFree)
+                    : slipSettings.fiveSlipsFree;
+            } else {
+                console.log('⚠️ fiveSlipsFree not found in database, using defaults');
+                fiveSlipsFree = null; // Will use fallback below
+            }
+            
+            if (slipSettings.sixSlipsFree) {
+                sixSlipsFree = slipSettings.sixSlipsFree instanceof Map 
+                    ? Object.fromEntries(slipSettings.sixSlipsFree)
+                    : slipSettings.sixSlipsFree;
+            } else {
+                console.log('⚠️ sixSlipsFree not found in database, using defaults');
+                sixSlipsFree = null; // Will use fallback below
+            }
                 
             fontSize = slipsPerPage === 6 ? sixSlips : fiveSlips;
+            fontSizeFree = slipsPerPage === 6 ? sixSlipsFree : fiveSlipsFree;
+            
+            // If fontSizeFree is null, use defaults
+            if (!fontSizeFree) {
+                console.log('⚠️ Symbol-free settings missing, using fallback defaults');
+                throw new Error('Symbol-free settings not found, using defaults');
+            }
+            
             console.log('✅ Loaded font settings from database for', slipsPerPage, 'slips per page');
         } else {
             throw new Error('Settings not found, using defaults');
@@ -256,7 +301,13 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             voterName: '11pt',
             infoRow: '9pt',
             infoLabel: '16mm',
-            pollingStation: '9pt'
+            pollingStation: '9pt',
+            wardMarginBottom: '0.8mm',
+            wardPadding: '0mm 0mm 0mm 0mm',
+            headerMarginBottom: '0.8mm',
+            headerMarginTop: '0mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.6mm'
         } : {
             symbolHeader: '8pt',
             symbolImage: '24mm',
@@ -266,7 +317,44 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             voterName: '11pt',
             infoRow: '10pt',
             infoLabel: '17mm',
-            pollingStation: '10pt'
+            pollingStation: '10pt',
+            wardMarginBottom: '1mm',
+            wardPadding: '0mm 0mm 0mm 0mm',
+            headerMarginBottom: '1mm',
+            headerMarginTop: '0mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.8mm'
+        };
+        fontSizeFree = slipsPerPage === 6 ? {
+            slipNumberLabel: '10pt',
+            slipNumberValue: '18pt',
+            secId: '10pt',
+            voterName: '12pt',
+            infoRow: '10pt',
+            infoLabel: '16mm',
+            pollingStation: '10pt',
+            wardInfo: '10pt',
+            wardMarginBottom: '0mm',
+            wardPadding: '0mm 0 0.2mm 0',
+            headerMarginBottom: '0.4mm',
+            headerMarginTop: '0.4mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.5mm'
+        } : {
+            slipNumberLabel: '12pt',
+            slipNumberValue: '20pt',
+            secId: '11pt',
+            voterName: '13pt',
+            infoRow: '11pt',
+            infoLabel: '18mm',
+            pollingStation: '11pt',
+            wardInfo: '11pt',
+            wardMarginBottom: '0mm',
+            wardPadding: '0mm 0 0.2mm 0',
+            headerMarginBottom: '0.5mm',
+            headerMarginTop: '0.5mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.6mm'
         };
     }
     
@@ -307,15 +395,30 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
+        /* Symbol-free mode: different layout with serial number on left */
+        .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
+        .voter-slip.symbol-free .slip-left { display: flex !important; width: 35mm; border-right: 2px solid #000; background: #fff; margin-right: 0; padding: 2mm; }
+        .voter-slip.symbol-free .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        .voter-slip.symbol-free .serial-label { font-size: ${fontSizeFree.slipNumberLabel}; font-weight: 700; color: #000; margin-bottom: 1mm; text-align: center; line-height: 1.2; }
+        .voter-slip.symbol-free .serial-value { font-size: ${fontSizeFree.slipNumberValue}; font-weight: 800; color: #000; text-align: center; line-height: 1; }
+        .voter-slip.symbol-free .slip-right { margin-left: 0; padding: 1mm 2mm; }
+        .voter-slip.symbol-free .ward-info { font-size: ${fontSizeFree.wardInfo}; margin-bottom: ${fontSizeFree.wardMarginBottom}; padding: ${fontSizeFree.wardPadding}; }
+        .voter-slip.symbol-free .slip-header { margin-bottom: ${fontSizeFree.headerMarginBottom}; margin-top: ${fontSizeFree.headerMarginTop}; }
+        .voter-slip.symbol-free .sec-id { font-size: ${fontSizeFree.secId}; }
+        .voter-slip.symbol-free .voter-name { font-size: ${fontSizeFree.voterName}; }
+        .voter-slip.symbol-free .info-row { font-size: ${fontSizeFree.infoRow}; margin-bottom: ${fontSizeFree.infoRowMarginBottom}; }
+        .voter-slip.symbol-free .info-label { min-width: ${fontSizeFree.infoLabel}; }
+        .voter-slip.symbol-free .polling-station-info { font-size: ${fontSizeFree.pollingStation}; min-height: 8mm; display: flex; align-items: center; }
+        
         .slip-right { flex: 1; padding: 1.5mm 2.5mm; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-width: 0; }
-        .ward-info { font-size: 10pt; font-weight: bold; margin-bottom: 1mm; padding: 0.3mm 0; border-bottom: 1px solid #000; text-align: center; }
-        .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1mm; font-size: 10pt; gap: 1mm; overflow: hidden; }
+        .ward-info { font-size: 10pt; font-weight: bold; margin-bottom: ${fontSize.wardMarginBottom}; padding: ${fontSize.wardPadding}; border-bottom: 1px solid #000; text-align: center; }
+        .slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: ${fontSize.headerMarginBottom}; margin-top: ${fontSize.headerMarginTop}; font-size: 10pt; gap: 1mm; overflow: hidden; }
         .slip-number { font-weight: bold; font-size: ${fontSize.slipNumber}; white-space: nowrap; }
         .sec-id { font-weight: bold; font-size: ${fontSize.secId}; white-space: nowrap; }
         
         .voter-info { flex: 1; overflow: hidden; min-height: 0; }
-        .info-row { margin-bottom: 0.8mm; font-size: ${fontSize.infoRow}; display: flex; line-height: 1.25; overflow: hidden; }
-        .info-row.voter-name { font-size: ${fontSize.voterName}; font-weight: bold; margin-bottom: 1mm; }
+        .info-row { margin-bottom: ${fontSize.infoRowMarginBottom}; font-size: ${fontSize.infoRow}; display: flex; line-height: 1.25; overflow: hidden; }
+        .info-row.voter-name { font-size: ${fontSize.voterName}; font-weight: bold; margin-bottom: ${fontSize.voterNameMarginBottom}; }
         .info-label { font-weight: bold; min-width: ${fontSize.infoLabel}; flex-shrink: 0; }
         .info-value { flex: 1; word-break: break-word; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .polling-station-info { font-size: ${fontSize.pollingStation}; border-top: 1px solid; padding-top: 0.8mm; margin-top: 0.5mm; line-height: 1.3; font-weight: 600; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; }
@@ -454,18 +557,34 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             const gender = genderAge[0]?.trim() || '';
             const age = genderAge[1]?.trim() || '';
             
+            // Add symbol-free class if no symbol
+            const symbolFreeClass = order.customization.symbolFree ? ' symbol-free' : '';
+            
             htmlParts.push(`
-            <div class="voter-slip">
+            <div class="voter-slip${symbolFreeClass}">
+                ${order.customization.symbolFree ? `
+                <div class="slip-left">
+                    <div class="slip-left-content">
+                        <div class="serial-label">ക്രമ നമ്പർ</div>
+                        <div class="serial-value">${serialNo}</div>
+                    </div>
+                </div>
+                ` : `
                 <div class="slip-left">
                     <div class="symbol-header">നമ്മുടെ ചിഹ്നം</div>
                     <div class="symbol-image" role="img" aria-label="Symbol"></div>
                     <div class="symbol-name">${displaySymbolName}</div>
                 </div>
+                `}
                 <div class="slip-right">
                     <div class="ward-info">വാര്‍ഡ്: ${wardName}</div>
                     <div class="slip-header">
+                        ${order.customization.symbolFree ? `
+                        <div class="sec-id">കാർഡ് നമ്പർ: ${voter.sec_id || 'N/A'}</div>
+                        ` : `
                         <div class="slip-number">ക്രമ നമ്പർ: ${serialNo}</div>
                         <div class="sec-id">കാർഡ് നമ്പർ: ${voter.sec_id || 'N/A'}</div>
+                        `}
                     </div>
                     <div class="voter-info">
                         <div class="info-row voter-name">
@@ -673,7 +792,12 @@ export const generatePreview = async (req, res) => {
         // if (shouldUseCache) { ... }
 
         // If Malayalam name is not in order, fetch it from Symbol model
-        if (!filteredOrder.customization.symbolNameMalayalam && filteredOrder.customization.symbolId) {
+            // Ensure customization exists on filteredOrder as well
+            if (!filteredOrder.customization || typeof filteredOrder.customization !== 'object') {
+                filteredOrder.customization = {};
+            }
+
+            if (!filteredOrder.customization.symbolNameMalayalam && filteredOrder.customization.symbolId) {
             try {
                 const Symbol = (await import('../models/Symbol.js')).default;
                 const symbol = await Symbol.findById(filteredOrder.customization.symbolId);

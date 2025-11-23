@@ -161,65 +161,67 @@ export const trackSession = async (req, res, next) => {
             return next();
         }
 
-        // Check if session already exists
-        let session = await UserSession.findOne({ sessionId, isActive: true });
-
-        if (!session) {
-            // Get device info
-            const deviceInfo = parseDeviceInfo(req.headers['user-agent'] || '');
-            
-            // Get client IP with better extraction logic
-            let clientIp = null;
-            
-            // Try multiple headers in order of priority
-            if (req.headers['cf-connecting-ip']) {
-                // Cloudflare
-                clientIp = req.headers['cf-connecting-ip'];
-            } else if (req.headers['x-real-ip']) {
-                // Nginx
-                clientIp = req.headers['x-real-ip'];
-            } else if (req.headers['x-forwarded-for']) {
-                // Standard proxy header (get first IP in chain)
-                clientIp = req.headers['x-forwarded-for'].split(',')[0].trim();
-            } else if (req.connection?.remoteAddress) {
-                // Direct connection
-                clientIp = req.connection.remoteAddress;
-            } else if (req.socket?.remoteAddress) {
-                // Socket connection
-                clientIp = req.socket.remoteAddress;
-            } else {
-                clientIp = 'unknown';
-            }
-
-            console.log(`📍 Client IP detected: ${clientIp}`);
-            console.log(`📋 Headers: x-forwarded-for=${req.headers['x-forwarded-for']}, x-real-ip=${req.headers['x-real-ip']}, cf-connecting-ip=${req.headers['cf-connecting-ip']}`);
-
-            // Get location (async, don't wait for it)
-            const location = await getLocationFromIP(clientIp);
-
-            // Get screen info from headers (sent from frontend)
-            const screen = {
-                width: parseInt(req.headers['x-screen-width']) || null,
-                height: parseInt(req.headers['x-screen-height']) || null
-            };
-
-            session = new UserSession({
-                userId: req.user._id,
-                sessionId,
-                device: { ...deviceInfo, screen },
-                location,
-                startTime: new Date(),
-                lastActivity: new Date(),
-                isActive: true
-            });
-
-            await session.save();
-            console.log(`✅ New session created for user ${req.user.email}`);
+        // Get device info
+        const deviceInfo = parseDeviceInfo(req.headers['user-agent'] || '');
+        
+        // Get client IP with better extraction logic
+        let clientIp = null;
+        
+        // Try multiple headers in order of priority
+        if (req.headers['cf-connecting-ip']) {
+            // Cloudflare
+            clientIp = req.headers['cf-connecting-ip'];
+        } else if (req.headers['x-real-ip']) {
+            // Nginx
+            clientIp = req.headers['x-real-ip'];
+        } else if (req.headers['x-forwarded-for']) {
+            // Standard proxy header (get first IP in chain)
+            clientIp = req.headers['x-forwarded-for'].split(',')[0].trim();
+        } else if (req.connection?.remoteAddress) {
+            // Direct connection
+            clientIp = req.connection.remoteAddress;
+        } else if (req.socket?.remoteAddress) {
+            // Socket connection
+            clientIp = req.socket.remoteAddress;
         } else {
-            // Update last activity
-            session.lastActivity = new Date();
-            await session.save();
+            clientIp = 'unknown';
         }
+
+        console.log(`📍 Client IP detected: ${clientIp}`);
+        console.log(`📋 Headers: x-forwarded-for=${req.headers['x-forwarded-for']}, x-real-ip=${req.headers['x-real-ip']}, cf-connecting-ip=${req.headers['cf-connecting-ip']}`);
+
+        // Get location (async, don't wait for it)
+        const location = await getLocationFromIP(clientIp);
+
+        // Get screen info from headers (sent from frontend)
+        const screen = {
+            width: parseInt(req.headers['x-screen-width']) || null,
+            height: parseInt(req.headers['x-screen-height']) || null
+        };
+
+        // Upsert: update if exists, create if not (prevents duplicate key errors)
+        const session = await UserSession.findOneAndUpdate(
+            { sessionId },
+            {
+                $set: {
+                    userId: req.user._id,
+                    device: { ...deviceInfo, screen },
+                    location,
+                    lastActivity: new Date(),
+                    isActive: true
+                },
+                $setOnInsert: {
+                    startTime: new Date()
+                }
+            },
+            { 
+                upsert: true, 
+                new: true,
+                runValidators: true
+            }
+        );
+
+        console.log(`✅ Session ${session.isNew ? 'created' : 'updated'} for user ${req.user.email}`);
 
         req.userSession = session;
         next();
