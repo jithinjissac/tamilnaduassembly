@@ -6,17 +6,75 @@ import { chromium } from 'playwright';
  * - Reuses browsers efficiently (20 browsers can handle 80+ users)
  * - Each user gets isolated context (no data mixing)
  * - Automatic cleanup and health checks
+ * - Closes idle browsers after 5 minutes of inactivity to save memory
  */
 class BrowserPool {
-  constructor(maxBrowsers = 20) {
+  constructor(maxBrowsers = 20, idleTimeout = 5 * 60 * 1000) {
     this.maxBrowsers = maxBrowsers;
+    this.idleTimeout = idleTimeout; // 5 minutes default
     this.browsers = [];
     this.contextCount = new Map(); // Track contexts per browser
+    this.lastActivityTime = new Map(); // Track last activity per browser
+    this.idleCheckInterval = null; // Interval for checking idle browsers
     this.launching = false;
     this.launchPromise = null;
     this.shuttingDown = false; // Flag to prevent new contexts during shutdown
     
-    console.log(`🏊 Browser Pool initialized (max: ${maxBrowsers} browsers)`);
+    console.log(`🏊 Browser Pool initialized (max: ${maxBrowsers} browsers, idle timeout: ${idleTimeout/1000}s)`);
+    
+    // Start idle browser cleanup checker (runs every minute)
+    this.startIdleChecker();
+  }
+
+  /**
+   * Start idle browser checker
+   * Runs every minute to close browsers with no active contexts for more than idleTimeout
+   */
+  startIdleChecker() {
+    this.idleCheckInterval = setInterval(() => {
+      if (this.shuttingDown) return;
+      
+      const now = Date.now();
+      const browsersToClose = [];
+      
+      for (let i = 0; i < this.browsers.length; i++) {
+        const browser = this.browsers[i];
+        const contextCount = this.contextCount.get(browser) || 0;
+        const lastActivity = this.lastActivityTime.get(browser) || now;
+        
+        // If browser has no contexts and has been idle for longer than idleTimeout
+        if (contextCount === 0 && (now - lastActivity) > this.idleTimeout) {
+          browsersToClose.push({ browser, index: i, idleTime: now - lastActivity });
+        }
+      }
+      
+      // Close idle browsers
+      for (const { browser, index, idleTime } of browsersToClose) {
+        this.closeIdleBrowser(browser, index, idleTime);
+      }
+    }, 60000); // Check every minute
+    
+    console.log('✅ Idle browser checker started (checking every 60 seconds)');
+  }
+
+  /**
+   * Close an idle browser
+   */
+  async closeIdleBrowser(browser, index, idleTime) {
+    try {
+      if (browser.isConnected()) {
+        await browser.close();
+        console.log(`🧹 Closed idle browser #${index} (idle for ${Math.round(idleTime/1000)}s, freed memory)`);
+      }
+      
+      // Remove from pool
+      this.browsers = this.browsers.filter(b => b !== browser);
+      this.contextCount.delete(browser);
+      this.lastActivityTime.delete(browser);
+      
+    } catch (error) {
+      console.error(`❌ Error closing idle browser #${index}:`, error.message);
+    }
   }
 
   /**
@@ -78,6 +136,9 @@ class BrowserPool {
     // Track context count
     const currentCount = this.contextCount.get(selectedBrowser) || 0;
     this.contextCount.set(selectedBrowser, currentCount + 1);
+    
+    // Update last activity time (browser is now active)
+    this.lastActivityTime.set(selectedBrowser, Date.now());
 
     // Store metadata
     context._poolMetadata = {
@@ -110,8 +171,13 @@ class BrowserPool {
       const browser = this.browsers[browserId];
       if (browser) {
         const currentCount = this.contextCount.get(browser) || 0;
-        this.contextCount.set(browser, Math.max(0, currentCount - 1));
-        console.log(`♻️ Context released for user ${userId} from browser #${browserId} (${currentCount - 1} remaining)`);
+        const newCount = Math.max(0, currentCount - 1);
+        this.contextCount.set(browser, newCount);
+        
+        // Update last activity time (for idle tracking)
+        this.lastActivityTime.set(browser, Date.now());
+        
+        console.log(`♻️ Context released for user ${userId} from browser #${browserId} (${newCount} remaining)`);
       }
     } catch (error) {
       console.error(`❌ Error releasing context for user ${userId}:`, error.message);
@@ -178,10 +244,12 @@ class BrowserPool {
         console.log(`⚠️ Browser #${browserIndex} disconnected, removing from pool`);
         this.browsers = this.browsers.filter(b => b !== browser);
         this.contextCount.delete(browser);
+        this.lastActivityTime.delete(browser);
       });
 
       this.browsers.push(browser);
       this.contextCount.set(browser, 0);
+      this.lastActivityTime.set(browser, Date.now()); // Initialize activity time
       
       console.log(`✅ Browser #${browserIndex} launched (total: ${this.browsers.length}/${this.maxBrowsers})`);
       return browser;
@@ -196,21 +264,29 @@ class BrowserPool {
    * Get pool statistics
    */
   getStats() {
+    const now = Date.now();
     const stats = {
       totalBrowsers: this.browsers.length,
       connectedBrowsers: this.browsers.filter(b => b.isConnected()).length,
       totalContexts: 0,
+      idleTimeout: this.idleTimeout,
       browsers: []
     };
 
     for (let i = 0; i < this.browsers.length; i++) {
       const browser = this.browsers[i];
       const contexts = this.contextCount.get(browser) || 0;
+      const lastActivity = this.lastActivityTime.get(browser) || now;
+      const idleTime = now - lastActivity;
+      const willCloseIn = contexts === 0 ? Math.max(0, this.idleTimeout - idleTime) : null;
+      
       stats.totalContexts += contexts;
       stats.browsers.push({
         id: i,
         connected: browser.isConnected(),
-        contexts
+        contexts,
+        idleTime: Math.round(idleTime / 1000), // seconds
+        willCloseIn: willCloseIn ? Math.round(willCloseIn / 1000) : null // seconds until auto-close
       });
     }
 
@@ -222,6 +298,13 @@ class BrowserPool {
    */
   async shutdown() {
     console.log('🛑 Shutting down browser pool...');
+    
+    // Stop idle checker
+    if (this.idleCheckInterval) {
+      clearInterval(this.idleCheckInterval);
+      this.idleCheckInterval = null;
+      console.log('✅ Stopped idle browser checker');
+    }
     
     // Set shutdown flag to prevent new contexts
     this.shuttingDown = true;
@@ -243,6 +326,7 @@ class BrowserPool {
 
     this.browsers = [];
     this.contextCount.clear();
+    this.lastActivityTime.clear();
     console.log('✅ Browser pool shutdown complete');
   }
 }

@@ -638,6 +638,17 @@
             }
         }
 
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
         .btn-secondary {
             background: #6b7280;
             color: white;
@@ -827,7 +838,12 @@
             <div class="card">
                 <div class="card-header">
                     <h2>All Orders</h2>
-                    <button class="btn btn-primary" onclick="loadAllOrders()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="openWhatsAppTemplateEditor()" title="Edit WhatsApp Message Template">
+                            <i class="fab fa-whatsapp"></i> Edit Message
+                        </button>
+                        <button class="btn btn-primary" onclick="loadAllOrders()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
                 </div>
 
                 <div class="search-filter">
@@ -899,12 +915,13 @@
                                     <th>Amount</th>
                                     <th>Status</th>
                                     <th>Date</th>
+                                    <th>WhatsApp</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="ordersTable">
                                 <tr>
-                                    <td colspan="11" class="empty-state">
+                                    <td colspan="12" class="empty-state">
                                         <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                         <p>No orders found</p>
                                     </td>
@@ -1002,7 +1019,10 @@
                 <div class="card-header">
                     <h3 style="margin: 0;">Resource Overview</h3>
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <span id="resourcesRefreshCounter" style="font-size: 0.85rem; opacity: 0.7;">Auto-refresh in <span id="resourcesCountdown">10</span>s</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s ease-in-out infinite;"></div>
+                            <span id="resourcesRefreshCounter" style="font-size: 0.85rem; opacity: 0.7; transition: all 0.3s;">Auto-refresh in <span id="resourcesCountdown">5</span>s</span>
+                        </div>
                         <button class="btn btn-primary" onclick="loadResources()"><i class="fas fa-sync-alt"></i> Refresh Now</button>
                     </div>
                 </div>
@@ -1363,6 +1383,61 @@
             </div>
 
             <div id="slip-alert" class="alert" style="display: none;"></div>
+            
+            <!-- Polling Station Text Editor for Testing -->
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <i class="fas fa-edit" style="font-size: 1.5rem;"></i>
+                    <h3 style="margin: 0; font-size: 1.3rem;">Polling Station Text Editor & Preview</h3>
+                </div>
+                <p style="margin: 0 0 1rem 0; opacity: 0.95; font-size: 0.95rem;">
+                    <i class="fas fa-info-circle"></i> Test different polling station name lengths and see live preview in all slip templates below
+                </p>
+                
+                <div style="background: white; padding: 1.25rem; border-radius: 8px; color: #1f2937;">
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label style="font-weight: 600; color: #374151;">
+                                    <i class="fas fa-map-marker-alt" style="color: #f59e0b;"></i> Polling Station Name:
+                                </label>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: #6b7280;">Characters:</span>
+                                    <span id="pollingStationCharCount" style="font-size: 1.1rem; font-weight: 600; color: #10b981; min-width: 40px; text-align: right;">29</span>
+                                    <span style="font-size: 0.85rem; color: #6b7280;">/</span>
+                                    <span style="font-size: 0.9rem; color: #9ca3af;">~60 max</span>
+                                </div>
+                            </div>
+                            <textarea 
+                                id="pollingStationTextInput" 
+                                oninput="updatePollingStationText()"
+                                rows="3"
+                                style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 1rem; font-family: 'Noto Sans Malayalam', Arial, sans-serif; resize: vertical; min-height: 80px; transition: border-color 0.2s;"
+                                placeholder="Enter polling station name in Malayalam..."
+                                onfocus="this.style.borderColor='#f59e0b'"
+                                onblur="this.style.borderColor='#e5e7eb'"
+                            >001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ</textarea>
+                            <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                                <button type="button" onclick="document.getElementById('pollingStationTextInput').value='001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ'; updatePollingStationText();" style="background: #667eea; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">
+                                    <i class="fas fa-font"></i> Short (29 chars)
+                                </button>
+                                <button type="button" onclick="document.getElementById('pollingStationTextInput').value='001 - ശ്രീ നാരായണ ഗുരു മെമ്മോറിയൽ ഗവൺമെന്റ് ഹയർ സെക്കണ്ടറി സ്കൂൾ'; updatePollingStationText();" style="background: #f59e0b; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">
+                                    <i class="fas fa-align-left"></i> Medium (53 chars)
+                                </button>
+                                <button type="button" onclick="document.getElementById('pollingStationTextInput').value='001 - ശ്രീ നാരായണ ഗുരു സ്മാരകം മെമ്മോറിയൽ ഗവൺമെന്റ് ഹയർ സെക്കണ്ടറി സ്കൂൾ വടക്കുംപുറം'; updatePollingStationText();" style="background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+                                    <i class="fas fa-align-justify"></i> Long (70 chars)
+                                </button>
+                                <button type="button" onclick="document.getElementById('pollingStationTextInput').value=''; updatePollingStationText();" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
+                                    <i class="fas fa-eraser"></i> Clear
+                                </button>
+                            </div>
+                            <div style="margin-top: 0.75rem; padding: 0.75rem; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 0.85rem; color: #92400e;">
+                                <strong><i class="fas fa-lightbulb"></i> Tip:</strong> Ideal length is 25-45 characters for best fit. Text longer than 60 characters may overflow or wrap.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="settings-form-wrapper" style="margin-top: 1.5rem;">
                 <!-- Settings Form -->
@@ -2820,6 +2895,149 @@ Login to https://easyslip.in to download your PDF.</textarea>
             }
         }
 
+        // ==================== WHATSAPP TEMPLATE FUNCTIONS ====================
+        
+        // Default WhatsApp message template
+        const defaultWhatsAppTemplate = `ഹലോ {name},
+
+നിങ്ങളുടെ ഓർഡർ {orderId} പൂർത്തിയാക്കാൻ ബാക്കിയുണ്ട്.
+
+📊 വിവരങ്ങൾ:
+▫️ വോട്ടർമാർ: {voters}
+▫️ തുക: ₹{amount}
+▫️ സ്ഥലം: {location}
+
+🔗 പേയ്മെന്റ് പൂർത്തിയാക്കാൻ:
+{paymentLink}
+
+നന്ദി! 🙏`;
+
+        // Load saved template or use default
+        function getWhatsAppTemplate() {
+            return localStorage.getItem('whatsappMessageTemplate') || defaultWhatsAppTemplate;
+        }
+
+        // Save template
+        function saveWhatsAppTemplate(template) {
+            localStorage.setItem('whatsappMessageTemplate', template);
+        }
+
+        // Generate WhatsApp message from template
+        function generateWhatsAppMessage(order) {
+            const template = getWhatsAppTemplate();
+            
+            return template
+                .replace(/{name}/g, order.userId?.name || 'Customer')
+                .replace(/{orderId}/g, order.orderId)
+                .replace(/{voters}/g, order.voterCount || order.totalVoters || 0)
+                .replace(/{amount}/g, (order.amount || 0).toFixed(2))
+                .replace(/{location}/g, `${order.location?.wardName || order.location?.ward || ''}, ${order.location?.localBodyName || order.location?.localBody || ''}`)
+                .replace(/{paymentLink}/g, `${window.location.origin}/order-success.html?orderId=${order.orderId}`);
+        }
+
+        // Open WhatsApp template editor
+        function openWhatsAppTemplateEditor() {
+            const template = getWhatsAppTemplate();
+            
+            // Create modal HTML
+            const modalHTML = `
+                <div id="whatsappTemplateModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <div style="background: white; border-radius: 12px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 1.5rem; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                            <h2 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fab fa-whatsapp"></i> Edit WhatsApp Message Template
+                            </h2>
+                            <button onclick="closeWhatsAppTemplateEditor()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='none'">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div style="padding: 2rem;">
+                            <div style="background: #e8f5e9; border-left: 4px solid #25D366; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
+                                <h3 style="margin: 0 0 0.5rem 0; color: #2e7d32; font-size: 1rem;">
+                                    <i class="fas fa-info-circle"></i> Available Variables
+                                </h3>
+                                <div style="color: #1b5e20; font-size: 0.9rem; line-height: 1.6;">
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{name}</code> - Customer name</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{orderId}</code> - Order ID</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{voters}</code> - Number of voters</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{amount}</code> - Order amount</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{location}</code> - Ward and Local Body</div>
+                                    <div><code style="background: #fff; padding: 2px 6px; border-radius: 3px; color: #d32f2f;">{paymentLink}</code> - Payment page URL</div>
+                                </div>
+                            </div>
+                            
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                                <i class="fas fa-edit"></i> Message Template
+                            </label>
+                            <textarea id="whatsappTemplateTextarea" style="width: 100%; min-height: 300px; padding: 1rem; border: 2px solid #ddd; border-radius: 8px; font-family: 'Noto Sans Malayalam', Arial, sans-serif; font-size: 0.95rem; line-height: 1.6; resize: vertical;" placeholder="Enter your WhatsApp message template...">${template}</textarea>
+                            
+                            <div style="margin-top: 1rem; color: #666; font-size: 0.85rem;">
+                                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i> <strong>Tip:</strong> Use variables like {name}, {orderId}, etc. They will be replaced with actual values.
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button onclick="saveWhatsAppTemplateFromEditor()" class="btn btn-success" style="flex: 1; background: #25D366; border-color: #25D366; padding: 0.75rem;">
+                                    <i class="fas fa-save"></i> Save Template
+                                </button>
+                                <button onclick="resetWhatsAppTemplate()" class="btn btn-secondary" style="flex: 1;">
+                                    <i class="fas fa-undo"></i> Reset to Default
+                                </button>
+                                <button onclick="closeWhatsAppTemplateEditor()" class="btn btn-danger">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Focus textarea
+            setTimeout(() => {
+                document.getElementById('whatsappTemplateTextarea').focus();
+            }, 100);
+        }
+
+        // Close WhatsApp template editor
+        function closeWhatsAppTemplateEditor() {
+            const modal = document.getElementById('whatsappTemplateModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Save template from editor
+        function saveWhatsAppTemplateFromEditor() {
+            const textarea = document.getElementById('whatsappTemplateTextarea');
+            const template = textarea.value.trim();
+            
+            if (!template) {
+                alert('Please enter a message template');
+                return;
+            }
+            
+            saveWhatsAppTemplate(template);
+            showSuccess('WhatsApp template saved successfully! It will be used for all future messages.');
+            closeWhatsAppTemplateEditor();
+            
+            // Reload orders to update WhatsApp links
+            if (document.getElementById('orders-tab').classList.contains('active')) {
+                loadAllOrders();
+            }
+        }
+
+        // Reset to default template
+        function resetWhatsAppTemplate() {
+            if (confirm('Are you sure you want to reset to the default template? This will overwrite your current template.')) {
+                const textarea = document.getElementById('whatsappTemplateTextarea');
+                textarea.value = defaultWhatsAppTemplate;
+                saveWhatsAppTemplate(defaultWhatsAppTemplate);
+                showSuccess('Template reset to default');
+            }
+        }
+
         // Load all orders (admin)
         async function loadAllOrders() {
             const loading = document.getElementById('ordersLoading');
@@ -2862,7 +3080,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 if (!data.orders || data.orders.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="11" class="empty-state">
+                            <td colspan="12" class="empty-state">
                                 <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
                                 <p>No orders found</p>
                             </td>
@@ -2907,6 +3125,21 @@ Login to https://easyslip.in to download your PDF.</textarea>
                                 </span>
                             </td>
                             <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                            <td>
+                                ${order.paymentStatus === 'pending' && order.userId?.phone ? `
+                                    <a href="https://wa.me/91${order.userId.phone}?text=${encodeURIComponent(generateWhatsAppMessage(order))}" 
+                                    target="_blank" 
+                                    class="btn btn-success btn-small" 
+                                    title="Send WhatsApp Reminder"
+                                    style="background: #25D366; border-color: #25D366;">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                ` : order.paymentStatus !== 'pending' ? `
+                                    <span style="color: #888; font-size: 0.85rem;">-</span>
+                                ` : `
+                                    <span style="color: #888; font-size: 0.85rem;" title="No phone number">-</span>
+                                `}
+                            </td>
                             <td>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                     <button class="btn btn-primary btn-small" onclick="viewOrderDetails('${order._id}')" title="View Details">
@@ -3321,13 +3554,24 @@ Login to https://easyslip.in to download your PDF.</textarea>
         // Load resources (system stats)
         let resourcesRefreshInterval;
         let resourcesCountdownInterval;
+        let isInitialResourceLoad = true;
         
         async function loadResources() {
             const loading = document.getElementById('resourcesLoading');
             const content = document.getElementById('resourcesContent');
+            const refreshBtn = document.querySelector('#resources-tab .btn-primary');
             
-            loading.classList.add('active');
-            content.style.display = 'none';
+            // Only show loading on initial load, not on auto-refresh
+            if (isInitialResourceLoad) {
+                loading.classList.add('active');
+                content.style.display = 'none';
+            } else {
+                // Add subtle updating indicator
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Updating...';
+                    refreshBtn.disabled = true;
+                }
+            }
 
             try {
                 const response = await fetch('/api/system/stats', {
@@ -3400,11 +3644,27 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
                 loading.classList.remove('active');
                 content.style.display = 'block';
+                isInitialResourceLoad = false;
+                
+                // Reset refresh button
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Now';
+                    refreshBtn.disabled = false;
+                }
 
             } catch (error) {
                 console.error('Error loading resources:', error);
-                showError('Failed to load resource stats');
+                if (isInitialResourceLoad) {
+                    showError('Failed to load resource stats');
+                }
                 loading.classList.remove('active');
+                isInitialResourceLoad = false;
+                
+                // Reset refresh button
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Now';
+                    refreshBtn.disabled = false;
+                }
             }
         }
 
@@ -3413,21 +3673,30 @@ Login to https://easyslip.in to download your PDF.</textarea>
             if (resourcesRefreshInterval) clearInterval(resourcesRefreshInterval);
             if (resourcesCountdownInterval) clearInterval(resourcesCountdownInterval);
 
-            // Auto-refresh every 10 seconds
+            // Auto-refresh every 5 seconds (faster updates)
             resourcesRefreshInterval = setInterval(() => {
                 loadResources();
-            }, 10000);
+            }, 5000);
 
-            // Countdown timer
-            let countdown = 10;
+            // Countdown timer with visual indicator
+            let countdown = 5;
             resourcesCountdownInterval = setInterval(() => {
                 countdown--;
                 if (countdown <= 0) {
-                    countdown = 10;
+                    countdown = 5;
                 }
                 const countdownEl = document.getElementById('resourcesCountdown');
+                const counterEl = document.getElementById('resourcesRefreshCounter');
                 if (countdownEl) {
                     countdownEl.textContent = countdown;
+                    // Add pulsing effect when close to refresh
+                    if (countdown <= 2 && counterEl) {
+                        counterEl.style.color = '#667eea';
+                        counterEl.style.fontWeight = '600';
+                    } else if (counterEl) {
+                        counterEl.style.color = '';
+                        counterEl.style.fontWeight = '';
+                    }
                 }
             }, 1000);
         }
@@ -3435,6 +3704,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
         function stopResourcesAutoRefresh() {
             if (resourcesRefreshInterval) clearInterval(resourcesRefreshInterval);
             if (resourcesCountdownInterval) clearInterval(resourcesCountdownInterval);
+            isInitialResourceLoad = true; // Reset for next time
         }
 
         // Load symbols
@@ -4371,7 +4641,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
         // ============================================
 
         // Sample voter data for slip preview
-        const sampleVoter = {
+        let sampleVoter = {
             sl_no: '123',
             name: 'രമേഷ് കുമാർ',
             guardian_name: 'സുരേഷ് കുമാർ',
@@ -4382,6 +4652,33 @@ Login to https://easyslip.in to download your PDF.</textarea>
             polling_station_name: '001 - കോട്ടയ്ക്കൽ സർക്കാർ സ്കൂൾ',
             ward: '012 - കോട്ടയ്ക്കൽ'
         };
+
+        // Update polling station text and refresh preview
+        function updatePollingStationText() {
+            const input = document.getElementById('pollingStationTextInput');
+            if (input) {
+                sampleVoter.polling_station_name = input.value;
+                updateSlipPreview();
+                
+                // Update character count
+                const charCount = document.getElementById('pollingStationCharCount');
+                if (charCount) {
+                    charCount.textContent = input.value.length;
+                    
+                    // Color code based on length
+                    if (input.value.length > 60) {
+                        charCount.style.color = '#ef4444';
+                        charCount.style.fontWeight = '700';
+                    } else if (input.value.length > 45) {
+                        charCount.style.color = '#f59e0b';
+                        charCount.style.fontWeight = '600';
+                    } else {
+                        charCount.style.color = '#10b981';
+                        charCount.style.fontWeight = '500';
+                    }
+                }
+            }
+        }
 
         // Load slip settings from database
         async function loadSlipSettings() {
