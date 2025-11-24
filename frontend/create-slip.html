@@ -2119,14 +2119,21 @@ s0.parentNode.insertBefore(s1,s0);
                     
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
                     
-                    const orderData = {
-                        customization: {
+                    let customization;
+                    if (symbolFreeMode || !selectedSymbol) {
+                        customization = { symbolFree: true, slipsPerPage };
+                    } else {
+                        customization = {
                             symbolId: selectedSymbol._id,
                             symbolImage: selectedSymbol.imageUrl,
                             symbolName: selectedSymbol.name,
                             symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
-                            slipsPerPage: slipsPerPage
-                        },
+                            slipsPerPage
+                        };
+                    }
+                    
+                    const orderData = {
+                        customization,
                         location: {
                             district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
                             localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
