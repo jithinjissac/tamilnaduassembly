@@ -1489,13 +1489,15 @@ s0.parentNode.insertBefore(s1,s0);
         function isInAppBrowser() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             
+            console.log('User Agent:', userAgent); // Debug
+            
             // Instagram in-app browser
             if (userAgent.indexOf('Instagram') > -1) {
                 return 'Instagram';
             }
             
             // Facebook in-app browser (FBAN = Facebook App, FBAV = Facebook App Version)
-            if (userAgent.indexOf('FBAN') > -1 || userAgent.indexOf('FBAV') > -1) {
+            if (userAgent.indexOf('FBAN') > -1 || userAgent.indexOf('FBAV') > -1 || userAgent.indexOf('FB_IAB') > -1) {
                 return 'Facebook';
             }
             
@@ -1524,16 +1526,45 @@ s0.parentNode.insertBefore(s1,s0);
                 return 'WhatsApp';
             }
             
+            // Generic WebView detection
+            if (userAgent.indexOf('wv') > -1 || userAgent.indexOf('WebView') > -1) {
+                return 'WebView';
+            }
+            
             return false;
         }
 
-        // Check on page load
+        // Check immediately (not waiting for load event)
+        (function() {
+            const inAppBrowser = isInAppBrowser();
+            console.log('In-app browser detected:', inAppBrowser);
+            if (inAppBrowser) {
+                // Show overlay immediately
+                const overlay = document.getElementById('inAppBrowserOverlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    console.log('Overlay displayed');
+                } else {
+                    console.log('Overlay element not found');
+                }
+            }
+        })();
+
+        // Also check on page load as backup
         window.addEventListener('load', function() {
             const inAppBrowser = isInAppBrowser();
             if (inAppBrowser) {
-                console.log('Detected in-app browser:', inAppBrowser);
-                document.getElementById('inAppBrowserOverlay').style.display = 'block';
+                console.log('Detected in-app browser on load:', inAppBrowser);
+                const overlay = document.getElementById('inAppBrowserOverlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                }
             }
         });
+
+        // Test function - you can call this from browser console: testOverlay()
+        window.testOverlay = function() {
+            document.getElementById('inAppBrowserOverlay').style.display = 'block';
+        };
     </script>
 </html>
