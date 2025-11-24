@@ -125,6 +125,14 @@ export const createOrder = [
                 amount
             });
 
+            // Debug: Check if voters have polling station data
+            const votersWithStation = voters.filter(v => v.polling_station_value || v.polling_station_name);
+            if (votersWithStation.length > 0) {
+                console.log(`📊 Order has ${votersWithStation.length}/${voters.length} voters with polling station data`);
+                const uniqueStations = [...new Set(votersWithStation.map(v => v.polling_station_value))];
+                console.log(`📍 Unique polling stations: ${uniqueStations.length} - ${uniqueStations.join(', ')}`);
+            }
+
             await order.save();
 
             // Send order confirmation email (use already fetched user)

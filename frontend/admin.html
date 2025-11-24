@@ -2934,7 +2934,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
         // Default WhatsApp message template
         const defaultWhatsAppTemplate = `ഹലോ {name},
 
-നിങ്ങളുടെ ഓർഡർ {orderId} പൂർത്തിയാക്കാൻ ബാക്കിയുണ്ട്.
+നിങ്ങളുടെ വോട്ടർ സ്ലിപ്പ് ഓർഡർ {orderId} പൂർത്തിയാക്കാൻ ബാക്കിയുണ്ട്.
 
 📊 വിവരങ്ങൾ:
 ▫️ ചിഹ്നം: {symbol}
@@ -2972,7 +2972,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 .replace(/{voters}/g, order.voterCount || order.totalVoters || 0)
                 .replace(/{amount}/g, (order.amount || 0).toFixed(2))
                 .replace(/{location}/g, `${order.location?.wardName || order.location?.ward || ''}, ${order.location?.localBodyName || order.location?.localBody || ''}`)
-                .replace(/{paymentLink}/g, `${window.location.origin}/preview/${order.orderId}`);
+                .replace(/{paymentLink}/g, `${window.location.origin}/preview.html?${order.orderId}`);
         }
 
         // Open WhatsApp template editor
