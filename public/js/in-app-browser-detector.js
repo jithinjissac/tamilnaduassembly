@@ -6,23 +6,40 @@
     function isInAppBrowser() {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         
-        // Check for Facebook in-app browser (FBAN, FBAV)
-        const isFacebookBrowser = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+        // Debug: Log user agent
+        console.log('User Agent:', ua);
+        
+        // Check for Facebook in-app browser (multiple patterns)
+        const isFacebookBrowser = (ua.indexOf('FBAN') > -1) || 
+                                  (ua.indexOf('FBAV') > -1) || 
+                                  (ua.indexOf('FB_IAB') > -1) ||
+                                  (ua.indexOf('FB4A') > -1) ||
+                                  (ua.indexOf('FBIOS') > -1) ||
+                                  (ua.indexOf('[FBAN') > -1);
         
         // Check for Instagram in-app browser
         const isInstagramBrowser = ua.indexOf('Instagram') > -1;
         
-        return isFacebookBrowser || isInstagramBrowser;
+        // Check for Messenger in-app browser
+        const isMessengerBrowser = (ua.indexOf('MessengerLite') > -1) || (ua.indexOf('Messenger') > -1);
+        
+        const detected = isFacebookBrowser || isInstagramBrowser || isMessengerBrowser;
+        console.log('In-app browser detected:', detected);
+        
+        return detected;
     }
     
     // Get browser name for display
     function getInAppBrowserName() {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
-        if ((ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1)) {
+        if ((ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1) || (ua.indexOf('FB_IAB') > -1) || (ua.indexOf('FB4A') > -1) || (ua.indexOf('FBIOS') > -1)) {
             return 'Facebook';
         }
         if (ua.indexOf('Instagram') > -1) {
             return 'Instagram';
+        }
+        if ((ua.indexOf('MessengerLite') > -1) || (ua.indexOf('Messenger') > -1)) {
+            return 'Messenger';
         }
         return 'in-app';
     }
@@ -269,8 +286,8 @@
         
         if (isInAppBrowser()) {
             console.log('⚠️ In-app browser detected:', getInAppBrowserName());
-            // Show modal after a short delay to ensure page is loaded
-            setTimeout(showOpenInBrowserModal, 500);
+            // Show modal immediately for better user experience
+            setTimeout(showOpenInBrowserModal, 100);
         }
     }
     
