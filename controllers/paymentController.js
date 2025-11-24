@@ -471,22 +471,36 @@ export const cashfreeWebhook = async (req, res) => {
     try {
         const { data } = req.body;
         
+        // Log the full webhook payload for debugging
+        logger.debug('Cashfree webhook received:', JSON.stringify(req.body));
+        
         if (!data || !data.order) {
+            logger.warn('Invalid Cashfree webhook payload - missing data.order');
             return res.status(400).json({ 
                 status: 'error',
                 message: 'Invalid webhook payload' 
             });
         }
 
-        const orderId = data.order.order_id;
+        const cashfreeOrderId = data.order.order_id;
         const orderStatus = data.order.order_status;
+        
+        logger.debug(`Cashfree webhook: order_id=${cashfreeOrderId}, status=${orderStatus}`);
 
-        const order = await Order.findOne({ orderId });
+        // Try to find order by Cashfree order ID first, then by our order ID
+        let order = await Order.findOne({ cashfreeOrderId: cashfreeOrderId });
         
         if (!order) {
-            logger.warn('Order not found for Cashfree webhook:', orderId);
+            // Fallback: try using cashfreeOrderId as our orderId (legacy)
+            order = await Order.findOne({ orderId: cashfreeOrderId });
+        }
+        
+        if (!order) {
+            logger.warn(`Order not found for Cashfree webhook. Cashfree order_id: ${cashfreeOrderId}`);
             return res.json({ status: 'success' }); // Return success to avoid retries
         }
+        
+        logger.debug(`Found order: ${order.orderId} (payment status: ${order.paymentStatus})`);
 
         if (orderStatus === 'PAID' && order.paymentStatus !== 'completed') {
             // Payment successful

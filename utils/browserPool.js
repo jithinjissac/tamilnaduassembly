@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
  * - Closes idle browsers after 5 minutes of inactivity to save memory
  */
 class BrowserPool {
-  constructor(maxBrowsers = 50, idleTimeout = 5 * 60 * 1000) {
+  constructor(maxBrowsers = 30, idleTimeout = 5 * 60 * 1000) {
     this.maxBrowsers = maxBrowsers;
     this.idleTimeout = idleTimeout; // 5 minutes default
     this.browsers = [];
@@ -341,8 +341,9 @@ class BrowserPool {
 
 // Singleton instance
 // Optimized for 32 vCPU / 32 GB RAM server
-// Each browser uses ~400-500 MB RAM, 50 browsers = ~25 GB max
-export const browserPool = new BrowserPool(50);
+// Each browser uses ~400-500 MB RAM, 30 browsers = ~15 GB
+// Reduced from 50 to prevent EAGAIN (process limit) errors
+export const browserPool = new BrowserPool(30);
 
 // Graceful shutdown
 process.on('SIGTERM', () => browserPool.shutdown());
