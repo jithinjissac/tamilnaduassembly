@@ -1874,7 +1874,7 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Sequential extraction for multiple polling stations - one at a time
         async function extractStationsSequentially() {
-            if (!selectedSymbol) {
+            if (!selectedSymbol && !symbolFreeMode) {
                 showError('captchaError', 'Please select a symbol before extracting');
                 return;
             }
@@ -2256,12 +2256,15 @@ s0.parentNode.insertBefore(s1,s0);
         }
 
         async function createOrder() {
+            const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+            
             const orderData = {
-                customization: symbolFreeMode ? { symbolFree: true } : {
+                customization: symbolFreeMode ? { symbolFree: true, slipsPerPage } : {
                     symbolId: selectedSymbol._id,
                     symbolImage: selectedSymbol.imageUrl,
                     symbolName: selectedSymbol.name,
-                    symbolNameMalayalam: selectedSymbol.nameMalayalam || ''
+                    symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                    slipsPerPage
                 },
                 location: {
                     district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
