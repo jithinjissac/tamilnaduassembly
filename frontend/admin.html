@@ -2972,7 +2972,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 .replace(/{voters}/g, order.voterCount || order.totalVoters || 0)
                 .replace(/{amount}/g, (order.amount || 0).toFixed(2))
                 .replace(/{location}/g, `${order.location?.wardName || order.location?.ward || ''}, ${order.location?.localBodyName || order.location?.localBody || ''}`)
-                .replace(/{paymentLink}/g, `${window.location.origin}/order-success.html?orderId=${order.orderId}`);
+                .replace(/{paymentLink}/g, `${window.location.origin}/preview/${order.orderId}`);
         }
 
         // Open WhatsApp template editor
@@ -3227,7 +3227,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                         document.getElementById('ordersTotalCount').textContent = data.total;
                         
                         // Show pagination controls if there are orders
-                        document.getElementById('ordersPaginationControls').style.display = data.total > 0 ? 'flex' : 'none';
+                        document.getElementById('ordersPagination').style.display = data.total > 0 ? 'block' : 'none';
                         
                         updatePaginationUI();
                     }
@@ -3257,11 +3257,13 @@ Login to https://easyslip.in to download your PDF.</textarea>
         }
 
         function updatePaginationUI() {
-            const pageNumbers = document.getElementById('ordersPaginationNumbers');
-            const firstBtn = pageNumbers.parentElement.querySelector('[onclick*="goToOrdersPage(1)"]');
-            const prevBtn = pageNumbers.parentElement.querySelector('[onclick*="goToOrdersPage(currentOrdersPage - 1)"]');
-            const nextBtn = pageNumbers.parentElement.querySelector('[onclick*="goToOrdersPage(currentOrdersPage + 1)"]');
-            const lastBtn = pageNumbers.parentElement.querySelector('[onclick*="goToOrdersPage(totalOrdersPages)"]');
+            const pageNumbers = document.getElementById('ordersPageNumbers');
+            if (!pageNumbers) return; // Exit if element doesn't exist
+            
+            const firstBtn = document.getElementById('ordersFirstPage');
+            const prevBtn = document.getElementById('ordersPrevPage');
+            const nextBtn = document.getElementById('ordersNextPage');
+            const lastBtn = document.getElementById('ordersLastPage');
             
             // Enable/disable navigation buttons
             if (firstBtn) {
