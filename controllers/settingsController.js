@@ -82,6 +82,32 @@ export const updateSettings = async (req, res) => {
         // Clear cache for this category
         clearSettingsCache(category);
         
+        // If slip settings changed, delete all preview PDFs to force regeneration with new settings
+        if (category === 'slip') {
+            try {
+                const fs = await import('fs');
+                const path = await import('path');
+                const { fileURLToPath } = await import('url');
+                const __filename = fileURLToPath(import.meta.url);
+                const __dirname = path.dirname(__filename);
+                
+                const previewDir = path.join(__dirname, '..', 'public', 'preview-pdfs');
+                if (fs.existsSync(previewDir)) {
+                    const files = await fs.promises.readdir(previewDir);
+                    let deletedCount = 0;
+                    for (const file of files) {
+                        if (file.endsWith('.pdf')) {
+                            await fs.promises.unlink(path.join(previewDir, file)).catch(() => {});
+                            deletedCount++;
+                        }
+                    }
+                    console.log(`🗑️ Deleted ${deletedCount} preview PDFs after slip settings update`);
+                }
+            } catch (err) {
+                console.warn('⚠️ Could not clear preview PDF cache:', err.message);
+            }
+        }
+        
         console.log(`✅ Settings updated for category: ${category} by user: ${userId}`);
         
         res.json({
