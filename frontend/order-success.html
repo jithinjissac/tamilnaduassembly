@@ -877,9 +877,12 @@ s0.parentNode.insertBefore(s1,s0);
                 console.log('Loading order details for orderId:', orderId);
                 console.log('Token present:', !!token);
                 
-                const response = await fetch(`/api/orders/${orderId}`, {
+                // Add cache-busting to ensure fresh data after payment
+                const response = await fetch(`/api/orders/${orderId}?_t=${Date.now()}`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
                     }
                 });
 
@@ -915,9 +918,11 @@ s0.parentNode.insertBefore(s1,s0);
                     if (verified) {
                         // Reload order data to get updated status
                         console.log('✅ Payment verified, reloading order data...');
-                        const reloadResponse = await fetch(`/api/orders/${orderId}`, {
+                        const reloadResponse = await fetch(`/api/orders/${orderId}?_t=${Date.now()}`, {
                             headers: {
-                                'Authorization': `Bearer ${token}`
+                                'Authorization': `Bearer ${token}`,
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache'
                             }
                         });
                         if (reloadResponse.ok) {
