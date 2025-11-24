@@ -733,6 +733,7 @@ s0.parentNode.insertBefore(s1,s0);
                             <tr>
                                 <th>Order ID</th>
                                 <th>Date</th>
+                                <th>Symbol</th>
                                 <th>Location</th>
                                 <th>Voters</th>
                                 <th>Amount</th>
@@ -745,6 +746,14 @@ s0.parentNode.insertBefore(s1,s0);
                             <tr>
                                 <td><strong>${order.orderId}</strong></td>
                                 <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                                <td>
+                                    <div style="font-size: 0.85rem; line-height: 1.4;">
+                                        ${order.customization?.symbolFree 
+                                            ? '<span style="color: #718096; font-style: italic;">No Symbol</span>'
+                                            : `<div><strong>${order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-'}</strong></div>`
+                                        }
+                                    </div>
+                                </td>
                                 <td>
                                     <div style="font-size: 0.9rem; line-height: 1.4;">
                                         <div><strong>${order.location.wardName || order.location.ward || '-'}</strong></div>
@@ -786,6 +795,15 @@ s0.parentNode.insertBefore(s1,s0);
                         <div class="order-card-date">${new Date(order.createdAt).toLocaleDateString('en-IN')}</div>
                     </div>
                     <div class="order-card-body">
+                        <div class="order-card-row">
+                            <div class="order-card-label">Symbol:</div>
+                            <div class="order-card-value">
+                                ${order.customization?.symbolFree 
+                                    ? '<span style="color: #718096; font-style: italic;">No Symbol</span>'
+                                    : `<strong>${order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-'}</strong>`
+                                }
+                            </div>
+                        </div>
                         <div class="order-card-row">
                             <div class="order-card-label">Location:</div>
                             <div class="order-card-value">
