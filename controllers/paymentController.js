@@ -343,7 +343,14 @@ export const verifyPayment = async (req, res) => {
         order.razorpayPaymentId = razorpay_payment_id;
         order.razorpaySignature = razorpay_signature;
         order.paidAt = new Date();
-        await order.save();
+        
+        try {
+            await order.save();
+            logger.info(`✅ Payment verified for order ${order.orderId} (symbolFree: ${order.customization?.symbolFree})`);
+        } catch (saveError) {
+            logger.error(`❌ Failed to save order ${order.orderId} after payment:`, saveError);
+            throw saveError;
+        }
 
         // Send payment success email
         const user = await User.findById(order.userId);
@@ -416,7 +423,14 @@ export const webhook = async (req, res) => {
                 order.paymentStatus = 'completed';
                 order.razorpayPaymentId = payload.id;
                 order.paidAt = new Date();
-                await order.save();
+                
+                try {
+                    await order.save();
+                    logger.info(`✅ Webhook: Payment captured for order ${order.orderId} (symbolFree: ${order.customization?.symbolFree})`);
+                } catch (saveError) {
+                    logger.error(`❌ Webhook: Failed to save order ${order.orderId}:`, saveError);
+                    throw saveError;
+                }
                 
                 // Send PDF ready email if PDF exists
                 const user = await User.findById(order.userId);
@@ -578,7 +592,14 @@ export const verifyCashfreePayment = async (req, res) => {
                 order.paymentStatus = 'completed';
                 order.cashfreePaymentId = latestPayment.cf_payment_id;
                 order.paidAt = new Date();
-                await order.save();
+                
+                try {
+                    await order.save();
+                    logger.info(`✅ Cashfree payment verified for order ${order.orderId} (symbolFree: ${order.customization?.symbolFree})`);
+                } catch (saveError) {
+                    logger.error(`❌ Failed to save order ${order.orderId} after Cashfree payment:`, saveError);
+                    throw saveError;
+                }
 
                 // Send emails
                 const user = await User.findById(order.userId);
