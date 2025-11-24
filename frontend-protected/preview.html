@@ -2334,6 +2334,37 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
+        // Helper function to open PDF in external browser on Android
+        function openPDFInChrome(url, filename) {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isInAppBrowser = /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Instagram|MessengerLite|Messenger/i.test(navigator.userAgent);
+            
+            if (isAndroid) {
+                // Try to open in Chrome using intent
+                const intentUrl = `intent:${url}#Intent;scheme=https;package=com.android.chrome;end`;
+                window.location.href = intentUrl;
+                
+                // Fallback: also create download link
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, 500);
+            } else {
+                // Non-Android: normal download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+
         async function downloadFullPDF() {
             if (!orderData) {
                 showMessage('info', 'Please Wait', 'Loading order details...');

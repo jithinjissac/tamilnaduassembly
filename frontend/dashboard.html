@@ -371,11 +371,6 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        /* Mobile Card View for Orders */
-        .order-card {
-            display: none; /* Hidden on desktop */
-        }
-
         @media (max-width: 768px) {
             .header-container {
                 flex-direction: column;
@@ -391,113 +386,19 @@ s0.parentNode.insertBefore(s1,s0);
                 grid-template-columns: 1fr;
             }
 
-            /* Hide table on mobile */
-            .table-wrapper {
-                display: none;
-            }
-
-            /* Show cards on mobile */
-            .order-card {
-                display: block;
-                background: white;
-                border: 2px solid #e2e8f0;
-                border-radius: 12px;
-                padding: 1.25rem;
-                margin-bottom: 1rem;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-                transition: all 0.3s;
-            }
-
-            .order-card:hover {
-                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-                transform: translateY(-2px);
-            }
-
-            .order-card-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1rem;
-                padding-bottom: 0.75rem;
-                border-bottom: 2px solid #f0f0f0;
-            }
-
-            .order-card-id {
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: var(--kerala-green);
-            }
-
-            .order-card-date {
+            .orders-table {
                 font-size: 0.85rem;
-                color: #718096;
+                min-width: 700px;
             }
 
-            .order-card-body {
-                display: grid;
-                gap: 0.75rem;
-            }
-
-            .order-card-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
-                padding: 0.5rem 0;
-            }
-
-            .order-card-label {
-                font-weight: 600;
-                color: #4a5568;
-                font-size: 0.9rem;
-                min-width: 80px;
-            }
-
-            .order-card-value {
-                text-align: right;
-                color: #2d3748;
-                font-size: 0.95rem;
-                flex: 1;
-            }
-
-            .order-card-location {
-                display: flex;
-                flex-direction: column;
-                gap: 0.25rem;
-                text-align: right;
-            }
-
-            .order-card-location-main {
-                font-weight: 600;
-                color: #2d3748;
-            }
-
-            .order-card-location-sub {
-                font-size: 0.85rem;
-                color: #718096;
-            }
-
-            .order-card-actions {
-                margin-top: 1rem;
-                padding-top: 1rem;
-                border-top: 2px solid #f0f0f0;
-                display: flex;
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-
-            .order-card-actions .btn {
-                width: 100%;
-                justify-content: center;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.875rem;
-                font-size: 0.95rem;
+            .orders-table th,
+            .orders-table td {
+                padding: 0.75rem 0.5rem;
             }
 
             .btn-download {
-                font-size: 0.95rem;
-                padding: 0.875rem;
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
             }
         }
 
@@ -725,7 +626,6 @@ s0.parentNode.insertBefore(s1,s0);
                 return;
             }
 
-            // Desktop Table View
             const tableHTML = `
                 <div class="table-wrapper">
                     <table class="orders-table">
@@ -733,7 +633,6 @@ s0.parentNode.insertBefore(s1,s0);
                             <tr>
                                 <th>Order ID</th>
                                 <th>Date</th>
-                                <th>Symbol</th>
                                 <th>Location</th>
                                 <th>Voters</th>
                                 <th>Amount</th>
@@ -742,26 +641,10 @@ s0.parentNode.insertBefore(s1,s0);
                             </tr>
                         </thead>
                     <tbody>
-                        ${filteredOrders.map(order => {
-                            const displayDate = order.paidAt || order.createdAt;
-                            const dateLabel = order.paidAt ? 'Paid' : 'Created';
-                            return `
+                        ${filteredOrders.map(order => `
                             <tr>
                                 <td><strong>${order.orderId}</strong></td>
-                                <td>
-                                    <div style="font-size: 0.9rem; line-height: 1.3;">
-                                        <div>${new Date(displayDate).toLocaleDateString('en-IN')}</div>
-                                        <div style="font-size: 0.75rem; color: #718096;">${dateLabel}</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-size: 0.85rem; line-height: 1.4;">
-                                        ${order.customization?.symbolFree 
-                                            ? '<span style="color: #718096; font-style: italic;">No Symbol</span>'
-                                            : `<div><strong>${order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-'}</strong></div>`
-                                        }
-                                    </div>
-                                </td>
+                                <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
                                 <td>
                                     <div style="font-size: 0.9rem; line-height: 1.4;">
                                         <div><strong>${order.location.wardName || order.location.ward || '-'}</strong></div>
@@ -789,84 +672,13 @@ s0.parentNode.insertBefore(s1,s0);
                                     </div>
                                 </td>
                             </tr>
-                        `
-                        }).join('')}
+                        `).join('')}
                     </tbody>
                 </table>
                 </div>
             `;
 
-            // Mobile Card View
-            const cardsHTML = filteredOrders.map(order => {
-                const displayDate = order.paidAt || order.createdAt;
-                const dateLabel = order.paidAt ? 'Paid' : 'Created';
-                return `
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-card-id">${order.orderId}</div>
-                        <div class="order-card-date">
-                            <div>${new Date(displayDate).toLocaleDateString('en-IN')}</div>
-                            <div style="font-size: 0.75rem; opacity: 0.8;">${dateLabel}</div>
-                        </div>
-                    </div>
-                    <div class="order-card-body">
-                        <div class="order-card-row">
-                            <div class="order-card-label">Symbol:</div>
-                            <div class="order-card-value">
-                                ${order.customization?.symbolFree 
-                                    ? '<span style="color: #718096; font-style: italic;">No Symbol</span>'
-                                    : `<strong>${order.customization?.symbolNameMalayalam || order.customization?.symbolName || '-'}</strong>`
-                                }
-                            </div>
-                        </div>
-                        <div class="order-card-row">
-                            <div class="order-card-label">Location:</div>
-                            <div class="order-card-value">
-                                <div class="order-card-location">
-                                    <div class="order-card-location-main">${order.location.wardName || order.location.ward || '-'}</div>
-                                    <div class="order-card-location-sub">${order.location.localBodyName || order.location.localBody || '-'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="order-card-row">
-                            <div class="order-card-label">Voters:</div>
-                            <div class="order-card-value"><strong>${order.voterCount}</strong></div>
-                        </div>
-                        <div class="order-card-row">
-                            <div class="order-card-label">Amount:</div>
-                            <div class="order-card-value"><strong>₹${order.amount.toFixed(2)}</strong></div>
-                        </div>
-                        <div class="order-card-row">
-                            <div class="order-card-label">Status:</div>
-                            <div class="order-card-value">
-                                <span class="status-badge status-${order.paymentStatus}">
-                                    ${order.paymentStatus === 'completed' ? 'Completed' : 
-                                      order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="order-card-actions">
-                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: var(--kerala-green); text-decoration: none;">
-                            <i class="fas fa-eye"></i> View Order
-                        </a>
-                        ${order.paymentStatus === 'completed' 
-                            ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')">
-                                   <i class="fas fa-download"></i> Download PDF
-                               </button>
-                               <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;">
-                                   <i class="fas fa-file-invoice"></i> Download Invoice
-                               </button>`
-                            : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'">
-                                   <i class="fas fa-credit-card"></i> Complete Payment
-                               </button>`
-                        }
-                    </div>
-                </div>
-            `
-            }).join('');
-
-            container.innerHTML = tableHTML + cardsHTML;
+            container.innerHTML = tableHTML;
         }
 
         // Filter tabs
@@ -1079,7 +891,5 @@ s0.parentNode.insertBefore(s1,s0);
             loadAndShowPopup();
         }
     </script>
-    <!-- In-app browser detector -->
-    <script src="/js/in-app-browser-detector.js"></script>
 </body>
 </html>

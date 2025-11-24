@@ -519,6 +519,10 @@ export const getAllOrders = async (req, res) => {
             ];
         }
         
+        const sortOrder = order === 'asc' ? 1 : -1;
+        const sortOptions = {};
+        sortOptions[sortBy] = sortOrder;
+        
         // Pagination
         const pageNum = parseInt(page);
         const limitNum = parseInt(limit);
@@ -526,29 +530,12 @@ export const getAllOrders = async (req, res) => {
         
         // Get orders with pagination - OPTIMIZED
         const orders = await Order.find(query)
-            .select('orderId userId totalVoters amount paymentStatus createdAt paidAt pdfPath customization location')
+            .select('orderId userId totalVoters amount paymentStatus createdAt pdfPath customization location')
             .populate('userId', 'name email phone')
+            .sort(sortOptions)
             .skip(skip)
             .limit(limitNum)
             .lean();  // 30-40% faster!
-        
-        // Sort by latest activity (payment date if paid, otherwise creation date)
-        orders.sort((a, b) => {
-            // Handle custom sort field
-            if (sortBy === 'createdAt') {
-                const dateA = a.paidAt || a.createdAt;
-                const dateB = b.paidAt || b.createdAt;
-                return order === 'asc' 
-                    ? new Date(dateA) - new Date(dateB)
-                    : new Date(dateB) - new Date(dateA);
-            }
-            
-            // Default sorting for other fields
-            const sortOrder = order === 'asc' ? 1 : -1;
-            if (a[sortBy] < b[sortBy]) return -sortOrder;
-            if (a[sortBy] > b[sortBy]) return sortOrder;
-            return 0;
-        });
         
         // Get total count for pagination (run in parallel)
         const totalCount = await Order.countDocuments(query);

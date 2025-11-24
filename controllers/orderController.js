@@ -193,14 +193,8 @@ export const getUserOrders = async (req, res) => {
         // Use lean() for faster queries and select only needed fields
         const orders = await Order.find({ userId })
             .select('-voters -__v') // Don't send voter data or version key in list
+            .sort({ createdAt: -1 })
             .lean(); // Returns plain JS objects (faster)
-
-        // Sort by latest activity (payment date if paid, otherwise creation date)
-        orders.sort((a, b) => {
-            const dateA = a.paidAt || a.createdAt;
-            const dateB = b.paidAt || b.createdAt;
-            return new Date(dateB) - new Date(dateA);
-        });
 
         // Return array directly for dashboard compatibility
         res.json(orders.map(order => ({

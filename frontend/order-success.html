@@ -224,36 +224,6 @@ s0.parentNode.insertBefore(s1,s0);
             font-size: 0.95rem;
         }
 
-        .browser-warning {
-            background: linear-gradient(135deg, #fff4e5 0%, #ffe0b2 100%);
-            border: 2px solid #ff9800;
-            border-left: 5px solid #ff9800;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .browser-warning h3 {
-            color: #e65100;
-            margin: 0 0 0.5rem 0;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .browser-warning p {
-            color: #bf360c;
-            margin: 0.5rem 0;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .browser-warning.show {
-            display: block;
-        }
-
         .features-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -418,12 +388,6 @@ s0.parentNode.insertBefore(s1,s0);
                 <span class="detail-label">Payment Date</span>
                 <span class="detail-value" id="paymentDate">-</span>
             </div>
-        </div>
-
-        <div class="browser-warning" id="browserWarning">
-            <h3><i class="fas fa-exclamation-triangle"></i> Browser Compatibility Notice</h3>
-            <p><strong>If downloads are not working:</strong> The browser you are currently using may not support file downloads properly. Please open this page in <strong>Google Chrome</strong> or your device's default browser for the best experience.</p>
-            <p style="font-size: 0.85rem; margin-top: 0.75rem; color: #795548;"><i class="fas fa-info-circle"></i> Facebook, Instagram, and other in-app browsers have limited file download capabilities.</p>
         </div>
 
         <div class="download-info">
@@ -1263,19 +1227,6 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        // Detect in-app browsers and show warning
-        function detectInAppBrowser() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isInAppBrowser = /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Instagram|MessengerLite|Messenger/i.test(ua);
-            
-            if (isInAppBrowser) {
-                const warningEl = document.getElementById('browserWarning');
-                if (warningEl) {
-                    warningEl.classList.add('show');
-                }
-            }
-        }
-
         // PRIORITY: Initialize page and load order data FIRST
         // This ensures order details are fetched immediately when page loads
         (function init() {
@@ -1293,9 +1244,6 @@ s0.parentNode.insertBefore(s1,s0);
                 showMessage('error', 'Order ID Not Found', 'Redirecting back to dashboard...', 'dashboard.html', 3000);
                 return;
             }
-
-            // Detect and show browser warning
-            detectInAppBrowser();
 
             // Get order data from URL params if available (passed from payment success)
             const urlOrderData = urlParams.get('orderData');
@@ -1391,6 +1339,4 @@ s0.parentNode.insertBefore(s1,s0);
             loadAndShowPopup();
         }
     </script>
-    <!-- In-app browser detector -->
-    <script src="/js/in-app-browser-detector.js"></script>
 </html>
