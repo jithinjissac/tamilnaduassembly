@@ -20,25 +20,22 @@ const OrderSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Symbol',
             required: function() { 
-                // Access the root document's customization.symbolFree
-                const doc = this.ownerDocument();
-                return !doc.customization || !doc.customization.symbolFree;
+                // Only required if NOT symbol-free
+                return this.parent().symbolFree !== true;
             }
         },
         symbolImage: {
             type: String, // URL to symbol image
             required: function() { 
-                // Access the root document's customization.symbolFree
-                const doc = this.ownerDocument();
-                return !doc.customization || !doc.customization.symbolFree;
+                // Only required if NOT symbol-free
+                return this.parent().symbolFree !== true;
             }
         },
         symbolName: {
             type: String,
             required: function() { 
-                // Access the root document's customization.symbolFree
-                const doc = this.ownerDocument();
-                return !doc.customization || !doc.customization.symbolFree;
+                // Only required if NOT symbol-free
+                return this.parent().symbolFree !== true;
             }
         },
         symbolNameMalayalam: {
