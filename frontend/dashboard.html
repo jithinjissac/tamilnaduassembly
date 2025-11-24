@@ -742,10 +742,18 @@ s0.parentNode.insertBefore(s1,s0);
                             </tr>
                         </thead>
                     <tbody>
-                        ${filteredOrders.map(order => `
+                        ${filteredOrders.map(order => {
+                            const displayDate = order.paidAt || order.createdAt;
+                            const dateLabel = order.paidAt ? 'Paid' : 'Created';
+                            return `
                             <tr>
                                 <td><strong>${order.orderId}</strong></td>
-                                <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                                <td>
+                                    <div style="font-size: 0.9rem; line-height: 1.3;">
+                                        <div>${new Date(displayDate).toLocaleDateString('en-IN')}</div>
+                                        <div style="font-size: 0.75rem; color: #718096;">${dateLabel}</div>
+                                    </div>
+                                </td>
                                 <td>
                                     <div style="font-size: 0.85rem; line-height: 1.4;">
                                         ${order.customization?.symbolFree 
@@ -781,18 +789,25 @@ s0.parentNode.insertBefore(s1,s0);
                                     </div>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `
+                        }).join('')}
                     </tbody>
                 </table>
                 </div>
             `;
 
             // Mobile Card View
-            const cardsHTML = filteredOrders.map(order => `
+            const cardsHTML = filteredOrders.map(order => {
+                const displayDate = order.paidAt || order.createdAt;
+                const dateLabel = order.paidAt ? 'Paid' : 'Created';
+                return `
                 <div class="order-card">
                     <div class="order-card-header">
                         <div class="order-card-id">${order.orderId}</div>
-                        <div class="order-card-date">${new Date(order.createdAt).toLocaleDateString('en-IN')}</div>
+                        <div class="order-card-date">
+                            <div>${new Date(displayDate).toLocaleDateString('en-IN')}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.8;">${dateLabel}</div>
+                        </div>
                     </div>
                     <div class="order-card-body">
                         <div class="order-card-row">
@@ -848,7 +863,8 @@ s0.parentNode.insertBefore(s1,s0);
                         }
                     </div>
                 </div>
-            `).join('');
+            `
+            }).join('');
 
             container.innerHTML = tableHTML + cardsHTML;
         }
