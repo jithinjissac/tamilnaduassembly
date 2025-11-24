@@ -19,24 +19,15 @@ const OrderSchema = new mongoose.Schema({
         symbolId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Symbol',
-            required: function() { 
-                // Only required if NOT symbol-free
-                return this.parent().symbolFree !== true;
-            }
+            required: false // Validated in controller instead
         },
         symbolImage: {
             type: String, // URL to symbol image
-            required: function() { 
-                // Only required if NOT symbol-free
-                return this.parent().symbolFree !== true;
-            }
+            required: false // Validated in controller instead
         },
         symbolName: {
             type: String,
-            required: function() { 
-                // Only required if NOT symbol-free
-                return this.parent().symbolFree !== true;
-            }
+            required: false // Validated in controller instead
         },
         symbolNameMalayalam: {
             type: String,
