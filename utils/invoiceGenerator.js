@@ -39,14 +39,21 @@ export async function generateInvoice(order, user) {
                                  order.cashfreePaymentId ? 'Cashfree' : 'N/A';
             const paymentId = order.razorpayPaymentId || order.cashfreePaymentId || 'N/A';
 
-            // Try to register Noto Sans Malayalam if available in assets/fonts
-            const notoFontPath = path.join(process.cwd(), 'assets', 'fonts', 'NotoSansMalayalam-Regular.ttf');
+            // Try to register Anek Malayalam font for invoices
+            const anekFontPath = path.join(process.cwd(), 'assets', 'fonts', 'AnekMalayalam-Regular.ttf');
+            const anekBoldPath = path.join(process.cwd(), 'assets', 'fonts', 'AnekMalayalam-Bold.ttf');
             let hasMalayalamFont = false;
             try {
-               if (fs.existsSync(notoFontPath)) {
-                  doc.registerFont('NotoSansMalayalam', notoFontPath);
+               if (fs.existsSync(anekFontPath)) {
+                  doc.registerFont('AnekMalayalam', anekFontPath);
                   hasMalayalamFont = true;
-                  console.log('✅ Malayalam font registered successfully for invoice');
+                  console.log('✅ Anek Malayalam font registered successfully for invoice');
+                  
+                  // Try to register bold variant if available
+                  if (fs.existsSync(anekBoldPath)) {
+                      doc.registerFont('AnekMalayalam-Bold', anekBoldPath);
+                      console.log('✅ Anek Malayalam Bold font registered');
+                  }
                }
             } catch (e) {
                // fallback to Helvetica if anything goes wrong
@@ -63,8 +70,8 @@ export async function generateInvoice(order, user) {
             // Helper function to select appropriate font based on content
             const selectFont = (text, isBold = false) => {
                 if (hasMalayalamFont && hasMalayalamChars(text)) {
-                    // Use Malayalam font but be prepared for fallback
-                    return 'NotoSansMalayalam';
+                    // Use Anek Malayalam font (bold variant if available and requested)
+                    return isBold && fs.existsSync(anekBoldPath) ? 'AnekMalayalam-Bold' : 'AnekMalayalam';
                 }
                 return isBold ? 'Helvetica-Bold' : 'Helvetica';
             };
@@ -82,30 +89,26 @@ export async function generateInvoice(order, user) {
                     const isAnchorError = fontError.message && (
                         fontError.message.includes('xCoordinate') ||
                         fontError.message.includes('anchor') ||
-                        fontError.message.includes('mark')
+                        fontError.message.includes('mark') ||
+                        fontError.message.includes('Cannot read')
                     );
                     
                     if (isAnchorError && hasMalayalamFont && hasMalayalamChars(text)) {
-                        // Try breaking text into smaller chunks to avoid complex rendering
-                        console.warn('⚠️ Malayalam font anchor error, trying character-by-character rendering');
+                        // Malayalam font anchor error - use clean fallback without character rendering
+                        console.warn('⚠️ Malayalam font anchor error for invoice, using Helvetica fallback');
                         try {
-                            doc.font('Helvetica');
-                            // For now, use transliteration or simpler rendering
-                            const simpleText = text.split('').map(char => {
-                                const code = char.charCodeAt(0);
-                                // Keep Malayalam characters, they'll render as boxes but preserve structure
-                                if (code >= 0x0D00 && code <= 0x0D7F) return char;
-                                return char;
-                            }).join('');
-                            doc.text(simpleText, x, y, options);
-                        } catch (retryError) {
-                            // Final fallback: ASCII only
-                            console.error('⚠️ Retry failed, using ASCII fallback');
                             doc.font(options.bold ? 'Helvetica-Bold' : 'Helvetica');
-                            const asciiText = text.replace(/[^\x20-\x7E]/g, '');
-                            if (asciiText.trim()) {
-                                doc.text(asciiText, x, y, options);
+                            // Extract only ASCII/Latin characters for safe rendering
+                            const safeText = text.replace(/[\u0D00-\u0D7F]/g, ''); // Remove Malayalam chars
+                            if (safeText.trim()) {
+                                doc.text(safeText.trim(), x, y, options);
+                            } else {
+                                // If only Malayalam, show placeholder
+                                doc.text('[Malayalam Text]', x, y, options);
                             }
+                        } catch (retryError) {
+                            console.error('⚠️ Helvetica fallback failed:', retryError.message);
+                            // Skip this text completely
                         }
                     } else {
                         // Non-anchor error, use simple fallback
