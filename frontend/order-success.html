@@ -553,14 +553,24 @@ s0.parentNode.insertBefore(s1,s0);
             <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
                 <i class="fas fa-download"></i> Download PDF
             </button>
+            <!-- Google Drive download button (shown when available for in-app browsers) -->
+            <button class="btn" onclick="downloadFromGoogleDrive()" id="googleDriveBtn" style="display: none; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); margin-left: 0.5rem;">
+                <i class="fab fa-google-drive"></i> Download from Google Drive
+            </button>
             <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
                 <i class="fas fa-file-invoice"></i> Download Invoice
             </button>
         </div>
 
-        <div class="download-note">
+        <div class="download-note" id="downloadNote">
             <i class="fas fa-info-circle"></i>
             <strong>Download Tip:</strong> If download doesn't start, tap the 3 dots in the top corner and select 'Open in External Browser' or open the website in Google Chrome / Safari or other browser to download the PDF file.
+        </div>
+        
+        <!-- Google Drive help note (shown when Google Drive link is available) -->
+        <div class="download-note" id="googleDriveNote" style="display: none; background: #e3f2fd; border-left-color: #2196F3;">
+            <i class="fab fa-google-drive"></i>
+            <strong>Using In-App Browser?</strong> If the regular download doesn't work in Instagram/Facebook browser, use the "Download from Google Drive" button above for guaranteed access.
         </div>
 
         <div style="margin-bottom: 2rem;">
@@ -1139,6 +1149,30 @@ s0.parentNode.insertBefore(s1,s0);
                     downloadBtn.disabled = false;
                     downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
                     
+                    // Always show Google Drive button when PDF is ready
+                    const googleDriveBtn = document.getElementById('googleDriveBtn');
+                    const googleDriveNote = document.getElementById('googleDriveNote');
+                    const downloadNote = document.getElementById('downloadNote');
+                    
+                    // Show Google Drive button and set link if available
+                    if (googleDriveBtn) {
+                        googleDriveBtn.style.display = 'inline-block';
+                        if (status.googleDriveLink) {
+                            googleDriveBtn.setAttribute('data-drive-link', status.googleDriveLink);
+                            console.log('✅ Google Drive download option enabled:', status.googleDriveLink);
+                        }
+                    }
+                    
+                    // Show Google Drive note
+                    if (googleDriveNote) {
+                        googleDriveNote.style.display = 'block';
+                    }
+                    
+                    // Hide the regular download note when Google Drive is shown
+                    if (downloadNote) {
+                        downloadNote.style.display = 'none';
+                    }
+                    
                     // Stop checking
                     if (statusCheckInterval) {
                         clearInterval(statusCheckInterval);
@@ -1310,6 +1344,35 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('downloadLoading').classList.remove('show');
             }
         }
+        
+        // Download from Google Drive (for in-app browsers)
+        function downloadFromGoogleDrive() {
+            const googleDriveBtn = document.getElementById('googleDriveBtn');
+            const driveLink = googleDriveBtn.getAttribute('data-drive-link');
+            
+            if (!driveLink) {
+                showMessage('error', 'Error', 'Google Drive link not available');
+                return;
+            }
+            
+            console.log('Opening Google Drive download:', driveLink);
+            
+            // Show feedback
+            const originalHTML = googleDriveBtn.innerHTML;
+            googleDriveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening Drive...';
+            googleDriveBtn.disabled = true;
+            
+            // Open in new window/tab
+            window.open(driveLink, '_blank');
+            
+            // Reset button after short delay
+            setTimeout(() => {
+                googleDriveBtn.innerHTML = originalHTML;
+                googleDriveBtn.disabled = false;
+                showMessage('success', 'Opening Google Drive', 'Your download should start automatically from Google Drive');
+            }, 2000);
+        }
+
 
         // Download Invoice
         async function downloadInvoice() {

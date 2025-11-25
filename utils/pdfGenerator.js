@@ -51,8 +51,8 @@ export const createFreshBrowser = async () => {
                         '--disable-software-rasterizer',
                         '--max-old-space-size=2048' // Increase memory for large PDFs
                     ],
-                    timeout: 280000, // 180 second timeout for large voter lists
-                    protocolTimeout: 280000 // 180 seconds (3 minutes) for PDF generation protocol operations
+                    timeout: 120000, // 120 second timeout for large voter lists
+                    protocolTimeout: 180000 // 180 seconds (3 minutes) for PDF generation protocol operations
                 });
                 console.log('✅ Fresh browser instance created successfully');
                 return browser;
@@ -134,12 +134,12 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         const page = await browser.newPage();
         await page.setBypassCSP(true);
         await page.setJavaScriptEnabled(false);
-        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 240000 }); // 3 minutes for large HTML
+        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
         const pdf = await page.pdf({ 
             format: 'A4', 
             printBackground: true, 
             margin: { top: 0, bottom: 0, left: 0, right: 0 },
-            timeout: 240000 // 3 minutes for large PDFs
+            timeout: 180000 // 3 minutes for large PDFs
         });
         await page.close();
         await browser.close();
@@ -186,12 +186,12 @@ export const generatePDFBackground = async (order, orderId) => {
                 page = await browser.newPage();
                 await page.setBypassCSP(true);
                 await page.setJavaScriptEnabled(false);
-                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 240000 }); // 3 minutes for large HTML
+                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
                 pdf = await page.pdf({ 
                     format: 'A4', 
                     printBackground: true, 
                     margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                    timeout: 240000 // 3 minutes for large PDFs
+                    timeout: 180000 // 3 minutes for large PDFs
                 });
                 await page.close();
                 await browser.close();
@@ -212,14 +212,44 @@ export const generatePDFBackground = async (order, orderId) => {
         if (!fs.existsSync(permanentPdfDir)) fs.mkdirSync(permanentPdfDir, { recursive: true });
         const filePath = path.join(permanentPdfDir, `${orderId}.pdf`);
         fs.writeFileSync(filePath, pdf);
-        registerPDFJob(orderId, { status: 'ready', path: filePath, size: pdf.length, createdAt: new Date(), progress: 100 });
+        
+        // Upload to Google Drive and get shareable link
+        let googleDriveLink = null;
+        try {
+            const { uploadToGoogleDrive, isGoogleDriveConfigured } = await import('./googleDrive.js');
+            if (isGoogleDriveConfigured()) {
+                console.log(`📤 Uploading ${orderId} to Google Drive...`);
+                googleDriveLink = await uploadToGoogleDrive(filePath, orderId);
+                if (googleDriveLink) {
+                    console.log(`✅ Google Drive upload successful: ${googleDriveLink}`);
+                } else {
+                    console.warn(`⚠️ Google Drive upload failed for ${orderId}`);
+                }
+            } else {
+                console.log('ℹ️ Google Drive not configured, skipping upload');
+            }
+        } catch (driveError) {
+            console.error('❌ Google Drive upload error:', driveError.message);
+        }
+        
+        registerPDFJob(orderId, { 
+            status: 'ready', 
+            path: filePath, 
+            size: pdf.length, 
+            createdAt: new Date(), 
+            progress: 100,
+            googleDriveLink: googleDriveLink 
+        });
 
         try {
             const Order = (await import('../models/Order.js')).default;
             const orderBefore = await Order.findOne({ orderId });
             const hadPdfBefore = orderBefore?.permanentPdfFilename;
             
-            await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
+            await Order.findOneAndUpdate({ orderId }, { 
+                permanentPdfFilename: `${orderId}.pdf`,
+                googleDriveLink: googleDriveLink 
+            });
             
             // Send PDF ready email ONLY for NEW PDF generation (not when finding existing PDFs)
             if (!hadPdfBefore) {

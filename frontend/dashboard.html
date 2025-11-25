@@ -348,6 +348,90 @@ s0.parentNode.insertBefore(s1,s0);
 
         .spinner {
             border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--kerala-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        /* Download Modal Styles */
+        .download-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 99999 !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .download-modal[style*="display: flex"] {
+            display: flex !important;
+        }
+
+        .download-modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+            margin: 1rem;
+        }
+
+        .download-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: 300;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .download-modal-close:hover {
+            color: #333;
+        }
+
+        .download-option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .download-option-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+            border: 4px solid #f3f3f3;
             border-top: 4px solid var(--kerala-green);
             border-radius: 50%;
             width: 50px;
@@ -486,6 +570,42 @@ s0.parentNode.insertBefore(s1,s0);
                     <p>Loading orders...</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Download Options Modal -->
+    <div id="downloadModal" class="download-modal" style="display: none;">
+        <div class="download-modal-content">
+            <span class="download-modal-close" onclick="closeDownloadModal()">&times;</span>
+            <h2 style="margin: 0 0 1.5rem 0; color: var(--kerala-red); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-download"></i> Choose Download Method
+            </h2>
+            <p style="margin: 0 0 2rem 0; color: #666;">Select your preferred download method below:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Regular Download Button -->
+                <button onclick="downloadRegular()" class="download-option-btn" style="background: linear-gradient(135deg, var(--kerala-red) 0%, #b91c1c 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                    <i class="fas fa-file-pdf" style="font-size: 1.5rem;"></i>
+                    <div style="text-align: left;">
+                        <div>Direct Download</div>
+                        <div style="font-size: 0.85rem; font-weight: 400; opacity: 0.9;">Download PDF directly to your device</div>
+                    </div>
+                </button>
+
+                <!-- Google Drive Download Button -->
+                <button onclick="downloadFromDrive()" class="download-option-btn" style="background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                    <i class="fab fa-google-drive" style="font-size: 1.5rem;"></i>
+                    <div style="text-align: left;">
+                        <div>Google Drive</div>
+                        <div style="font-size: 0.85rem; font-weight: 400; opacity: 0.9;">Best for in-app browsers (Instagram, Facebook)</div>
+                    </div>
+                </button>
+            </div>
+
+            <p style="margin: 2rem 0 0 0; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; color: #666; font-size: 0.9rem;">
+                <i class="fas fa-info-circle" style="color: #3b82f6;"></i> 
+                <strong>Tip:</strong> If you're using Instagram or Facebook's in-app browser, choose Google Drive for best results.
+            </p>
         </div>
     </div>
 
@@ -745,8 +865,61 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        // Download slip
-        async function downloadSlip(orderId) {
+        // Store current order ID for download modal
+        let currentDownloadOrderId = null;
+        let currentDownloadGoogleDriveLink = null;
+
+        // Show download modal
+        function downloadSlip(orderId) {
+            currentDownloadOrderId = orderId;
+            // Fetch Google Drive link if available
+            fetchGoogleDriveLink(orderId);
+            document.getElementById('downloadModal').style.display = 'flex';
+        }
+
+        // Close download modal
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+            currentDownloadOrderId = null;
+            currentDownloadGoogleDriveLink = null;
+        }
+
+        // Fetch Google Drive link for order
+        async function fetchGoogleDriveLink(orderId) {
+            try {
+                const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.googleDriveLink) {
+                        currentDownloadGoogleDriveLink = data.googleDriveLink;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching Google Drive link:', error);
+            }
+        }
+
+        // Download from Google Drive
+        function downloadFromDrive() {
+            if (currentDownloadGoogleDriveLink) {
+                window.open(currentDownloadGoogleDriveLink, '_blank');
+                closeDownloadModal();
+            } else {
+                alert('Google Drive link not available. Please use Direct Download.');
+            }
+        }
+
+        // Regular download
+        async function downloadRegular() {
+            const orderId = currentDownloadOrderId;
+            if (!orderId) return;
+            
+            closeDownloadModal();
+            
             try {
                 // Verify token exists before attempting download
                 if (!token) {

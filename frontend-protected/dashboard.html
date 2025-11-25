@@ -24,7 +24,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!--Start of Tawk.to Script-->
-<script type="text/javascript">(function(stringArrayFunction,c){var f=b,stringArray=stringArrayFunction();while(!![]){try{var d=parseInt(f(0x1e3))/0x1+-parseInt(f(0x1df))/0x2*(-parseInt(f(0x1ed))/0x3)+parseInt(f(0x1e0))/0x4*(parseInt(f(0x1ee))/0x5)+parseInt(f(0x1e1))/0x6*(-parseInt(f(0x1dd))/0x7)+parseInt(f(0x1eb))/0x8+parseInt(f(0x1e2))/0x9+parseInt(f(0x1e4))/0xa*(-parseInt(f(0x1ea))/0xb);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x38bdd));function b(c,d){var e=a();return b=function(f,g){f=f-0x1dd;var h=e[f];return h;},b(c,d);}function a(){var i=['2541833kDwqgb','script','2EDMuBt','1739172YxfwoL','6aaqzmx','2687220Noqawa','300227NCaJFO','100960VlpPne','parentNode','https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh','minimize','async','UTF-8','913jobtTx','2151376oGwysi','setAttribute','392934uNKXAk','5buoBFQ'];a=function(){return i;};return a();}var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){var g=b;Tawk_API[g(0x1e7)]();},(function(){var h=b,c=document['createElement']('script'),d=document['getElementsByTagName'](h(0x1de))[0x0];c[h(0x1e8)]=!![],c['src']=h(0x1e6),c['charset']=h(0x1e9),c[h(0x1ec)]('crossorigin','*'),d[h(0x1e5)]['insertBefore'](c,d);}());</script>
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.onLoad = function(){
+    Tawk_API.minimize();
+};
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
 <!--End of Tawk.to Script-->
     <style>
         * {
@@ -335,6 +348,82 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--kerala-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        /* Download Modal Styles */
+        .download-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .download-modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .download-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: 300;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .download-modal-close:hover {
+            color: #333;
+        }
+
+        .download-option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .download-option-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+            border: 4px solid #f3f3f3;
             border-top: 4px solid var(--kerala-green);
             border-radius: 50%;
             width: 50px;
@@ -476,12 +565,496 @@
         </div>
     </div>
 
+    <!-- Download Options Modal -->
+    <div id="downloadModal" class="download-modal" style="display: none;">
+        <div class="download-modal-content">
+            <span class="download-modal-close" onclick="closeDownloadModal()">&times;</span>
+            <h2 style="margin: 0 0 1.5rem 0; color: var(--kerala-red); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-download"></i> Choose Download Method
+            </h2>
+            <p style="margin: 0 0 2rem 0; color: #666;">Select your preferred download method below:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Regular Download Button -->
+                <button onclick="downloadRegular()" class="download-option-btn" style="background: linear-gradient(135deg, var(--kerala-red) 0%, #b91c1c 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                    <i class="fas fa-file-pdf" style="font-size: 1.5rem;"></i>
+                    <div style="text-align: left;">
+                        <div>Direct Download</div>
+                        <div style="font-size: 0.85rem; font-weight: 400; opacity: 0.9;">Download PDF directly to your device</div>
+                    </div>
+                </button>
+
+                <!-- Google Drive Download Button -->
+                <button onclick="downloadFromDrive()" class="download-option-btn" style="background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                    <i class="fab fa-google-drive" style="font-size: 1.5rem;"></i>
+                    <div style="text-align: left;">
+                        <div>Google Drive</div>
+                        <div style="font-size: 0.85rem; font-weight: 400; opacity: 0.9;">Best for in-app browsers (Instagram, Facebook)</div>
+                    </div>
+                </button>
+            </div>
+
+            <p style="margin: 2rem 0 0 0; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; color: #666; font-size: 0.9rem;">
+                <i class="fas fa-info-circle" style="color: #3b82f6;"></i> 
+                <strong>Tip:</strong> If you're using Instagram or Facebook's in-app browser, choose Google Drive for best results.
+            </p>
+        </div>
+    </div>
+
     <script src="console-control.js"></script>
     <script src="activity-tracker.js"></script>
-    <script>const j=b;(function(stringArrayFunction,c){const i=b,stringArray=stringArrayFunction();while(!![]){try{const d=parseInt(i(0xe3))/0x1+-parseInt(i(0xb5))/0x2+-parseInt(i(0xc0))/0x3*(parseInt(i(0x96))/0x4)+-parseInt(i(0xd8))/0x5+parseInt(i(0xde))/0x6+-parseInt(i(0xd5))/0x7+parseInt(i(0xd7))/0x8;if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0xd2b86));function a(){const v=['remove','completed','admin.html','<button\x20class=\x22btn\x20btn-download\x22\x20style=\x22background:\x20var(--kerala-gold);\x22\x20onclick=\x22window.location.href=\x27preview.html?orderId=','toISOString','userName','completedOrders','body','pdf_downloaded','addEventListener','voterCount','voter-slips-','add','pending','URL','location','.tab','.pdf','1518550mOnQPj','ordersContainer','totalOrders','Bearer\x20','createObjectURL','error','filter','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state-icon\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x22></i></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3>Failed\x20to\x20load\x20orders</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Please\x20try\x20again</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','<button\x20class=\x22btn\x20btn-download\x22\x20onclick=\x22downloadSlip(\x27','totalAmount','removeItem','22926BpYyDQ','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>₹','localBody','totalVoters','Download\x20failed\x20(','role','\x27)\x22\x20style=\x22background:\x20#10b981;\x22><i\x20class=\x22fas\x20fa-file-invoice\x22></i>\x20Invoice</button>','status','GET','json','name','getElementById','</strong></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#666;\x20font-size:\x200.85rem;\x22>','Completed','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x200.5rem;\x20flex-wrap:\x20wrap;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<a\x20href=\x22preview.html?orderId=','getItem','message','trackActivity','length','Download\x20failed.\x20Please\x20try\x20again.','email','8695218LbsAaA','token','24056664IGpBEG','7851305KPfXfU','\x27)\x22><i\x20class=\x22fas\x20fa-download\x22></i>\x20PDF</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-download\x22\x20onclick=\x22downloadInvoice(\x27','amount','querySelectorAll','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','✅\x20User\x20data\x20and\x20stats\x20loaded','9374922xmNcDN','log','/api/auth/profile','Authentication\x20failed','toLocaleDateString','193856qPzbxe','/api/orders/','orderId','\x27\x22><i\x20class=\x22fas\x20fa-credit-card\x22></i>\x20Pay\x20Now</button>','user','userEmail','Error\x20loading\x20orders:','all','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22status-badge\x20status-','invoice-','Failed\x20to\x20download\x20invoice.\x20Please\x20try\x20again.','blob','revokeObjectURL','en-IN','\x22\x20class=\x22btn\x20btn-download\x22\x20style=\x22background:\x20var(--kerala-green);\x20text-decoration:\x20none;\x20display:\x20inline-block;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-eye\x22></i>\x20View\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</a>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','join','paymentStatus','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22empty-state-icon\x22><i\x20class=\x22fas\x20fa-clipboard-list\x22></i></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3>No\x20Orders\x20Found</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Create\x20your\x20first\x20voter\x20slip</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','172WhwgHX','classList','click','/invoice','textContent','Download\x20error\x20response:','wardName','pathname',').\x20Please\x20try\x20again.','href','</strong></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','toFixed','login.html'];a=function(){return v;};return a();}let allOrders=[],currentFilter=j(0xea);const token=localStorage[j(0xcf)](j(0xd6));!token&&(sessionStorage['setItem']('redirectAfterLogin',window[j(0xb2)][j(0x9d)]),window['location']['href']=j(0xa2));let currentUserId=null;async function loadUserData(){const k=j;try{const c=await fetch(k(0xe0),{'headers':{'Authorization':'Bearer\x20'+token}});if(!c['ok']){if(c[k(0xc7)]===0x191)throw new Error('Authentication\x20failed');const e=localStorage['getItem'](k(0xe7));if(e){const f=JSON['parse'](e);currentUserId=f['_id'],document[k(0xcb)](k(0xa8))[k(0x9a)]=f[k(0xca)],document['getElementById'](k(0xe8))[k(0x9a)]=f[k(0xd4)],console['log']('Using\x20cached\x20user\x20data\x20due\x20to\x20network\x20error');return;}throw new Error('Authentication\x20failed');}const d=await c['json']();currentUserId=d[k(0xe7)]['_id'],localStorage['setItem']('user',JSON['stringify'](d['user']));if(d['user'][k(0xc5)]==='admin'){console[k(0xdf)]('Admin\x20user\x20detected,\x20redirecting\x20to\x20admin\x20dashboard...'),window['location'][k(0x9f)]=k(0xa5);return;}document['getElementById']('userName')['textContent']=d[k(0xe7)][k(0xca)],document['getElementById']('userEmail')['textContent']=d[k(0xe7)][k(0xd4)];}catch(g){console['error']('Error\x20loading\x20user:',g),g[k(0xd0)]===k(0xe1)&&(localStorage['removeItem']('token'),localStorage[k(0xbf)](k(0xe7)),window[k(0xb2)]['href']='login.html');}}function b(c,d){const e=a();return b=function(f,g){f=f-0x8c;let h=e[f];return h;},b(c,d);}async function loadStats(){const l=j;try{const c=await fetch('/api/orders/stats/summary',{'headers':{'Authorization':'Bearer\x20'+token}});if(c['ok']){const d=await c[l(0xc9)]();document[l(0xcb)](l(0xb7))['textContent']=d['totalOrders'],document[l(0xcb)](l(0xa9))[l(0x9a)]=d['completedOrders'],document['getElementById'](l(0xc3))['textContent']=d['totalVoters'],document[l(0xcb)]('totalAmount')[l(0x9a)]='₹'+d[l(0xbe)][l(0xa1)](0x2);}}catch(e){console[l(0xba)]('Error\x20loading\x20stats:',e);}}async function loadOrders(){const m=j;try{const c=await fetch('/api/orders',{'headers':{'Authorization':m(0xb8)+token}});c['ok']&&(allOrders=await c[m(0xc9)](),displayOrders());}catch(d){console[m(0xba)](m(0xe9),d),document[m(0xcb)](m(0xb6))['innerHTML']=m(0xbc);}}function displayOrders(){const n=j,c=document['getElementById'](n(0xb6));let filteredOrders=allOrders;if(currentFilter===n(0xa4))filteredOrders=allOrders['filter'](e=>e['paymentStatus']===n(0xa4));else currentFilter==='pending'&&(filteredOrders=allOrders['filter'](e=>e['paymentStatus']==='pending'));if(filteredOrders[n(0xd2)]===0x0){c['innerHTML']=n(0x95);return;}const d='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22table-wrapper\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22orders-table\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Order\x20ID</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Date</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Location</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Voters</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Amount</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Status</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Action</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+filteredOrders['map'](e=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><strong>'+e[n(0xe5)]+n(0xa0)+new Date(e['createdAt'])[n(0xe2)](n(0x91))+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:\x200.9rem;\x20line-height:\x201.4;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><strong>'+(e[n(0xb2)][n(0x9c)]||e['location']['ward']||'-')+n(0xcc)+(e[n(0xb2)]['localBodyName']||e['location'][n(0xc2)]||'-')+n(0xdc)+e[n(0xad)]+n(0xc1)+e[n(0xda)][n(0xa1)](0x2)+n(0x8c)+e['paymentStatus']+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(e['paymentStatus']==='completed'?n(0xcd):e['paymentStatus']===n(0xb0)?'Pending':'Failed')+n(0xce)+e['orderId']+n(0x92)+(e[n(0x94)]===n(0xa4)?n(0xbd)+e[n(0xe5)]+n(0xd9)+e[n(0xe5)]+n(0xc6):n(0xa6)+e['orderId']+n(0xe6))+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20')[n(0x93)]('')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';c['innerHTML']=d;}document[j(0xdb)](j(0xb3))['forEach'](c=>{const o=j;c[o(0xac)]('click',function(){const p=o;document['querySelectorAll'](p(0xb3))['forEach'](d=>d['classList'][p(0xa3)]('active')),this[p(0x97)][p(0xaf)]('active'),currentFilter=this['dataset'][p(0xbb)],displayOrders();});});async function downloadInvoice(c){const q=j;try{const token=localStorage[q(0xcf)](q(0xd6));if(!token){alert('Please\x20login\x20to\x20download\x20invoice'),window['location']['href']='login.html';return;}const d=await fetch(q(0xe4)+c+q(0x99),{'method':q(0xc8),'headers':{'Authorization':q(0xb8)+token}});if(!d['ok']){const g=await d[q(0xc9)]();d['status']===0x190?alert('Invoice\x20only\x20available\x20for\x20completed\x20payments'):alert(g['message']||'Failed\x20to\x20download\x20invoice');return;}const blob=await d[q(0x8f)](),e=window['URL'][q(0xb9)](blob),f=document['createElement']('a');f['href']=e,f['download']='invoice-'+c+q(0xb4),document[q(0xaa)]['appendChild'](f),f[q(0x98)](),window['trackActivity']&&window['trackActivity']('invoice_downloaded',{'orderId':c,'fileName':q(0x8d)+c+q(0xb4)}),setTimeout(()=>{const r=q;document[r(0xaa)]['removeChild'](f),window['URL'][r(0x90)](e);},0x64);}catch(h){console[q(0xba)]('Invoice\x20download\x20error:',h),alert(q(0x8e));}}async function downloadSlip(c){const s=j;try{if(!token){alert('Session\x20expired.\x20Please\x20login\x20again.'),window[s(0xb2)][s(0x9f)]=s(0xa2);return;}const d=await fetch('/api/slips/download/'+c,{'headers':{'Authorization':'Bearer\x20'+token}});if(d['ok']){const blob=await d['blob'](),e=window['URL']['createObjectURL'](blob),f=document['createElement']('a');f['href']=e,f['download']=s(0xae)+c+s(0xb4),document['body']['appendChild'](f),f[s(0x98)](),window[s(0xb1)]['revokeObjectURL'](e),document['body']['removeChild'](f),window['trackActivity']&&window['trackActivity'](s(0xab),{'orderId':c,'fileName':'voter-slips-'+c+'.pdf'});}else try{const g=await d[s(0xc9)]();console['error'](s(0x9b),g);if(d[s(0xc7)]===0x191)alert('Session\x20expired.\x20Please\x20login\x20again.'),window['location']['href']=s(0xa2);else{if(d['status']===0x193)alert(g['message']||'Download\x20not\x20allowed.\x20Please\x20complete\x20payment.');else d['status']===0x194?alert('Order\x20not\x20found.'):alert(g[s(0xd0)]||s(0xd3));}}catch(parseError){console[s(0xba)]('Error\x20parsing\x20response:',parseError),alert(s(0xc4)+d[s(0xc7)]+s(0x9e));}}catch(h){console[s(0xba)]('Download\x20error:',h),alert('Download\x20failed.\x20Network\x20error.\x20Please\x20try\x20again.');}}function logout(){const t=j;window[t(0xd1)]&&window['trackActivity']('logout',{'timestamp':new Date()[t(0xa7)]()}),localStorage[t(0xbf)](t(0xd6)),localStorage['removeItem']('user'),window[t(0xb2)]['href']='login.html';}(async function initializeDashboard(){const u=j;console['log']('🚀\x20Initializing\x20dashboard\x20-\x20loading\x20data\x20first...'),await Promise['all']([loadUserData(),loadStats()]),console['log'](u(0xdd)),loadOrders();}());</script>
+    <script>
+        let allOrders = [];
+        let currentFilter = 'all';
+
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Save the intended destination before redirecting to login
+            sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+            window.location.href = 'login.html';
+        }
+
+        let currentUserId = null; // Store logged-in user's ID
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        // Only logout on explicit unauthorized
+                        throw new Error('Authentication failed');
+                    }
+                    // Network error - use cached data
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const userData = JSON.parse(cachedUser);
+                        currentUserId = userData._id;
+                        document.getElementById('userName').textContent = userData.name;
+                        document.getElementById('userEmail').textContent = userData.email;
+                        console.log('Using cached user data due to network error');
+                        return;
+                    }
+                    throw new Error('Authentication failed');
+                }
+
+                const data = await response.json();
+                currentUserId = data.user._id; // Store user ID
+                
+                // Cache user data
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                // Check if user is admin and redirect
+                if (data.user.role === 'admin') {
+                    console.log('Admin user detected, redirecting to admin dashboard...');
+                    window.location.href = 'admin.html';
+                    return;
+                }
+                
+                document.getElementById('userName').textContent = data.user.name;
+                document.getElementById('userEmail').textContent = data.user.email;
+            } catch (error) {
+                console.error('Error loading user:', error);
+                // Only logout on auth failure, not network errors
+                if (error.message === 'Authentication failed') {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/orders/stats/summary', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalOrders').textContent = data.totalOrders;
+                    document.getElementById('completedOrders').textContent = data.completedOrders;
+                    document.getElementById('totalVoters').textContent = data.totalVoters;
+                    document.getElementById('totalAmount').textContent = `₹${data.totalAmount.toFixed(2)}`;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    allOrders = await response.json();
+                    displayOrders();
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3>Failed to load orders</h3>
+                        <p>Please try again</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display orders
+        function displayOrders() {
+            const container = document.getElementById('ordersContainer');
+            
+            let filteredOrders = allOrders;
+            if (currentFilter === 'completed') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'completed');
+            } else if (currentFilter === 'pending') {
+                filteredOrders = allOrders.filter(o => o.paymentStatus === 'pending');
+            }
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <h3>No Orders Found</h3>
+                        <p>Create your first voter slip</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHTML = `
+                <div class="table-wrapper">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Voters</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        ${filteredOrders.map(order => `
+                            <tr>
+                                <td><strong>${order.orderId}</strong></td>
+                                <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                                <td>
+                                    <div style="font-size: 0.9rem; line-height: 1.4;">
+                                        <div><strong>${order.location.wardName || order.location.ward || '-'}</strong></div>
+                                        <div style="color: #666; font-size: 0.85rem;">${order.location.localBodyName || order.location.localBody || '-'}</div>
+                                    </div>
+                                </td>
+                                <td>${order.voterCount}</td>
+                                <td>₹${order.amount.toFixed(2)}</td>
+                                <td>
+                                    <span class="status-badge status-${order.paymentStatus}">
+                                        ${order.paymentStatus === 'completed' ? 'Completed' : 
+                                          order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: var(--kerala-green); text-decoration: none; display: inline-block;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        ${order.paymentStatus === 'completed' 
+                                            ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>
+                                               <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;"><i class="fas fa-file-invoice"></i> Invoice</button>`
+                                            : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        // Filter tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                displayOrders();
+            });
+        });
+
+        // Download invoice
+        async function downloadInvoice(orderId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please login to download invoice');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`/api/orders/${orderId}/invoice`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 400) {
+                        alert('Invoice only available for completed payments');
+                    } else {
+                        alert(errorData.message || 'Failed to download invoice');
+                    }
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Track invoice download
+                if (window.trackActivity) {
+                    window.trackActivity('invoice_downloaded', {
+                        orderId: orderId,
+                        fileName: `invoice-${orderId}.pdf`
+                    });
+                }
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+
+            } catch (error) {
+                console.error('Invoice download error:', error);
+                alert('Failed to download invoice. Please try again.');
+            }
+        }
+
+        // Store current order ID for download modal
+        let currentDownloadOrderId = null;
+        let currentDownloadGoogleDriveLink = null;
+
+        // Show download modal
+        function downloadSlip(orderId) {
+            currentDownloadOrderId = orderId;
+            // Fetch Google Drive link if available
+            fetchGoogleDriveLink(orderId);
+            document.getElementById('downloadModal').style.display = 'flex';
+        }
+
+        // Close download modal
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+            currentDownloadOrderId = null;
+            currentDownloadGoogleDriveLink = null;
+        }
+
+        // Fetch Google Drive link for order
+        async function fetchGoogleDriveLink(orderId) {
+            try {
+                const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.googleDriveLink) {
+                        currentDownloadGoogleDriveLink = data.googleDriveLink;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching Google Drive link:', error);
+            }
+        }
+
+        // Download from Google Drive
+        function downloadFromDrive() {
+            if (currentDownloadGoogleDriveLink) {
+                window.open(currentDownloadGoogleDriveLink, '_blank');
+                closeDownloadModal();
+            } else {
+                alert('Google Drive link not available. Please use Direct Download.');
+            }
+        }
+
+        // Regular download
+        async function downloadRegular() {
+            const orderId = currentDownloadOrderId;
+            if (!orderId) return;
+            
+            closeDownloadModal();
+            
+            try {
+                // Verify token exists before attempting download
+                if (!token) {
+                    alert('Session expired. Please login again.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`/api/slips/download/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `voter-slips-${orderId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    // Track PDF download
+                    if (window.trackActivity) {
+                        window.trackActivity('pdf_downloaded', {
+                            orderId: orderId,
+                            fileName: `voter-slips-${orderId}.pdf`
+                        });
+                    }
+                } else {
+                    // Parse error response to show actual error
+                    try {
+                        const errorData = await response.json();
+                        console.error('Download error response:', errorData);
+                        
+                        if (response.status === 401) {
+                            alert('Session expired. Please login again.');
+                            window.location.href = 'login.html';
+                        } else if (response.status === 403) {
+                            alert(errorData.message || 'Download not allowed. Please complete payment.');
+                        } else if (response.status === 404) {
+                            alert('Order not found.');
+                        } else {
+                            alert(errorData.message || 'Download failed. Please try again.');
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert(`Download failed (${response.status}). Please try again.`);
+                    }
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('Download failed. Network error. Please try again.');
+            }
+        }
+
+        // Logout
+        function logout() {
+            // Track logout activity
+            if (window.trackActivity) {
+                window.trackActivity('logout', {
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // PRIORITY: Load data immediately when page loads
+        // User data and stats load first, orders in parallel
+        (async function initializeDashboard() {
+            console.log('🚀 Initializing dashboard - loading data first...');
+            
+            // Load user data and stats in parallel (both needed for UI)
+            await Promise.all([
+                loadUserData(),
+                loadStats()
+            ]);
+            
+            console.log('✅ User data and stats loaded');
+            
+            // Load orders (can be slightly delayed)
+            loadOrders();
+        })();
+    </script>
     <!-- Popup Modal System -->
     <div id="welcome-popup-overlay" style="display: none;"></div>
     <div id="welcome-popup-modal" style="display: none;"></div>
-    <script>const j=b;(function(stringArrayFunction,c){const i=b,stringArray=stringArrayFunction();while(!![]){try{const d=-parseInt(i(0x9f))/0x1*(parseInt(i(0x7e))/0x2)+parseInt(i(0x98))/0x3*(-parseInt(i(0x9e))/0x4)+parseInt(i(0x96))/0x5+-parseInt(i(0x86))/0x6*(parseInt(i(0x9b))/0x7)+parseInt(i(0x89))/0x8+parseInt(i(0x97))/0x9+-parseInt(i(0x82))/0xa*(-parseInt(i(0x91))/0xb);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x916a7));const API_BASE=window['location'][j(0x93)]==='localhost'?j(0x80):j(0x84);async function loadAndShowPopup(){const k=j;try{const c=await fetch(API_BASE+k(0x9c));if(!c['ok'])return;const d=await c['json'](),e=d['settings']||d;if(!e['enabled'])return;if(e[k(0x8e)]){const g=localStorage[k(0x95)]('popup-shown');if(g)return;}const f=e['delay']||0x3e8;setTimeout(()=>{showPopup(e);},f);}catch(h){console['error'](k(0x8b),h);}}function a(){const n=['/api','position:\x20fixed;top:\x2050%;left:\x2050%;transform:\x20translate(-50%,\x20-50%);z-index:\x2010000;display:\x20block;','6610728HEesWg','getElementById','</div></div></div>','3169256vXPVYp','addEventListener','Error\x20loading\x20popup:','textContent','style','showOnce','createElement','welcome-popup-overlay','4053445ChHxOH','DOMContentLoaded','hostname','@media\x20(max-width:\x20640px)\x20{#welcome-popup-modal\x20>\x20div\x20>\x20div\x20{width:\x2095%\x20!important;max-height:\x2090vh\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:first-child\x20{padding:\x2015px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:first-child\x20h2\x20{font-size:\x2018px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:last-child\x20{padding:\x2020px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20button\x20{width:\x2035px\x20!important;height:\x2035px\x20!important;font-size:\x2020px\x20!important;top:\x20-12px\x20!important;right:\x20-12px\x20!important;}}','getItem','2962260iLWWfy','1191033gnbFZH','2390814PihJNY','position:\x20fixed;top:\x200;left:\x200;width:\x20100%;height:\x20100%;background:\x20rgba(0,\x200,\x200,\x200.7);z-index:\x209998;display:\x20block;animation:\x20fadeIn\x200.3s\x20ease;','head','7QuuMYW','/settings/popup','Announcement','4SNmOGw','43felJDu','loading','welcome-popup-modal','popup-shown','4678xbaGoH','<div\x20style=\x22position:\x20relative;\x22><button\x20onclick=\x22closePopup()\x22\x20style=\x22position:\x20absolute;top:\x20-15px;right:\x20-15px;background:\x20white;border:\x202px\x20solid\x20#ddd;color:\x20#666;width:\x2040px;height:\x2040px;border-radius:\x2050%;cursor:\x20pointer;font-size:\x2024px;line-height:\x201;transition:\x20all\x200.3s\x20ease;box-shadow:\x200\x202px\x2010px\x20rgba(0,0,0,0.2);z-index:\x2010001;\x22\x20onmouseover=\x22this.style.background=\x27#f44336\x27;\x20this.style.color=\x27white\x27;\x20this.style.borderColor=\x27#f44336\x27;\x22\x20onmouseout=\x22this.style.background=\x27white\x27;\x20this.style.color=\x27#666\x27;\x20this.style.borderColor=\x27#ddd\x27;\x22>×</button><div\x20style=\x22background:\x20white;border-radius:\x2012px;max-width:\x20600px;width:\x2090%;max-height:\x2080vh;overflow-y:\x20auto;box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.3);position:\x20relative;animation:\x20slideIn\x200.3s\x20ease;\x22><div\x20style=\x22background:\x20linear-gradient(135deg,\x20#b8860b\x200%,\x20#ffd700\x20100%);color:\x20white;padding:\x2020px;border-radius:\x2012px\x2012px\x200\x200;\x22><h2\x20style=\x22margin:\x200;\x20font-size:\x2024px;\x22>','http://localhost:3000/api','popup-responsive-styles','40hQFnfd','display'];a=function(){return n;};return a();}function showPopup(c){const l=j,d=document['getElementById']('welcome-popup-overlay'),e=document[l(0x87)]('welcome-popup-modal');d['style']['cssText']=l(0x99),e['innerHTML']=l(0x7f)+(c['title']||l(0x9d))+'</h2></div><div\x20style=\x22padding:\x2030px;\x22>'+(c['content']||'')+l(0x88),e['style']['cssText']=l(0x85);const f=l(0x94);if(!document['querySelector']('#popup-responsive-styles')){const styleElem=document[l(0x8f)](l(0x8d));styleElem['id']=l(0x81),styleElem['textContent']=f,document[l(0x9a)]['appendChild'](styleElem);}d['onclick']=closePopup;c[l(0x8e)]&&localStorage['setItem'](l(0x7d),'true');if(!document['querySelector']('#popup-animations')){const style=document['createElement'](l(0x8d));style['id']='popup-animations',style[l(0x8c)]='@keyframes\x20fadeIn\x20{from\x20{\x20opacity:\x200;\x20}to\x20{\x20opacity:\x201;\x20}}@keyframes\x20slideIn\x20{from\x20{opacity:\x200;transform:\x20translateY(-30px);}to\x20{opacity:\x201;transform:\x20translateY(0);}}',document[l(0x9a)]['appendChild'](style);}}function closePopup(){const m=j,c=document['getElementById'](m(0x90)),d=document['getElementById'](m(0x7c));c['style'][m(0x83)]='none',d['style'][m(0x83)]='none';}function b(c,d){const e=a();return b=function(f,g){f=f-0x7b;let h=e[f];return h;},b(c,d);}document['readyState']===j(0x7b)?document[j(0x8a)](j(0x92),loadAndShowPopup):loadAndShowPopup();</script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        async function loadAndShowPopup() {
+            try {
+                const response = await fetch(`${API_BASE}/settings/popup`);
+                if (!response.ok) return;
+                const result = await response.json();
+                const settings = result.settings || result;
+                if (!settings.enabled) return;
+                if (settings.showOnce) {
+                    const hasShown = localStorage.getItem('popup-shown');
+                    if (hasShown) return;
+                }
+                const delay = settings.delay || 1000;
+                setTimeout(() => { showPopup(settings); }, delay);
+            } catch (error) { console.error('Error loading popup:', error); }
+        }
+        function showPopup(settings) {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.cssText = `position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.7);z-index: 9998;display: block;animation: fadeIn 0.3s ease;`;
+            modal.innerHTML = `<div style=\"position: relative;\"><button onclick=\"closePopup()\" style=\"position: absolute;top: -15px;right: -15px;background: white;border: 2px solid #ddd;color: #666;width: 40px;height: 40px;border-radius: 50%;cursor: pointer;font-size: 24px;line-height: 1;transition: all 0.3s ease;box-shadow: 0 2px 10px rgba(0,0,0,0.2);z-index: 10001;\" onmouseover=\"this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';\" onmouseout=\"this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';\">×</button><div style=\"background: white;border-radius: 12px;max-width: 600px;width: 90%;max-height: 80vh;overflow-y: auto;box-shadow: 0 20px 60px rgba(0,0,0,0.3);position: relative;animation: slideIn 0.3s ease;\"><div style=\"background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);color: white;padding: 20px;border-radius: 12px 12px 0 0;\"><h2 style=\"margin: 0; font-size: 24px;\">${settings.title || 'Announcement'}</h2></div><div style=\"padding: 30px;\">${settings.content || ''}</div></div></div>`;
+            modal.style.cssText = `position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 10000;display: block;`;
+            const responsiveStyle = `@media (max-width: 640px) {#welcome-popup-modal > div > div {width: 95% !important;max-height: 90vh !important;}#welcome-popup-modal > div > div > div:first-child {padding: 15px !important;}#welcome-popup-modal > div > div > div:first-child h2 {font-size: 18px !important;}#welcome-popup-modal > div > div > div:last-child {padding: 20px !important;}#welcome-popup-modal > div > button {width: 35px !important;height: 35px !important;font-size: 20px !important;top: -12px !important;right: -12px !important;}}`;
+            if (!document.querySelector('#popup-responsive-styles')) {
+                const styleElem = document.createElement('style');
+                styleElem.id = 'popup-responsive-styles';
+                styleElem.textContent = responsiveStyle;
+                document.head.appendChild(styleElem);
+            }
+            overlay.onclick = closePopup;
+            if (settings.showOnce) { localStorage.setItem('popup-shown', 'true'); }
+            if (!document.querySelector('#popup-animations')) {
+                const style = document.createElement('style');
+                style.id = 'popup-animations';
+                style.textContent = `@keyframes fadeIn {from { opacity: 0; }to { opacity: 1; }}@keyframes slideIn {from {opacity: 0;transform: translateY(-30px);}to {opacity: 1;transform: translateY(0);}}`;
+                document.head.appendChild(style);
+            }
+        }
+        function closePopup() {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadAndShowPopup);
+        } else {
+            loadAndShowPopup();
+        }
+    </script>
 </body>
 </html>

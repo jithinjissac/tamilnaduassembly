@@ -136,6 +136,11 @@ const OrderSchema = new mongoose.Schema({
     permanentPdfFilename: {
         type: String,
         default: null
+    },
+    // Google Drive shareable link
+    googleDriveLink: {
+        type: String,
+        default: null
     }
 });
 

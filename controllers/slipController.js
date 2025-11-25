@@ -1660,7 +1660,9 @@ export const getPDFStatus = async (req, res) => {
                 isPaid: true,
                 pdfReady: true,
                 progress: 100,
-                downloadCount: order.downloadCount || 0
+                downloadCount: order.downloadCount || 0,
+                googleDriveAvailable: !!order.googleDriveLink,
+                googleDriveLink: order.googleDriveLink || null
             };
             console.log(`[PDF STATUS] ✅ Returning pdfReady=true for ${orderId}:`, response);
             return res.json(response);
