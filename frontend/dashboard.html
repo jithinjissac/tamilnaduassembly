@@ -255,34 +255,107 @@ s0.parentNode.insertBefore(s1,s0);
             border-color: var(--kerala-green);
         }
 
-        /* Orders Table */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        /* Orders Grid */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
-        .orders-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
+        .order-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .orders-table th {
-            background: #f8f9fa;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #2d3748;
-            border-bottom: 2px solid #e2e8f0;
+        .order-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
 
-        .orders-table td {
-            padding: 1rem;
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .orders-table tr:hover {
-            background: #f8f9fa;
+        .order-id {
+            font-weight: 700;
+            color: var(--kerala-green);
+            font-size: 1.1rem;
+        }
+
+        .order-date {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        .order-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-info-label {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .order-info-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .order-location {
+            background: #f7fafc;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .order-location-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-location-body {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        .order-card-footer {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .order-card-footer .btn {
+            flex: 1;
+            min-width: fit-content;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .status-badge {
@@ -470,14 +543,21 @@ s0.parentNode.insertBefore(s1,s0);
                 grid-template-columns: 1fr;
             }
 
-            .orders-table {
-                font-size: 0.85rem;
-                min-width: 700px;
+            .orders-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
 
-            .orders-table th,
-            .orders-table td {
-                padding: 0.75rem 0.5rem;
+            .order-card {
+                padding: 1rem;
+            }
+
+            .order-card-footer {
+                flex-direction: column;
+            }
+
+            .order-card-footer .btn {
+                width: 100%;
             }
 
             .btn-download {
@@ -746,59 +826,54 @@ s0.parentNode.insertBefore(s1,s0);
                 return;
             }
 
-            const tableHTML = `
-                <div class="table-wrapper">
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Date</th>
-                                <th>Location</th>
-                                <th>Voters</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                    <tbody>
-                        ${filteredOrders.map(order => `
-                            <tr>
-                                <td><strong>${order.orderId}</strong></td>
-                                <td>${new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
-                                <td>
-                                    <div style="font-size: 0.9rem; line-height: 1.4;">
-                                        <div><strong>${order.location.wardName || order.location.ward || '-'}</strong></div>
-                                        <div style="color: #666; font-size: 0.85rem;">${order.location.localBodyName || order.location.localBody || '-'}</div>
-                                    </div>
-                                </td>
-                                <td>${order.voterCount}</td>
-                                <td>₹${order.amount.toFixed(2)}</td>
-                                <td>
-                                    <span class="status-badge status-${order.paymentStatus}">
-                                        ${order.paymentStatus === 'completed' ? 'Completed' : 
-                                          order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                        <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: var(--kerala-green); text-decoration: none; display: inline-block;">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                        ${order.paymentStatus === 'completed' 
-                                            ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>
-                                               <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;"><i class="fas fa-file-invoice"></i> Invoice</button>`
-                                            : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            const cardsHTML = `
+                <div class="orders-grid">
+                    ${filteredOrders.map(order => `
+                        <div class="order-card">
+                            <div class="order-card-header">
+                                <div>
+                                    <div class="order-id">${order.orderId}</div>
+                                    <div class="order-date">${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                </div>
+                                <span class="status-badge status-${order.paymentStatus}">
+                                    ${order.paymentStatus === 'completed' ? 'Completed' : 
+                                      order.paymentStatus === 'pending' ? 'Pending' : 'Failed'}
+                                </span>
+                            </div>
+                            
+                            <div class="order-card-body">
+                                <div class="order-location">
+                                    <div class="order-location-name"><i class="fas fa-map-marker-alt"></i> ${order.location.wardName || order.location.ward || '-'}</div>
+                                    <div class="order-location-body">${order.location.localBodyName || order.location.localBody || '-'}</div>
+                                </div>
+                                
+                                <div class="order-info-row">
+                                    <span class="order-info-label"><i class="fas fa-users"></i> Voters</span>
+                                    <span class="order-info-value">${order.voterCount}</span>
+                                </div>
+                                
+                                <div class="order-info-row">
+                                    <span class="order-info-label"><i class="fas fa-rupee-sign"></i> Amount</span>
+                                    <span class="order-info-value" style="color: var(--kerala-green); font-size: 1.1rem;">₹${order.amount.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-card-footer">
+                                <a href="preview.html?orderId=${order.orderId}" class="btn btn-download" style="background: var(--kerala-green); text-decoration: none;">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                ${order.paymentStatus === 'completed' 
+                                    ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>
+                                       <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;"><i class="fas fa-file-invoice"></i> Invoice</button>`
+                                    : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
+                                }
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             `;
 
-            container.innerHTML = tableHTML;
+            container.innerHTML = cardsHTML;
         }
 
         // Filter tabs
@@ -872,6 +947,21 @@ s0.parentNode.insertBefore(s1,s0);
         // Show download modal
         function downloadSlip(orderId) {
             currentDownloadOrderId = orderId;
+            // Show loading state on button
+            const clickedBtn = event.target.closest('.btn-download');
+            if (clickedBtn) {
+                const originalHTML = clickedBtn.innerHTML;
+                clickedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                clickedBtn.disabled = true;
+                
+                // Reset after modal opens
+                setTimeout(() => {
+                    if (clickedBtn) {
+                        clickedBtn.innerHTML = originalHTML;
+                        clickedBtn.disabled = false;
+                    }
+                }, 500);
+            }
             // Fetch Google Drive link if available
             fetchGoogleDriveLink(orderId);
             document.getElementById('downloadModal').style.display = 'flex';
@@ -905,9 +995,24 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Download from Google Drive
         function downloadFromDrive() {
+            const driveBtn = event.target.closest('.download-option-btn');
+            const originalHTML = driveBtn ? driveBtn.innerHTML : '';
+            
             if (currentDownloadGoogleDriveLink) {
+                if (driveBtn) {
+                    driveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening Drive...';
+                    driveBtn.disabled = true;
+                }
+                
                 window.open(currentDownloadGoogleDriveLink, '_blank');
-                closeDownloadModal();
+                
+                setTimeout(() => {
+                    closeDownloadModal();
+                    if (driveBtn) {
+                        driveBtn.innerHTML = originalHTML;
+                        driveBtn.disabled = false;
+                    }
+                }, 1000);
             } else {
                 alert('Google Drive link not available. Please use Direct Download.');
             }
@@ -917,6 +1022,14 @@ s0.parentNode.insertBefore(s1,s0);
         async function downloadRegular() {
             const orderId = currentDownloadOrderId;
             if (!orderId) return;
+            
+            // Show loading on button
+            const regularBtn = event.target.closest('.download-option-btn');
+            const originalHTML = regularBtn ? regularBtn.innerHTML : '';
+            if (regularBtn) {
+                regularBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
+                regularBtn.disabled = true;
+            }
             
             closeDownloadModal();
             

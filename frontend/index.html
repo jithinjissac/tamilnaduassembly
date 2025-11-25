@@ -2534,6 +2534,54 @@
 
     <script>const mobileMenuHelper=b;function a(){const l=['closest','158477yxNWOE','forEach','111BKmKCY','2589140JZvnrN','contains','navButtons','360Flgjew','9KGMHdi','querySelector','4xLpMRL','fa-bars','fa-times','22028AxMRXI','remove','3023176tjSMPq','656015yEvdrP','classList','mobileMenuToggle','addEventListener','194594zppBxU','6AoXsZv','1370852ceUvzw','getElementById','active','add'];a=function(){return l;};return a();}function b(c,d){const e=a();return b=function(f,g){f=f-0xd6;let h=e[f];return h;},b(c,d);}(function(stringArrayFunction,c){const f=b,stringArray=stringArrayFunction();while(!![]){try{const d=parseInt(f(0xd7))/0x1*(parseInt(f(0xe7))/0x2)+parseInt(f(0xe0))/0x3*(-parseInt(f(0xea))/0x4)+-parseInt(f(0xed))/0x5*(-parseInt(f(0xd8))/0x6)+parseInt(f(0xd9))/0x7+-parseInt(f(0xec))/0x8*(-parseInt(f(0xe5))/0x9)+-parseInt(f(0xe1))/0xa+-parseInt(f(0xde))/0xb*(parseInt(f(0xe4))/0xc);if(d===c)break;else stringArray['push'](stringArray['shift']());}catch(e){stringArray['push'](stringArray['shift']());}}}(a,0x30a49));const mobileMenuToggle=document[mobileMenuHelper(0xda)](mobileMenuHelper(0xef)),navButtons=document['getElementById'](mobileMenuHelper(0xe3));mobileMenuToggle&&(mobileMenuToggle['addEventListener']('click',function(){const h=mobileMenuHelper;navButtons[h(0xee)]['toggle']('active');const c=this[h(0xe6)]('i');navButtons['classList'][h(0xe2)]('active')?(c['classList']['remove']('fa-bars'),c[h(0xee)][h(0xdc)](h(0xe9))):(c[h(0xee)]['remove'](h(0xe9)),c[h(0xee)][h(0xdc)]('fa-bars'));}),document['addEventListener']('click',function(c){const i=mobileMenuHelper;if(!c['target'][i(0xdd)]('.nav-container')){navButtons[i(0xee)]['remove'](i(0xdb));const d=mobileMenuToggle['querySelector']('i');d['classList'][i(0xeb)]('fa-times'),d[i(0xee)][i(0xdc)]('fa-bars');}}),navButtons['querySelectorAll']('a')[mobileMenuHelper(0xdf)](c=>{const j=mobileMenuHelper;c[j(0xd6)]('click',function(){const k=j;navButtons[k(0xee)]['remove']('active');const d=mobileMenuToggle['querySelector']('i');d[k(0xee)][k(0xeb)](k(0xe9)),d[k(0xee)]['add'](k(0xe8));});}));</script>
 
+    <!-- Mobile Menu Fallback Script -->
+    <script>
+        // Clean mobile menu implementation as fallback
+        (function() {
+            const menuToggle = document.getElementById('mobileMenuToggle');
+            const menuNav = document.getElementById('navButtons');
+            
+            if (!menuToggle || !menuNav) return;
+            
+            // Toggle menu on button click
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menuNav.classList.toggle('active');
+                
+                // Toggle icon
+                const icon = this.querySelector('i');
+                if (menuNav.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.nav-container')) {
+                    menuNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking on a link
+            const menuLinks = menuNav.querySelectorAll('a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+        })();
+    </script>
+
     <!-- Popup Modal System -->
     <div id="welcome-popup-overlay" style="display: none;"></div>
     <div id="welcome-popup-modal" style="display: none;"></div>

@@ -2581,9 +2581,24 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Download from Google Drive
         function downloadFromDrive() {
+            const driveBtn = event.target.closest('.download-option-btn');
+            const originalHTML = driveBtn ? driveBtn.innerHTML : '';
+            
             if (currentDownloadGoogleDriveLink) {
+                if (driveBtn) {
+                    driveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening Drive...';
+                    driveBtn.disabled = true;
+                }
+                
                 window.open(currentDownloadGoogleDriveLink, '_blank');
-                closeDownloadModal();
+                
+                setTimeout(() => {
+                    closeDownloadModal();
+                    if (driveBtn) {
+                        driveBtn.innerHTML = originalHTML;
+                        driveBtn.disabled = false;
+                    }
+                }, 1000);
             } else {
                 alert('Google Drive link not available. Please use Direct Download.');
             }
@@ -2591,8 +2606,23 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Regular download
         async function downloadRegular() {
+            const regularBtn = event.target.closest('.download-option-btn');
+            const originalHTML = regularBtn ? regularBtn.innerHTML : '';
+            if (regularBtn) {
+                regularBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
+                regularBtn.disabled = true;
+            }
+            
             closeDownloadModal();
-            await performDirectDownload();
+            
+            try {
+                await performDirectDownload();
+            } finally {
+                if (regularBtn) {
+                    regularBtn.innerHTML = originalHTML;
+                    regularBtn.disabled = false;
+                }
+            }
         }
 
         async function downloadFullPDF() {
@@ -2610,6 +2640,21 @@ s0.parentNode.insertBefore(s1,s0);
                     'Please complete the payment first.'
                 );
                 return;
+            }
+
+            // Show loading on button if triggered by button click
+            const downloadBtn = event && event.target ? event.target.closest('.btn-payment, .btn') : null;
+            if (downloadBtn) {
+                const originalHTML = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Options...';
+                downloadBtn.disabled = true;
+                
+                setTimeout(() => {
+                    if (downloadBtn) {
+                        downloadBtn.innerHTML = originalHTML;
+                        downloadBtn.disabled = false;
+                    }
+                }, 500);
             }
 
             // Show download modal instead of direct download

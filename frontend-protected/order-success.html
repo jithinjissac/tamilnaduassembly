@@ -1267,6 +1267,9 @@ s0.parentNode.insertBefore(s1,s0);
                 const downloadBtn = document.getElementById('downloadBtn');
                 const downloadLoading = document.getElementById('downloadLoading');
                 
+                // Show loading state on button
+                const originalHTML = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
                 downloadBtn.disabled = true;
                 downloadLoading.classList.add('show');
 
@@ -1348,10 +1351,10 @@ s0.parentNode.insertBefore(s1,s0);
         // Download from Google Drive (for in-app browsers)
         function downloadFromGoogleDrive() {
             const googleDriveBtn = document.getElementById('googleDriveBtn');
-            const driveLink = googleDriveBtn.getAttribute('data-drive-link');
+            const driveLink = googleDriveBtn ? googleDriveBtn.getAttribute('data-drive-link') : null;
             
             if (!driveLink) {
-                showMessage('error', 'Error', 'Google Drive link not available');
+                showMessage('error', 'Error', 'Google Drive link not available yet. Please wait a moment and try again.');
                 return;
             }
             
