@@ -296,8 +296,42 @@ export const getPDFFilePath = (orderId) => {
     console.log(`[getPDFFilePath] Checking filesystem: ${permanentPdfPath}`);
     
     if (fs.existsSync(permanentPdfPath)) {
-        console.log(`[getPDFFilePath] ✅ Found permanent PDF on disk, registering in cache`);
-        pdfJobs.set(orderId, { orderId, path: permanentPdfPath, status: 'ready', createdAt: new Date() });
+        console.log(`[getPDFFilePath] ✅ Found permanent PDF on disk, re-registering in cache`);
+        
+        // Re-register with Google Drive link from database if available
+        (async () => {
+            try {
+                const Order = (await import('../models/Order.js')).default;
+                const order = await Order.findOne({ orderId });
+                if (order && order.googleDriveLink) {
+                    console.log(`[getPDFFilePath] ✅ Re-registered with Google Drive link from DB`);
+                    pdfJobs.set(orderId, { 
+                        orderId, 
+                        path: permanentPdfPath, 
+                        status: 'ready', 
+                        createdAt: new Date(),
+                        googleDriveLink: order.googleDriveLink 
+                    });
+                } else {
+                    pdfJobs.set(orderId, { 
+                        orderId, 
+                        path: permanentPdfPath, 
+                        status: 'ready', 
+                        createdAt: new Date() 
+                    });
+                }
+            } catch (err) {
+                console.warn(`[getPDFFilePath] Could not fetch Google Drive link from DB:`, err.message);
+                pdfJobs.set(orderId, { 
+                    orderId, 
+                    path: permanentPdfPath, 
+                    status: 'ready', 
+                    createdAt: new Date() 
+                });
+            }
+        })();
+        
+        // Return path immediately (async DB fetch happens in background)
         return permanentPdfPath;
     }
     

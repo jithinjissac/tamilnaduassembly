@@ -1459,19 +1459,45 @@ export const downloadSlip = async (req, res) => {
         fs.writeFileSync(permanentPdfPath2, pdf);
         console.log('✅ PDF saved permanently to disk');
         
+        // ✅ Upload to Google Drive (if configured)
+        let googleDriveLink = null;
+        try {
+            const { uploadToGoogleDrive, isGoogleDriveConfigured } = await import('../utils/googleDrive.js');
+            if (isGoogleDriveConfigured()) {
+                console.log(`📤 Uploading ${orderId} to Google Drive...`);
+                googleDriveLink = await uploadToGoogleDrive(permanentPdfPath2, orderId);
+                if (googleDriveLink) {
+                    console.log(`✅ Google Drive upload successful: ${googleDriveLink}`);
+                } else {
+                    console.warn(`⚠️ Google Drive upload failed for ${orderId}`);
+                }
+            } else {
+                console.log('ℹ️ Google Drive not configured, skipping upload');
+            }
+        } catch (driveError) {
+            console.error('❌ Google Drive upload error:', driveError.message);
+        }
+        
         // Register in pdfJobs cache for instant retrieval next time
         registerPDFJob(orderId, {
             orderId,
             path: permanentPdfPath2,
             status: 'ready',
-            createdAt: new Date()
+            createdAt: new Date(),
+            googleDriveLink: googleDriveLink
             // NO deletionScheduled - permanent storage!
         });
         
-        // ✅ PERSIST permanent filename to database
+        // ✅ PERSIST permanent filename and Google Drive link to database
         try {
-            await Order.findOneAndUpdate({ orderId }, { permanentPdfFilename: `${orderId}.pdf` });
+            await Order.findOneAndUpdate({ orderId }, { 
+                permanentPdfFilename: `${orderId}.pdf`,
+                googleDriveLink: googleDriveLink 
+            });
             console.log(`✅ Saved permanentPdfFilename to DB: ${orderId}.pdf`);
+            if (googleDriveLink) {
+                console.log(`✅ Saved Google Drive link to DB: ${googleDriveLink}`);
+            }
         } catch (dbErr) {
             console.warn('⚠️ Could not update Order with permanentPdfFilename:', dbErr.message);
         }
