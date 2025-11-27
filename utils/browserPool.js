@@ -233,7 +233,7 @@ class BrowserPool {
 
     try {
       const browser = await chromium.launch({
-        headless: false, // Show browser UI for debugging
+        headless: true, // Must be true for production servers without display
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -242,7 +242,8 @@ class BrowserPool {
           '--disable-background-networking',
           '--disable-default-apps',
           '--disable-extensions',
-          '--disable-sync'
+          '--disable-sync',
+          '--disable-gpu' // Required for headless mode on Linux
         ],
         timeout: 30000
       });
