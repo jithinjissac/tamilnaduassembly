@@ -243,6 +243,29 @@ settingsSchema.statics.getSettings = async function(category) {
             category,
             settings: defaultSettings[category] || {}
         });
+    } else {
+        // Merge with defaults to add any new fields
+        const defaults = defaultSettings[category] || {};
+        const currentSettings = settings.settings instanceof Map 
+            ? Object.fromEntries(settings.settings) 
+            : settings.settings;
+        
+        let needsUpdate = false;
+        const mergedSettings = { ...currentSettings };
+        
+        // Add missing top-level keys from defaults
+        for (const key in defaults) {
+            if (!(key in mergedSettings)) {
+                mergedSettings[key] = defaults[key];
+                needsUpdate = true;
+            }
+        }
+        
+        // Save if we added new fields
+        if (needsUpdate) {
+            settings.settings = new Map(Object.entries(mergedSettings));
+            await settings.save();
+        }
     }
     
     return settings.settings;
