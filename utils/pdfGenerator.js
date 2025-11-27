@@ -38,9 +38,17 @@ export const createFreshBrowser = async () => {
         let lastError;
         for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-                const browser = await puppeteer.launch({
+                // Try different launch strategies on each attempt
+                const launchOptions = {
                     headless: true,
-                    args: [
+                    timeout: 120000,
+                    protocolTimeout: 180000,
+                    dumpio: false
+                };
+
+                // Attempt 1: Standard args with single-process
+                if (attempt === 1) {
+                    launchOptions.args = [
                         '--no-sandbox',
                         '--disable-setuid-sandbox',
                         '--disable-dev-shm-usage',
@@ -49,16 +57,31 @@ export const createFreshBrowser = async () => {
                         '--disable-extensions',
                         '--disable-gpu',
                         '--disable-software-rasterizer',
-                        '--disable-web-security', // Helps with resource cleanup
-                        '--single-process', // Run in single process mode to avoid orphaned processes
-                        '--no-zygote', // Disable zygote process on Windows
-                        '--max-old-space-size=2048' // Increase memory for large PDFs
-                    ],
-                    timeout: 120000, // 120 second timeout for large voter lists
-                    protocolTimeout: 180000, // 180 seconds (3 minutes) for PDF generation protocol operations
-                    ignoreDefaultArgs: ['--disable-extensions'], // Allow proper cleanup
-                    dumpio: false // Disable stdio dumps for cleaner process
-                });
+                        '--disable-web-security',
+                        '--single-process',
+                        '--no-zygote',
+                        '--max-old-space-size=2048'
+                    ];
+                }
+                // Attempt 2: Minimal args (more compatible)
+                else if (attempt === 2) {
+                    console.log('⚠️ Using minimal launch arguments for compatibility...');
+                    launchOptions.args = [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage'
+                    ];
+                    launchOptions.executablePath = puppeteer.executablePath(); // Use bundled Chromium
+                }
+                // Attempt 3: Bare minimum (most compatible)
+                else {
+                    console.log('⚠️ Using bare minimum launch arguments...');
+                    launchOptions.args = ['--no-sandbox'];
+                    launchOptions.executablePath = puppeteer.executablePath();
+                    launchOptions.timeout = 60000; // Shorter timeout
+                }
+
+                const browser = await puppeteer.launch(launchOptions);
                 console.log('✅ Fresh browser instance created successfully');
                 return browser;
                 

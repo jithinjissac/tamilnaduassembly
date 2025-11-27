@@ -1000,8 +1000,25 @@ export const generatePreview = async (req, res) => {
                 const browserStartTime = Date.now();
                 
                 // ✅ USE FRESH BROWSER - allows multiple users to generate previews simultaneously
-                browser = await createFreshBrowser();
-                console.log('✅ Fresh browser ready in', Date.now() - browserStartTime, 'ms');
+                // Fallback to persistent browser on last attempt if fresh browser keeps failing
+                let useFreshBrowser = true;
+                
+                try {
+                    browser = await createFreshBrowser();
+                    console.log('✅ Fresh browser ready in', Date.now() - browserStartTime, 'ms');
+                } catch (browserError) {
+                    console.error('❌ Fresh browser launch failed:', browserError.message);
+                    
+                    if (attempt === maxAttempts) {
+                        console.log('⚠️ Final attempt - falling back to persistent browser from pool...');
+                        useFreshBrowser = false;
+                        const { getBrowser } = await import('../utils/browserPool.js');
+                        browser = await getBrowser();
+                        console.log('✅ Using browser from pool as fallback');
+                    } else {
+                        throw browserError; // Retry with fresh browser
+                    }
+                }
                 
                 console.log('Creating new page...');
                 page = await browser.newPage();
@@ -1047,8 +1064,14 @@ export const generatePreview = async (req, res) => {
                 
                 // ✅ Close fresh browser (not shared, safe to close)
                 await page.close();
-                await browser.close();
-                console.log('✅ Fresh browser closed');
+                
+                if (useFreshBrowser) {
+                    await browser.close();
+                    console.log('✅ Fresh browser closed');
+                } else {
+                    console.log('✅ Browser returned to pool (persistent browser)');
+                }
+                
                 console.log('Total processing time:', Date.now() - browserStartTime, 'ms');
                 
                 // Success! Break out of retry loop
@@ -1059,7 +1082,11 @@ export const generatePreview = async (req, res) => {
                 
                 // Clean up page and browser if they exist
                 try { if (page) await page.close(); } catch (e) {}
-                try { if (browser) await browser.close(); } catch (e) {}
+                try { 
+                    if (browser && useFreshBrowser) {
+                        await browser.close();
+                    }
+                } catch (e) {}
                 
                 // Check if this is a transient error that we should retry
                 const isTransient = pdfError && (
@@ -1067,7 +1094,8 @@ export const generatePreview = async (req, res) => {
                     (pdfError.message && (
                         pdfError.message.includes('ECONNRESET') ||
                         pdfError.message.includes('Target closed') ||
-                        pdfError.message.includes('Connection closed')
+                        pdfError.message.includes('Connection closed') ||
+                        pdfError.message.includes('browser launch')
                     ))
                 );
                 
