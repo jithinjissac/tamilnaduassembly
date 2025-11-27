@@ -478,13 +478,13 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
         /* Multi-symbol horizontal layout */
-        .slip-left.multi-symbol { width: 60mm; padding: 1mm; }
+        .slip-left.multi-symbol { width: 68mm; padding: 1mm; }
         .multi-symbol-header { font-size: 8pt; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; }
         .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
         .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
         .symbol-item-image { width: 18mm; height: 18mm; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
         .symbol-item-name { font-size: 7pt; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: break-word; max-width: 100%; }
-        .symbol-item-type { font-size: 6pt; font-weight: normal; text-align: center; line-height: 1.1; margin-top: 0.3mm; color: #333; }
+        .symbol-item-type { font-size: 6pt; font-weight: normal; text-align: center; line-height: 1.1; margin-top: 1.5mm; color: #333; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
@@ -686,7 +686,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 // Multi-symbol mode: show all symbols horizontally
                 leftSectionHTML = `
                 <div class="slip-left multi-symbol">
-                    <div class="multi-symbol-header">നമ്മുടെ ചിഹ്നങ്ങൾ</div>
+                    <div class="multi-symbol-header">നമ്മുടെ ചിഹ്നം</div>
                     <div class="symbols-row">`;
                 
                 // Add all symbols from the symbolsArray
