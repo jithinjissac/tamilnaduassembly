@@ -313,7 +313,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         const symbolNameEnglish = typeof order.customization.symbolName === 'string'
             ? order.customization.symbolName
             : (order.customization.symbolName?.name || '');
-        const displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
+        displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
     }
     
     // Load font settings from database
