@@ -317,7 +317,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     }
     
     // Load font settings from database
-    let fontSize, fontSizeFree;
+    let fontSize, fontSizeFree, fontSizeMulti;
     try {
         const Settings = (await import('../models/Settings.js')).default;
         const slipSettingsMap = await Settings.getSettings('slip');
@@ -357,14 +357,42 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 console.log('⚠️ sixSlipsFree not found in database, using defaults');
                 sixSlipsFree = null; // Will use fallback below
             }
+
+            // Handle multi-symbol settings with fallback
+            let multiSymbolFive, multiSymbolSix;
+            if (slipSettings.multiSymbolFive) {
+                multiSymbolFive = slipSettings.multiSymbolFive instanceof Map 
+                    ? Object.fromEntries(slipSettings.multiSymbolFive)
+                    : slipSettings.multiSymbolFive;
+            } else {
+                console.log('⚠️ multiSymbolFive not found in database, using defaults');
+                multiSymbolFive = null;
+            }
+            
+            if (slipSettings.multiSymbolSix) {
+                multiSymbolSix = slipSettings.multiSymbolSix instanceof Map 
+                    ? Object.fromEntries(slipSettings.multiSymbolSix)
+                    : slipSettings.multiSymbolSix;
+            } else {
+                console.log('⚠️ multiSymbolSix not found in database, using defaults');
+                multiSymbolSix = null;
+            }
                 
             fontSize = slipsPerPage === 6 ? sixSlips : fiveSlips;
             fontSizeFree = slipsPerPage === 6 ? sixSlipsFree : fiveSlipsFree;
+            fontSizeMulti = slipsPerPage === 6 ? multiSymbolSix : multiSymbolFive;
             
             // If fontSizeFree is null, use defaults
             if (!fontSizeFree) {
                 console.log('⚠️ Symbol-free settings missing, using fallback defaults');
                 throw new Error('Symbol-free settings not found, using defaults');
+            }
+
+            // If fontSizeMulti is null, use defaults
+            if (!fontSizeMulti) {
+                console.log('⚠️ Multi-symbol settings missing, using fallback defaults');
+                // Will be set in catch block
+                fontSizeMulti = null;
             }
             
             console.log('✅ Loaded font settings from database for', slipsPerPage, 'slips per page');
@@ -438,6 +466,43 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             voterNameMarginBottom: '1mm',
             infoRowMarginBottom: '0.6mm'
         };
+        fontSizeMulti = slipsPerPage === 6 ? {
+            leftWidth: '68mm',
+            headerText: 'നമ്മുടെ ചിഹ്നം',
+            headerFont: '7pt',
+            symbolImageSize: '16mm',
+            symbolNameFont: '6.5pt',
+            symbolTypeFont: '5.5pt',
+            symbolTypeMarginTop: '1.2mm',
+            slipNumber: '10pt',
+            secId: '9pt',
+            voterName: '11pt',
+            infoRow: '9pt',
+            infoLabel: '16mm',
+            pollingStation: '9pt',
+            wardMarginBottom: '0.8mm',
+            headerMarginBottom: '0.8mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.6mm'
+        } : {
+            leftWidth: '68mm',
+            headerText: 'നമ്മുടെ ചിഹ്നം',
+            headerFont: '8pt',
+            symbolImageSize: '18mm',
+            symbolNameFont: '7pt',
+            symbolTypeFont: '6pt',
+            symbolTypeMarginTop: '1.5mm',
+            slipNumber: '11pt',
+            secId: '10pt',
+            voterName: '11pt',
+            infoRow: '10pt',
+            infoLabel: '17mm',
+            pollingStation: '10pt',
+            wardMarginBottom: '1mm',
+            headerMarginBottom: '1mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.8mm'
+        };
     }
     
     // Calculate slip height and gap based on slipsPerPage
@@ -478,13 +543,13 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
         /* Multi-symbol horizontal layout */
-        .slip-left.multi-symbol { width: 68mm; padding: 1mm; }
-        .multi-symbol-header { font-size: 8pt; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; }
+        .slip-left.multi-symbol { width: ${fontSizeMulti.leftWidth}; padding: 1mm; }
+        .multi-symbol-header { font-size: ${fontSizeMulti.headerFont}; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; }
         .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
         .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
-        .symbol-item-image { width: 18mm; height: 18mm; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
-        .symbol-item-name { font-size: 7pt; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: break-word; max-width: 100%; }
-        .symbol-item-type { font-size: 6pt; font-weight: normal; text-align: center; line-height: 1.1; margin-top: 1.5mm; color: #333; }
+        .symbol-item-image { width: ${fontSizeMulti.symbolImageSize}; height: ${fontSizeMulti.symbolImageSize}; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
+        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: break-word; max-width: 100%; }
+        .symbol-item-type { font-size: ${fontSizeMulti.symbolTypeFont}; font-weight: normal; text-align: center; line-height: 1.1; margin-top: ${fontSizeMulti.symbolTypeMarginTop}; color: #333; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
@@ -686,7 +751,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 // Multi-symbol mode: show all symbols horizontally
                 leftSectionHTML = `
                 <div class="slip-left multi-symbol">
-                    <div class="multi-symbol-header">നമ്മുടെ ചിഹ്നം</div>
+                    <div class="multi-symbol-header">${fontSizeMulti.headerText}</div>
                     <div class="symbols-row">`;
                 
                 // Add all symbols from the symbolsArray

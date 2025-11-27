@@ -178,6 +178,46 @@ Login to https://easyslip.in to download your PDF.`
             headerMarginTop: '0.4mm',
             voterNameMarginBottom: '0.8mm',
             infoRowMarginBottom: '0.5mm'
+        },
+        // Multi-symbol: 5 slips per page
+        multiSymbolFive: {
+            leftWidth: '68mm',
+            headerText: 'നമ്മുടെ ചിഹ്നം',
+            headerFont: '8pt',
+            symbolImageSize: '18mm',
+            symbolNameFont: '7pt',
+            symbolTypeFont: '6pt',
+            symbolTypeMarginTop: '1.5mm',
+            slipNumber: '11pt',
+            secId: '10pt',
+            voterName: '11pt',
+            infoRow: '10pt',
+            infoLabel: '17mm',
+            pollingStation: '10pt',
+            wardMarginBottom: '1mm',
+            headerMarginBottom: '1mm',
+            voterNameMarginBottom: '1mm',
+            infoRowMarginBottom: '0.8mm'
+        },
+        // Multi-symbol: 6 slips per page
+        multiSymbolSix: {
+            leftWidth: '68mm',
+            headerText: 'നമ്മുടെ ചിഹ്നം',
+            headerFont: '7pt',
+            symbolImageSize: '16mm',
+            symbolNameFont: '6.5pt',
+            symbolTypeFont: '5.5pt',
+            symbolTypeMarginTop: '1.2mm',
+            slipNumber: '10pt',
+            secId: '9pt',
+            voterName: '11pt',
+            infoRow: '9pt',
+            infoLabel: '16mm',
+            pollingStation: '9pt',
+            wardMarginBottom: '0.8mm',
+            headerMarginBottom: '0.8mm',
+            voterNameMarginBottom: '0.8mm',
+            infoRowMarginBottom: '0.6mm'
         }
     },
     popup: {
