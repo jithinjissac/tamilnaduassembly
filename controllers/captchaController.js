@@ -631,7 +631,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     // Wait for the page to update with the response
     // The page will update .ajxpos div with voter data and update the form
     console.log('[CAPTCHA] ⏳ Waiting for page to update with response...');
-    await page.waitForTimeout(3000); // Give time for XHR response and DOM update
+    await page.waitForTimeout(5000); // Give more time for XHR response and DOM update (increased from 3s to 5s)
     
     // Get the entire page HTML after it's been updated
     let submitResult;
@@ -780,7 +780,19 @@ router.post('/submitWithCaptcha', async (req, res) => {
       console.error('[CAPTCHA] ❌ Failed to parse Malayalam from response:', parseError.message);
     }
 
-    // NOW cleanup session after extraction is complete
+    // Return the HTML response to be parsed FIRST
+    res.json({
+      status: 'success',
+      html: submitResult.html,
+      pollingStationMalayalam: pollingStationMalayalam || null
+    });
+
+    // Keep browser open for 5 seconds so you can see the result
+    console.log('[CAPTCHA] ⏳ Keeping browser open for 5 seconds for inspection...');
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    console.log('[CAPTCHA] ✅ Now cleaning up session...');
+
+    // NOW cleanup session after delay
     await sessionManager.cleanup(sessionId);
 
     // Delete captcha file
@@ -788,13 +800,6 @@ router.post('/submitWithCaptcha', async (req, res) => {
     if (fs.existsSync(captchaPath)) {
       fs.unlinkSync(captchaPath);
     }
-
-    // Return the HTML response to be parsed
-    res.json({
-      status: 'success',
-      html: submitResult.html,
-      pollingStationMalayalam: pollingStationMalayalam || null
-    });
 
   } catch (error) {
     console.error('❌ Error submitting with captcha:', error);

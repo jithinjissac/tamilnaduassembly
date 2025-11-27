@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Voters - Multi-Symbol Slip - EasySlip</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="activity-tracker.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
+            color: #333;
+        }
+
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img.app-logo { 
+            height:80px; 
+            width:auto; 
+            display:block; 
+            filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); 
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .symbols-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            margin-bottom: 2rem;
+        }
+
+        .symbols-summary-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .symbols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .symbol-card {
+            padding: 1rem;
+            background: linear-gradient(135deg, #f6f9fc 0%, #e9f5f0 100%);
+            border-radius: 12px;
+            border: 2px solid var(--kerala-green);
+            text-align: center;
+        }
+
+        .symbol-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.75rem;
+        }
+
+        .symbol-card-local-body {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+
+        .symbol-card-name {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: 700;
+            color: var(--kerala-green);
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .label-description {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,109,59,0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--kerala-green);
+            border: 2px solid var(--kerala-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            border-left: 4px solid #c53030;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .captcha-container {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .captcha-image {
+            flex-shrink: 0;
+        }
+
+        .captcha-image img {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            max-width: 200px;
+        }
+
+        .captcha-input-group {
+            flex: 1;
+        }
+
+        .btn-refresh {
+            background: white;
+            border: 2px solid var(--kerala-green);
+            color: var(--kerala-green);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-refresh:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--kerala-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-subtext {
+            color: #718096;
+        }
+
+        .slip-count-option {
+            cursor: pointer;
+        }
+
+        .slip-count-option:hover {
+            background: #f7fafc;
+        }
+
+        .slip-count-option input:checked + div {
+            color: var(--kerala-green);
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .symbols-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .captcha-container {
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo" />
+            </div>
+            <a href="create-multi-symbol-slip.html" class="btn-back">← Back to Symbol Selection</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Symbols Summary -->
+        <div class="symbols-summary">
+            <div class="symbols-summary-title">
+                <i class="fas fa-layer-group"></i>
+                Selected Symbols
+            </div>
+            <div class="symbols-grid" id="symbolsGrid"></div>
+        </div>
+
+        <!-- Voter Extraction Form -->
+        <div class="form-container">
+            <h2 class="form-title"><i class="fas fa-users"></i> Extract Voter Data</h2>
+            <p class="form-subtitle">Select location and extract voter list for your multi-symbol slip</p>
+
+            <div class="form-group">
+                <label for="district">
+                    District / ജില്ല
+                    <span class="label-description">Select your district</span>
+                </label>
+                <select id="district" required>
+                    <option value="">Select District</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="localBody">
+                    Local Body / പ്രാദേശിക സ്വയംഭരണ സ്ഥാപനം
+                    <span class="label-description">Select your local body</span>
+                </label>
+                <select id="localBody" required disabled>
+                    <option value="">Select Local Body</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ward">
+                    Ward / വാർഡ്
+                    <span class="label-description">Select your ward</span>
+                </label>
+                <select id="ward" required disabled>
+                    <option value="">Select Ward</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pollingStation">
+                    Polling Station / പോളിംഗ് സ്റ്റേഷൻ
+                    <span class="label-description">Select polling station</span>
+                </label>
+                <select id="pollingStation" required disabled>
+                    <option value="">Select Polling Station</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Captcha Verification
+                    <span class="label-description">Enter the characters shown in the image</span>
+                </label>
+                <div class="captcha-container">
+                    <div class="captcha-image" id="captchaImage">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div class="captcha-input-group">
+                        <input type="text" id="captcha" placeholder="Enter captcha" required>
+                        <button type="button" class="btn-refresh" onclick="loadCaptcha()">
+                            <i class="fas fa-sync-alt"></i> Refresh Captcha
+                        </button>
+                    </div>
+                </div>
+                <div class="error-message" id="captchaError"></div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    Slips per Page
+                    <span class="label-description">Choose how many voter slips to print on each page</span>
+                </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px;">
+                    <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="radio" name="slipsPerPage" value="5" checked style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; color: #2d3748;">5 Slips</div>
+                            <small style="color: #718096;">Standard</small>
+                        </div>
+                    </label>
+                    <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="radio" name="slipsPerPage" value="6" style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; color: #2d3748;">6 Slips</div>
+                            <small style="color: #718096;">Compact</small>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="location.href='create-multi-symbol-slip.html'">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn btn-primary" onclick="extractAndCreateOrder()" id="extractBtn">
+                    <i class="fas fa-download"></i> Extract & Create Voter Slip
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingMainText">Processing...</div>
+            <div class="loading-subtext" id="loadingSubText">Please wait</div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        let multiSymbols = [];
+        let sessionId = '';
+        let selectedStations = [];
+        let extractedVoters = [];
+
+        // Load multi-symbols from sessionStorage
+        function loadMultiSymbols() {
+            const multiSymbolMode = sessionStorage.getItem('multiSymbolMode') === 'true';
+            const symbolsData = sessionStorage.getItem('multiSymbols');
+            
+            if (!multiSymbolMode || !symbolsData) {
+                alert('No multi-symbol data found. Please select symbols first.');
+                window.location.href = 'create-multi-symbol-slip.html';
+                return;
+            }
+
+            multiSymbols = JSON.parse(symbolsData);
+            console.log('Loaded multi-symbols:', multiSymbols);
+
+            // Display symbols
+            const grid = document.getElementById('symbolsGrid');
+            grid.innerHTML = multiSymbols.map(symbol => `
+                <div class="symbol-card">
+                    <img src="${symbol.symbolImage}" alt="${symbol.symbolName}">
+                    <div class="symbol-card-local-body">${symbol.localBodyType}</div>
+                    <div class="symbol-card-name">${symbol.symbolNameMalayalam}</div>
+                </div>
+            `).join('');
+        }
+
+        // Load districts
+        async function loadDistricts() {
+            try {
+                console.log('📡 Fetching districts from database...');
+                const response = await fetch('/api/getDistricts');
+                const data = await response.json();
+                const select = document.getElementById('district');
+                
+                if (data.status === 'success' && data.districts) {
+                    console.log(`✅ Loaded ${data.districts.length} districts`);
+                    data.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.value;
+                        option.textContent = district.text;
+                        select.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to load districts:', data);
+                }
+            } catch (error) {
+                console.error('❌ Error loading districts:', error);
+                alert('Failed to load districts. Please refresh the page.');
+            }
+        }
+
+        // Load local bodies
+        async function loadLocalBodies(districtId) {
+            const select = document.getElementById('localBody');
+            select.innerHTML = '<option value="">Loading...</option>';
+            select.disabled = true;
+            
+            document.getElementById('ward').innerHTML = '<option value="">Select Ward</option>';
+            document.getElementById('ward').disabled = true;
+            document.getElementById('pollingStation').innerHTML = '<option value="">Select Polling Station</option>';
+            document.getElementById('pollingStation').disabled = true;
+
+            try {
+                const response = await fetch('/api/getLocalBodies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ district_id: districtId })
+                });
+                const data = await response.json();
+                select.innerHTML = '<option value="">Select Local Body</option>';
+                
+                if (data.status === 'success' && data.local_bodies) {
+                    data.local_bodies.forEach(lb => {
+                        const option = document.createElement('option');
+                        option.value = lb.value;
+                        option.textContent = lb.text;
+                        select.appendChild(option);
+                    });
+                    select.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error loading local bodies:', error);
+                select.innerHTML = '<option value="">Error loading data</option>';
+            }
+        }
+
+        // Load wards
+        async function loadWards(districtId, localBodyId) {
+            const select = document.getElementById('ward');
+            select.innerHTML = '<option value="">Loading...</option>';
+            select.disabled = true;
+            
+            document.getElementById('pollingStation').innerHTML = '<option value="">Select Polling Station</option>';
+            document.getElementById('pollingStation').disabled = true;
+
+            try {
+                const response = await fetch('/api/getWards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ local_body_id: localBodyId })
+                });
+                const data = await response.json();
+                select.innerHTML = '<option value="">Select Ward</option>';
+                
+                if (data.status === 'success' && data.wards) {
+                    data.wards.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.value;
+                        option.textContent = ward.text;
+                        select.appendChild(option);
+                    });
+                    select.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error loading wards:', error);
+                select.innerHTML = '<option value="">Error loading data</option>';
+            }
+        }
+
+        // Load polling stations
+        async function loadPollingStations(districtId, localBodyId, wardId) {
+            const select = document.getElementById('pollingStation');
+            select.innerHTML = '<option value="">Loading...</option>';
+            select.disabled = true;
+
+            try {
+                const response = await fetch('/api/getPollingStations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ward_id: wardId })
+                });
+                const data = await response.json();
+                select.innerHTML = '<option value="">Select Polling Station</option>';
+                
+                if (data.status === 'success' && data.polling_stations && data.polling_stations.length > 0) {
+                    selectedStations = data.polling_stations.map(ps => ({
+                        value: ps.value,
+                        text: ps.text
+                    }));
+                    
+                    selectedStations.forEach(ps => {
+                        const option = document.createElement('option');
+                        option.value = ps.value;
+                        option.textContent = ps.text;
+                        select.appendChild(option);
+                    });
+                    select.disabled = false;
+                    console.log('Loaded', selectedStations.length, 'polling stations');
+                }
+            } catch (error) {
+                console.error('Error loading polling stations:', error);
+                select.innerHTML = '<option value="">Error loading data</option>';
+            }
+        }
+
+        // Load captcha
+        async function loadCaptcha() {
+            try {
+                const response = await fetch('/api/initCaptchaSession');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    sessionId = data.sessionId;
+                    document.getElementById('captchaImage').innerHTML = `
+                        <img src="${data.captchaUrl}" alt="Captcha" style="max-width: 200px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading captcha:', error);
+                alert('Failed to load captcha. Please try again.');
+            }
+        }
+
+        // Parse voters from HTML
+        function parseVotersFromHTML(doc) {
+            const voters = [];
+            let pollingStationName = null;
+
+            // Try to extract Malayalam polling station name from the HTML
+            try {
+                console.log('🔍 Attempting to extract Malayalam polling station name from HTML...');
+                
+                // PRIORITY 1: Try to find it in the selected option text
+                const selectedOption = doc.querySelector(
+                    'select[id*="pollingStation"] option[selected], ' +
+                    'select[name*="pollingStation"] option[selected], ' +
+                    '#view_voters_list_pollingStation option[selected="selected"]'
+                );
+                if (selectedOption) {
+                    pollingStationName = selectedOption.textContent.trim().replace(/\s+/g, ' ');
+                    console.log('✅ Found polling station from selected option:', pollingStationName);
+                }
+
+                // PRIORITY 2: Try the chosen-single span
+                if (!pollingStationName) {
+                    const chosenSpan = doc.querySelector('.chosen-container .chosen-single span, .chosen-single span');
+                    if (chosenSpan) {
+                        const text = chosenSpan.textContent.trim().replace(/\s+/g, ' ');
+                        if (text && text !== '-- തിരഞ്ഞെടുക്കുക --' && text !== 'Select' && text !== '--' && !text.startsWith('--')) {
+                            pollingStationName = text;
+                            console.log('✅ Found polling station from Chosen dropdown:', pollingStationName);
+                        }
+                    }
+                }
+
+                if (!pollingStationName) {
+                    console.warn('❌ Could not find Malayalam polling station name in HTML');
+                }
+            } catch (e) {
+                console.error('❌ Error extracting polling station name:', e);
+            }
+
+            // Section handling
+            const INCLUDE_SECTIONS = new Set([
+                'കൂട്ടിച്ചേർക്കലുകൾ',      // Additions
+                'തിരുത്തലുകൾ',          // Corrections
+                'പ്രവാസി വോട്ടർപട്ടിക'    // NRI / Overseas voters
+            ]);
+            const EXCLUDE_AFTER_SECTION = 'ഒഴിവാക്കലുകൾ'; // Deletions
+
+            let currentIncludedSection = null;
+            let stopParsing = false;
+
+            // Try multiple selectors to find voter table rows
+            const selectors = [
+                'tbody.voters-list tr',
+                'tbody tr',
+                'table tr',
+                '.voter-row',
+                'tr'
+            ];
+
+            let rows = [];
+            for (const selector of selectors) {
+                const foundRows = doc.querySelectorAll(selector);
+                if (foundRows.length > 0) {
+                    rows = Array.from(foundRows);
+                    console.log(`Found ${rows.length} rows using selector: ${selector}`);
+                    break;
+                }
+            }
+
+            rows.forEach(row => {
+                if (stopParsing) return;
+
+                // Detect section header rows
+                const header = row.querySelector('h3');
+                if (header) {
+                    const title = header.textContent.trim().replace(/\s+/g, ' ').trim();
+                    console.log('Section header detected:', title);
+
+                    if (title.startsWith(EXCLUDE_AFTER_SECTION)) {
+                        stopParsing = true;
+                        console.log('Stopping parse after deletions section');
+                        return;
+                    }
+
+                    if (INCLUDE_SECTIONS.has(title)) {
+                        currentIncludedSection = title;
+                        console.log('Entering included section:', title);
+                    } else {
+                        currentIncludedSection = '__EXCLUDE__';
+                    }
+                    return;
+                }
+
+                const cols = row.querySelectorAll('td');
+                if (cols.length === 0) return;
+
+                // Determine if we should collect this row
+                const inBaseList = currentIncludedSection === null;
+                const inIncludedSection = currentIncludedSection && currentIncludedSection !== '__EXCLUDE__';
+                if (!(inBaseList || inIncludedSection)) {
+                    return;
+                }
+
+                // Build voter object based on column count
+                let voter = null;
+                if (cols.length === 7) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2].textContent.trim(),
+                        house_no: cols[3].textContent.trim(),
+                        house_name: cols[4].textContent.trim(),
+                        gender_age: cols[5].textContent.trim(),
+                        sec_id: cols[6].textContent.trim()
+                    };
+                } else if (cols.length === 6) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2].textContent.trim(),
+                        house_no: '',
+                        house_name: cols[3].textContent.trim(),
+                        gender_age: cols[4].textContent.trim(),
+                        sec_id: cols[5].textContent.trim()
+                    };
+                } else if (cols.length >= 4) {
+                    voter = {
+                        sl_no: cols[0].textContent.trim(),
+                        name: cols[1].textContent.trim(),
+                        guardian_name: cols[2] ? cols[2].textContent.trim() : '',
+                        house_no: '',
+                        house_name: cols[3] ? cols[3].textContent.trim() : '',
+                        gender_age: '',
+                        sec_id: Array.from(cols).slice(4).map(c => c.textContent.trim()).join(' | ')
+                    };
+                }
+
+                if (!voter) return;
+
+                // Filter out DELETED or SHIFTED rows
+                const upperName = voter.name.toUpperCase();
+                if (upperName.includes('DELETED') || upperName.includes('SHIFTED')) {
+                    return;
+                }
+
+                // Basic validity check
+                if (voter.name || voter.sec_id) {
+                    voters.push(voter);
+                }
+            });
+
+            console.log(`Parsed ${voters.length} filtered voters from HTML`);
+            return { voters, pollingStationName };
+        }
+
+        // Extract and create order
+        async function extractAndCreateOrder() {
+            const district = document.getElementById('district').value;
+            const localBody = document.getElementById('localBody').value;
+            const ward = document.getElementById('ward').value;
+            const pollingStation = document.getElementById('pollingStation').value;
+            const captcha = document.getElementById('captcha').value;
+            const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+
+            if (!district || !localBody || !ward || !pollingStation || !captcha) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            console.log('🚀 Starting voter extraction with:', {
+                district, localBody, ward, pollingStation, captcha, sessionId
+            });
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+            document.getElementById('loadingMainText').textContent = 'Fetching voter data...';
+            document.getElementById('loadingSubText').textContent = 'Please wait while we fetch the voter list';
+
+            try {
+                // Extract voters
+                console.log('📡 Calling /api/submitWithCaptcha...');
+                
+                // Add timeout to prevent hanging forever
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+                
+                const extractResponse = await fetch('/api/submitWithCaptcha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        district,
+                        local_body: localBody,
+                        ward,
+                        polling_station: pollingStation,
+                        language: 'mal',
+                        captcha
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+
+                console.log('📥 Response status:', extractResponse.status);
+                const extractData = await extractResponse.json();
+                console.log('📥 Response data:', extractData);
+
+                if (extractData.status === 'success' && extractData.html) {
+                    console.log('✅ Successfully received HTML, parsing voters...');
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(extractData.html, 'text/html');
+                    const parseResult = parseVotersFromHTML(doc);
+                    extractedVoters = parseResult.voters;
+
+                    console.log(`📊 Parsed ${extractedVoters.length} voters`);
+
+                    const malayalamPollingStationName = 
+                        extractData.pollingStationMalayalam || 
+                        parseResult.pollingStationName ||
+                        (selectedStations.length > 0 ? selectedStations.find(s => s.value === pollingStation)?.text : null) || 
+                        null;
+
+                    if (malayalamPollingStationName) {
+                        extractedVoters = extractedVoters.map(voter => ({
+                            ...voter,
+                            polling_station_name: malayalamPollingStationName
+                        }));
+                        console.log('✅ Added polling station name to voters:', malayalamPollingStationName);
+                    }
+
+                    if (extractedVoters.length === 0) {
+                        console.error('❌ No voters found in parsed data');
+                        alert('No voters found. Please check your selection and try again.');
+                        loadingOverlay.classList.remove('active');
+                        loadCaptcha();
+                        return;
+                    }
+
+                    document.getElementById('loadingMainText').textContent = `Found ${extractedVoters.length} voters`;
+                    document.getElementById('loadingSubText').textContent = 'Creating your order...';
+
+                    // Create order with multi-symbols
+                    console.log('📦 Creating order with multi-symbols:', multiSymbols);
+                    const orderData = {
+                        customization: {
+                            multiSymbols: multiSymbols,
+                            slipsPerPage
+                        },
+                        location: {
+                            district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
+                            localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
+                            ward: document.getElementById('ward').options[document.getElementById('ward').selectedIndex].text,
+                            pollingStation: document.getElementById('pollingStation').options[document.getElementById('pollingStation').selectedIndex].text
+                        },
+                        voters: extractedVoters
+                    };
+
+                    console.log('📡 Creating order...');
+                    const orderResponse = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    console.log('📥 Order response status:', orderResponse.status);
+                    const orderResult = await orderResponse.json();
+                    console.log('📥 Order result:', orderResult);
+
+                    if (orderResponse.ok) {
+                        console.log('✅ Order created successfully:', orderResult.order._id);
+                        // Clear session data
+                        sessionStorage.removeItem('multiSymbolMode');
+                        sessionStorage.removeItem('multiSymbols');
+                        
+                        // Redirect to preview
+                        window.location.href = `preview.html?orderId=${orderResult.order._id}`;
+                    } else {
+                        throw new Error(orderResult.message || 'Failed to create order');
+                    }
+                } else {
+                    console.error('❌ API returned error:', extractData);
+                    throw new Error(extractData.message || 'Failed to extract voters');
+                }
+            } catch (error) {
+                console.error('❌ Error in extractAndCreateOrder:', error);
+                
+                let errorMessage = 'Unknown error';
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Request timed out after 2 minutes. The SEC website may be slow or down. Please try again.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(`Failed: ${errorMessage}. Please try again.`);
+                loadingOverlay.classList.remove('active');
+                loadCaptcha();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('district').addEventListener('change', function() {
+            if (this.value) loadLocalBodies(this.value);
+        });
+
+        document.getElementById('localBody').addEventListener('change', function() {
+            const district = document.getElementById('district').value;
+            if (this.value && district) loadWards(district, this.value);
+        });
+
+        document.getElementById('ward').addEventListener('change', function() {
+            const district = document.getElementById('district').value;
+            const localBody = document.getElementById('localBody').value;
+            if (this.value && district && localBody) loadPollingStations(district, localBody, this.value);
+        });
+
+        // Initialize - CRITICAL: Load districts first
+        (async function initializeApp() {
+            console.log('🚀 Initializing multi-symbol extraction page...');
+            loadMultiSymbols();
+            
+            // Load districts immediately - blocking operation
+            await loadDistricts();
+            
+            console.log('✅ Districts loaded, now loading captcha...');
+            
+            // Load captcha after districts
+            loadCaptcha();
+            
+            trackPageView();
+        })();
+    </script>
+</body>
+</html>

@@ -16,6 +16,25 @@ const OrderSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
+        multiSymbol: {
+            type: Boolean,
+            default: false
+        },
+        symbolCount: {
+            type: Number,
+            min: 2,
+            max: 3
+        },
+        symbols: [{
+            symbolId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Symbol'
+            },
+            symbolImage: String,
+            symbolName: String,
+            symbolNameMalayalam: String,
+            localBodyType: String
+        }],
         symbolId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Symbol',

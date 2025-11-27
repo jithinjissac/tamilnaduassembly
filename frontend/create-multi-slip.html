@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Slip - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    <title>Create Multi-Symbol Slip - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
     
     <!-- Preload critical API endpoint for instant district loading -->
     <link rel="preconnect" href="/api">
@@ -12,7 +12,7 @@
     <!-- Open Graph / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://easyslip.in/create-slip">
-    <meta property="og:title" content="Create Voter Slip - EasySlip | Kerala Elections">
+    <meta property="og:title" content="Create Multi-Symbol Voter Slip - EasySlip | Kerala Elections">
     <meta property="og:description" content="Generate professional voter slips for Kerala elections. All 14 districts covered. ₹0.50/voter. Instant PDF download.">
     <meta property="og:image" content="https://easyslip.in/favicon/android-chrome-512x512.png">
     <meta property="og:image:width" content="512">
@@ -288,6 +288,42 @@ s0.parentNode.insertBefore(s1,s0);
             color: #2d3748;
             font-weight: 600;
             font-size: 1.1rem;
+        }
+
+        /* Multi-Symbol Count Options */
+        .symbol-count-option {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            margin: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .symbol-count-option:hover {
+            border-color: var(--kerala-green);
+            box-shadow: 0 4px 12px rgba(0, 109, 59, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .symbol-count-option input[type="radio"] {
+            width: auto;
+            margin-right: 0.75rem;
+            cursor: pointer;
+        }
+
+        .symbol-count-option input[type="radio"]:checked + span {
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .symbol-count-option:has(input[type="radio"]:checked) {
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
         }
 
         .label-description {
@@ -851,25 +887,37 @@ s0.parentNode.insertBefore(s1,s0);
 
                 <div class="form-group">
                     <label>
-                        Select Symbol
-                        <span class="label-description"><i class="fas fa-exclamation-triangle"></i> Required: Choose your EC-approved election symbol first</span>
+                        Number of Symbols on Slip
+                        <span class="label-description">Select how many election symbols to display (for different local body levels)</span>
                     </label>
-                    <div class="symbol-selection-area" id="symbolSelectionArea">
-                        <div class="symbol-preview" id="symbolPreview" style="display: none;">
-                            <img id="selectedSymbolImage" src="" alt="Selected Symbol" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;">
-                            <div id="selectedSymbolName" style="font-weight: 700; color: #2d3748; font-size: 1.1rem; margin-bottom: 0.3rem;"></div>
-                            <div id="selectedSymbolNameMalayalam" style="font-family: 'Noto Sans Malayalam', sans-serif; font-weight: 600; color: #FFB81C; font-size: 1.2rem; margin-bottom: 0.5rem;"></div>
-                            <div style="color: #48bb78; font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Symbol Selected</div>
-                            <button type="button" class="btn btn-secondary" onclick="symbolPicker.open()" style="padding: 0.75rem 1.5rem;">
-                                <i class="fas fa-sync-alt"></i> Change Symbol
-                            </button>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="selectSymbolBtn" onclick="symbolPicker.open()" style="display: block; margin: 0 auto;">
-                            <i class="fas fa-hand-pointer" style="margin-right: 0.5rem;"></i> SELECT YOUR SYMBOL
-                        </button>
-                        <div style="text-align:center; margin-top:1rem;">
-                            <a href="#" id="continueWithoutSymbol" style="color:#2c5282; text-decoration:underline; font-weight:600; cursor:pointer;">Continue without any symbols</a>
-                        </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; max-width: 400px;">
+                        <label class="symbol-count-option" style="display: flex; flex-direction: column; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="symbolCount" value="2" checked style="margin-bottom: 0.5rem; width: 18px; height: 18px; cursor: pointer;" onchange="updateSymbolPickers()">
+                            <div style="text-align: center;">
+                                <div style="font-weight: 600; color: #2d3748;">2 Symbols</div>
+                                <small style="color: #718096;">Two levels</small>
+                            </div>
+                        </label>
+                        <label class="symbol-count-option" style="display: flex; flex-direction: column; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="symbolCount" value="3" style="margin-bottom: 0.5rem; width: 18px; height: 18px; cursor: pointer;" onchange="updateSymbolPickers()">
+                            <div style="text-align: center;">
+                                <div style="font-weight: 600; color: #2d3748;">3 Symbols</div>
+                                <small style="color: #718096;">Three levels</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="multiSymbolContainer">
+                    <label>
+                        Select Symbols & Local Bodies
+                        <span class="label-description"><i class="fas fa-exclamation-triangle"></i> Required: Choose symbols and their corresponding local body names</span>
+                    </label>
+                    <div id="symbolPickersContainer">
+                        <!-- Symbol pickers will be dynamically generated here -->
+                    </div>
+                    <div style="text-align:center; margin-top:1rem;">
+                        <a href="#" id="continueWithoutSymbol" style="color:#2c5282; text-decoration:underline; font-weight:600; cursor:pointer;">Continue without any symbols</a>
                     </div>
                     <div class="error-message" id="symbolError"></div>
                 </div>
@@ -1044,6 +1092,10 @@ s0.parentNode.insertBefore(s1,s0);
         let allPollingStations = []; // Store all stations
         let selectedStations = []; // Store user-selected stations
         const token = localStorage.getItem('token');
+        
+        // Multi-symbol support
+        let multiSymbolData = [];
+        let currentSymbolPickerIndex = -1;
 
         if (!token) {
             // Save the intended destination before redirecting to login
@@ -1115,34 +1167,106 @@ s0.parentNode.insertBefore(s1,s0);
         // Initialize symbol picker
         window.addEventListener('DOMContentLoaded', () => {
             window.symbolPicker = initSymbolPicker((symbol) => {
-                // Callback when symbol is selected
-                selectedSymbol = symbol;
-                symbolFreeMode = false;
-                // Update UI
-                document.getElementById('selectedSymbolImage').src = symbol.imageUrl;
-                document.getElementById('selectedSymbolName').textContent = symbol.nameMalayalam || symbol.name;
-                // Display English name as secondary if Malayalam exists
-                const malayalamNameElement = document.getElementById('selectedSymbolNameMalayalam');
-                if (symbol.nameMalayalam && symbol.nameMalayalam.trim()) {
-                    malayalamNameElement.textContent = symbol.name;
-                    malayalamNameElement.style.display = 'block';
-                } else {
-                    malayalamNameElement.style.display = 'none';
+                // Callback when symbol is selected for multi-symbol mode
+                if (currentSymbolPickerIndex >= 0) {
+                    multiSymbolData[currentSymbolPickerIndex].symbol = symbol;
+                    updateSymbolPickerDisplay(currentSymbolPickerIndex);
                 }
-                document.getElementById('symbolPreview').style.display = 'block';
-                document.getElementById('selectSymbolBtn').style.display = 'none';
-                // Restore the continue link if previously changed
-                const continueLink = document.getElementById('continueWithoutSymbol');
-                if (continueLink) {
-                    continueLink.textContent = 'Continue without any symbols';
-                    continueLink.style.color = '#2c5282';
-                    continueLink.style.pointerEvents = 'auto';
-                }
-                // Clear error
                 document.getElementById('symbolError').classList.remove('show');
-                console.log('Symbol selected:', symbol);
             });
+            
+            // Initialize with 2 symbol pickers by default
+            updateSymbolPickers();
         });
+        
+        // Update number of symbol pickers based on selected count
+        function updateSymbolPickers() {
+            const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
+            const container = document.getElementById('symbolPickersContainer');
+            container.innerHTML = '';
+            multiSymbolData = [];
+            
+            for (let i = 0; i < symbolCount; i++) {
+                multiSymbolData.push({
+                    symbol: null,
+                    localBodyName: ''
+                });
+                
+                const pickerHTML = `
+                    <div class="symbol-picker-item" id="symbolPicker${i}" style="margin-bottom: 1.5rem; padding: 1.5rem; border: 2px dashed #e2e8f0; border-radius: 12px; background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: var(--kerala-green); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">${i + 1}</div>
+                            <h4 style="margin: 0; color: #2d3748;">Symbol ${i + 1}</h4>
+                        </div>
+                        
+                        <div class="symbol-preview" id="symbolPreview${i}" style="display: none; padding: 1rem; background: white; border-radius: 8px; border: 2px solid #48bb78; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <img id="symbolImage${i}" src="" style="width: 60px; height: 60px; object-fit: contain;">
+                                <div style="flex: 1;">
+                                    <div id="symbolName${i}" style="font-weight: 600; color: #2d3748;"></div>
+                                    <div id="symbolNameMal${i}" style="font-family: 'Noto Sans Malayalam'; color: #FFB81C; font-size: 0.95rem;"></div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="openSymbolPicker(${i})" style="padding: 0.5rem 1rem;">
+                                    <i class="fas fa-sync-alt"></i> Change
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary" id="selectSymbolBtn${i}" onclick="openSymbolPicker(${i})" style="width: 100%; margin-bottom: 1rem;">
+                            <i class="fas fa-hand-pointer"></i> Select Symbol ${i + 1}
+                        </button>
+                        
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; display: block;">
+                                Local Body Type (Malayalam)
+                                <span style="color: #e53e3e; font-size: 0.9rem;">*</span>
+                            </label>
+                            <select id="localBodyName${i}" class="form-control" 
+                                    style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Noto Sans Malayalam', sans-serif; font-size: 1rem;"
+                                    onchange="updateLocalBodyName(${i}, this.value)">
+                                <option value="">Select local body type...</option>
+                                <option value="G">ഗ്രാമപഞ്ചായത്ത്</option>
+                                <option value="B">ബ്ലോക്ക് പഞ്ചായത്ത്</option>
+                                <option value="D">ജില്ലാ പഞ്ചായത്ത്</option>
+                            </select>
+                            <small style="color: #718096; margin-top: 0.25rem; display: block;">Select the local body level type (will appear below the symbol)</small>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += pickerHTML;
+            }
+        }
+        
+        // Open symbol picker for specific index
+        function openSymbolPicker(index) {
+            currentSymbolPickerIndex = index;
+            window.symbolPicker.open();
+        }
+        
+        // Update symbol picker display after selection
+        function updateSymbolPickerDisplay(index) {
+            const data = multiSymbolData[index];
+            if (data.symbol) {
+                document.getElementById(`symbolImage${index}`).src = data.symbol.imageUrl;
+                document.getElementById(`symbolName${index}`).textContent = data.symbol.name;
+                document.getElementById(`symbolNameMal${index}`).textContent = data.symbol.nameMalayalam || '';
+                document.getElementById(`symbolPreview${index}`).style.display = 'block';
+                document.getElementById(`selectSymbolBtn${index}`).style.display = 'none';
+            }
+        }
+        
+        // Update local body name in data
+        function updateLocalBodyName(index, value) {
+            // Map the value to Malayalam name
+            const localBodyTypeMap = {
+                'G': 'ഗ്രാമപഞ്ചായത്ത്',
+                'B': 'ബ്ലോക്ക് പഞ്ചായത്ത്',
+                'D': 'ജില്ലാ പഞ്ചായത്ത്'
+            };
+            multiSymbolData[index].localBodyType = value; // Store the code (G/B/D)
+            multiSymbolData[index].localBodyName = localBodyTypeMap[value] || value; // Store the Malayalam name
+        }
 
         // Step navigation
         function nextStep(step) {
@@ -1194,10 +1318,33 @@ s0.parentNode.insertBefore(s1,s0);
         function validateStep1() {
             let valid = true;
             document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
-            if (!selectedSymbol && !symbolFreeMode) {
-                showError('symbolError', 'Please select a symbol or continue without any symbols');
-                valid = false;
+            
+            if (symbolFreeMode) {
+                return true; // Symbol-free mode is valid
             }
+            
+            // Validate multi-symbol data
+            const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
+            
+            for (let i = 0; i < symbolCount; i++) {
+                // Check if multiSymbolData entry exists
+                if (!multiSymbolData[i]) {
+                    showError('symbolError', `Please select Symbol ${i + 1} or continue without any symbols`);
+                    valid = false;
+                    break;
+                }
+                if (!multiSymbolData[i].symbol) {
+                    showError('symbolError', `Please select Symbol ${i + 1} or continue without any symbols`);
+                    valid = false;
+                    break;
+                }
+                if (!multiSymbolData[i].localBodyType || multiSymbolData[i].localBodyType.trim() === '') {
+                    showError('symbolError', `Please select Local Body Type for Symbol ${i + 1}`);
+                    valid = false;
+                    break;
+                }
+            }
+            
             return valid;
         }
 
@@ -1540,6 +1687,10 @@ s0.parentNode.insertBefore(s1,s0);
 
             // Try multiple selectors to find voter table rows
             const selectors = [
+                '#view_voters_list_voters_tbody tr',       // Most specific - tbody with voter table ID
+                'tbody#view_voters_list_voters_tbody tr',  // Same but more explicit
+                'table.table-bordered tbody tr',           // Table with border class
+                'table.table tbody tr',                    // Generic Bootstrap table
                 'tbody.voters-list tr',
                 'tbody tr',
                 'table tr',
@@ -1550,14 +1701,30 @@ s0.parentNode.insertBefore(s1,s0);
             let rows = [];
             for (const selector of selectors) {
                 const foundRows = doc.querySelectorAll(selector);
+                console.log(`Trying selector "${selector}": found ${foundRows.length} rows`);
                 if (foundRows.length > 0) {
                     rows = Array.from(foundRows);
-                    console.log(`Found ${rows.length} rows using selector: ${selector}`);
+                    console.log(`✅ Using selector: ${selector} (${rows.length} rows)`);
+                    
+                    // Debug: Check if we have the voter tbody
+                    const voterTbody = doc.querySelector('#view_voters_list_voters_tbody');
+                    console.log('Voter tbody exists?', !!voterTbody);
+                    if (voterTbody) {
+                        console.log('Voter tbody rows:', voterTbody.querySelectorAll('tr').length);
+                    }
+                    
+                    // Debug: Check all tbody elements
+                    const allTbodies = doc.querySelectorAll('tbody');
+                    console.log('Total tbody elements:', allTbodies.length);
+                    allTbodies.forEach((tbody, i) => {
+                        console.log(`Tbody ${i}: id="${tbody.id}", class="${tbody.className}", rows=${tbody.querySelectorAll('tr').length}`);
+                    });
+                    
                     break;
                 }
             }
 
-            rows.forEach(row => {
+            rows.forEach((row, rowIndex) => {
                 if (stopParsing) return; // We've reached deletions section
 
                 // Detect section header rows with <h3>
@@ -1588,12 +1755,14 @@ s0.parentNode.insertBefore(s1,s0);
                 }
 
                 const cols = row.querySelectorAll('td');
+                console.log(`Row ${rowIndex}: Found ${cols.length} columns`, cols.length > 0 ? Array.from(cols).map(c => c.textContent.trim().substring(0, 20)) : 'empty');
                 if (cols.length === 0) return; // skip empty rows
 
                 // Determine if we should collect this row
                 const inBaseList = currentIncludedSection === null; // before any h3 section encountered
                 const inIncludedSection = currentIncludedSection && currentIncludedSection !== '__EXCLUDE__';
                 if (!(inBaseList || inIncludedSection)) {
+                    console.log(`Row ${rowIndex}: Skipping - not in base list or included section`);
                     return; // skip rows in excluded sections
                 }
 
@@ -1636,12 +1805,16 @@ s0.parentNode.insertBefore(s1,s0);
                 // Filter out rows where name contains DELETED or SHIFTED (case-insensitive)
                 const upperName = voter.name.toUpperCase();
                 if (upperName.includes('DELETED') || upperName.includes('SHIFTED')) {
+                    console.log(`Row ${rowIndex}: Skipping - contains DELETED or SHIFTED`);
                     return; // skip
                 }
 
                 // Basic validity check
                 if (voter.name || voter.sec_id) {
+                    console.log(`Row ${rowIndex}: ✅ Valid voter - ${voter.name}`);
                     voters.push(voter);
+                } else {
+                    console.log(`Row ${rowIndex}: ❌ Invalid - no name or sec_id`);
                 }
             });
 
@@ -1683,9 +1856,31 @@ s0.parentNode.insertBefore(s1,s0);
             }
 
             // Get customization data from step 1
-            if (!selectedSymbol && !symbolFreeMode) {
-                showError('symbolError', 'Please select a symbol or continue without any symbols');
-                return;
+            if (!symbolFreeMode) {
+                // Validate multi-symbol data
+                const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
+                let hasAllSymbols = true;
+                let hasAllLocalBodyNames = true;
+                
+                for (let i = 0; i < symbolCount; i++) {
+                    if (!multiSymbolData[i] || !multiSymbolData[i].symbol) {
+                        hasAllSymbols = false;
+                        break;
+                    }
+                    if (!multiSymbolData[i].localBodyType || multiSymbolData[i].localBodyType.trim() === '') {
+                        hasAllLocalBodyNames = false;
+                        break;
+                    }
+                }
+                
+                if (!hasAllSymbols) {
+                    showError('captchaError', 'Please go back to Step 1 and select all symbols (or continue without symbols)');
+                    return;
+                }
+                if (!hasAllLocalBodyNames) {
+                    showError('captchaError', 'Please go back to Step 1 and select local body types for all symbols');
+                    return;
+                }
             }
 
             document.getElementById('extractBtn').disabled = true;
@@ -1790,19 +1985,53 @@ s0.parentNode.insertBefore(s1,s0);
 
                     // Step 2: Create order with the extracted data
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+                    const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
                     console.log('🎫 Slips per page selected:', slipsPerPage);
+                    console.log('🎯 Symbol count:', symbolCount);
                     
                     let customization;
-                    if (symbolFreeMode || !selectedSymbol) {
+                    if (symbolFreeMode) {
                         customization = { symbolFree: true, slipsPerPage };
                     } else {
+                        // Multi-symbol mode (always 2 or 3 symbols for this page)
                         customization = {
-                            symbolId: selectedSymbol._id,
-                            symbolImage: selectedSymbol.imageUrl,
-                            symbolName: selectedSymbol.name,
-                            symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                            multiSymbol: true,
+                            symbolCount: symbolCount,
+                            symbols: multiSymbolData.slice(0, symbolCount).map(item => ({
+                                symbolId: item.symbol._id,
+                                symbolImage: item.symbol.imageUrl,
+                                symbolName: item.symbol.name,
+                                symbolNameMalayalam: item.symbol.nameMalayalam || '',
+                                localBodyType: item.localBodyType
+                            })),
                             slipsPerPage: slipsPerPage
                         };
+                        
+                        // Determine local body type from the selected local body dropdown
+                        // Format: "G06003-ബൈസണ്‍വാലി" where G=Grama, M=Municipality, C=Corporation
+                        const localBodyText = document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text;
+                        let selectedLocalBodyType = 'G'; // Default to Grama Panchayat
+                        
+                        if (localBodyText) {
+                            const firstChar = localBodyText.trim().charAt(0).toUpperCase();
+                            if (firstChar === 'G' || firstChar === 'M' || firstChar === 'C') {
+                                selectedLocalBodyType = firstChar;
+                            }
+                        }
+                        
+                        console.log(`📍 Selected local body: "${localBodyText}"`);
+                        console.log(`🏛️ Detected local body type: ${selectedLocalBodyType} (${
+                            selectedLocalBodyType === 'G' ? 'Grama Panchayat' : 
+                            selectedLocalBodyType === 'M' ? 'Municipality' : 'Corporation'
+                        })`);
+                        
+                        // Assign the detected local body type to all voters
+                        extractedVoters = extractedVoters.map(voter => ({
+                            ...voter,
+                            local_body_type: selectedLocalBodyType
+                        }));
+                        
+                        console.log(`✅ Assigned local_body_type "${selectedLocalBodyType}" to ${extractedVoters.length} voters`);
                     }
                     const orderData = {
                         customization,
@@ -1885,9 +2114,31 @@ s0.parentNode.insertBefore(s1,s0);
 
         // Sequential extraction for multiple polling stations - one at a time
         async function extractStationsSequentially() {
-            if (!selectedSymbol && !symbolFreeMode) {
-                showError('captchaError', 'Please select a symbol before extracting');
-                return;
+            if (!symbolFreeMode) {
+                // Validate multi-symbol data
+                const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
+                let hasAllSymbols = true;
+                let hasAllLocalBodyNames = true;
+                
+                for (let i = 0; i < symbolCount; i++) {
+                    if (!multiSymbolData[i] || !multiSymbolData[i].symbol) {
+                        hasAllSymbols = false;
+                        break;
+                    }
+                    if (!multiSymbolData[i].localBodyType || multiSymbolData[i].localBodyType.trim() === '') {
+                        hasAllLocalBodyNames = false;
+                        break;
+                    }
+                }
+                
+                if (!hasAllSymbols) {
+                    showError('captchaError', 'Please select all symbols before extracting (or continue without symbols)');
+                    return;
+                }
+                if (!hasAllLocalBodyNames) {
+                    showError('captchaError', 'Please select local body types for all symbols before extracting');
+                    return;
+                }
             }
 
             if (selectedStations.length === 0) {
@@ -2129,16 +2380,23 @@ s0.parentNode.insertBefore(s1,s0);
                         : selectedStations[0].text;
                     
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
+                    const symbolCount = parseInt(document.querySelector('input[name="symbolCount"]:checked').value);
                     
                     let customization;
-                    if (symbolFreeMode || !selectedSymbol) {
+                    if (symbolFreeMode) {
                         customization = { symbolFree: true, slipsPerPage };
                     } else {
+                        // Multi-symbol mode (2 or 3 symbols)
                         customization = {
-                            symbolId: selectedSymbol._id,
-                            symbolImage: selectedSymbol.imageUrl,
-                            symbolName: selectedSymbol.name,
-                            symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                            multiSymbol: true,
+                            symbolCount: symbolCount,
+                            symbols: multiSymbolData.map(data => ({
+                                symbolId: data.symbol._id,
+                                symbolImage: data.symbol.imageUrl,
+                                symbolName: data.symbol.name,
+                                symbolNameMalayalam: data.symbol.nameMalayalam || '',
+                                localBodyType: data.localBodyType
+                            })),
                             slipsPerPage
                         };
                     }
@@ -2325,58 +2583,45 @@ s0.parentNode.insertBefore(s1,s0);
                 continueLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     symbolFreeMode = true;
-                    selectedSymbol = null;
-                    document.getElementById('symbolPreview').style.display = 'none';
-                    // Change the select symbol button to a text saying No Symbol
-                    var selectBtn = document.getElementById('selectSymbolBtn');
-                    if (selectBtn) {
-                        selectBtn.style.display = 'none';
-                        // Insert a "No Symbol" text with "Select Symbol" link
-                        let noSymbolText = document.getElementById('noSymbolText');
-                        if (!noSymbolText) {
-                            noSymbolText = document.createElement('div');
-                            noSymbolText.id = 'noSymbolText';
-                            noSymbolText.innerHTML = `
-                                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);">
-                                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: stretch;">
-                                        <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
-                                            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                                                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                                                </svg>
-                                            </div>
-                                            <div style="flex: 1; min-width: 0;">
-                                                <div style="color: white; font-weight: 700; font-size: clamp(1rem, 3vw, 1.25rem); margin-bottom: 0.25rem;">Create Without Symbol</div>
-                                                <div style="color: rgba(255,255,255,0.9); font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Slips will be generated without election symbols</div>
-                                            </div>
-                                        </div>
-                                        <a href="#" id="selectSymbolLink" style="color: white; text-decoration: underline; font-size: clamp(0.85rem, 2.5vw, 0.95rem); transition: opacity 0.3s ease; display: inline-block; margin-top: 0.5rem; opacity: 0.9;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
-                                         I want to select a symbol
-                                        </a>
+                    multiSymbolData = []; // Clear multi-symbol data
+                    document.getElementById('symbolPickersContainer').innerHTML = `
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);">
+                            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: stretch;">
+                                <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                                    <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        </svg>
                                     </div>
-                            `;
-                            noSymbolText.style.cssText = 'margin: 1.5rem 0;';
-                            selectBtn.parentNode.insertBefore(noSymbolText, selectBtn.nextSibling);
-                            
-                            // Add click handler to select symbol link
-                            document.getElementById('selectSymbolLink').addEventListener('click', function(e) {
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="color: white; font-weight: 700; font-size: clamp(1rem, 3vw, 1.25rem); margin-bottom: 0.25rem;">Symbol-Free Mode Activated</div>
+                                        <div style="color: rgba(255,255,255,0.9); font-size: clamp(0.8rem, 2.5vw, 0.9rem);">Slips will be generated without election symbols</div>
+                                    </div>
+                                </div>
+                                <a href="#" id="selectSymbolsAgain" style="color: white; text-decoration: underline; font-size: clamp(0.85rem, 2.5vw, 0.95rem); transition: opacity 0.3s ease; display: inline-block; margin-top: 0.5rem; opacity: 0.9;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
+                                    I want to select symbols
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add click handler to re-enable symbol selection
+                    setTimeout(function() {
+                        var reEnableLink = document.getElementById('selectSymbolsAgain');
+                        if (reEnableLink) {
+                            reEnableLink.addEventListener('click', function(e) {
                                 e.preventDefault();
                                 symbolFreeMode = false;
                                 window.symbolFreeMode = false;
-                                selectBtn.style.display = 'inline-flex';
-                                noSymbolText.style.display = 'none';
                                 continueLink.style.display = '';
-                                // Trigger symbol picker
-                                selectBtn.click();
+                                updateSymbolPickers(); // Regenerate symbol pickers
                             });
-                        } else {
-                            noSymbolText.style.display = 'block';
                         }
-                    }
+                    }, 100);
+                    
                     document.getElementById('symbolError').classList.remove('show');
-                    // Visually indicate symbol-free mode
                     continueLink.style.display = 'none';
                     // Ensure all validations and UI respect symbolFreeMode
                     window.symbolFreeMode = true;

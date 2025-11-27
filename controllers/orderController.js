@@ -40,7 +40,9 @@ export const createOrder = [
             let { customization } = req.body;
             const errors = validationResult(req);
             let validationErrors = errors.array();
-            if (!customization?.symbolFree) {
+            
+            // Skip symbol validation for symbolFree or multiSymbol mode
+            if (!customization?.symbolFree && !customization?.multiSymbol) {
                 if (!customization?.symbolImage) {
                     validationErrors.push({
                         msg: 'Symbol image is required',
@@ -56,6 +58,31 @@ export const createOrder = [
                     });
                 }
             }
+            
+            // Validate multiSymbol mode
+            if (customization?.multiSymbol) {
+                if (!customization?.symbols || !Array.isArray(customization.symbols)) {
+                    validationErrors.push({
+                        msg: 'Symbols array is required for multi-symbol mode',
+                        param: 'customization.symbols',
+                        location: 'body'
+                    });
+                } else if (customization.symbols.length < 2 || customization.symbols.length > 3) {
+                    validationErrors.push({
+                        msg: 'Multi-symbol mode requires 2-3 symbols',
+                        param: 'customization.symbols',
+                        location: 'body'
+                    });
+                }
+                if (!customization?.symbolCount || customization.symbolCount < 2 || customization.symbolCount > 3) {
+                    validationErrors.push({
+                        msg: 'Symbol count must be 2 or 3',
+                        param: 'customization.symbolCount',
+                        location: 'body'
+                    });
+                }
+            }
+            
             if (validationErrors.length > 0) {
                 return res.status(400).json({
                     status: 'error',
@@ -95,6 +122,12 @@ export const createOrder = [
 
             // Debug: Log customization before symbol-free handling
             console.log('[DEBUG] Customization received:', JSON.stringify(customization));
+
+            // If multi-symbol mode is enabled
+            if (customization.multiSymbol) {
+                console.log(`[DEBUG] Multi-symbol mode: ${customization.symbolCount} symbols`);
+                console.log('[DEBUG] Symbols:', JSON.stringify(customization.symbols));
+            }
 
             // If symbol-free mode is enabled, ensure symbolFree is explicitly true
             // and DON'T set symbolId/symbolImage/symbolName (Mongoose will skip validation)
@@ -148,6 +181,7 @@ export const createOrder = [
             const existingPDF = getPDFFilePath(order.orderId);
             
             let pdfStatus = 'generating'; // Default: PDF still generating
+            
             if (existingPDF) {
                 console.log(`✅ [ORDER] Permanent PDF already exists for ${order.orderId}`);
                 pdfStatus = 'ready'; // PDF ready for instant download!

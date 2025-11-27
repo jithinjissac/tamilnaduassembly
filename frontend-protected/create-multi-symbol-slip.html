@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Multi-Symbol Slip - EasySlip</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="symbol-picker.js"></script>
+    <script src="activity-tracker.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img.app-logo { 
+            height:80px; 
+            width:auto; 
+            display:block; 
+            filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); 
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 4px;
+            background: var(--kerala-gradient);
+            z-index: 1;
+            transition: width 0.3s;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #718096;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            border-color: var(--kerala-green);
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            border-color: var(--kerala-gold);
+            background: var(--kerala-gold);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .step.active .step-label {
+            color: var(--kerala-green);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .label-description {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .symbol-count-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .count-option {
+            padding: 2rem 1rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .count-option:hover {
+            border-color: var(--kerala-green);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,109,59,0.15);
+        }
+
+        .count-option.selected {
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
+        }
+
+        .count-option input[type="radio"] {
+            display: none;
+        }
+
+        .count-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .count-label {
+            font-size: 0.95rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .symbol-entry {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .symbol-entry-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .symbol-preview {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(0, 109, 59, 0.05);
+            border-radius: 12px;
+            margin-top: 1rem;
+            border: 2px solid var(--kerala-green);
+        }
+
+        .symbol-preview.show {
+            display: flex;
+        }
+
+        .symbol-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .symbol-preview-info {
+            flex: 1;
+        }
+
+        .symbol-preview-name {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .symbol-preview-malayalam {
+            color: var(--kerala-gold);
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: 600;
+            font-size: 1.15rem;
+        }
+
+        .symbol-preview-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-change-symbol {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--kerala-green);
+            color: var(--kerala-green);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-change-symbol:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-choose-symbol {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--kerala-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-choose-symbol:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,109,59,0.3);
+        }
+
+        .btn-choose-symbol i {
+            font-size: 1.3rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,109,59,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--kerala-green);
+            border: 2px solid var(--kerala-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            border-left: 4px solid #c53030;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f6f9fc 0%, #e9f5f0 100%);
+            border-radius: 12px;
+            border: 2px dashed var(--kerala-green);
+        }
+
+        .preview-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Noto Sans Malayalam', sans-serif;
+        }
+
+        .symbols-horizontal {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .symbol-item {
+            flex: 1;
+            min-width: 150px;
+            max-width: 250px;
+            text-align: center;
+        }
+
+        .symbol-item img {
+            width: 100%;
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 0.75rem;
+        }
+
+        .symbol-item-local-body {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+
+        .symbol-item-name {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .symbol-count-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .symbols-horizontal {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .symbol-item {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo" />
+            </div>
+            <a href="create-slip.html" class="btn-back">← Back to Standard Slip</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-line" id="progressLine" style="width: 0%;"></div>
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Symbol Count</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Select Symbols</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Preview</div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <!-- Step 1: Select Number of Symbols -->
+            <div class="form-section active" id="step1">
+                <h2 class="form-title"><i class="fas fa-layer-group"></i> Multi-Symbol Slip</h2>
+                <p class="form-subtitle">Perfect for coalition campaigns - Add multiple symbols in one slip</p>
+
+                <div class="form-group">
+                    <label>
+                        How many symbols do you want to add?
+                        <span class="label-description">Choose 1-3 symbols for your coalition slip</span>
+                    </label>
+                    <div class="symbol-count-grid">
+                        <label class="count-option" onclick="selectSymbolCount(1)">
+                            <input type="radio" name="symbolCount" value="1" id="count1">
+                            <div class="count-number">1</div>
+                            <div class="count-label">Single Symbol</div>
+                        </label>
+                        <label class="count-option" onclick="selectSymbolCount(2)">
+                            <input type="radio" name="symbolCount" value="2" id="count2">
+                            <div class="count-number">2</div>
+                            <div class="count-label">Two Symbols</div>
+                        </label>
+                        <label class="count-option" onclick="selectSymbolCount(3)">
+                            <input type="radio" name="symbolCount" value="3" id="count3">
+                            <div class="count-number">3</div>
+                            <div class="count-label">Three Symbols</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="error-message" id="step1Error"></div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="location.href='create-slip.html'">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </button>
+                    <button class="btn btn-primary" onclick="proceedToStep2()">
+                        Next: Select Symbols <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Symbols and Local Bodies -->
+            <div class="form-section" id="step2">
+                <h2 class="form-title"><i class="fas fa-star"></i> Select Symbols</h2>
+                <p class="form-subtitle">Choose symbols and local body types for each position</p>
+                
+                <div id="symbolEntries"></div>
+                
+                <div class="error-message" id="step2Error"></div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="backToStep1()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="showPreview()">
+                        Preview Slip <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <div class="preview-title">
+                    നമ്മുടെ ചിഹ്നം
+                </div>
+                <div class="symbols-horizontal" id="symbolsPreview"></div>
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="hidePreview()">
+                        <i class="fas fa-edit"></i> Edit Symbols
+                    </button>
+                    <button class="btn btn-primary" onclick="proceedToExtraction()">
+                        Continue to Voter Extraction <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let symbolCount = 0;
+        let selectedSymbols = [];
+        let currentSymbolIndex = -1; // Track which symbol we're selecting
+
+        // Local body types in Malayalam
+        const localBodyTypes = [
+            'ഗ്രാമപഞ്ചായത്ത്',
+            'ബ്ലോക്ക് പഞ്ചായത്ത്',
+            'ജില്ലാ പഞ്ചായത്ത്',
+            'നഗരസഭ',
+            'കോർപ്പറേഷൻ'
+        ];
+
+        function selectSymbolCount(count) {
+            symbolCount = count;
+            
+            // Update visual selection
+            document.querySelectorAll('.count-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Check the radio button
+            document.getElementById('count' + count).checked = true;
+            
+            console.log('Symbol count selected:', symbolCount);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize symbol picker with callback
+            window.symbolPicker = initSymbolPicker(handleSymbolSelection);
+            trackPageView();
+        });
+
+        function proceedToStep2() {
+            if (symbolCount === 0) {
+                showError('step1Error', 'Please select the number of symbols');
+                return;
+            }
+            hideError('step1Error');
+            
+            // Generate symbol entry forms
+            generateSymbolEntries();
+            
+            // Update progress
+            document.getElementById('progressLine').style.width = '50%';
+            document.querySelector('.step[data-step="1"]').classList.remove('active');
+            document.querySelector('.step[data-step="1"]').classList.add('completed');
+            document.querySelector('.step[data-step="2"]').classList.add('active');
+            
+            // Show step 2, hide step 1
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        }
+
+        function generateSymbolEntries() {
+            const container = document.getElementById('symbolEntries');
+            container.innerHTML = '';
+            
+            // Initialize selectedSymbols array
+            selectedSymbols = new Array(symbolCount).fill(null);
+            
+            for (let i = 0; i < symbolCount; i++) {
+                const entry = document.createElement('div');
+                entry.className = 'symbol-entry';
+                entry.innerHTML = `
+                    <div class="symbol-entry-header">
+                        <i class="fas fa-star"></i>
+                        Symbol ${i + 1}
+                    </div>
+                    <div class="form-group">
+                        <label for="localBody${i}">Local Body Type / തദ്ദേശസ്വയംഭരണ സ്ഥാപനം</label>
+                        <select id="localBody${i}" class="local-body-select" data-index="${i}">
+                            <option value="">Select Local Body Type</option>
+                            ${localBodyTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Symbol / ചിഹ്നം</label>
+                        <button type="button" class="btn-choose-symbol" onclick="openSymbolPicker(${i})" id="chooseBtn${i}">
+                            <i class="fas fa-hand-pointer"></i>
+                            Choose Symbol
+                        </button>
+                        <div class="symbol-preview" id="preview${i}">
+                            <img id="previewImg${i}" src="" alt="">
+                            <div class="symbol-preview-info">
+                                <div class="symbol-preview-name" id="previewName${i}"></div>
+                                <div class="symbol-preview-malayalam" id="previewMalayalam${i}"></div>
+                            </div>
+                            <div class="symbol-preview-actions">
+                                <button type="button" class="btn-change-symbol" onclick="openSymbolPicker(${i})">
+                                    <i class="fas fa-sync-alt"></i> Change
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(entry);
+            }
+        }
+
+        function openSymbolPicker(index) {
+            currentSymbolIndex = index;
+            if (symbolPicker) {
+                symbolPicker.open();
+            }
+        }
+
+        function handleSymbolSelection(symbol) {
+            if (currentSymbolIndex === -1) return;
+
+            const localBodySelect = document.getElementById(`localBody${currentSymbolIndex}`);
+            const localBodyValue = localBodySelect.value;
+
+            // Store the selected symbol data
+            selectedSymbols[currentSymbolIndex] = {
+                localBodyType: localBodyValue,
+                symbolId: symbol._id,
+                symbolImage: symbol.imageUrl,
+                symbolName: symbol.name,
+                symbolNameMalayalam: symbol.nameMalayalam || symbol.name
+            };
+
+            // Update UI to show selected symbol
+            document.getElementById(`chooseBtn${currentSymbolIndex}`).style.display = 'none';
+            const preview = document.getElementById(`preview${currentSymbolIndex}`);
+            preview.classList.add('show');
+            document.getElementById(`previewImg${currentSymbolIndex}`).src = symbol.imageUrl;
+            document.getElementById(`previewName${currentSymbolIndex}`).textContent = symbol.name;
+            document.getElementById(`previewMalayalam${currentSymbolIndex}`).textContent = symbol.nameMalayalam || symbol.name;
+
+            console.log('Symbol selected for position', currentSymbolIndex + 1, ':', symbol);
+        }
+
+        function showPreview() {
+            // Validate all fields
+            console.log('Checking preview with symbolCount:', symbolCount);
+            console.log('Selected symbols array:', selectedSymbols);
+
+            for (let i = 0; i < symbolCount; i++) {
+                const localBody = document.getElementById(`localBody${i}`).value;
+                const symbolData = selectedSymbols[i];
+
+                console.log(`Symbol ${i + 1}: localBody=${localBody}, symbolData=`, symbolData);
+
+                if (!localBody) {
+                    showError('step2Error', `Please select local body type for Symbol ${i + 1}`);
+                    return;
+                }
+
+                if (!symbolData || !symbolData.symbolId) {
+                    showError('step2Error', `Please choose a symbol for Symbol ${i + 1}`);
+                    return;
+                }
+
+                // Update local body type in selected symbols array
+                selectedSymbols[i].localBodyType = localBody;
+            }
+
+            hideError('step2Error');
+
+            // Filter out null values and get only valid symbols
+            const validSymbols = selectedSymbols.filter(s => s && s.symbolId);
+            
+            console.log('Valid symbols for preview:', validSymbols);
+
+            // Generate preview
+            const previewContainer = document.getElementById('symbolsPreview');
+            previewContainer.innerHTML = '';
+
+            validSymbols.forEach(symbol => {
+                const symbolDiv = document.createElement('div');
+                symbolDiv.className = 'symbol-item';
+                symbolDiv.innerHTML = `
+                    <img src="${symbol.symbolImage}" alt="${symbol.symbolName}">
+                    <div class="symbol-item-local-body">${symbol.localBodyType}</div>
+                    <div class="symbol-item-name">${symbol.symbolNameMalayalam}</div>
+                `;
+                previewContainer.appendChild(symbolDiv);
+            });
+
+            // Update progress
+            document.getElementById('progressLine').style.width = '100%';
+            document.querySelector('.step[data-step="2"]').classList.remove('active');
+            document.querySelector('.step[data-step="2"]').classList.add('completed');
+            document.querySelector('.step[data-step="3"]').classList.add('active');
+
+            // Show preview
+            document.getElementById('previewSection').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hidePreview() {
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('progressLine').style.width = '50%';
+            document.querySelector('.step[data-step="2"]').classList.add('active');
+            document.querySelector('.step[data-step="2"]').classList.remove('completed');
+            document.querySelector('.step[data-step="3"]').classList.remove('active');
+        }
+
+        function backToStep1() {
+            document.getElementById('progressLine').style.width = '0%';
+            document.querySelector('.step[data-step="1"]').classList.add('active');
+            document.querySelector('.step[data-step="1"]').classList.remove('completed');
+            document.querySelector('.step[data-step="2"]').classList.remove('active');
+            
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+        }
+
+        function proceedToExtraction() {
+            // Filter out null values and get only valid symbols
+            const validSymbols = selectedSymbols.filter(s => s && s.symbolId);
+            
+            console.log('Proceeding to extraction with symbols:', validSymbols);
+            
+            // Store multi-symbol data in sessionStorage
+            sessionStorage.setItem('multiSymbolMode', 'true');
+            sessionStorage.setItem('multiSymbols', JSON.stringify(validSymbols));
+            
+            // Redirect to dedicated multi-symbol extraction page
+            window.location.href = 'multi-symbol-extract.html';
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.classList.remove('show');
+        }
+    </script>
+</body>
+</html>

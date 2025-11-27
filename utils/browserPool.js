@@ -233,7 +233,7 @@ class BrowserPool {
 
     try {
       const browser = await chromium.launch({
-        headless: true, // Headless mode for production
+        headless: false, // Show browser UI for debugging
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',

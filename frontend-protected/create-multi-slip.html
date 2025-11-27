@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Multi-Symbol Slip - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    
+    <!-- Preload critical API endpoint for instant district loading -->
+    <link rel="preconnect" href="/api">
+    <link rel="dns-prefetch" href="/api">
+    
+    <!-- Open Graph / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://easyslip.in/create-slip">
+    <meta property="og:title" content="Create Multi-Symbol Voter Slip - EasySlip | Kerala Elections">
+    <meta property="og:description" content="Generate professional voter slips for Kerala elections. All 14 districts covered. ₹0.50/voter. Instant PDF download.">
+    <meta property="og:image" content="https://easyslip.in/favicon/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:site_name" content="EasySlip">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="symbol-picker.js"></script>
+    <script src="activity-tracker.js"></script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){Tawk_API['minimize']();},(function(){var a=document['createElement']('script'),b=document['getElementsByTagName']('script')[0x0];a['async']=!![],a['src']='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh',a['charset']='UTF-8',a['setAttribute']('crossorigin','*'),b['parentNode']['insertBefore'](a,b);}());</script>
+<!--End of Tawk.to Script-->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G0M40G1DK1"></script>
+<script>window['dataLayer']=window['dataLayer']||[];function gtag(){dataLayer['push'](arguments);}gtag('js',new Date()),gtag('config','G-G0M40G1DK1');</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-cream);
+            color: #333;
+        }
+
+        /* Symbol-Free Mode Card Styles */
+        #noSymbolText #selectSymbolLink {
+            white-space: nowrap;
+        }
+        
+        #noSymbolText #selectSymbolLink:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            background: #f7fafc !important;
+        }
+
+        #noSymbolText #selectSymbolLink:active {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 640px) {
+            #noSymbolText > div > div > div:first-child {
+                flex-direction: row !important;
+                align-items: center !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                width: auto !important;
+                display: inline-block !important;
+                align-self: flex-end;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #noSymbolText > div > div {
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+            #noSymbolText #selectSymbolLink {
+                margin-left: 2rem;
+                flex-shrink: 0;
+            }
+        }
+
+        /* Header */
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 0.5em;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .logo img.app-logo { height:80px; width:auto; display:block; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+        .animated-logo { animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; }
+        @keyframes logoFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        @keyframes logoFade { 0% { opacity:0; transform:scale(0.9);} 100% { opacity:1; transform:scale(1);} }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 4px;
+            background: var(--kerala-gradient);
+            z-index: 1;
+            transition: width 0.3s;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #718096;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            border-color: var(--kerala-green);
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            border-color: var(--kerala-gold);
+            background: var(--kerala-gold);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .step.active .step-label {
+            color: var(--kerala-green);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            position: relative;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Multi-Symbol Count Options */
+        .symbol-count-option {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            margin: 0.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .symbol-count-option:hover {
+            border-color: var(--kerala-green);
+            box-shadow: 0 4px 12px rgba(0, 109, 59, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .symbol-count-option input[type="radio"] {
+            width: auto;
+            margin-right: 0.75rem;
+            cursor: pointer;
+        }
+
+        .symbol-count-option input[type="radio"]:checked + span {
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .symbol-count-option:has(input[type="radio"]:checked) {
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .label-description {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--kerala-green);
+            background: rgba(0, 109, 59, 0.05);
+        }
+
+        .file-upload-area.has-file {
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 1rem auto;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .symbol-selection-area {
+            border: 3px dashed var(--kerala-gold);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symbol-selection-area::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--kerala-green), var(--kerala-gold), var(--kerala-red));
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        #selectSymbolBtn {
+            background: var(--kerala-gradient) !important;
+            border: none !important;
+            padding: 1.5rem 3rem !important;
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4), 0 0 0 0 rgba(0, 109, 59, 0.5) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: pulse 2s ease-in-out infinite !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        #selectSymbolBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        #selectSymbolBtn::after {
+            content: '\26a1 CLICK HERE FIRST \26a1';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--kerala-red);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(224, 58, 62, 0.4);
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        #selectSymbolBtn:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(0, 109, 59, 0.5), 0 0 0 4px rgba(255, 184, 28, 0.3) !important;
+            animation: none !important;
+        }
+
+        #selectSymbolBtn:active {
+            transform: translateY(-1px) !important;
+        }
+
+        .symbol-preview {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 3px solid #48bb78;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
+        }
+
+        /* Slips per page option */
+        .slip-count-option {
+            transition: all 0.3s;
+        }
+
+        .slip-count-option:hover {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4;
+        }
+
+        .slip-count-option input[type="radio"]:checked + div {
+            color: var(--kerala-green);
+        }
+
+        .slip-count-option:has(input[type="radio"]:checked) {
+            border-color: var(--kerala-green) !important;
+            background: #f0fdf4;
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--kerala-green);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-link:hover {
+            color: var(--kerala-gold);
+            text-decoration: underline;
+        }
+
+        .polling-station-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .polling-station-checkbox:hover {
+            border-color: var(--kerala-green);
+            background: #f7fafc;
+        }
+
+        .polling-station-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .polling-station-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.95rem;
+            color: #2d3748;
+        }
+
+        .polling-station-checkbox.checked {
+            border-color: var(--kerala-gold);
+            background: rgba(255, 184, 28, 0.05);
+        }
+
+        .selected-count {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 245, 242, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 16px;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading.show {
+            display: flex;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .loading > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .loading > div:not(.spinner) {
+            background: #f5f5f2;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 109, 59, 0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-right: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loadingProgress {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Step 2 - Voter Extraction */
+        .voter-extraction-container {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .extraction-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .extraction-info p {
+            margin: 0;
+            color: #856404;
+        }
+
+        #captchaImage {
+            max-width: 200px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .voters-count {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .voters-count.show {
+            display: block;
+        }
+
+        .voters-count h3 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .btn-back {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .progress-steps {
+                font-size: 0.85rem;
+                gap: 0.5rem;
+            }
+
+            .step-circle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            input, select, textarea {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .step-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo animated-logo" />
+            </div>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-line" id="progressLine"></div>
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Customization</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Voter Data</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Preview & Payment</div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <!-- Step 1: Customization -->
+            <div class="form-section active" id="step1">
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
+                <p class="form-subtitle">Upload your symbol and details (Required for slip generation)</p>
+
+                <div class="form-group">
+                    <label>
+                        Number of Symbols on Slip
+                        <span class="label-description">Select how many election symbols to display (for different local body levels)</span>
+                    </label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; max-width: 400px;">
+                        <label class="symbol-count-option" style="display: flex; flex-direction: column; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="symbolCount" value="2" checked style="margin-bottom: 0.5rem; width: 18px; height: 18px; cursor: pointer;" onchange="updateSymbolPickers()">
+                            <div style="text-align: center;">
+                                <div style="font-weight: 600; color: #2d3748;">2 Symbols</div>
+                                <small style="color: #718096;">Two levels</small>
+                            </div>
+                        </label>
+                        <label class="symbol-count-option" style="display: flex; flex-direction: column; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="symbolCount" value="3" style="margin-bottom: 0.5rem; width: 18px; height: 18px; cursor: pointer;" onchange="updateSymbolPickers()">
+                            <div style="text-align: center;">
+                                <div style="font-weight: 600; color: #2d3748;">3 Symbols</div>
+                                <small style="color: #718096;">Three levels</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="multiSymbolContainer">
+                    <label>
+                        Select Symbols & Local Bodies
+                        <span class="label-description"><i class="fas fa-exclamation-triangle"></i> Required: Choose symbols and their corresponding local body names</span>
+                    </label>
+                    <div id="symbolPickersContainer">
+                        <!-- Symbol pickers will be dynamically generated here -->
+                    </div>
+                    <div style="text-align:center; margin-top:1rem;">
+                        <a href="#" id="continueWithoutSymbol" style="color:#2c5282; text-decoration:underline; font-weight:600; cursor:pointer;">Continue without any symbols</a>
+                    </div>
+                    <div class="error-message" id="symbolError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Slips per Page
+                        <span class="label-description">Choose how many voter slips to print on each page</span>
+                    </label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px;">
+                        <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="slipsPerPage" value="5" checked style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748;">5 Slips</div>
+                                <small style="color: #718096;">Standard</small>
+                            </div>
+                        </label>
+                        <label class="slip-count-option" style="display: flex; align-items: center; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                            <input type="radio" name="slipsPerPage" value="6" style="margin-right: 0.75rem; width: 18px; height: 18px; cursor: pointer;">
+                            <div>
+                                <div style="font-weight: 600; color: #2d3748;">6 Slips</div>
+                                <small style="color: #718096;">Compact</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">Next: Select Local Body</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Create Voter Slip -->
+            <div class="form-section" id="step2">
+                <h2 class="form-title"><i class="fas fa-ticket-alt"></i> Create Voter Slip</h2>
+                <p class="form-subtitle">Select location and generate your customized voter slips</p>
+
+                            <div class="voter-extraction-container">
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <select id="district" required>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="localBody">Local Body</label>
+                        <select id="localBody" required disabled>
+                            <option value="">First select District</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ward">Ward</label>
+                        <select id="ward" required disabled>
+                            <option value="">First select Local Body</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>Polling Stations</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button type="button" class="btn-link" onclick="selectAllPS()" id="selectAllBtn" style="font-size: 0.85rem; display: none;">
+                                    <i class="fas fa-check"></i> Select All
+                                </button>
+                                <button type="button" class="btn-link" onclick="clearAllPS()" id="clearAllBtn" style="font-size: 0.85rem; display: none;">
+                                    ✗ Clear All
+                                </button>
+                            </div>
+                        </label>
+                        
+                        <!-- Multi-select checkbox list for polling stations -->
+                        <div id="pollingStationList" style="display: none; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; max-height: 300px; overflow-y: auto; background: #f8f9fa;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <p style="color: #718096; margin: 0; font-size: 0.9rem;">
+                                    <i class="fas fa-info-circle"></i> Select one or more polling stations to extract
+                                </p>
+                                <div class="polling-station-controls" style="display: none;">
+                                    <button type="button" class="btn-link" onclick="selectAllPS()" style="margin-right: 0.5rem;">Select All</button>
+                                    <button type="button" class="btn-link" onclick="clearAllPS()">Clear All</button>
+                                </div>
+                            </div>
+                            <div id="pollingStationCheckboxes">
+                                <!-- Checkboxes will be populated here -->
+                            </div>
+                            <div id="pollingStationEmpty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; color: #718096;">
+                                <i class="fas fa-map-marker-alt" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                                <p style="margin: 0;">No polling stations available</p>
+                            </div>
+                        </div>
+                        
+                     
+                    </div>
+
+                    <div class="form-group">
+                        <label>Captcha</label>
+                        <div style="position: relative; min-height: 80px;">
+                            <!-- Captcha Loader -->
+                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
+                                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
+                            </div>
+                            
+                            <!-- Captcha Image -->
+                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto;">
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
+                            <span id="loadCaptchaText">Load Captcha</span>
+                        </button>
+                        <input type="text" id="captcha" placeholder="Enter Captcha" style="margin-top: 1rem;">
+                        <div class="error-message" id="captchaError"></div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="createSlip()" id="extractBtn">
+                        <span id="extractBtnText"><i class="fas fa-ticket-alt"></i> Create Voter Slip</span>
+                    </button>
+
+                    <div class="voters-count" id="votersCount" style="display: none;">
+                        <p>Total Voters</p>
+                        <h3 id="voterCountNumber">0</h3>
+                    </div>
+                </div>
+
+                <div class="loading" id="extractionLoading" tabindex="-1" role="alert" aria-live="polite">
+                    <div>
+                        <div class="spinner"></div>
+                        <div>
+                            <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
+                            <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.4;">Please wait while we fetch the voter list from SEC portal</small>
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                                    <div style="text-align: left;">
+                                        <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.95rem;">Please stay on this page</strong>
+                                        <small style="font-size: 0.85rem; line-height: 1.3;">Do not minimize or close the browser window during extraction</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0, 0, 0, 0.08);">
+                                <small style="color: #999; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="loadingProgress">Step 1 of 2: Extracting data</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep(2)">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(2)" id="step2NextBtn" disabled style="display: none;">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Loading (will redirect to preview) -->
+            <div class="form-section" id="step3">
+                <div class="loading show">
+                    <div class="spinner"></div>
+                    <p>Creating order...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>let currentStep=0x1,selectedSymbol=null,symbolFreeMode=![],extractedVoters=[],sessionId='',allPollingStations=[],selectedStations=[];const token=localStorage['getItem']('token');let multiSymbolData=[],currentSymbolPickerIndex=-0x1;!token&&(sessionStorage['setItem']('redirectAfterLogin',window['location']['pathname']),window['location']['href']='login.html');function selectAllPS(){const a=document['querySelectorAll']('.ps-checkbox');a['forEach'](b=>{b['checked']=!![],b['closest']('.polling-station-checkbox')['classList']['add']('checked');}),updateSelectedStations();}function clearAllPS(){const a=document['querySelectorAll']('.ps-checkbox');a['forEach'](b=>{b['checked']=![],b['closest']('.polling-station-checkbox')['classList']['remove']('checked');}),updateSelectedStations();}function updateSelectedStations(){const a=document['querySelectorAll']('.ps-checkbox:checked');selectedStations=Array['from'](a)['map'](e=>{const f=parseInt(e['dataset']['index']);return allPollingStations[f];});const b=document['getElementById']('extractBtnText'),c=selectedStations['length'];b['textContent']='Create\x20Voter\x20Slip';const d=document['querySelector']('.selected-count');if(d)d['remove']();if(c>0x0){const e=document['getElementById']('pollingStationList');if(e){const f=document['createElement']('div');f['className']='selected-count',f['textContent']=c+'\x20station'+(c>0x1?'s':'')+'\x20selected',e['appendChild'](f);}}console['log']('Selected\x20stations:',c);}function togglePSCheckbox(a){const b=a['closest']('.polling-station-checkbox');a['checked']?b['classList']['add']('checked'):b['classList']['remove']('checked'),updateSelectedStations();}window['addEventListener']('DOMContentLoaded',()=>{window['symbolPicker']=initSymbolPicker(a=>{currentSymbolPickerIndex>=0x0&&(multiSymbolData[currentSymbolPickerIndex]['symbol']=a,updateSymbolPickerDisplay(currentSymbolPickerIndex)),document['getElementById']('symbolError')['classList']['remove']('show');}),updateSymbolPickers();});function updateSymbolPickers(){const a=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']),b=document['getElementById']('symbolPickersContainer');b['innerHTML']='',multiSymbolData=[];for(let c=0x0;c<a;c++){multiSymbolData['push']({'symbol':null,'localBodyName':''});const d='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22symbol-picker-item\x22\x20id=\x22symbolPicker'+c+'\x22\x20style=\x22margin-bottom:\x201.5rem;\x20padding:\x201.5rem;\x20border:\x202px\x20dashed\x20#e2e8f0;\x20border-radius:\x2012px;\x20background:\x20linear-gradient(135deg,\x20#fff9e6\x200%,\x20#fffbf0\x20100%);\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20gap:\x201rem;\x20margin-bottom:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20var(--kerala-green);\x20color:\x20white;\x20width:\x2032px;\x20height:\x2032px;\x20border-radius:\x2050%;\x20display:\x20flex;\x20align-items:\x20center;\x20justify-content:\x20center;\x20font-weight:\x20700;\x22>'+(c+0x1)+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20style=\x22margin:\x200;\x20color:\x20#2d3748;\x22>Symbol\x20'+(c+0x1)+'</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22symbol-preview\x22\x20id=\x22symbolPreview'+c+'\x22\x20style=\x22display:\x20none;\x20padding:\x201rem;\x20background:\x20white;\x20border-radius:\x208px;\x20border:\x202px\x20solid\x20#48bb78;\x20margin-bottom:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20gap:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20id=\x22symbolImage'+c+'\x22\x20src=\x22\x22\x20style=\x22width:\x2060px;\x20height:\x2060px;\x20object-fit:\x20contain;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22flex:\x201;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22symbolName'+c+'\x22\x20style=\x22font-weight:\x20600;\x20color:\x20#2d3748;\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22symbolNameMal'+c+'\x22\x20style=\x22font-family:\x20\x27Noto\x20Sans\x20Malayalam\x27;\x20color:\x20#FFB81C;\x20font-size:\x200.95rem;\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-sm\x20btn-secondary\x22\x20onclick=\x22openSymbolPicker('+c+')\x22\x20style=\x22padding:\x200.5rem\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-sync-alt\x22></i>\x20Change\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-primary\x22\x20id=\x22selectSymbolBtn'+c+'\x22\x20onclick=\x22openSymbolPicker('+c+')\x22\x20style=\x22width:\x20100%;\x20margin-bottom:\x201rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-hand-pointer\x22></i>\x20Select\x20Symbol\x20'+(c+0x1)+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22form-group\x22\x20style=\x22margin-bottom:\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20style=\x22font-weight:\x20600;\x20color:\x20#2d3748;\x20margin-bottom:\x200.5rem;\x20display:\x20block;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Local\x20Body\x20Type\x20(Malayalam)\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:\x20#e53e3e;\x20font-size:\x200.9rem;\x22>*</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<select\x20id=\x22localBodyName'+c+'\x22\x20class=\x22form-control\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22padding:\x200.75rem;\x20border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20font-family:\x20\x27Noto\x20Sans\x20Malayalam\x27,\x20sans-serif;\x20font-size:\x201rem;\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onchange=\x22updateLocalBodyName('+c+',\x20this.value)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22\x22>Select\x20local\x20body\x20type...</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22G\x22>ഗ്രാമപഞ്ചായത്ത്</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22B\x22>ബ്ലോക്ക്\x20പഞ്ചായത്ത്</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22D\x22>ജില്ലാ\x20പഞ്ചായത്ത്</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</select>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small\x20style=\x22color:\x20#718096;\x20margin-top:\x200.25rem;\x20display:\x20block;\x22>Select\x20the\x20local\x20body\x20level\x20type\x20(will\x20appear\x20below\x20the\x20symbol)</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';b['innerHTML']+=d;}}function openSymbolPicker(a){currentSymbolPickerIndex=a,window['symbolPicker']['open']();}function updateSymbolPickerDisplay(a){const b=multiSymbolData[a];b['symbol']&&(document['getElementById']('symbolImage'+a)['src']=b['symbol']['imageUrl'],document['getElementById']('symbolName'+a)['textContent']=b['symbol']['name'],document['getElementById']('symbolNameMal'+a)['textContent']=b['symbol']['nameMalayalam']||'',document['getElementById']('symbolPreview'+a)['style']['display']='block',document['getElementById']('selectSymbolBtn'+a)['style']['display']='none');}function updateLocalBodyName(a,value){const b={'G':'ഗ്രാമപഞ്ചായത്ത്','B':'ബ്ലോക്ക്\x20പഞ്ചായത്ത്','D':'ജില്ലാ\x20പഞ്ചായത്ത്'};multiSymbolData[a]['localBodyType']=value,multiSymbolData[a]['localBodyName']=b[value]||value;}function nextStep(a){if(a===0x1){if(!validateStep1())return;}else{if(a===0x2){if(extractedVoters['length']===0x0){alert('Please\x20extract\x20voter\x20data');return;}createOrder();return;}}document['querySelector']('.form-section.active')['classList']['remove']('active'),document['getElementById']('step'+(a+0x1))['classList']['add']('active'),document['querySelectorAll']('.step')['forEach'](b=>b['classList']['remove']('active','completed'));for(let b=0x1;b<a+0x1;b++){document['querySelector']('.step[data-step=\x22'+b+'\x22]')['classList']['add']('completed');}document['querySelector']('.step[data-step=\x22'+(a+0x1)+'\x22]')['classList']['add']('active'),updateProgressBar(a+0x1),currentStep=a+0x1,window['scrollTo'](0x0,0x0);}function prevStep(a){document['querySelector']('.form-section.active')['classList']['remove']('active'),document['getElementById']('step'+(a-0x1))['classList']['add']('active'),document['querySelectorAll']('.step')['forEach'](b=>b['classList']['remove']('active','completed'));for(let b=0x1;b<a-0x1;b++){document['querySelector']('.step[data-step=\x22'+b+'\x22]')['classList']['add']('completed');}document['querySelector']('.step[data-step=\x22'+(a-0x1)+'\x22]')['classList']['add']('active'),updateProgressBar(a-0x1),currentStep=a-0x1,window['scrollTo'](0x0,0x0);}function updateProgressBar(a){const b=(a-0x1)/0x2*0x64;document['getElementById']('progressLine')['style']['width']=b+'%';}function validateStep1(){let a=!![];document['querySelectorAll']('.error-message')['forEach'](c=>c['classList']['remove']('show'));if(symbolFreeMode)return!![];const b=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']);for(let c=0x0;c<b;c++){if(!multiSymbolData[c]){showError('symbolError','Please\x20select\x20Symbol\x20'+(c+0x1)+'\x20or\x20continue\x20without\x20any\x20symbols'),a=![];break;}if(!multiSymbolData[c]['symbol']){showError('symbolError','Please\x20select\x20Symbol\x20'+(c+0x1)+'\x20or\x20continue\x20without\x20any\x20symbols'),a=![];break;}if(!multiSymbolData[c]['localBodyType']||multiSymbolData[c]['localBodyType']['trim']()===''){showError('symbolError','Please\x20select\x20Local\x20Body\x20Type\x20for\x20Symbol\x20'+(c+0x1)),a=![];break;}}return a;}function showError(a,b){if(b!==undefined){const c=document['getElementById'](a);c?(c['textContent']=b,c['classList']['add']('show')):alert(b);}else{const captchaErrorElement=document['getElementById']('captchaError');captchaErrorElement?(captchaErrorElement['textContent']=a,captchaErrorElement['classList']['add']('show'),setTimeout(()=>captchaErrorElement['classList']['remove']('show'),0x1388)):alert(a);}}(async function initializeApp(){console['log']('🚀\x20Loading\x20districts\x20first\x20(highest\x20priority)...'),await loadDistricts(),console['log']('✅\x20Districts\x20loaded,\x20now\x20loading\x20captcha\x20in\x20background...'),loadCaptcha();}());async function loadDistricts(){try{console['log']('📡\x20Fetching\x20districts\x20from\x20database...');const a=await fetch('/api/getDistricts'),b=await a['json'](),select=document['getElementById']('district');b['status']==='success'&&b['districts']&&(console['log']('✅\x20Loaded\x20'+b['districts']['length']+'\x20districts'),b['districts']['forEach'](c=>{const d=document['createElement']('option');d['value']=c['value'],d['textContent']=c['text'],select['appendChild'](d);}));}catch(c){console['error']('❌\x20Error\x20loading\x20districts:',c),showError('Failed\x20to\x20load\x20districts.\x20Please\x20refresh\x20the\x20page.');}}document['getElementById']('district')['addEventListener']('change',async function(){const a=this['value'],b=document['getElementById']('localBody'),c=document['getElementById']('ward'),d=document['getElementById']('pollingStationList');b['innerHTML']='<option\x20value=\x22\x22>Loading...</option>',b['disabled']=!![],c['innerHTML']='<option\x20value=\x22\x22>Select\x20Ward</option>',c['disabled']=!![],d['style']['display']='none',selectedStations=[];try{const e=await fetch('/api/getLocalBodies',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'district_id':a})}),f=await e['json']();b['innerHTML']='<option\x20value=\x22\x22>Select\x20Local\x20Body</option>',f['status']==='success'&&f['local_bodies']&&f['local_bodies']['forEach'](g=>{const h=document['createElement']('option');h['value']=g['value'],h['textContent']=g['text'],b['appendChild'](h);}),b['disabled']=![];}catch(g){console['error']('Error\x20loading\x20local\x20bodies:',g),b['innerHTML']='<option\x20value=\x22\x22>Error\x20loading\x20data</option>';}}),document['getElementById']('localBody')['addEventListener']('change',async function(){const a=this['value'],b=document['getElementById']('ward'),c=document['getElementById']('pollingStationList');b['innerHTML']='<option\x20value=\x22\x22>Loading...</option>',b['disabled']=!![],c['style']['display']='none',selectedStations=[];try{const d=await fetch('/api/getWards',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'local_body_id':a})}),e=await d['json']();b['innerHTML']='<option\x20value=\x22\x22>Select\x20Ward</option>',e['status']==='success'&&e['wards']&&e['wards']['forEach'](f=>{const g=document['createElement']('option');g['value']=f['value'],g['textContent']=f['text'],b['appendChild'](g);}),b['disabled']=![];}catch(f){console['error']('Error\x20loading\x20wards:',f),b['innerHTML']='<option\x20value=\x22\x22>Error\x20loading\x20data</option>';}}),document['getElementById']('ward')['addEventListener']('change',async function(){const a=this['value'],b=document['getElementById']('pollingStationList'),c=document['getElementById']('pollingStationCheckboxes'),d=document['getElementById']('pollingStationEmpty'),e=document['querySelector']('.polling-station-controls');if(b)b['style']['display']='block';if(c)c['innerHTML']='<p\x20style=\x22text-align:center;padding:15px;color:#666;\x22>Loading...</p>';if(d)d['style']['display']='none';if(e)e['style']['display']='none';selectedStations=[];try{const f=await fetch('/api/getPollingStations',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'ward_id':a})}),g=await f['json']();if(g['status']==='success'&&g['polling_stations']&&g['polling_stations']['length']>0x0){allPollingStations=g['polling_stations'];c&&(c['innerHTML']='',allPollingStations['forEach']((h,i)=>{const j=document['createElement']('label');j['className']='polling-station-checkbox',j['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20class=\x22ps-checkbox\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22'+h['value']+'\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-index=\x22'+i+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-text=\x22'+h['text']+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onchange=\x22togglePSCheckbox(this)\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+h['text']+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',c['appendChild'](j);}));if(e)e['style']['display']='flex';if(d)d['style']['display']='none';console['log']('Loaded',allPollingStations['length'],'polling\x20stations');}else{if(c)c['innerHTML']='';if(d)d['style']['display']='flex';if(e)e['style']['display']='none';}}catch(h){console['error']('Error\x20loading\x20polling\x20stations:',h);if(c)c['innerHTML']='<p\x20style=\x22text-align:center;padding:15px;color:#e74c3c;\x22>Error\x20loading\x20polling\x20stations</p>';if(d)d['style']['display']='none';}});async function loadCaptcha(){try{document['getElementById']('captchaImage')['src']='',document['getElementById']('captchaImage')['style']['display']='none',document['getElementById']('captchaLoader')['style']['display']='block';const a=document['querySelector']('button[onclick=\x22loadCaptcha()\x22]'),b=document['getElementById']('loadCaptchaText');if(a)a['disabled']=!![];if(b)b['innerHTML']='<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Loading...';const c=await fetch('/api/initCaptchaSession');if(!c['ok'])throw new Error('HTTP\x20error!\x20status:\x20'+c['status']);const d=await c['json']();if(d['status']==='success'){sessionId=d['sessionId'],document['getElementById']('captchaLoader')['style']['display']='none',document['getElementById']('captchaImage')['src']=d['captchaUrl'],document['getElementById']('captchaImage')['style']['display']='block';if(b)b['innerHTML']='<i\x20class=\x22fas\x20fa-sync-alt\x22></i>\x20Refresh\x20Captcha';}else throw new Error(d['message']||'Failed\x20to\x20load\x20captcha');}catch(e){console['error']('Error\x20loading\x20captcha:',e),document['getElementById']('captchaLoader')['style']['display']='none',showError('Failed\x20to\x20load\x20captcha.\x20Please\x20try\x20again.');}finally{const f=document['querySelector']('button[onclick=\x22loadCaptcha()\x22]'),g=document['getElementById']('loadCaptchaText');if(f)f['disabled']=![];g&&g['innerHTML']['includes']('Loading')&&(g['innerHTML']='Load\x20Captcha');}}function parseVotersFromHTML(a){const b=[];let c=null;try{console['log']('🔍\x20Attempting\x20to\x20extract\x20Malayalam\x20polling\x20station\x20name\x20from\x20HTML...');const selectedOption=a['querySelector']('select[id*=\x22pollingStation\x22]\x20option[selected],\x20'+'select[name*=\x22pollingStation\x22]\x20option[selected],\x20'+'#view_voters_list_pollingStation\x20option[selected=\x22selected\x22]');selectedOption&&(c=selectedOption['textContent']['trim']()['replace'](/\s+/g,'\x20'),console['log']('✅\x20Found\x20polling\x20station\x20from\x20selected\x20option:',c));if(!c){const j=a['querySelector']('.chosen-container\x20.chosen-single\x20span,\x20.chosen-single\x20span');if(j){const text=j['textContent']['trim']()['replace'](/\s+/g,'\x20');console['log']('🔍\x20Found\x20chosen-single\x20span\x20text:',text),text&&text!=='--\x20തിരഞ്ഞെടുക്കുക\x20--'&&text!=='Select'&&text!=='--'&&!text['startsWith']('--')&&(c=text,console['log']('✅\x20Found\x20polling\x20station\x20from\x20Chosen\x20dropdown:',c));}else console['log']('⚠️\x20No\x20chosen-single\x20span\x20found');}if(!c){const k=a['querySelector']('.chosen-results\x20li.result-selected,\x20.chosen-results\x20li.active-result.result-selected');if(k){const text=k['textContent']['trim']()['replace'](/\s+/g,'\x20');console['log']('🔍\x20Found\x20result-selected\x20text:',text),text&&text!=='--\x20തിരഞ്ഞെടുക്കുക\x20--'&&text!=='Select'&&text!=='--'&&!text['startsWith']('--')&&(c=text,console['log']('✅\x20Found\x20polling\x20station\x20from\x20chosen-results:',c));}}if(!c){const l=a['querySelectorAll']('.breadcrumb\x20li,\x20.page-title,\x20h1,\x20h2,\x20h3');console['log']('🔍\x20Searching\x20in',l['length'],'header\x20elements');for(const m of l){const text=m['textContent']['trim']();if(text['includes']('പോളിംഗ്')||text['includes']('പോളിങ്')||text['includes']('സ്റ്റേഷൻ')){c=text,console['log']('✅\x20Found\x20Malayalam\x20polling\x20station\x20name\x20from\x20page\x20header:',c);break;}}}!c&&(console['warn']('❌\x20Could\x20not\x20find\x20Malayalam\x20polling\x20station\x20name\x20in\x20HTML'),console['log']('🔍\x20HTML\x20structure\x20of\x20polling\x20station\x20dropdown:',a['querySelector']('select[id*=\x22pollingStation\x22]')?.['outerHTML']?.['substring'](0x0,0x1f4)||'Not\x20found'));}catch(n){console['error']('❌\x20Error\x20extracting\x20polling\x20station\x20name\x20from\x20HTML:',n);}const d=new Set(['കൂട്ടിച്ചേർക്കലുകൾ','തിരുത്തലുകൾ','പ്രവാസി\x20വോട്ടർപട്ടിക']),f='ഒഴിവാക്കലുകൾ';let g=null,h=![];const selectors=['#view_voters_list_voters_tbody\x20tr','tbody#view_voters_list_voters_tbody\x20tr','table.table-bordered\x20tbody\x20tr','table.table\x20tbody\x20tr','tbody.voters-list\x20tr','tbody\x20tr','table\x20tr','.voter-row','tr'];let i=[];for(const selector of selectors){const o=a['querySelectorAll'](selector);console['log']('Trying\x20selector\x20\x22'+selector+'\x22:\x20found\x20'+o['length']+'\x20rows');if(o['length']>0x0){i=Array['from'](o),console['log']('✅\x20Using\x20selector:\x20'+selector+'\x20('+i['length']+'\x20rows)');const voterTbody=a['querySelector']('#view_voters_list_voters_tbody');console['log']('Voter\x20tbody\x20exists?',!!voterTbody);voterTbody&&console['log']('Voter\x20tbody\x20rows:',voterTbody['querySelectorAll']('tr')['length']);const p=a['querySelectorAll']('tbody');console['log']('Total\x20tbody\x20elements:',p['length']),p['forEach']((tbody,q)=>{console['log']('Tbody\x20'+q+':\x20id=\x22'+tbody['id']+'\x22,\x20class=\x22'+tbody['className']+'\x22,\x20rows='+tbody['querySelectorAll']('tr')['length']);});break;}}return i['forEach']((q,r)=>{if(h)return;const s=q['querySelector']('h3');if(s){const y=s['textContent']['trim'](),z=y['replace'](/\s+/g,'\x20')['trim']();console['log']('Section\x20header\x20detected:',z);if(z['startsWith'](f)){h=!![],console['log']('Stopping\x20parse\x20after\x20deletions\x20section\x20header');return;}d['has'](z)?(g=z,console['log']('Entering\x20included\x20section:',z)):(g='__EXCLUDE__',console['log']('Entering\x20non-included\x20section,\x20rows\x20will\x20be\x20skipped\x20until\x20next\x20included\x20section'));return;}const t=q['querySelectorAll']('td');console['log']('Row\x20'+r+':\x20Found\x20'+t['length']+'\x20columns',t['length']>0x0?Array['from'](t)['map'](A=>A['textContent']['trim']()['substring'](0x0,0x14)):'empty');if(t['length']===0x0)return;const u=g===null,v=g&&g!=='__EXCLUDE__';if(!(u||v)){console['log']('Row\x20'+r+':\x20Skipping\x20-\x20not\x20in\x20base\x20list\x20or\x20included\x20section');return;}let w=null;if(t['length']===0x7)w={'sl_no':t[0x0]['textContent']['trim'](),'name':t[0x1]['textContent']['trim'](),'guardian_name':t[0x2]['textContent']['trim'](),'house_no':t[0x3]['textContent']['trim'](),'house_name':t[0x4]['textContent']['trim'](),'gender_age':t[0x5]['textContent']['trim'](),'sec_id':t[0x6]['textContent']['trim']()};else{if(t['length']===0x6)w={'sl_no':t[0x0]['textContent']['trim'](),'name':t[0x1]['textContent']['trim'](),'guardian_name':t[0x2]['textContent']['trim'](),'house_no':'','house_name':t[0x3]['textContent']['trim'](),'gender_age':t[0x4]['textContent']['trim'](),'sec_id':t[0x5]['textContent']['trim']()};else t['length']>=0x4&&(w={'sl_no':t[0x0]['textContent']['trim'](),'name':t[0x1]['textContent']['trim'](),'guardian_name':t[0x2]?t[0x2]['textContent']['trim']():'','house_no':'','house_name':t[0x3]?t[0x3]['textContent']['trim']():'','gender_age':'','sec_id':Array['from'](t)['slice'](0x4)['map'](A=>A['textContent']['trim']())['join']('\x20|\x20')});}if(!w)return;const x=w['name']['toUpperCase']();if(x['includes']('DELETED')||x['includes']('SHIFTED')){console['log']('Row\x20'+r+':\x20Skipping\x20-\x20contains\x20DELETED\x20or\x20SHIFTED');return;}w['name']||w['sec_id']?(console['log']('Row\x20'+r+':\x20✅\x20Valid\x20voter\x20-\x20'+w['name']),b['push'](w)):console['log']('Row\x20'+r+':\x20❌\x20Invalid\x20-\x20no\x20name\x20or\x20sec_id');}),console['log']('Parsed\x20'+b['length']+'\x20filtered\x20voters\x20from\x20HTML'),{'voters':b,'pollingStationName':c};}async function createSlip(){const a=document['getElementById']('district')['value'],b=document['getElementById']('localBody')['value'],c=document['getElementById']('ward')['value'],d='M';if(selectedStations['length']>0x1){await extractStationsSequentially();return;}const e=selectedStations['length']===0x1?selectedStations[0x0]['value']:null,f=selectedStations['length']===0x1?selectedStations[0x0]['text']:null,g=document['getElementById']('captcha')['value']['trim']();console['log']('📍\x20Polling\x20Station\x20Value:',e),console['log']('📍\x20Polling\x20Station\x20Malayalam\x20Text:',f);if(!a||!b||!c||!e||!g){showError('captchaError','Please\x20select\x20at\x20least\x20one\x20polling\x20station\x20and\x20fill\x20all\x20fields');return;}if(!sessionId){showError('captchaError','Captcha\x20session\x20expired.\x20Please\x20refresh\x20the\x20page.');return;}if(!symbolFreeMode){const j=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']);let k=!![],l=!![];for(let m=0x0;m<j;m++){if(!multiSymbolData[m]||!multiSymbolData[m]['symbol']){k=![];break;}if(!multiSymbolData[m]['localBodyType']||multiSymbolData[m]['localBodyType']['trim']()===''){l=![];break;}}if(!k){showError('captchaError','Please\x20go\x20back\x20to\x20Step\x201\x20and\x20select\x20all\x20symbols\x20(or\x20continue\x20without\x20symbols)');return;}if(!l){showError('captchaError','Please\x20go\x20back\x20to\x20Step\x201\x20and\x20select\x20local\x20body\x20types\x20for\x20all\x20symbols');return;}}document['getElementById']('extractBtn')['disabled']=!![];const h=document['getElementById']('extractionLoading');h['classList']['add']('show'),setTimeout(()=>{h['focus']();const n=h['getBoundingClientRect'](),o=window['innerHeight'];(n['top']<0x0||n['bottom']>o)&&h['scrollIntoView']({'behavior':'smooth','block':'center'});},0x64),document['getElementById']('loadingMainText')['textContent']='Fetching\x20voter\x20data...',document['getElementById']('loadingSubText')['textContent']='Please\x20wait\x20while\x20we\x20fetch\x20the\x20voter\x20list';try{const n=await fetch('/api/submitWithCaptcha',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'sessionId':sessionId,'district':a,'local_body':b,'ward':c,'polling_station':e,'language':d,'captcha':g})}),o=await n['json']();if(o['status']==='success'&&o['html']){const p=new DOMParser(),q=p['parseFromString'](o['html'],'text/html');console['log']('🔍\x20HTML\x20response\x20length:',o['html']['length']),console['log']('🔍\x20HTML\x20contains\x20\x22pollingStation\x22?',o['html']['includes']('pollingStation')),console['log']('🔍\x20HTML\x20contains\x20\x22പോളിംഗ്\x22?',o['html']['includes']('പോളിംഗ്'));const r=parseVotersFromHTML(q);extractedVoters=r['voters'];const s=o['pollingStationMalayalam']||(selectedStations['length']===0x1?selectedStations[0x0]['text']:null)||null;console['log']('🔍\x20Parse\x20result\x20pollingStationName\x20from\x20HTML:',r['pollingStationName']),console['log']('✅\x20API\x20response\x20Malayalam\x20name:',o['pollingStationMalayalam']),console['log']('✅\x20Frontend\x20dropdown\x20text\x20(fallback):',selectedStations['length']===0x1?selectedStations[0x0]['text']:null),console['log']('✅\x20Final\x20Malayalam\x20polling\x20station\x20name:',s),console['log']('🔍\x20Parse\x20result:',r),console['log']('🔍\x20Extracted\x20Malayalam\x20polling\x20station\x20name:',s),console['log']('🔍\x20Type\x20of\x20malayalamPollingStationName:',typeof s),console['log']('🔍\x20Sample\x20voter\x20before\x20adding\x20station\x20name:',extractedVoters[0x0]);s?(console['log']('✅\x20Adding\x20Malayalam\x20polling\x20station\x20name\x20to\x20voters:',s),extractedVoters=extractedVoters['map'](z=>({...z,'polling_station_name':s})),console['log']('✅\x20Sample\x20voter\x20after\x20adding\x20station\x20name:',extractedVoters[0x0])):(console['warn']('⚠️\x20No\x20Malayalam\x20polling\x20station\x20name\x20found\x20in\x20HTML\x20response!'),console['log']('⚠️\x20Will\x20use\x20fallback\x20polling\x20station\x20name\x20from\x20location\x20data'));if(extractedVoters['length']===0x0){document['getElementById']('extractionLoading')['classList']['remove']('show'),document['getElementById']('extractBtn')['disabled']=![],showError('captchaError','No\x20voters\x20found.\x20Please\x20check\x20your\x20selection\x20and\x20try\x20again.'),setTimeout(()=>loadCaptcha(),0x3e8);return;}document['getElementById']('loadingMainText')['textContent']='Found\x20'+extractedVoters['length']+'\x20voters',document['getElementById']('loadingSubText')['textContent']='Creating\x20your\x20order...';const t=parseInt(document['querySelector']('input[name=\x22slipsPerPage\x22]:checked')['value']),u=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']);console['log']('🎫\x20Slips\x20per\x20page\x20selected:',t),console['log']('🎯\x20Symbol\x20count:',u);let v;if(symbolFreeMode)v={'symbolFree':!![],'slipsPerPage':t};else{v={'multiSymbol':!![],'symbolCount':u,'symbols':multiSymbolData['slice'](0x0,u)['map'](A=>({'symbolId':A['symbol']['_id'],'symbolImage':A['symbol']['imageUrl'],'symbolName':A['symbol']['name'],'symbolNameMalayalam':A['symbol']['nameMalayalam']||'','localBodyType':A['localBodyType']})),'slipsPerPage':t};const z=document['getElementById']('localBody')['options'][document['getElementById']('localBody')['selectedIndex']]['text'];let selectedLocalBodyType='G';if(z){const A=z['trim']()['charAt'](0x0)['toUpperCase']();(A==='G'||A==='M'||A==='C')&&(selectedLocalBodyType=A);}console['log']('📍\x20Selected\x20local\x20body:\x20\x22'+z+'\x22'),console['log']('🏛️\x20Detected\x20local\x20body\x20type:\x20'+selectedLocalBodyType+'\x20('+(selectedLocalBodyType==='G'?'Grama\x20Panchayat':selectedLocalBodyType==='M'?'Municipality':'Corporation')+')'),extractedVoters=extractedVoters['map'](B=>({...B,'local_body_type':selectedLocalBodyType})),console['log']('✅\x20Assigned\x20local_body_type\x20\x22'+selectedLocalBodyType+'\x22\x20to\x20'+extractedVoters['length']+'\x20voters');}const w={'customization':v,'location':{'district':document['getElementById']('district')['options'][document['getElementById']('district')['selectedIndex']]['text'],'localBody':document['getElementById']('localBody')['options'][document['getElementById']('localBody')['selectedIndex']]['text'],'ward':document['getElementById']('ward')['options'][document['getElementById']('ward')['selectedIndex']]['text'],'pollingStation':selectedStations['length']===0x1?selectedStations[0x0]['text']:'Single\x20Polling\x20Station','pollingStationMalayalam':s||null},'voters':extractedVoters,'voterCount':extractedVoters['length']};console['log']('📦\x20Order\x20data\x20being\x20sent:',w);const x=await fetch('/api/orders/create',{'method':'POST','headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+token},'body':JSON['stringify'](w)}),y=await x['json']();if(y['status']==='success')document['getElementById']('loadingMainText')['innerHTML']='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!\x20Order\x20created\x20with\x20'+extractedVoters['length']+'\x20voters',document['getElementById']('loadingSubText')['textContent']='Redirecting\x20to\x20preview...',setTimeout(()=>{window['location']['href']='preview.html?orderId='+y['order']['orderId'];},0x5dc);else throw new Error(y['message']||'Failed\x20to\x20create\x20order');}else{if(o['errorType']==='SEC_WEBSITE_ERROR'){document['getElementById']('extractionLoading')['classList']['remove']('show'),document['getElementById']('extractBtn')['disabled']=![];const B=o['customErrorTitle']||'SEC\x20Website\x20Unavailable',C=o['customErrorMessage']||o['message'];Swal['fire']({'icon':'error','title':B,'html':'<p>'+C+'</p>'+'<p\x20class=\x22text-muted\x20mt-2\x22\x20style=\x22font-size:\x200.9em;\x22>The\x20Kerala\x20State\x20Election\x20Commission\x20website\x20is\x20currently\x20down\x20or\x20experiencing\x20issues.\x20This\x20is\x20beyond\x20our\x20control.</p>'+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':'#3085d6','allowOutsideClick':![]})['then'](()=>{loadCaptcha();});}else{const D=o['message']||'Extraction\x20failed.\x20Please\x20check\x20your\x20captcha\x20and\x20try\x20again.';showError('captchaError',D);}}}catch(E){console['error']('Create\x20slip\x20error:',E);const F=E['message']||'Failed\x20to\x20create\x20slip.\x20Please\x20try\x20again.';showError('captchaError',F),setTimeout(()=>loadCaptcha(),0x3e8);}finally{document['getElementById']('extractBtn')['disabled']=![],document['getElementById']('extractionLoading')['classList']['remove']('show');}}async function extractStationsSequentially(){if(!symbolFreeMode){const l=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']);let m=!![],n=!![];for(let o=0x0;o<l;o++){if(!multiSymbolData[o]||!multiSymbolData[o]['symbol']){m=![];break;}if(!multiSymbolData[o]['localBodyType']||multiSymbolData[o]['localBodyType']['trim']()===''){n=![];break;}}if(!m){showError('captchaError','Please\x20select\x20all\x20symbols\x20before\x20extracting\x20(or\x20continue\x20without\x20symbols)');return;}if(!n){showError('captchaError','Please\x20select\x20local\x20body\x20types\x20for\x20all\x20symbols\x20before\x20extracting');return;}}if(selectedStations['length']===0x0){showError('captchaError','Please\x20select\x20at\x20least\x20one\x20polling\x20station');return;}const a=document['getElementById']('district')['value'],b=document['getElementById']('localBody')['value'],c=document['getElementById']('ward')['value'],d='M';document['getElementById']('extractBtn')['disabled']=!![];const e=document['getElementById']('extractionLoading');e['classList']['add']('show'),setTimeout(()=>{e['focus']();const p=e['getBoundingClientRect'](),q=window['innerHeight'];(p['top']<0x0||p['bottom']>q)&&e['scrollIntoView']({'behavior':'smooth','block':'center'});},0x64);let f=[],g=0x0,h=[],j=0x0;console['log']('🚀\x20Starting\x20sequential\x20extraction\x20for\x20'+selectedStations['length']+'\x20Polling\x20Stations');const k=async p=>{if(p>=selectedStations['length'])return finializeExtraction(f,g,h);const q=selectedStations[p];document['getElementById']('loadingMainText')['textContent']='Station\x20'+(p+0x1)+'\x20of\x20'+selectedStations['length'],document['getElementById']('loadingSubText')['textContent']=q['text'];try{let r,s;if(p===0x0){console['log']('🚀\x20Extracting\x20first\x20station\x20with\x20main\x20page\x20captcha...');const v=document['getElementById']('captcha')['value']['trim']();if(!v)return h['push']({'station':q['text'],'reason':'Captcha\x20not\x20entered'}),k(p+0x1);r=v,s=sessionId;}else{console['log']('📋\x20Station\x20'+(p+0x1)+':\x20Loading\x20new\x20captcha\x20session...');const w=await loadCaptchaForBulk();if(!w)return h['push']({'station':q['text'],'reason':'Failed\x20to\x20load\x20captcha'}),k(p+0x1);s=window['currentSessionId'],r=await showCaptchaDialog(q['text'],p+0x1,selectedStations['length']);if(!r)return h['push']({'station':q['text'],'reason':'Cancelled\x20by\x20user'}),k(p+0x1);}console['log']('🔄\x20Submitting\x20captcha\x20for\x20station\x20'+(p+0x1)+'...');const t=await fetch('/api/submitWithCaptcha',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'sessionId':s,'district':a,'local_body':b,'ward':c,'polling_station':q['value'],'language':d,'captcha':r})}),u=await t['json']();if(u['status']==='success'&&u['html']){const x=new DOMParser(),y=x['parseFromString'](u['html'],'text/html'),z=parseVotersFromHTML(y),A=z['voters'],B=z['pollingStationName'];if(A['length']>0x0){const C=A['map'](D=>({...D,'polling_station_name':B||q['text'],'polling_station_value':q['value']}));f=f['concat'](C),g++,console['log']('✅\x20Station\x20'+(p+0x1)+'\x20('+q['text']+'):\x20'+A['length']+'\x20voters\x20extracted');}else h['push']({'station':q['text'],'reason':'No\x20voters\x20found'});}else{if(u['errorType']==='SEC_WEBSITE_ERROR'){const D=u['customErrorTitle']||'SEC\x20Website\x20Unavailable',E=u['customErrorMessage']||u['message'];Swal['fire']({'icon':'error','title':D,'html':'<p>'+E+'</p>'+'<p\x20class=\x22text-muted\x20mt-2\x22\x20style=\x22font-size:\x200.9em;\x22>The\x20Kerala\x20State\x20Election\x20Commission\x20website\x20is\x20currently\x20down\x20or\x20experiencing\x20issues.\x20This\x20is\x20beyond\x20our\x20control.</p>'+'<p\x20class=\x22text-muted\x20mt-1\x22\x20style=\x22font-size:\x200.9em;\x22>Please\x20try\x20again\x20after\x20some\x20time.</p>','confirmButtonText':'OK','confirmButtonColor':'#3085d6','allowOutsideClick':![]})['then'](()=>{document['getElementById']('extractBtn')['disabled']=![],document['getElementById']('extractionLoading')['classList']['remove']('show');});return;}else h['push']({'station':q['text'],'reason':u['message']||'Extraction\x20failed'});}}catch(F){console['error']('❌\x20Error\x20extracting\x20station\x20'+(p+0x1)+':',F),h['push']({'station':q['text'],'reason':F['message']});}return k(p+0x1);};await k(0x0);}async function finializeExtraction(a,b,c){document['getElementById']('loadingMainText')['textContent']='Extraction\x20Complete!',document['getElementById']('loadingSubText')['textContent']=b+'/'+selectedStations['length']+'\x20stations\x20successful,\x20'+a['length']+'\x20total\x20voters';if(a['length']===0x0){showError('captchaError','No\x20voters\x20extracted\x20from\x20any\x20polling\x20station'),document['getElementById']('extractBtn')['disabled']=![],document['getElementById']('extractionLoading')['classList']['remove']('show');return;}extractedVoters=a;if(c['length']>0x0){console['warn']('⚠️\x20Failed\x20stations:',c);const d=c['map'](g=>'•\x20'+g['station']+':\x20'+g['reason'])['join']('\x0a'),e='⚠️\x20'+c['length']+'\x20polling\x20station(s)\x20failed:\x0a\x0a'+d+'\x0a\x0aProceeding\x20with\x20'+a['length']+'\x20voters\x20from\x20'+b+'\x20successful\x20station(s).',f=document['createElement']('div');f['style']['cssText']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20width:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,\x200,\x200,\x200.7);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(5px);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010001;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x202rem;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',f['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202.5rem;\x20border-radius:\x2016px;\x20max-width:\x20500px;\x20width:\x20100%;\x20box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.3);\x20border-top:\x204px\x20solid\x20#ff9800;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x203rem;\x20color:\x20#ff9800;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22color:\x20#ff9800;\x20margin-bottom:\x201rem;\x20text-align:\x20center;\x20font-size:\x201.3rem;\x22>Partial\x20Extraction</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22color:\x20#666;\x20white-space:\x20pre-line;\x20line-height:\x201.6;\x20margin-bottom:\x201.5rem;\x20font-size:\x200.95rem;\x22>'+e+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x200.75rem;\x20flex-direction:\x20column;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove()\x22\x20style=\x22width:\x20100%;\x20background:\x20var(--kerala-green);\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check\x22></i>\x20Continue\x20with\x20'+a['length']+'\x20Voters\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22this.closest(\x27[style*=\x5c\x27position:\x20fixed\x5c\x27]\x27).remove();\x20document.getElementById(\x27extractionLoading\x27).classList.remove(\x27show\x27);\x20document.getElementById(\x27extractBtn\x27).disabled\x20=\x20false;\x20window.scrollTo({\x20top:\x200,\x20behavior:\x20\x27smooth\x27\x20});\x22\x20style=\x22width:\x20100%;\x20background:\x20#718096;\x20color:\x20white;\x20padding:\x201rem;\x20border:\x20none;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20font-weight:\x20600;\x20cursor:\x20pointer;\x20transition:\x20all\x200.3s;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-redo\x22></i>\x20Retry\x20Extraction\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body']['appendChild'](f);}setTimeout(async()=>{document['getElementById']('loadingMainText')['textContent']='Creating\x20order...',document['getElementById']('loadingSubText')['textContent']=a['length']+'\x20voters\x20from\x20'+b+'\x20polling\x20stations';try{const g=selectedStations['length']>0x1?selectedStations['length']+'\x20Polling\x20Stations':selectedStations[0x0]['text'],h=parseInt(document['querySelector']('input[name=\x22slipsPerPage\x22]:checked')['value']),i=parseInt(document['querySelector']('input[name=\x22symbolCount\x22]:checked')['value']);let j;symbolFreeMode?j={'symbolFree':!![],'slipsPerPage':h}:j={'multiSymbol':!![],'symbolCount':i,'symbols':multiSymbolData['map'](n=>({'symbolId':n['symbol']['_id'],'symbolImage':n['symbol']['imageUrl'],'symbolName':n['symbol']['name'],'symbolNameMalayalam':n['symbol']['nameMalayalam']||'','localBodyType':n['localBodyType']})),'slipsPerPage':h};const k={'customization':j,'location':{'district':document['getElementById']('district')['options'][document['getElementById']('district')['selectedIndex']]['text'],'localBody':document['getElementById']('localBody')['options'][document['getElementById']('localBody')['selectedIndex']]['text'],'ward':document['getElementById']('ward')['options'][document['getElementById']('ward')['selectedIndex']]['text'],'pollingStation':g},'voters':a,'voterCount':a['length']},l=await fetch('/api/orders/create',{'method':'POST','headers':{'Content-Type':'application/json','Authorization':'Bearer\x20'+token},'body':JSON['stringify'](k)}),m=await l['json']();if(m['status']==='success')document['getElementById']('loadingMainText')['innerHTML']='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success!',document['getElementById']('loadingSubText')['textContent']='Redirecting\x20to\x20preview...',setTimeout(()=>{window['location']['href']='preview.html?orderId='+m['order']['orderId'];},0x5dc);else throw new Error(m['message']||'Failed\x20to\x20create\x20order');}catch(n){console['error']('Order\x20creation\x20error:',n),showError('captchaError',n['message']||'Failed\x20to\x20create\x20order'),document['getElementById']('extractBtn')['disabled']=![],document['getElementById']('extractionLoading')['classList']['remove']('show');}},0x7d0);}async function loadCaptchaForBulk(){try{const a=await fetch('/api/initCaptchaSession');if(!a['ok'])throw new Error('HTTP\x20error!\x20status:\x20'+a['status']);const b=await a['json']();if(b['status']==='success')return sessionId=b['sessionId'],window['currentSessionId']=b['sessionId'],window['currentCaptchaImage']=b['captchaUrl'],console['log']('✅\x20New\x20captcha\x20session\x20loaded:\x20'+b['sessionId']),!![];return![];}catch(c){return console['error']('Error\x20loading\x20captcha:',c),![];}}function showCaptchaDialog(a,b,c){return new Promise(d=>{const e=document['createElement']('div');e['style']['cssText']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20top:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20left:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20right:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20bottom:\x200;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,0,0,0.8);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x2010000;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',e['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20white;\x20padding:\x202rem;\x20border-radius:\x2012px;\x20max-width:\x20500px;\x20width:\x2090%;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20style=\x22margin:\x200\x200\x201rem\x200;\x20color:\x20#2d3748;\x22>Station\x20'+b+'\x20of\x20'+c+'</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x200\x200\x201.5rem\x200;\x20color:\x20#718096;\x20font-size:\x200.95rem;\x22>'+a+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20padding:\x201rem;\x20margin-bottom:\x201.5rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22'+window['currentCaptchaImage']+'\x22\x20alt=\x22Captcha\x22\x20style=\x22max-width:\x20100%;\x20height:\x20auto;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22bulkCaptchaInput\x22\x20placeholder=\x22Enter\x20Captcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.75rem;\x20border:\x202px\x20solid\x20#e2e8f0;\x20border-radius:\x208px;\x20font-size:\x201rem;\x20margin-bottom:\x201.5rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22submitBulkCaptcha\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x20100%;\x20padding:\x200.875rem;\x20background:\x20linear-gradient(135deg,\x20#006d3b\x200%,\x20#004d2a\x20100%);\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20cursor:\x20pointer;\x20font-weight:\x20600;\x20font-size:\x201.05rem;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x201rem\x200\x200\x200;\x20color:\x20#718096;\x20font-size:\x200.85rem;\x20text-align:\x20center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Press\x20Enter\x20to\x20continue\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['body']['appendChild'](e);const f=e['querySelector']('#bulkCaptchaInput'),submitBtn=e['querySelector']('#submitBulkCaptcha');f['focus']();const submit=()=>{const value=f['value']['trim']();document['body']['removeChild'](e),d(value||null);};submitBtn['onclick']=submit,f['addEventListener']('keypress',g=>{if(g['key']==='Enter')submit();});});}async function createOrder(){const a=parseInt(document['querySelector']('input[name=\x22slipsPerPage\x22]:checked')['value']),b={'customization':symbolFreeMode?{'symbolFree':!![],'slipsPerPage':a}:{'symbolId':selectedSymbol['_id'],'symbolImage':selectedSymbol['imageUrl'],'symbolName':selectedSymbol['name'],'symbolNameMalayalam':selectedSymbol['nameMalayalam']||'','slipsPerPage':a},'location':{'district':document['getElementById']('district')['options'][document['getElementById']('district')['selectedIndex']]['text'],'localBody':document['getElementById']('localBody')['options'][document['getElementById']('localBody')['selectedIndex']]['text'],'ward':document['getElementById']('ward')['options'][document['getElementById']('ward')['selectedIndex']]['text'],'pollingStation':document['getElementById']('pollingStation')['options'][document['getElementById']('pollingStation')['selectedIndex']]['text']},'voters':extractedVoters};try{const c=await fetch('/api/orders/create',{'method':'POST','headers':{'Authorization':'Bearer\x20'+token,'Content-Type':'application/json'},'body':JSON['stringify'](b)}),d=await c['json']();if(c['ok'])window['location']['href']='preview.html?orderId='+d['order']['_id'];else throw new Error(d['message']||'ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല');}catch(e){console['error']('Order\x20creation\x20error:',e),alert('ഓർഡർ\x20സൃഷ്ടിക്കാൻ\x20കഴിഞ്ഞില്ല.\x20വീണ്ടും\x20ശ്രമിക്കുക.'),prevStep(0x3);}}window['addEventListener']('DOMContentLoaded',function(){var a=document['getElementById']('continueWithoutSymbol');a&&a['addEventListener']('click',function(b){b['preventDefault'](),symbolFreeMode=!![],multiSymbolData=[],document['getElementById']('symbolPickersContainer')['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20linear-gradient(135deg,\x20#667eea\x200%,\x20#764ba2\x20100%);\x20padding:\x201.5rem;\x20border-radius:\x2012px;\x20box-shadow:\x200\x204px\x2020px\x20rgba(102,\x20126,\x20234,\x200.3);\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20flex-direction:\x20column;\x20gap:\x201rem;\x20align-items:\x20stretch;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20gap:\x201rem;\x20flex:\x201;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22background:\x20rgba(255,255,255,0.2);\x20padding:\x200.8rem;\x20border-radius:\x2050%;\x20width:\x2048px;\x20height:\x2048px;\x20display:\x20flex;\x20align-items:\x20center;\x20justify-content:\x20center;\x20flex-shrink:\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20width=\x2224\x22\x20height=\x2224\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22white\x22\x20stroke-width=\x222.5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<circle\x20cx=\x2212\x22\x20cy=\x2212\x22\x20r=\x2210\x22></circle>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<line\x20x1=\x2215\x22\x20y1=\x229\x22\x20x2=\x229\x22\x20y2=\x2215\x22></line>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<line\x20x1=\x229\x22\x20y1=\x229\x22\x20x2=\x2215\x22\x20y2=\x2215\x22></line>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22flex:\x201;\x20min-width:\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20white;\x20font-weight:\x20700;\x20font-size:\x20clamp(1rem,\x203vw,\x201.25rem);\x20margin-bottom:\x200.25rem;\x22>Symbol-Free\x20Mode\x20Activated</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20rgba(255,255,255,0.9);\x20font-size:\x20clamp(0.8rem,\x202.5vw,\x200.9rem);\x22>Slips\x20will\x20be\x20generated\x20without\x20election\x20symbols</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<a\x20href=\x22#\x22\x20id=\x22selectSymbolsAgain\x22\x20style=\x22color:\x20white;\x20text-decoration:\x20underline;\x20font-size:\x20clamp(0.85rem,\x202.5vw,\x200.95rem);\x20transition:\x20opacity\x200.3s\x20ease;\x20display:\x20inline-block;\x20margin-top:\x200.5rem;\x20opacity:\x200.9;\x22\x20onmouseover=\x22this.style.opacity=\x271\x27\x22\x20onmouseout=\x22this.style.opacity=\x270.9\x27\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20I\x20want\x20to\x20select\x20symbols\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</a>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',setTimeout(function(){var c=document['getElementById']('selectSymbolsAgain');c&&c['addEventListener']('click',function(d){d['preventDefault'](),symbolFreeMode=![],window['symbolFreeMode']=![],a['style']['display']='',updateSymbolPickers();});},0x64),document['getElementById']('symbolError')['classList']['remove']('show'),a['style']['display']='none',window['symbolFreeMode']=!![];});});</script>
+    <!-- Popup Modal System -->
+    <div id="welcome-popup-overlay" style="display: none;"></div>
+    <div id="welcome-popup-modal" style="display: none;"></div>
+    <script>const API_BASE=window['location']['hostname']==='localhost'?'http://localhost:3000/api':'/api';async function loadAndShowPopup(){try{const a=await fetch(API_BASE+'/settings/popup');if(!a['ok'])return;const b=await a['json'](),c=b['settings']||b;if(!c['enabled'])return;if(c['showOnce']){const e=localStorage['getItem']('popup-shown');if(e)return;}const d=c['delay']||0x3e8;setTimeout(()=>{showPopup(c);},d);}catch(f){console['error']('Error\x20loading\x20popup:',f);}}function showPopup(a){const b=document['getElementById']('welcome-popup-overlay'),c=document['getElementById']('welcome-popup-modal');b['style']['cssText']='position:\x20fixed;top:\x200;left:\x200;width:\x20100%;height:\x20100%;background:\x20rgba(0,\x200,\x200,\x200.7);z-index:\x209998;display:\x20block;animation:\x20fadeIn\x200.3s\x20ease;',c['innerHTML']='<div\x20style=\x22position:\x20relative;\x22><button\x20onclick=\x22closePopup()\x22\x20style=\x22position:\x20absolute;top:\x20-15px;right:\x20-15px;background:\x20white;border:\x202px\x20solid\x20#ddd;color:\x20#666;width:\x2040px;height:\x2040px;border-radius:\x2050%;cursor:\x20pointer;font-size:\x2024px;line-height:\x201;transition:\x20all\x200.3s\x20ease;box-shadow:\x200\x202px\x2010px\x20rgba(0,0,0,0.2);z-index:\x2010001;\x22\x20onmouseover=\x22this.style.background=\x27#f44336\x27;\x20this.style.color=\x27white\x27;\x20this.style.borderColor=\x27#f44336\x27;\x22\x20onmouseout=\x22this.style.background=\x27white\x27;\x20this.style.color=\x27#666\x27;\x20this.style.borderColor=\x27#ddd\x27;\x22>×</button><div\x20style=\x22background:\x20white;border-radius:\x2012px;max-width:\x20600px;width:\x2090%;max-height:\x2080vh;overflow-y:\x20auto;box-shadow:\x200\x2020px\x2060px\x20rgba(0,0,0,0.3);position:\x20relative;animation:\x20slideIn\x200.3s\x20ease;\x22><div\x20style=\x22background:\x20linear-gradient(135deg,\x20#b8860b\x200%,\x20#ffd700\x20100%);color:\x20white;padding:\x2020px;border-radius:\x2012px\x2012px\x200\x200;\x22><h2\x20style=\x22margin:\x200;\x20font-size:\x2024px;\x22>'+(a['title']||'Announcement')+'</h2></div><div\x20style=\x22padding:\x2030px;\x22>'+(a['content']||'')+'</div></div></div>',c['style']['cssText']='position:\x20fixed;top:\x2050%;left:\x2050%;transform:\x20translate(-50%,\x20-50%);z-index:\x2010000;display:\x20block;';const d='@media\x20(max-width:\x20640px)\x20{#welcome-popup-modal\x20>\x20div\x20>\x20div\x20{width:\x2095%\x20!important;max-height:\x2090vh\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:first-child\x20{padding:\x2015px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:first-child\x20h2\x20{font-size:\x2018px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20div\x20>\x20div:last-child\x20{padding:\x2020px\x20!important;}#welcome-popup-modal\x20>\x20div\x20>\x20button\x20{width:\x2035px\x20!important;height:\x2035px\x20!important;font-size:\x2020px\x20!important;top:\x20-12px\x20!important;right:\x20-12px\x20!important;}}';if(!document['querySelector']('#popup-responsive-styles')){const styleElem=document['createElement']('style');styleElem['id']='popup-responsive-styles',styleElem['textContent']=d,document['head']['appendChild'](styleElem);}b['onclick']=closePopup;a['showOnce']&&localStorage['setItem']('popup-shown','true');if(!document['querySelector']('#popup-animations')){const style=document['createElement']('style');style['id']='popup-animations',style['textContent']='@keyframes\x20fadeIn\x20{from\x20{\x20opacity:\x200;\x20}to\x20{\x20opacity:\x201;\x20}}@keyframes\x20slideIn\x20{from\x20{opacity:\x200;transform:\x20translateY(-30px);}to\x20{opacity:\x201;transform:\x20translateY(0);}}',document['head']['appendChild'](style);}}function closePopup(){const a=document['getElementById']('welcome-popup-overlay'),b=document['getElementById']('welcome-popup-modal');a['style']['display']='none',b['style']['display']='none';}document['readyState']==='loading'?document['addEventListener']('DOMContentLoaded',loadAndShowPopup):loadAndShowPopup();</script>
+</body>
+</html>

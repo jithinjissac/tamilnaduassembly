@@ -804,8 +804,22 @@ s0.parentNode.insertBefore(s1,s0);
             // Display order details
             document.getElementById('orderIdDisplay').textContent = `Order #${data.orderId || 'N/A'}`;
             
-            // Use Malayalam symbol name first, then English as fallback
-            const displayName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            // Handle multi-symbol display
+            let displayName;
+            if (data.customization?.multiSymbol && data.customization?.symbols && data.customization.symbols.length > 0) {
+                // Multi-symbol mode: show count and names
+                const symbolNames = data.customization.symbols
+                    .map(s => s.symbolNameMalayalam || s.symbolName)
+                    .filter(name => name)
+                    .join(', ');
+                displayName = `${data.customization.symbolCount} Symbols: ${symbolNames}`;
+            } else if (data.customization?.symbolFree) {
+                // Symbol-free mode
+                displayName = 'No Symbol (Symbol Free)';
+            } else {
+                // Single symbol mode - Use Malayalam symbol name first, then English as fallback
+                displayName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            }
             document.getElementById('partyName').textContent = displayName;
             
             const voterCount = data.totalVoters || 0;

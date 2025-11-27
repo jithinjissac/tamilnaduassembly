@@ -49,10 +49,15 @@ export const createFreshBrowser = async () => {
                         '--disable-extensions',
                         '--disable-gpu',
                         '--disable-software-rasterizer',
+                        '--disable-web-security', // Helps with resource cleanup
+                        '--single-process', // Run in single process mode to avoid orphaned processes
+                        '--no-zygote', // Disable zygote process on Windows
                         '--max-old-space-size=2048' // Increase memory for large PDFs
                     ],
                     timeout: 120000, // 120 second timeout for large voter lists
-                    protocolTimeout: 180000 // 180 seconds (3 minutes) for PDF generation protocol operations
+                    protocolTimeout: 180000, // 180 seconds (3 minutes) for PDF generation protocol operations
+                    ignoreDefaultArgs: ['--disable-extensions'], // Allow proper cleanup
+                    dumpio: false // Disable stdio dumps for cleaner process
                 });
                 console.log('✅ Fresh browser instance created successfully');
                 return browser;
@@ -193,14 +198,52 @@ export const generatePDFBackground = async (order, orderId) => {
                     margin: { top: 0, bottom: 0, left: 0, right: 0 },
                     timeout: 180000 // 3 minutes for large PDFs
                 });
-                await page.close();
-                await browser.close();
+                
+                // Close page first and wait for cleanup
+                try {
+                    await page.close();
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for page cleanup
+                } catch (e) {
+                    console.warn('⚠️ Error closing page:', e.message);
+                }
+                
+                // Close browser with retry logic
+                try {
+                    await browser.close();
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for browser cleanup
+                } catch (e) {
+                    console.warn('⚠️ Error closing browser (will retry):', e.message);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    try {
+                        await browser.close();
+                    } catch (retryErr) {
+                        console.warn('⚠️ Browser close retry failed (ignoring):', retryErr.message);
+                    }
+                }
+                
                 console.log(`✅ Background PDF generated successfully for ${orderId}`);
                 break;
             } catch (err) {
                 console.error(`❌ PDF generation attempt ${attempt} failed for ${orderId}`, util.inspect(err, { depth: 1 }));
-                try { if (page) await page.close(); } catch (e) {}
-                try { if (browser) await browser.close(); } catch (e) {}
+                
+                // Clean up with proper delays
+                try { 
+                    if (page) {
+                        await page.close();
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error closing page in catch:', e.message);
+                }
+                
+                try { 
+                    if (browser) {
+                        await browser.close();
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error closing browser in catch:', e.message);
+                }
                 const isTransient = err && (err.code === 'ECONNRESET' || err.message?.includes('ECONNRESET') || err.message?.includes('Target closed'));
                 if (!isTransient || attempt === maxAttempts) throw err;
                 console.log(`⏳ Retrying in 2 seconds...`);

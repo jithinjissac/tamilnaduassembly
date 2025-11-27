@@ -179,14 +179,35 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     if (typeof order.customization.symbolFree !== 'boolean') {
         order.customization.symbolFree = false;
     }
+    if (typeof order.customization.multiSymbol !== 'boolean') {
+        order.customization.multiSymbol = false;
+    }
     if (typeof order.customization.slipsPerPage !== 'number') {
         order.customization.slipsPerPage = 5;
     }
-    if (typeof order.customization.symbolImage !== 'string') {
-        order.customization.symbolImage = '';
-    }
-    if (typeof order.customization.symbolName !== 'string') {
-        order.customization.symbolName = order.customization.symbolFree ? 'No Symbol' : 'Symbol';
+    
+    // Handle multi-symbol mode
+    let isMultiSymbol = order.customization.multiSymbol === true;
+    let symbolMap = new Map(); // localBodyType -> symbolData
+    
+    if (isMultiSymbol && order.customization.symbols && Array.isArray(order.customization.symbols)) {
+        console.log(`🎯 Multi-symbol mode activated with ${order.customization.symbols.length} symbols`);
+        
+        // Build symbol map for quick lookup
+        for (const symbolData of order.customization.symbols) {
+            if (symbolData.localBodyType) {
+                symbolMap.set(symbolData.localBodyType, symbolData);
+                console.log(`  📌 ${symbolData.localBodyType} → ${symbolData.symbolName}`);
+            }
+        }
+    } else {
+        // Single symbol mode - use regular symbol fields
+        if (typeof order.customization.symbolImage !== 'string') {
+            order.customization.symbolImage = '';
+        }
+        if (typeof order.customization.symbolName !== 'string') {
+            order.customization.symbolName = order.customization.symbolFree ? 'No Symbol' : 'Symbol';
+        }
     }
 
     const slipsPerPage = order.customization.slipsPerPage || 5;
@@ -197,41 +218,102 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     console.log(`📄 ==========================================\n`);
     console.log(`🔍 Full customization object:`, JSON.stringify(order.customization, null, 2));
     
-    // Use Malayalam name if available, otherwise English
-    // Ensure we get a string value, not an object
-    const symbolNameMalayalam = typeof order.customization.symbolNameMalayalam === 'string' 
-        ? order.customization.symbolNameMalayalam 
-        : (order.customization.symbolNameMalayalam?.name || '');
-    const symbolNameEnglish = typeof order.customization.symbolName === 'string'
-        ? order.customization.symbolName
-        : (order.customization.symbolName?.name || '');
-    const displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
-    
     // Use Malayalam polling station name with fallback to current fields
     const pollingStation = order.location.pollingStationMalayalam || 
                           order.location.pollingStationName || 
                           order.location.pollingStation;
     const wardName = order.location.wardName || order.location.ward;
     
-    // Convert symbol to base64 ONCE (not per slip)
+    // Convert symbol(s) to base64
     let symbolUrl = '';
-    const symbolImage = order.customization.symbolImage || '';
-    const symbolPath = symbolImage.startsWith('/') 
-        ? path.join(__dirname, '..', 'public', symbolImage)
-        : symbolImage;
+    let symbolUrlMap = new Map(); // localBodyType -> base64URL (for multi-symbol)
+    let symbolsArray = []; // For multi-symbol: array of {name, url}
+    let displaySymbolName = 'Symbol'; // default
     
-    if (symbolPath && !symbolPath.startsWith('http')) {
-        try {
-            const imageBuffer = fs.readFileSync(symbolPath);
-            const ext = path.extname(symbolPath).toLowerCase();
-            const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
-            symbolUrl = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
-            console.log('✅ Symbol converted to base64 once (', (imageBuffer.length / 1024).toFixed(2), 'KB)');
-        } catch (err) {
-            console.error('❌ Failed to read symbol file:', err.message);
+    if (isMultiSymbol && order.customization.symbols && Array.isArray(order.customization.symbols)) {
+        // Multi-symbol mode: convert all symbols to base64
+        console.log('🎨 Converting multiple symbols to base64...');
+        for (let idx = 0; idx < order.customization.symbols.length; idx++) {
+            const symbolData = order.customization.symbols[idx];
+            const symbolImage = symbolData.symbolImage || '';
+            const symbolPath = symbolImage.startsWith('/') 
+                ? path.join(__dirname, '..', 'public', symbolImage)
+                : symbolImage;
+            
+            if (symbolPath && !symbolPath.startsWith('http')) {
+                try {
+                    const imageBuffer = fs.readFileSync(symbolPath);
+                    const ext = path.extname(symbolPath).toLowerCase();
+                    const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
+                    const base64Url = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+                    
+                    // Store in both map (for backward compat) and array
+                    if (symbolData.localBodyType) {
+                        symbolUrlMap.set(symbolData.localBodyType, base64Url);
+                    }
+                    
+                    // Get local body type label
+                    const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമപഞ്ചായത്ത്' : 
+                                               symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക് പഞ്ചായത്ത്' : 
+                                               symbolData.localBodyType === 'D' ? 'ജില്ലാ പഞ്ചായത്ത്' : '';
+                    
+                    symbolsArray.push({
+                        name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
+                        url: base64Url,
+                        localBodyType: symbolData.localBodyType || '',
+                        localBodyLabel: localBodyTypeLabel
+                    });
+                    console.log(`  ✅ Symbol ${idx + 1}: ${symbolData.symbolName} (${(imageBuffer.length / 1024).toFixed(2)} KB)`);
+                } catch (err) {
+                    console.error(`  ❌ Failed to read symbol ${idx + 1}:`, err.message);
+                }
+            } else if (symbolPath) {
+                if (symbolData.localBodyType) {
+                    symbolUrlMap.set(symbolData.localBodyType, symbolPath);
+                }
+                
+                // Get local body type label
+                const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമപഞ്ചായത്ത്' : 
+                                           symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക് പഞ്ചായത്ത്' : 
+                                           symbolData.localBodyType === 'D' ? 'ജില്ലാ പഞ്ചായത്ത്' : '';
+                
+                symbolsArray.push({
+                    name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
+                    url: symbolPath,
+                    localBodyType: symbolData.localBodyType || '',
+                    localBodyLabel: localBodyTypeLabel
+                });
+            }
         }
-    } else if (symbolPath) {
-        symbolUrl = symbolPath;
+    } else {
+        // Single symbol mode
+        const symbolImage = order.customization.symbolImage || '';
+        const symbolPath = symbolImage.startsWith('/') 
+            ? path.join(__dirname, '..', 'public', symbolImage)
+            : symbolImage;
+        
+        if (symbolPath && !symbolPath.startsWith('http')) {
+            try {
+                const imageBuffer = fs.readFileSync(symbolPath);
+                const ext = path.extname(symbolPath).toLowerCase();
+                const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
+                symbolUrl = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+                console.log('✅ Symbol converted to base64 once (', (imageBuffer.length / 1024).toFixed(2), 'KB)');
+            } catch (err) {
+                console.error('❌ Failed to read symbol file:', err.message);
+            }
+        } else if (symbolPath) {
+            symbolUrl = symbolPath;
+        }
+        
+        // Use Malayalam name if available, otherwise English
+        const symbolNameMalayalam = typeof order.customization.symbolNameMalayalam === 'string' 
+            ? order.customization.symbolNameMalayalam 
+            : (order.customization.symbolNameMalayalam?.name || '');
+        const symbolNameEnglish = typeof order.customization.symbolName === 'string'
+            ? order.customization.symbolName
+            : (order.customization.symbolName?.name || '');
+        const displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
     }
     
     // Load font settings from database
@@ -379,7 +461,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
         
-        :root { --symbol-image: url('${symbolUrl}'); }
+        ${isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : `:root { --symbol-image: url('${symbolUrl}'); }`}
         
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
@@ -394,6 +476,15 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1; }
         .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
+        
+        /* Multi-symbol horizontal layout */
+        .slip-left.multi-symbol { width: 60mm; padding: 1mm; }
+        .multi-symbol-header { font-size: 8pt; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; }
+        .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
+        .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
+        .symbol-item-image { width: 18mm; height: 18mm; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
+        .symbol-item-name { font-size: 7pt; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: break-word; max-width: 100%; }
+        .symbol-item-type { font-size: 6pt; font-weight: normal; text-align: center; line-height: 1.1; margin-top: 0.3mm; color: #333; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
@@ -557,25 +648,83 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             const gender = genderAge[0]?.trim() || '';
             const age = genderAge[1]?.trim() || '';
             
+            // Get symbol data for this voter (multi-symbol or single)
+            let voterSymbolUrl = symbolUrl;
+            let voterSymbolName = displaySymbolName;
+            
+            if (isMultiSymbol && voter.local_body_type) {
+                const voterSymbolData = symbolMap.get(voter.local_body_type);
+                if (voterSymbolData) {
+                    voterSymbolUrl = symbolUrlMap.get(voter.local_body_type) || '';
+                    voterSymbolName = voterSymbolData.symbolNameMalayalam || voterSymbolData.symbolName || 'Symbol';
+                    
+                    // Debug: Log first 3 symbol assignments
+                    if ((startIndex + i + index) < 3) {
+                        console.log(`  🎨 Voter ${startIndex + i + index + 1}: ${voter.name} (${voter.local_body_type}) → ${voterSymbolName}`);
+                    }
+                } else {
+                    console.warn(`⚠️ Voter ${startIndex + i + index + 1}: No symbol found for local body type: ${voter.local_body_type}`);
+                }
+            }
+            
             // Add symbol-free class if no symbol
             const symbolFreeClass = order.customization.symbolFree ? ' symbol-free' : '';
             
-            htmlParts.push(`
-            <div class="voter-slip${symbolFreeClass}">
-                ${order.customization.symbolFree ? `
+            // Build left section based on mode
+            let leftSectionHTML = '';
+            
+            if (order.customization.symbolFree) {
+                // Symbol-free mode: show serial number
+                leftSectionHTML = `
                 <div class="slip-left">
                     <div class="slip-left-content">
                         <div class="serial-label">ക്രമ നമ്പർ</div>
                         <div class="serial-value">${serialNo}</div>
                     </div>
-                </div>
-                ` : `
+                </div>`;
+            } else if (isMultiSymbol) {
+                // Multi-symbol mode: show all symbols horizontally
+                leftSectionHTML = `
+                <div class="slip-left multi-symbol">
+                    <div class="multi-symbol-header">നമ്മുടെ ചിഹ്നങ്ങൾ</div>
+                    <div class="symbols-row">`;
+                
+                // Add all symbols from the symbolsArray
+                for (const symbolItem of symbolsArray) {
+                    leftSectionHTML += `
+                        <div class="symbol-item">
+                            <div class="symbol-item-image" style="background-image: url('${symbolItem.url}');"></div>
+                            <div class="symbol-item-name">${symbolItem.name}</div>`;
+                    
+                    // Add local body type label if available
+                    if (symbolItem.localBodyLabel) {
+                        leftSectionHTML += `
+                            <div class="symbol-item-type">${symbolItem.localBodyLabel}</div>`;
+                    }
+                    
+                    leftSectionHTML += `
+                        </div>`;
+                }
+                
+                leftSectionHTML += `
+                    </div>
+                </div>`;
+            } else {
+                // Single symbol mode: original layout
+                const symbolImageStyle = voterSymbolUrl 
+                    ? ` style="background-image: url('${voterSymbolUrl}');"` 
+                    : '';
+                leftSectionHTML = `
                 <div class="slip-left">
                     <div class="symbol-header">നമ്മുടെ ചിഹ്നം</div>
-                    <div class="symbol-image" role="img" aria-label="Symbol"></div>
-                    <div class="symbol-name">${displaySymbolName}</div>
-                </div>
-                `}
+                    <div class="symbol-image" role="img" aria-label="Symbol"${symbolImageStyle}></div>
+                    <div class="symbol-name">${voterSymbolName}</div>
+                </div>`;
+            }
+            
+            htmlParts.push(`
+            <div class="voter-slip${symbolFreeClass}">
+                ${leftSectionHTML}
                 <div class="slip-right">
                     <div class="ward-info">വാര്‍ഡ്: ${wardName}</div>
                     <div class="slip-header">
@@ -1403,14 +1552,32 @@ export const downloadSlip = async (req, res) => {
                 throw new Error('Invalid PDF generated');
             }
             
-            // Close page
-            await page.close();
+            // Close page with delay
+            try {
+                await page.close();
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait for page cleanup
+                console.log('✅ Page closed');
+            } catch (e) {
+                console.warn('⚠️ Error closing page:', e.message);
+            }
             
-            // Close fresh browser if we created one
+            // Close fresh browser if we created one with retry logic
             if (useFreshBrowser) {
                 console.log('Closing fresh browser instance...');
-                await browser.close();
-                console.log('✅ Fresh browser closed');
+                try {
+                    await browser.close();
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for browser cleanup
+                    console.log('✅ Fresh browser closed');
+                } catch (e) {
+                    console.warn('⚠️ Error closing browser (will retry):', e.message);
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    try {
+                        await browser.close();
+                        console.log('✅ Fresh browser closed on retry');
+                    } catch (retryErr) {
+                        console.warn('⚠️ Browser close retry failed (continuing anyway):', retryErr.message);
+                    }
+                }
             } else {
                 console.log('Keeping persistent browser alive for reuse');
             }
@@ -1420,8 +1587,9 @@ export const downloadSlip = async (req, res) => {
             if (page) {
                 try {
                     await page.close();
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 } catch (e) {
-                    console.error('Error closing page:', e.message);
+                    console.warn('⚠️ Error closing page in catch:', e.message);
                 }
             }
             
@@ -1429,9 +1597,10 @@ export const downloadSlip = async (req, res) => {
                 try {
                     console.log('⚠️ Error occurred, force-closing fresh browser...');
                     await browser.close();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                     console.log('✅ Fresh browser force-closed');
                 } catch (e) {
-                    console.error('Error closing fresh browser:', e.message);
+                    console.warn('⚠️ Error closing fresh browser (ignoring):', e.message);
                 }
             } else if (browser) {
                 // ✅ NEW: If using persistent browser and error occurs, mark it as disconnected

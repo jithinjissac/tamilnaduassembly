@@ -13,12 +13,12 @@ const safeObfuscatorOptions = {
     identifierNamesGenerator: 'mangled', // Safer than hex
     log: false,
     renameGlobals: false,
-    rotateStringArray: true,
+    rotateStringArray: false, // Disabled - causes method call issues
     selfDefending: false,
-    shuffleStringArray: true,
+    shuffleStringArray: false, // Disabled - causes method call issues
     splitStrings: false, // Disabled for stability
-    stringArray: true,
-    stringArrayThreshold: 0.5, // Reduced for stability
+    stringArray: false, // Disabled - breaks document/console method calls
+    stringArrayThreshold: 0, // Disabled
     transformObjectKeys: false, // Disabled to prevent object issues
     unicodeEscapeSequence: false,
     target: 'browser',
@@ -144,6 +144,7 @@ const htmlFiles = [
     'login.html',
     'register.html',
     'create-slip.html',
+    'create-multi-slip.html',
     'settings.html',
     'contact.html',
     'privacy-policy.html',
