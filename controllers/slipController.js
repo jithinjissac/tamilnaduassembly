@@ -577,8 +577,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .voter-slip > * { overflow: hidden; }
         
         .slip-left { width: 38mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0; }
-        .slip-left.custom-poster { padding: 0; background: #f5f5f5; border-right: 2px dotted; overflow: hidden; }
-        .poster-image { width: 100%; height: 100%; background-image: var(--poster-image); background-size: contain; background-repeat: no-repeat; background-position: center left; }
+        .slip-left.custom-poster { padding: 0; background: #ffffff; border-right: 2px dotted; overflow: hidden; display: flex; align-items: stretch; }
+        .poster-image { width: 100%; height: 100%; background-image: var(--poster-image); background-size: contain; background-repeat: no-repeat; background-position: top left; display: block; }
         .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1; }
         .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
