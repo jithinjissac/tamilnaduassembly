@@ -52,6 +52,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
     <link rel="manifest" href="/favicon/site.webmanifest">
     <link rel="stylesheet" href="kerala-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" integrity="sha512-cyzxRvewl+FOKTtpBzYjW6x6IAYUCZy3sGP40hn+DQkqeluGRCax7qztK2ImL64SA+C7kVWdLI6wvdlStawhyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="activity-tracker.js"></script>
@@ -80,6 +81,7 @@ s0.parentNode.insertBefore(s1,s0);
 
   gtag('config', 'G-G0M40G1DK1');
 </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             margin: 0;
@@ -96,6 +98,106 @@ s0.parentNode.insertBefore(s1,s0);
             font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
             background: var(--kerala-cream);
             color: #333;
+        }
+
+        /* Cropper Modal */
+        #imageCropperModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 11000;
+        }
+
+        #imageCropperModal.show {
+            display: flex;
+        }
+
+        .cropper-modal-content {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: min(900px, 95vw);
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .cropper-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .cropper-modal-header h3 {
+            margin: 0;
+            color: #1a202c;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .cropper-canvas-wrapper {
+            flex: 1;
+            min-height: 300px;
+            background: #f7fafc;
+            border: 2px dashed #cbd5f5;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .cropper-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .cropper-controls button {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            background: #edf2f7;
+            color: #2d3748;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .cropper-controls button:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .cropper-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cropper-actions button {
+            flex: 1;
+            border: none;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .cropper-confirm {
+            background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%);
+            color: #fff;
+        }
+
+        .cropper-cancel {
+            background: #edf2f7;
+            color: #2d3748;
         }
 
         /* Symbol-Free Mode Card Styles */
@@ -1072,6 +1174,30 @@ s0.parentNode.insertBefore(s1,s0);
         </div>
     </div>
 
+    <!-- Image Cropper Modal -->
+    <div id="imageCropperModal" aria-hidden="true">
+        <div class="cropper-modal-content" role="dialog" aria-modal="true" aria-labelledby="cropperModalTitle">
+            <div class="cropper-modal-header">
+                <h3 id="cropperModalTitle">Adjust Custom Symbol</h3>
+                <button type="button" onclick="cancelCropperModal()" aria-label="Close cropper" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #4a5568;">&times;</button>
+            </div>
+            <div class="cropper-canvas-wrapper">
+                <img id="imageCropperPreview" alt="Custom symbol preview for cropping" style="max-width: 100%;">
+            </div>
+            <div class="cropper-controls">
+                <button type="button" onclick="rotateCropper(-90)"><i class="fas fa-undo"></i> Rotate Left</button>
+                <button type="button" onclick="rotateCropper(90)"><i class="fas fa-redo"></i> Rotate Right</button>
+                <button type="button" onclick="zoomCropper(0.15)"><i class="fas fa-search-plus"></i> Zoom In</button>
+                <button type="button" onclick="zoomCropper(-0.15)"><i class="fas fa-search-minus"></i> Zoom Out</button>
+                <button type="button" onclick="resetCropper()"><i class="fas fa-sync"></i> Reset</button>
+            </div>
+            <div class="cropper-actions">
+                <button type="button" class="cropper-cancel" onclick="cancelCropperModal()">Cancel</button>
+                <button type="button" class="cropper-confirm" onclick="applyCroppedSymbol()">Use Cropped Image</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentStep = 1;
         let selectedSymbol = null;
@@ -1082,6 +1208,12 @@ s0.parentNode.insertBefore(s1,s0);
         let allPollingStations = []; // Store all stations
         let selectedStations = []; // Store user-selected stations
         const token = localStorage.getItem('token');
+        const TARGET_SYMBOL_WIDTH = 450;
+        const TARGET_SYMBOL_HEIGHT = 615;
+        const TARGET_SYMBOL_ASPECT_RATIO = TARGET_SYMBOL_WIDTH / TARGET_SYMBOL_HEIGHT;
+        let cropperInstance = null;
+        let pendingSymbolFileType = 'image/png';
+        let pendingOriginalSizeKB = null;
 
         // Check if admin is creating order for a user
         const urlParams = new URLSearchParams(window.location.search);
@@ -1127,96 +1259,165 @@ s0.parentNode.insertBefore(s1,s0);
                 return;
             }
 
-            // Compress and convert image to base64
+            // Load file into cropper modal
             const reader = new FileReader();
             reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    // Create canvas for compression
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Left column dimensions at 300 DPI:
-                    // Width: 38mm = 450px @ 300 DPI
-                    // Height: 52mm (4 slips) = 615px @ 300 DPI
-                    // Height: 42mm (6 slips) = 497px @ 300 DPI
-                    // Target aspect ratio: 38:52 = 0.73:1 (width:height)
-                    
-                    const TARGET_WIDTH = 450;
-                    const TARGET_HEIGHT = 615; // For 4 slips per page (most common)
-                    const TARGET_ASPECT_RATIO = TARGET_WIDTH / TARGET_HEIGHT; // 0.73
-                    
-                    let width = img.width;
-                    let height = img.height;
-                    const imageAspectRatio = width / height;
-                    
-                    // Crop to match target aspect ratio to fill left column perfectly
-                    let cropWidth = width;
-                    let cropHeight = height;
-                    let cropX = 0;
-                    let cropY = 0;
-                    
-                    if (imageAspectRatio > TARGET_ASPECT_RATIO) {
-                        // Image is too wide - crop width
-                        cropWidth = height * TARGET_ASPECT_RATIO;
-                        cropX = (width - cropWidth) / 2; // Center crop
-                    } else if (imageAspectRatio < TARGET_ASPECT_RATIO) {
-                        // Image is too tall - crop height
-                        cropHeight = width / TARGET_ASPECT_RATIO;
-                        cropY = 0; // Crop from top (keep top portion visible)
-                    }
-                    
-                    // Set canvas to target dimensions
-                    canvas.width = TARGET_WIDTH;
-                    canvas.height = TARGET_HEIGHT;
-                    
-                    // Draw cropped and scaled image
-                    ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
-                    
-                    // Convert to base64 with good quality
-                    const compressedBase64 = canvas.toDataURL(file.type, 0.9);
-                    
-                    // Calculate compression ratio
-                    const originalSize = (e.target.result.length * 0.75) / 1024; // KB
-                    const compressedSize = (compressedBase64.length * 0.75) / 1024; // KB
-                    console.log(`🗜️ Image compressed: ${originalSize.toFixed(0)}KB → ${compressedSize.toFixed(0)}KB (${((compressedSize/originalSize)*100).toFixed(0)}%)`);
-                    
-                    uploadedSymbolImage = compressedBase64;
-                    selectedSymbol = {
-                        imageUrl: compressedBase64,
-                        name: 'Custom Poster',
-                        nameMalayalam: '',
-                        isCustomUpload: true,
-                        isCustomPoster: true
-                    };
-                    symbolFreeMode = false;
-
-                    // Update UI
-                    document.getElementById('selectedSymbolImage').src = compressedBase64;
-                    document.getElementById('uploadPlaceholder').style.display = 'none';
-                    document.getElementById('symbolPreview').style.display = 'block';
-                    document.getElementById('symbolUploadArea').classList.add('has-file');
-                    document.getElementById('symbolError').classList.remove('show');
-                    
-                    // Restore the continue link if previously changed
-                    const continueLink = document.getElementById('continueWithoutSymbol');
-                    if (continueLink) {
-                        continueLink.textContent = 'Continue without any symbols';
-                        continueLink.style.color = '#2c5282';
-                        continueLink.style.pointerEvents = 'auto';
-                    }
-
-                    console.log('✅ Symbol image uploaded and compressed successfully');
-                };
-                img.onerror = function() {
-                    showError('symbolError', 'Failed to process image. Please try a different image.');
-                };
-                img.src = e.target.result;
+                pendingSymbolFileType = file.type;
+                pendingOriginalSizeKB = (e.target.result.length * 0.75) / 1024; // rough KB size
+                openCropperModal(e.target.result);
             };
             reader.onerror = function() {
                 showError('symbolError', 'Failed to read image file. Please try again.');
             };
             reader.readAsDataURL(file);
+        }
+
+        function openCropperModal(imageDataUrl) {
+            const modal = document.getElementById('imageCropperModal');
+            const preview = document.getElementById('imageCropperPreview');
+            if (!modal || !preview) return;
+            if (typeof Cropper === 'undefined') {
+                showError('symbolError', 'Image cropping library failed to load. Please refresh and try again.');
+                return;
+            }
+
+            // Destroy existing instance if any before assigning new source
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+
+            preview.onload = function() {
+                cropperInstance = new Cropper(preview, {
+                    aspectRatio: TARGET_SYMBOL_ASPECT_RATIO,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    movable: true,
+                    zoomable: true,
+                    responsive: true,
+                    background: false,
+                    dragMode: 'move'
+                });
+            };
+
+            preview.src = imageDataUrl;
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                const confirmBtn = modal.querySelector('.cropper-confirm');
+                if (confirmBtn) confirmBtn.focus();
+            });
+        }
+
+        function closeCropperModal(resetInput = false) {
+            const modal = document.getElementById('imageCropperModal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+            document.body.style.overflow = '';
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+            if (resetInput) {
+                const input = document.getElementById('symbolImageInput');
+                if (input) input.value = '';
+            }
+            pendingSymbolFileType = 'image/png';
+            pendingOriginalSizeKB = null;
+        }
+
+        function cancelCropperModal() {
+            closeCropperModal(true);
+        }
+
+        function applyCroppedSymbol() {
+            if (!cropperInstance) {
+                alert('Please load an image to crop.');
+                return;
+            }
+
+            const canvas = cropperInstance.getCroppedCanvas({
+                width: TARGET_SYMBOL_WIDTH,
+                height: TARGET_SYMBOL_HEIGHT,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            if (!canvas) {
+                alert('Unable to crop image. Please try again.');
+                return;
+            }
+
+            const mimeType = pendingSymbolFileType || 'image/png';
+            const croppedBase64 = canvas.toDataURL(mimeType, 0.92);
+            const compressedSizeKB = (croppedBase64.length * 0.75) / 1024;
+            if (pendingOriginalSizeKB) {
+                console.log(`🗜️ Image cropped/compressed: ${pendingOriginalSizeKB.toFixed(0)}KB → ${compressedSizeKB.toFixed(0)}KB (${((compressedSizeKB / pendingOriginalSizeKB) * 100).toFixed(0)}%)`);
+            } else {
+                console.log('🗜️ Image cropped and prepared for upload');
+            }
+
+            closeCropperModal();
+            const input = document.getElementById('symbolImageInput');
+            if (input) input.value = '';
+            setCustomSymbolImage(croppedBase64);
+        }
+
+        function setCustomSymbolImage(base64Image) {
+            uploadedSymbolImage = base64Image;
+            selectedSymbol = {
+                imageUrl: base64Image,
+                name: 'Custom Poster',
+                nameMalayalam: '',
+                isCustomUpload: true,
+                isCustomPoster: true
+            };
+            symbolFreeMode = false;
+            window.symbolFreeMode = false;
+
+            const selectedImage = document.getElementById('selectedSymbolImage');
+            if (selectedImage) {
+                selectedImage.src = base64Image;
+            }
+            const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+            if (uploadPlaceholder) uploadPlaceholder.style.display = 'none';
+            const preview = document.getElementById('symbolPreview');
+            if (preview) preview.style.display = 'block';
+            const uploadArea = document.getElementById('symbolUploadArea');
+            if (uploadArea) uploadArea.classList.add('has-file');
+            const symbolError = document.getElementById('symbolError');
+            if (symbolError) symbolError.classList.remove('show');
+
+            const continueLink = document.getElementById('continueWithoutSymbol');
+            if (continueLink) {
+                continueLink.textContent = 'Continue without any symbols';
+                continueLink.style.color = '#2c5282';
+                continueLink.style.pointerEvents = 'auto';
+                continueLink.style.display = '';
+            }
+
+            console.log('✅ Symbol image prepared with manual cropping');
+        }
+
+        function rotateCropper(degrees) {
+            if (cropperInstance) {
+                cropperInstance.rotate(degrees);
+            }
+        }
+
+        function zoomCropper(step) {
+            if (cropperInstance) {
+                cropperInstance.zoom(step);
+            }
+        }
+
+        function resetCropper() {
+            if (cropperInstance) {
+                cropperInstance.reset();
+            }
         }
 
         if (!token) {
@@ -1936,17 +2137,44 @@ s0.parentNode.insertBefore(s1,s0);
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
                     console.log('🎫 Slips per page selected:', slipsPerPage);
                     
+                    // Build customization object based on mode - keep logic identical across flows
                     let customization;
-                    if (symbolFreeMode || !selectedSymbol) {
-                        customization = { symbolFree: true, slipsPerPage };
-                    } else {
+                    if (symbolFreeMode) {
+                        customization = {
+                            symbolFree: true,
+                            multiSymbol: false,
+                            isCustomPoster: false,
+                            isCustomUpload: false,
+                            slipsPerPage
+                        };
+                    } else if (selectedSymbol && (selectedSymbol.isCustomPoster || selectedSymbol.isCustomUpload)) {
+                        customization = {
+                            symbolImage: selectedSymbol.imageUrl,
+                            isCustomUpload: true,
+                            isCustomPoster: true,
+                            symbolFree: false,
+                            multiSymbol: false,
+                            slipsPerPage
+                        };
+                    } else if (selectedSymbol) {
                         customization = {
                             symbolId: selectedSymbol._id,
                             symbolImage: selectedSymbol.imageUrl,
                             symbolName: selectedSymbol.name,
                             symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
-                            isCustomPoster: selectedSymbol.isCustomPoster || false,
-                            slipsPerPage: slipsPerPage
+                            isCustomPoster: false,
+                            isCustomUpload: false,
+                            symbolFree: false,
+                            multiSymbol: false,
+                            slipsPerPage
+                        };
+                    } else {
+                        customization = {
+                            symbolFree: true,
+                            multiSymbol: false,
+                            isCustomPoster: false,
+                            isCustomUpload: false,
+                            slipsPerPage
                         };
                     }
                     const orderData = {
@@ -2280,15 +2508,49 @@ s0.parentNode.insertBefore(s1,s0);
                     
                     const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
                     
+                    // Build customization object based on mode - MATCH createOrder() LOGIC!
                     let customization;
-                    if (symbolFreeMode || !selectedSymbol) {
-                        customization = { symbolFree: true, slipsPerPage };
-                    } else {
+                    
+                    if (symbolFreeMode) {
+                        // Symbol-free mode
+                        customization = {
+                            symbolFree: true,
+                            multiSymbol: false,
+                            isCustomPoster: false,
+                            isCustomUpload: false,
+                            slipsPerPage
+                        };
+                    } else if (selectedSymbol && (selectedSymbol.isCustomPoster || selectedSymbol.isCustomUpload)) {
+                        // Custom poster mode - CRITICAL: Don't send symbolId, symbolName, etc.
+                        customization = {
+                            symbolImage: selectedSymbol.imageUrl,
+                            isCustomUpload: true,
+                            isCustomPoster: true,
+                            symbolFree: false,
+                            multiSymbol: false,
+                            slipsPerPage
+                        };
+                        console.log('[SEQUENTIAL] Custom poster mode detected, flags set to TRUE');
+                    } else if (selectedSymbol) {
+                        // Regular symbol mode
                         customization = {
                             symbolId: selectedSymbol._id,
                             symbolImage: selectedSymbol.imageUrl,
                             symbolName: selectedSymbol.name,
                             symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
+                            isCustomUpload: false,
+                            isCustomPoster: false,
+                            symbolFree: false,
+                            multiSymbol: false,
+                            slipsPerPage
+                        };
+                    } else {
+                        // Fallback to symbol-free
+                        customization = {
+                            symbolFree: true,
+                            multiSymbol: false,
+                            isCustomPoster: false,
+                            isCustomUpload: false,
                             slipsPerPage
                         };
                     }
@@ -2431,17 +2693,54 @@ s0.parentNode.insertBefore(s1,s0);
         async function createOrder() {
             const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked').value);
             
-            const orderData = {
-                customization: symbolFreeMode ? { symbolFree: true, slipsPerPage } : {
+            // Build customization object based on mode
+            let customization;
+            
+            if (symbolFreeMode) {
+                // Symbol-free mode
+                customization = {
+                    symbolFree: true,
+                    multiSymbol: false,
+                    isCustomPoster: false,
+                    isCustomUpload: false,
+                    slipsPerPage
+                };
+            } else if (selectedSymbol.isCustomPoster || selectedSymbol.isCustomUpload) {
+                // Custom poster mode - CRITICAL: Don't send symbolId, symbolName, etc.
+                customization = {
+                    symbolImage: selectedSymbol.imageUrl,
+                    isCustomUpload: true,
+                    isCustomPoster: true,
+                    symbolFree: false,
+                    multiSymbol: false,
+                    slipsPerPage
+                };
+            } else {
+                // Regular symbol mode
+                customization = {
                     symbolId: selectedSymbol._id,
                     symbolImage: selectedSymbol.imageUrl,
                     symbolName: selectedSymbol.name,
                     symbolNameMalayalam: selectedSymbol.nameMalayalam || '',
-                    isCustomUpload: selectedSymbol.isCustomUpload || false,
-                    isCustomPoster: selectedSymbol.isCustomPoster || false,
-                    multiSymbol: false, // Explicitly disable multi-symbol mode for custom poster
+                    isCustomUpload: false,
+                    isCustomPoster: false,
+                    symbolFree: false,
+                    multiSymbol: false,
                     slipsPerPage
-                },
+                };
+            }
+            
+            console.log('🔍 [FRONTEND] Creating order with customization:', JSON.stringify({
+                isCustomUpload: customization.isCustomUpload,
+                isCustomPoster: customization.isCustomPoster,
+                multiSymbol: customization.multiSymbol,
+                symbolFree: customization.symbolFree,
+                hasSymbolName: !!customization.symbolName,
+                hasSymbolId: !!customization.symbolId
+            }, null, 2));
+            
+            const orderData = {
+                customization,
                 location: {
                     district: document.getElementById('district').options[document.getElementById('district').selectedIndex].text,
                     localBody: document.getElementById('localBody').options[document.getElementById('localBody').selectedIndex].text,
