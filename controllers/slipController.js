@@ -510,10 +510,10 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             infoRowMarginBottom: '0.6mm'
         };
         fontSizeMulti = slipsPerPage === 6 ? {
-            leftWidth: '68mm',
+            leftWidth: '70mm',
             headerText: 'നമ്മുടെ ചിഹ്നം',
             headerFont: '7pt',
-            symbolImageSize: '16mm',
+            symbolImageSize: '17mm',
             symbolNameFont: '6.5pt',
             slipNumber: '10pt',
             secId: '9pt',
@@ -526,11 +526,11 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             voterNameMarginBottom: '0.8mm',
             infoRowMarginBottom: '0.6mm'
         } : {
-            leftWidth: '68mm',
+            leftWidth: '70mm',
             headerText: 'നമ്മുടെ ചിഹ്നം',
             headerFont: '8pt',
-            symbolImageSize: '18mm',
-            symbolNameFont: '7pt',
+            symbolImageSize: '20mm',
+            symbolNameFont: '7.5pt',
             slipNumber: '11pt',
             secId: '10pt',
             voterName: '11pt',
@@ -584,12 +584,12 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
         
         /* Multi-symbol horizontal layout */
-        .slip-left.multi-symbol { width: ${fontSizeMulti.leftWidth}; padding: 1mm; }
-        .multi-symbol-header { font-size: ${fontSizeMulti.headerFont}; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; }
-        .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
-        .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
+        .slip-left.multi-symbol { width: ${fontSizeMulti.leftWidth}; padding: 1mm; overflow: hidden; }
+        .multi-symbol-header { font-size: ${fontSizeMulti.headerFont}; font-weight: bold; margin-bottom: 1mm; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; overflow: hidden; }
+        .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; max-width: 33%; overflow: hidden; }
         .symbol-item-image { width: ${fontSizeMulti.symbolImageSize}; height: ${fontSizeMulti.symbolImageSize}; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
-        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.3; word-wrap: break-word; max-width: 100%; }
+        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.2; word-wrap: break-word; word-break: break-word; max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; hyphens: auto; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
