@@ -52,6 +52,10 @@ const OrderSchema = new mongoose.Schema({
             type: String,
             default: ''
         },
+        isCustomPoster: {
+            type: Boolean,
+            default: false
+        },
         // Legacy fields for backward compatibility
         partyLogo: {
             type: String

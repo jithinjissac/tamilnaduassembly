@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 import { getPDFFilePath, getPDFJobStatus, clearPDFCache, createFreshBrowser, registerPDFJob } from '../utils/pdfGenerator.js';
 
 // ES Module __dirname equivalent
@@ -240,46 +241,47 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 ? path.join(__dirname, '..', 'public', symbolImage)
                 : symbolImage;
             
-            if (symbolPath && !symbolPath.startsWith('http')) {
+            let base64Url = '';
+            
+            // Check if it's already a base64 data URL
+            if (symbolPath.startsWith('data:')) {
+                base64Url = symbolPath;
+                console.log(`  ✅ Symbol ${idx + 1}: Already base64 data URL`);
+            } else if (symbolPath && !symbolPath.startsWith('http')) {
                 try {
-                    const imageBuffer = fs.readFileSync(symbolPath);
-                    const ext = path.extname(symbolPath).toLowerCase();
-                    const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
-                    const base64Url = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+                    const originalBuffer = fs.readFileSync(symbolPath);
+                    const originalSize = originalBuffer.length;
                     
-                    // Store in both map (for backward compat) and array
-                    if (symbolData.localBodyType) {
-                        symbolUrlMap.set(symbolData.localBodyType, base64Url);
-                    }
+                    // Compress and resize image using sharp
+                    const compressedBuffer = await sharp(originalBuffer)
+                        .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                        .jpeg({ quality: 85 })
+                        .toBuffer();
                     
-                    // Get local body type label
-                    const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമ<br>പഞ്ചായത്ത്' : 
-                                               symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്' : 
-                                               symbolData.localBodyType === 'D' ? 'ജില്ലാ<br>പഞ്ചായത്ത്' : '';
-                    
-                    symbolsArray.push({
-                        name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
-                        url: base64Url,
-                        localBodyType: symbolData.localBodyType || '',
-                        localBodyLabel: localBodyTypeLabel
-                    });
-                    console.log(`  ✅ Symbol ${idx + 1}: ${symbolData.symbolName} (${(imageBuffer.length / 1024).toFixed(2)} KB)`);
+                    const compressedSize = compressedBuffer.length;
+                    base64Url = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
+                    console.log(`  ✅ Symbol ${idx + 1}: ${symbolData.symbolName} (${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB, ${((compressedSize/originalSize)*100).toFixed(0)}%)`);
                 } catch (err) {
                     console.error(`  ❌ Failed to read symbol ${idx + 1}:`, err.message);
                 }
             } else if (symbolPath) {
-                if (symbolData.localBodyType) {
-                    symbolUrlMap.set(symbolData.localBodyType, symbolPath);
-                }
-                
-                // Get local body type label
-                const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമ<br>പഞ്ചായത്ത്' : 
-                                           symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്' : 
-                                           symbolData.localBodyType === 'D' ? 'ജില്ലാ<br>പഞ്ചായത്ത്' : '';
-                
+                base64Url = symbolPath;
+            }
+            
+            // Store in both map (for backward compat) and array
+            if (base64Url && symbolData.localBodyType) {
+                symbolUrlMap.set(symbolData.localBodyType, base64Url);
+            }
+            
+            // Get local body type label
+            const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമ<br>പഞ്ചായത്ത്' : 
+                                       symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്' : 
+                                       symbolData.localBodyType === 'D' ? 'ജില്ലാ<br>പഞ്ചായത്ത്' : '';
+            
+            if (base64Url) {
                 symbolsArray.push({
                     name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
-                    url: symbolPath,
+                    url: base64Url,
                     localBodyType: symbolData.localBodyType || '',
                     localBodyLabel: localBodyTypeLabel
                 });
@@ -292,13 +294,25 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             ? path.join(__dirname, '..', 'public', symbolImage)
             : symbolImage;
         
-        if (symbolPath && !symbolPath.startsWith('http')) {
+        // Check if it's already a base64 data URL
+        if (symbolPath.startsWith('data:')) {
+            symbolUrl = symbolPath;
+            console.log('✅ Symbol is already base64 data URL');
+        } else if (symbolPath && !symbolPath.startsWith('http')) {
             try {
-                const imageBuffer = fs.readFileSync(symbolPath);
-                const ext = path.extname(symbolPath).toLowerCase();
-                const mimeType = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/png';
-                symbolUrl = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
-                console.log('✅ Symbol converted to base64 once (', (imageBuffer.length / 1024).toFixed(2), 'KB)');
+                const originalBuffer = fs.readFileSync(symbolPath);
+                const originalSize = originalBuffer.length;
+                
+                // Compress and resize image using sharp
+                const compressedBuffer = await sharp(originalBuffer)
+                    .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                    .jpeg({ quality: 85 })
+                    .toBuffer();
+                
+                const compressedSize = compressedBuffer.length;
+                const mimeType = 'image/jpeg';
+                symbolUrl = `data:${mimeType};base64,${compressedBuffer.toString('base64')}`;
+                console.log(`✅ Symbol compressed: ${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB (${((compressedSize/originalSize)*100).toFixed(0)}%)`);
             } catch (err) {
                 console.error('❌ Failed to read symbol file:', err.message);
             }
@@ -522,7 +536,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
         
-        ${isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : `:root { --symbol-image: url('${symbolUrl}'); }`}
+        ${isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : order.customization.isCustomPoster ? `:root { --poster-image: url('${symbolUrl}'); }` : `:root { --symbol-image: url('${symbolUrl}'); }`}
         
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
@@ -534,6 +548,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .voter-slip > * { overflow: hidden; }
         
         .slip-left { width: 38mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0; }
+        .slip-left.custom-poster { padding: 0; background: #f5f5f5; border-right: 2px dotted; overflow: hidden; }
+        .poster-image { width: 100%; height: 100%; background-image: var(--poster-image); background-size: cover; background-repeat: no-repeat; background-position: center; }
         .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1; }
         .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
@@ -762,6 +778,13 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 
                 leftSectionHTML += `
                     </div>
+                </div>`;
+            } else if (order.customization.isCustomPoster) {
+                // Custom poster mode: fill entire column with uploaded image
+                // Use CSS variable to avoid repeating large base64 string for each voter
+                leftSectionHTML = `
+                <div class="slip-left custom-poster">
+                    <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
                 </div>`;
             } else {
                 // Single symbol mode: original layout

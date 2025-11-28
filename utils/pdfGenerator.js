@@ -41,8 +41,8 @@ export const createFreshBrowser = async () => {
                 // Try different launch strategies on each attempt
                 const launchOptions = {
                     headless: true,
-                    timeout: 120000,
-                    protocolTimeout: 180000,
+                    timeout: 180000,        // 3 minutes browser launch
+                    protocolTimeout: 300000, // 5 minutes protocol timeout (increased for large images)
                     dumpio: false
                 };
 
@@ -162,12 +162,16 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         const page = await browser.newPage();
         await page.setBypassCSP(true);
         await page.setJavaScriptEnabled(false);
-        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
+        
+        console.log('📝 Setting page content for session PDF...');
+        await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 240000 }); // 4 minutes
+        
+        console.log('🖨️ Generating session PDF...');
         const pdf = await page.pdf({ 
             format: 'A4', 
             printBackground: true, 
             margin: { top: 0, bottom: 0, left: 0, right: 0 },
-            timeout: 180000 // 3 minutes for large PDFs
+            timeout: 300000 // 5 minutes
         });
         await page.close();
         await browser.close();
@@ -214,12 +218,18 @@ export const generatePDFBackground = async (order, orderId) => {
                 page = await browser.newPage();
                 await page.setBypassCSP(true);
                 await page.setJavaScriptEnabled(false);
-                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 180000 }); // 3 minutes for large HTML
+                
+                // Set content with extended timeout for large images
+                console.log('📝 Setting page content...');
+                await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 240000 }); // 4 minutes for large base64 images
+                
+                // Generate PDF with extended timeout
+                console.log('🖨️ Generating PDF...');
                 pdf = await page.pdf({ 
                     format: 'A4', 
                     printBackground: true, 
                     margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                    timeout: 180000 // 3 minutes for large PDFs
+                    timeout: 300000 // 5 minutes for large PDFs with embedded images
                 });
                 
                 // Close page first and wait for cleanup
