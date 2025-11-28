@@ -589,7 +589,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
         .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; max-width: 33%; }
         .symbol-item-image { width: ${fontSizeMulti.symbolImageSize}; height: ${fontSizeMulti.symbolImageSize}; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
-        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: normal; max-width: 100%; white-space: normal; }
+        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: normal; max-width: 100%; white-space: normal; margin-bottom: 0.3mm; }
+        .symbol-item-label { font-size: 5pt; text-align: center; line-height: 1.1; color: #666; max-width: 100%; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
@@ -799,7 +800,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                     leftSectionHTML += `
                         <div class="symbol-item">
                             <div class="symbol-item-image" style="background-image: url('${symbolItem.url}');"></div>
-                            <div class="symbol-item-name">${symbolItem.name}<br><br>${symbolItem.localBodyLabel || ''}</div>`;
+                            <div class="symbol-item-name">${symbolItem.name}</div>
+                            <div class="symbol-item-label">${symbolItem.localBodyLabel || ''}</div>`;
                     
                     leftSectionHTML += `
                         </div>`;

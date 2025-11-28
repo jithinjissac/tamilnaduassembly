@@ -258,6 +258,14 @@ s0.parentNode.insertBefore(s1,s0);
             50% { transform: scale(1.1); }
         }
 
+        .btn-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            opacity: 0.8;
+        }
+
         /* Orders Section */
         .orders-section {
             background: white;
@@ -656,9 +664,13 @@ s0.parentNode.insertBefore(s1,s0);
             <p>Generate customized voter slips for your election campaign</p>
             <br>
             <div class="btn-group">
-                <a href="create-slip.html" class="btn btn-create"><i class="fas fa-plus"></i> Create New Slip</a>
+                <a href="create-slip.html" class="btn btn-create">
+                    <i class="fas fa-plus"></i> Create New Slip
+                    <span class="btn-label">ഒരു ചിഹ്നം മാത്രം</span>
+                </a>
                 <a href="create-multi-slip.html" class="btn btn-multi">
                     <i class="fas fa-layer-group"></i> Multi-Symbol Slip
+                    <span class="btn-label">ഒരു സ്ലിപ്പിൽ മൂന്ന് ചിഹ്നം വരെ</span>
                     <span class="new-badge">NEW</span>
                 </a>
             </div>

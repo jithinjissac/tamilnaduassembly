@@ -246,13 +246,13 @@ export async function generateInvoice(order, user) {
             
             description += descParts.join('\n');
 
-            // Calculate description column width to prevent overflow
+            // Calculate description column width to prevent overflow - leave more space for numbers
             const descX = 50;
-            const descWidth = qtyX - descX - 20; // more padding for Malayalam text
+            const descWidth = qtyX - descX - 30; // increased padding to prevent overlap
 
             // Use appropriate font for description (detect Malayalam)
             const descStartY = yPosition;
-            doc.fontSize(10);
+            doc.fontSize(9); // slightly smaller font to prevent wrapping issues
             safeText(description, descX, yPosition, { 
                 width: descWidth,
                 lineBreak: true,
@@ -265,14 +265,15 @@ export async function generateInvoice(order, user) {
                 lineBreak: true 
             });
 
-            // Draw numeric columns aligned to top of description
-            doc.font('Helvetica')
-               .text(order.totalVoters.toString(), qtyX, descStartY)
-               .text(`Rs. ${order.pricePerVoter.toFixed(2)}`, rateX, descStartY)
-               .text(`Rs. ${order.originalAmount.toFixed(2)}`, amountX, descStartY);
+            // Draw numeric columns aligned to top of description with proper spacing
+            doc.fontSize(10)
+               .font('Helvetica')
+               .text(order.totalVoters.toString(), qtyX, descStartY, { width: 60, align: 'left' })
+               .text(`Rs. ${order.pricePerVoter.toFixed(2)}`, rateX, descStartY, { width: 70, align: 'left' })
+               .text(`Rs. ${order.originalAmount.toFixed(2)}`, amountX, descStartY, { width: 80, align: 'right' });
 
             // Advance yPosition by description height (plus padding)
-            yPosition = descStartY + Math.max(descHeight, 20) + 5;
+            yPosition = descStartY + Math.max(descHeight, 30) + 10; // increased min height and padding
 
             // Discount row (if applicable)
             if (order.originalAmount !== order.amount) {
@@ -321,16 +322,17 @@ export async function generateInvoice(order, user) {
 
             // Payment information
             yPosition += 60;
-            doc.fontSize(10)
+            doc.fontSize(11)
                .font('Helvetica-Bold')
                .text('PAYMENT INFORMATION:', 50, yPosition);
             
-            yPosition += 20;
-            doc.font('Helvetica')
-               .text(`Payment Method: ${paymentGateway}`, 50, yPosition)
-               .text(`Transaction ID: ${paymentId}`, 50, yPosition + 15)
-               .text(`Payment Date: ${order.paidAt ? new Date(order.paidAt).toLocaleString('en-IN') : 'N/A'}`, 50, yPosition + 30)
-               .text(`Status: COMPLETED`, 50, yPosition + 45);
+            yPosition += 25;
+            doc.fontSize(10)
+               .font('Helvetica')
+               .text(`Payment Method: ${paymentGateway}`, 50, yPosition, { width: 500 })
+               .text(`Transaction ID: ${paymentId}`, 50, yPosition + 20, { width: 500 })
+               .text(`Payment Date: ${order.paidAt ? new Date(order.paidAt).toLocaleString('en-IN') : 'N/A'}`, 50, yPosition + 40, { width: 500 })
+               .text(`Status: COMPLETED`, 50, yPosition + 60, { width: 500 });
 
             // Footer section
             const footerY = doc.page.height - 100;
