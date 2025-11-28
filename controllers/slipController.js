@@ -253,9 +253,9 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                     }
                     
                     // Get local body type label
-                    const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമപഞ്ചായത്ത്' : 
-                                               symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക് പഞ്ചായത്ത്' : 
-                                               symbolData.localBodyType === 'D' ? 'ജില്ലാ പഞ്ചായത്ത്' : '';
+                    const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമ<br>പഞ്ചായത്ത്' : 
+                                               symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്' : 
+                                               symbolData.localBodyType === 'D' ? 'ജില്ലാ<br>പഞ്ചായത്ത്' : '';
                     
                     symbolsArray.push({
                         name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
@@ -273,9 +273,9 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 }
                 
                 // Get local body type label
-                const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമപഞ്ചായത്ത്' : 
-                                           symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക് പഞ്ചായത്ത്' : 
-                                           symbolData.localBodyType === 'D' ? 'ജില്ലാ പഞ്ചായത്ത്' : '';
+                const localBodyTypeLabel = symbolData.localBodyType === 'G' ? 'ഗ്രാമ<br>പഞ്ചായത്ത്' : 
+                                           symbolData.localBodyType === 'B' ? 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്' : 
+                                           symbolData.localBodyType === 'D' ? 'ജില്ലാ<br>പഞ്ചായത്ത്' : '';
                 
                 symbolsArray.push({
                     name: symbolData.symbolNameMalayalam || symbolData.symbolName || 'Symbol',
@@ -472,8 +472,6 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             headerFont: '7pt',
             symbolImageSize: '16mm',
             symbolNameFont: '6.5pt',
-            symbolTypeFont: '5.5pt',
-            symbolTypeMarginTop: '1.2mm',
             slipNumber: '10pt',
             secId: '9pt',
             voterName: '11pt',
@@ -490,8 +488,6 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             headerFont: '8pt',
             symbolImageSize: '18mm',
             symbolNameFont: '7pt',
-            symbolTypeFont: '6pt',
-            symbolTypeMarginTop: '1.5mm',
             slipNumber: '11pt',
             secId: '10pt',
             voterName: '11pt',
@@ -548,8 +544,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .symbols-row { display: flex; justify-content: space-evenly; align-items: flex-start; gap: 1mm; width: 100%; }
         .symbol-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
         .symbol-item-image { width: ${fontSizeMulti.symbolImageSize}; height: ${fontSizeMulti.symbolImageSize}; background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 0.5mm; flex-shrink: 0; }
-        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.1; word-wrap: break-word; max-width: 100%; }
-        .symbol-item-type { font-size: ${fontSizeMulti.symbolTypeFont}; font-weight: normal; text-align: center; line-height: 1.1; margin-top: ${fontSizeMulti.symbolTypeMarginTop}; color: #333; }
+        .symbol-item-name { font-size: ${fontSizeMulti.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.3; word-wrap: break-word; max-width: 100%; }
         
         /* Symbol-free mode: different layout with serial number on left */
         .voter-slip.symbol-free { display: grid; grid-template-columns: 35mm 1fr; gap: 0; }
@@ -759,13 +754,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                     leftSectionHTML += `
                         <div class="symbol-item">
                             <div class="symbol-item-image" style="background-image: url('${symbolItem.url}');"></div>
-                            <div class="symbol-item-name">${symbolItem.name}</div>`;
-                    
-                    // Add local body type label if available
-                    if (symbolItem.localBodyLabel) {
-                        leftSectionHTML += `
-                            <div class="symbol-item-type">${symbolItem.localBodyLabel}</div>`;
-                    }
+                            <div class="symbol-item-name">${symbolItem.name}<br><br>${symbolItem.localBodyLabel || ''}</div>`;
                     
                     leftSectionHTML += `
                         </div>`;

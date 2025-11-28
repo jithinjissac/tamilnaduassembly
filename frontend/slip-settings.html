@@ -464,26 +464,10 @@
                     </div>
 
                     <div class="setting-row">
-                        <div class="setting-label">Symbol Name Font</div>
+                        <div class="setting-label">Symbol & Type Font</div>
                         <div class="setting-input-group">
                             <input type="text" id="multiFive-symbolNameFont" class="setting-input" placeholder="7pt">
                             <span class="unit-badge">pt</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div class="setting-label">Symbol Type Font</div>
-                        <div class="setting-input-group">
-                            <input type="text" id="multiFive-symbolTypeFont" class="setting-input" placeholder="6pt">
-                            <span class="unit-badge">pt</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div class="setting-label">Symbol Type Margin Top</div>
-                        <div class="setting-input-group">
-                            <input type="text" id="multiFive-symbolTypeMarginTop" class="setting-input" placeholder="1.5mm">
-                            <span class="unit-badge">mm</span>
                         </div>
                     </div>
                 </div>
@@ -580,26 +564,10 @@
                     </div>
 
                     <div class="setting-row">
-                        <div class="setting-label">Symbol Name Font</div>
+                        <div class="setting-label">Symbol & Type Font</div>
                         <div class="setting-input-group">
                             <input type="text" id="multiSix-symbolNameFont" class="setting-input" placeholder="6.5pt">
                             <span class="unit-badge">pt</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div class="setting-label">Symbol Type Font</div>
-                        <div class="setting-input-group">
-                            <input type="text" id="multiSix-symbolTypeFont" class="setting-input" placeholder="5.5pt">
-                            <span class="unit-badge">pt</span>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <div class="setting-label">Symbol Type Margin Top</div>
-                        <div class="setting-input-group">
-                            <input type="text" id="multiSix-symbolTypeMarginTop" class="setting-input" placeholder="1.2mm">
-                            <span class="unit-badge">mm</span>
                         </div>
                     </div>
                 </div>
@@ -793,8 +761,6 @@
                         headerFont: document.getElementById('multiFive-headerFont').value,
                         symbolImageSize: document.getElementById('multiFive-symbolImageSize').value,
                         symbolNameFont: document.getElementById('multiFive-symbolNameFont').value,
-                        symbolTypeFont: document.getElementById('multiFive-symbolTypeFont').value,
-                        symbolTypeMarginTop: document.getElementById('multiFive-symbolTypeMarginTop').value,
                         slipNumber: document.getElementById('multiFive-slipNumber').value,
                         secId: document.getElementById('multiFive-secId').value,
                         voterName: document.getElementById('multiFive-voterName').value,
@@ -808,8 +774,6 @@
                         headerFont: document.getElementById('multiSix-headerFont').value,
                         symbolImageSize: document.getElementById('multiSix-symbolImageSize').value,
                         symbolNameFont: document.getElementById('multiSix-symbolNameFont').value,
-                        symbolTypeFont: document.getElementById('multiSix-symbolTypeFont').value,
-                        symbolTypeMarginTop: document.getElementById('multiSix-symbolTypeMarginTop').value,
                         slipNumber: document.getElementById('multiSix-slipNumber').value,
                         secId: document.getElementById('multiSix-secId').value,
                         voterName: document.getElementById('multiSix-voterName').value,
@@ -902,9 +866,9 @@
         function updatePreview() {
             // Sample symbols for preview
             const sampleSymbols = [
-                { name: 'പതാക', type: 'ഗ്രാമപഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNlNjdhNzAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7wn5qp77iPPC90ZXh0Pjwvc3ZnPg==' },
-                { name: 'താരം', type: 'ബ്ലോക്ക് പഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2ZDk4YmEiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7imIU8L3RleHQ+PC9zdmc+' },
-                { name: 'ചക്രം', type: 'ജില്ലാ പഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2ZGJhNzIiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7imq88L3RleHQ+PC9zdmc+' }
+                { name: 'പതാക', type: 'ഗ്രാമ<br>പഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNlNjdhNzAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7wn5qp77iPPC90ZXh0Pjwvc3ZnPg==' },
+                { name: 'താരം', type: 'ബ്ലോക്ക്<br>പഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2ZDk4YmEiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7imIU8L3RleHQ+PC9zdmc+' },
+                { name: 'ചക്രം', type: 'ജില്ലാ<br>പഞ്ചായത്ത്', image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiM2ZGJhNzIiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IndoaXRlIj7imq88L3RleHQ+PC9zdmc+' }
             ];
 
             // Get settings for 5 slips
@@ -913,9 +877,7 @@
                 headerText: document.getElementById('multiFive-headerText').value || 'നമ്മുടെ ചിഹ്നം',
                 headerFont: document.getElementById('multiFive-headerFont').value || '8pt',
                 symbolImageSize: document.getElementById('multiFive-symbolImageSize').value || '18mm',
-                symbolNameFont: document.getElementById('multiFive-symbolNameFont').value || '7pt',
-                symbolTypeFont: document.getElementById('multiFive-symbolTypeFont').value || '6pt',
-                symbolTypeMarginTop: document.getElementById('multiFive-symbolTypeMarginTop').value || '1.5mm'
+                symbolNameFont: document.getElementById('multiFive-symbolNameFont').value || '7pt'
             };
 
             // Get settings for 6 slips
@@ -924,9 +886,7 @@
                 headerText: document.getElementById('multiSix-headerText').value || 'നമ്മുടെ ചിഹ്നം',
                 headerFont: document.getElementById('multiSix-headerFont').value || '7pt',
                 symbolImageSize: document.getElementById('multiSix-symbolImageSize').value || '16mm',
-                symbolNameFont: document.getElementById('multiSix-symbolNameFont').value || '6.5pt',
-                symbolTypeFont: document.getElementById('multiSix-symbolTypeFont').value || '5.5pt',
-                symbolTypeMarginTop: document.getElementById('multiSix-symbolTypeMarginTop').value || '1.2mm'
+                symbolNameFont: document.getElementById('multiSix-symbolNameFont').value || '6.5pt'
             };
 
             // Generate preview HTML
@@ -945,12 +905,8 @@
                                         background-image: url('${symbol.image}'); 
                                         background-size: contain; background-repeat: no-repeat; background-position: center; 
                                         margin-bottom: 2px;"></div>
-                            <div style="font-size: ${settings.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.1;">
-                                ${symbol.name}
-                            </div>
-                            <div style="font-size: ${settings.symbolTypeFont}; text-align: center; line-height: 1.1; 
-                                        margin-top: ${settings.symbolTypeMarginTop}; color: #333;">
-                                ${symbol.type}
+                            <div style="font-size: ${settings.symbolNameFont}; font-weight: bold; text-align: center; line-height: 1.3;">
+                                ${symbol.name}<br><br>${symbol.type}
                             </div>
                         </div>`;
                 });
