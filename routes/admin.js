@@ -13,6 +13,8 @@ import {
     getAllOrders,
     getOrderDetails,
     createOrderWithoutPayment,
+    createPendingOrderForUser,
+    transferOrderToUser,
     markOrderCompleted,
     downloadOrderPDF,
     regenerateOrderPDF,
@@ -54,9 +56,11 @@ router.delete('/symbols/:symbolId', deleteSymbol);
 // ⚠️ IMPORTANT: Specific routes MUST come BEFORE parameterized routes!
 router.get('/orders', getAllOrders);
 router.post('/orders/create', createOrderWithoutPayment);
+router.post('/orders/create-pending', createPendingOrderForUser);
 router.post('/orders/delete-bulk', deleteOrders);  // ← Must be before :orderId routes
 router.get('/orders/:orderId', getOrderDetails);
 router.patch('/orders/:orderId/complete', markOrderCompleted);
+router.patch('/orders/:orderId/transfer', transferOrderToUser);
 router.get('/orders/:orderId/download', downloadOrderPDF);
 router.post('/orders/:orderId/regenerate-pdf', regenerateOrderPDF);
 router.delete('/orders/:orderId', deleteOrder);

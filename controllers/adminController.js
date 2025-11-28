@@ -674,6 +674,178 @@ export const createOrderWithoutPayment = async (req, res) => {
     }
 };
 
+// Admin: Transfer order to another user (change ownership)
+export const transferOrderToUser = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { userId, markAsPending } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'User ID is required'
+            });
+        }
+
+        // Find the order
+        const order = await Order.findOne({ orderId });
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found'
+            });
+        }
+
+        // Find the target user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Target user not found'
+            });
+        }
+
+        if (!user.isActive) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Cannot transfer order to inactive user'
+            });
+        }
+
+        const oldUserId = order.userId;
+
+        // Update order ownership
+        order.userId = userId;
+
+        // Recalculate amount based on new user's pricing
+        const pricePerVoter = user.pricePerVoter !== undefined ? user.pricePerVoter : 0.50;
+        const newAmount = Math.round(order.totalVoters * pricePerVoter * 100) / 100;
+        
+        order.pricePerVoter = pricePerVoter;
+        order.amount = newAmount;
+        order.originalAmount = newAmount;
+
+        // If markAsPending is true, change status to pending (user needs to pay)
+        if (markAsPending) {
+            order.paymentStatus = 'pending';
+            order.paidAt = null;
+            order.razorpayPaymentId = null;
+            order.razorpayOrderId = null;
+            order.cashfreeOrderId = null;
+            order.cashfreeSessionId = null;
+            order.cashfreePaymentId = null;
+        }
+
+        await order.save();
+
+        res.json({
+            status: 'success',
+            message: `Order transferred to ${user.name} (${user.email})${markAsPending ? ' and marked as pending payment' : ''}`,
+            order: {
+                orderId: order.orderId,
+                oldUserId,
+                newUserId: userId,
+                userName: user.name,
+                userEmail: user.email,
+                newAmount: order.amount,
+                paymentStatus: order.paymentStatus
+            }
+        });
+
+    } catch (error) {
+        console.error('Transfer order error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to transfer order',
+            error: error.message
+        });
+    }
+};
+
+// Admin: Create pending order on behalf of user (user will complete payment)
+export const createPendingOrderForUser = async (req, res) => {
+    try {
+        const { userId, customization, location, voters } = req.body;
+
+        // Validate required fields
+        if (!userId || !customization || !location || !voters || !Array.isArray(voters) || voters.length === 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Missing required fields: userId, customization, location, and voters array'
+            });
+        }
+
+        // Generate order ID
+        const generateOrderId = () => {
+            const date = new Date();
+            const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+            const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+            return `ORD-${dateStr}-${randomStr}`;
+        };
+
+        const orderId = generateOrderId();
+        const totalVoters = voters.length;
+        
+        // Fetch user to get their pricePerVoter
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'User not found'
+            });
+        }
+
+        if (!user.isActive) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Cannot create order for inactive user'
+            });
+        }
+        
+        const pricePerVoter = user.pricePerVoter !== undefined ? user.pricePerVoter : 0.50;
+        const amount = Math.round(totalVoters * pricePerVoter * 100) / 100;
+
+        // Create order with PENDING status (user will complete payment)
+        const order = new Order({
+            userId,
+            orderId,
+            customization,
+            location,
+            voters,
+            totalVoters,
+            originalAmount: amount,
+            pricePerVoter,
+            amount,
+            paymentStatus: 'pending' // User needs to pay
+        });
+
+        await order.save();
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Pending order created successfully. User can now complete payment.',
+            order: {
+                id: order._id,
+                orderId: order.orderId,
+                userId: order.userId,
+                totalVoters: order.totalVoters,
+                amount: order.amount,
+                paymentStatus: order.paymentStatus,
+                userEmail: user.email,
+                userName: user.name
+            }
+        });
+
+    } catch (error) {
+        console.error('Create pending order for user error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to create pending order',
+            error: error.message
+        });
+    }
+};
+
 // Admin: Mark order as completed without payment (bypass payment)
 export const markOrderCompleted = async (req, res) => {
     try {
