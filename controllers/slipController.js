@@ -188,7 +188,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     }
     
     // Handle multi-symbol mode
-    let isMultiSymbol = order.customization.multiSymbol === true;
+    // IMPORTANT: Custom poster mode should NEVER use multi-symbol layout
+    let isMultiSymbol = order.customization.isCustomPoster ? false : (order.customization.multiSymbol === true);
     let symbolMap = new Map(); // localBodyType -> symbolData
     
     if (isMultiSymbol && order.customization.symbols && Array.isArray(order.customization.symbols)) {
