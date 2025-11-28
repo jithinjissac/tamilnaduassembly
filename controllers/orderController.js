@@ -92,7 +92,23 @@ export const createOrder = [
             }
 
             const { location, voters } = req.body;
-            const userId = req.userId;
+            let userId = req.userId; // Default to logged-in user
+            
+            // Check if admin is creating order for another user
+            const adminCreateFor = req.body.adminCreateFor || req.query.adminCreateFor;
+            if (adminCreateFor) {
+                // Verify the requesting user is an admin
+                const requestingUser = await User.findById(req.userId);
+                if (requestingUser && requestingUser.role === 'admin') {
+                    userId = adminCreateFor; // Use the target user's ID
+                    console.log(`🔐 Admin ${requestingUser.email} creating order for user ${adminCreateFor}`);
+                } else {
+                    return res.status(403).json({
+                        status: 'error',
+                        message: 'Only admins can create orders for other users'
+                    });
+                }
+            }
 
             // Get user's custom price per voter
             const user = await User.findById(userId);

@@ -1045,10 +1045,42 @@ s0.parentNode.insertBefore(s1,s0);
         let selectedStations = []; // Store user-selected stations
         const token = localStorage.getItem('token');
 
+        // Check if admin is creating order for a user
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminCreateFor = urlParams.get('adminCreateFor');
+        let selectedUserForAdmin = null;
+
         if (!token) {
             // Save the intended destination before redirecting to login
             sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
             window.location.href = 'login.html';
+        }
+
+        // If admin is creating for user, fetch and display user info
+        if (adminCreateFor) {
+            // Try to get user info from sessionStorage first
+            const storedUser = sessionStorage.getItem('adminSelectedUser');
+            if (storedUser) {
+                try {
+                    selectedUserForAdmin = JSON.parse(storedUser);
+                    displayAdminUserBanner();
+                } catch (e) {
+                    console.error('Error parsing stored user:', e);
+                }
+            }
+        }
+
+        // Display banner showing which user the order is being created for
+        function displayAdminUserBanner() {
+            if (!selectedUserForAdmin) return;
+            
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; padding: 1rem; text-align: center; font-weight: 600; border-bottom: 3px solid #b8860b; position: sticky; top: 0; z-index: 999;';
+            banner.innerHTML = `
+                <i class="fas fa-user-tag"></i> Creating order for: <strong>${selectedUserForAdmin.name}</strong> (${selectedUserForAdmin.email})
+                <span style="margin-left: 1rem; font-size: 0.9em; opacity: 0.8;">Price: ₹${selectedUserForAdmin.pricePerVoter.toFixed(2)}/voter</span>
+            `;
+            document.body.insertBefore(banner, document.body.firstChild);
         }
 
         // Select/deselect all polling stations
@@ -1817,6 +1849,11 @@ s0.parentNode.insertBefore(s1,s0);
                         voterCount: extractedVoters.length
                     };
                     
+                    // Add adminCreateFor if admin is creating for a user
+                    if (adminCreateFor) {
+                        orderData.adminCreateFor = adminCreateFor;
+                    }
+                    
                     console.log('📦 Order data being sent:', orderData);
 
                     const orderResponse = await fetch('/api/orders/create', {
@@ -2155,6 +2192,11 @@ s0.parentNode.insertBefore(s1,s0);
                         voterCount: allVoters.length
                     };
 
+                    // Add adminCreateFor if admin is creating for a user
+                    if (adminCreateFor) {
+                        orderData.adminCreateFor = adminCreateFor;
+                    }
+
                     const orderResponse = await fetch('/api/orders/create', {
                         method: 'POST',
                         headers: {
@@ -2292,6 +2334,11 @@ s0.parentNode.insertBefore(s1,s0);
                 },
                 voters: extractedVoters
             };
+
+            // Add adminCreateFor if admin is creating for a user
+            if (adminCreateFor) {
+                orderData.adminCreateFor = adminCreateFor;
+            }
 
             try {
                 const response = await fetch('/api/orders/create', {
