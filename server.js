@@ -72,7 +72,8 @@ app.use(express.static(path.join(__dirname, frontendDir), {
                     "https://cdn.jsdelivr.net " +
                     "https://unpkg.com " +
                     "https://sdk.cashfree.com " +
-                    "https://checkout.razorpay.com; " +
+                    "https://checkout.razorpay.com " +
+                    "https://static.cloudflareinsights.com; " +
                     
                     // Allow stylesheets from external services
                     "style-src 'self' 'unsafe-inline' " +
