@@ -721,14 +721,19 @@
 
         <!-- Analytics Tab -->
         <div id="analytics-tab" class="tab-content active">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div>
                     <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Admin Dashboard</h2>
-                    <p style="margin: 0; opacity: 0.9;">You can create orders without payment using the same user flow</p>
+                    <p style="margin: 0; opacity: 0.9;">Manage users, orders, and system settings</p>
                 </div>
-                <a href="create-slip.html" class="btn" style="background: white; color: #667eea; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
-                    <i class="fas fa-plus-circle"></i> Create New Order
-                </a>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <a href="create-slip.html" class="btn" style="background: white; color: #667eea; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                        <i class="fas fa-plus-circle"></i> Create Order (Admin)
+                    </a>
+                    <a href="admin-create-order.html" class="btn" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                        <i class="fas fa-user-plus"></i> Create for User
+                    </a>
+                </div>
             </div>
 
             <div class="loading" id="analyticsLoading">

@@ -188,8 +188,24 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     }
     
     // Handle multi-symbol mode
-    // IMPORTANT: Custom poster mode should NEVER use multi-symbol layout
-    let isMultiSymbol = order.customization.isCustomPoster ? false : (order.customization.multiSymbol === true);
+    // CRITICAL: Custom poster mode COMPLETELY overrides multi-symbol mode
+    // When isCustomPoster is true, we NEVER use multi-symbol layout regardless of any other flags
+    const isCustomPoster = order.customization.isCustomPoster === true || order.customization.isCustomUpload === true;
+    let isMultiSymbol = false; // Default to false
+    
+    if (!isCustomPoster && !order.customization.symbolFree) {
+        // Only enable multi-symbol if NOT custom poster and NOT symbol-free
+        isMultiSymbol = order.customization.multiSymbol === true;
+    }
+    
+    console.log(`🔍 [SLIP GENERATION DEBUG]`);
+    console.log(`   Order ID: ${order.orderId}`);
+    console.log(`   isCustomPoster: ${isCustomPoster}`);
+    console.log(`   customization.isCustomPoster: ${order.customization.isCustomPoster}`);
+    console.log(`   customization.isCustomUpload: ${order.customization.isCustomUpload}`);
+    console.log(`   customization.multiSymbol: ${order.customization.multiSymbol}`);
+    console.log(`   isMultiSymbol (final): ${isMultiSymbol}`);
+    console.log(`   symbolFree: ${order.customization.symbolFree}`);
     let symbolMap = new Map(); // localBodyType -> symbolData
     
     if (isMultiSymbol && order.customization.symbols && Array.isArray(order.customization.symbols)) {
@@ -566,7 +582,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
         
-        ${isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : order.customization.isCustomPoster ? `:root { --poster-image: url('${symbolUrl}'); }` : `:root { --symbol-image: url('${symbolUrl}'); }`}
+        ${isCustomPoster ? `:root { --poster-image: url('${symbolUrl}'); }` : isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : `:root { --symbol-image: url('${symbolUrl}'); }`}
         
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
@@ -778,10 +794,18 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             const symbolFreeClass = order.customization.symbolFree ? ' symbol-free' : '';
             
             // Build left section based on mode
+            // CRITICAL PRIORITY ORDER: Custom Poster > Symbol-Free > Multi-Symbol > Single Symbol
             let leftSectionHTML = '';
             
-            if (order.customization.symbolFree) {
-                // Symbol-free mode: show serial number
+            if (isCustomPoster) {
+                // PRIORITY 1: Custom poster mode - fill entire column with uploaded image
+                // This ALWAYS takes precedence over everything else
+                leftSectionHTML = `
+                <div class="slip-left custom-poster">
+                    <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
+                </div>`;
+            } else if (order.customization.symbolFree) {
+                // PRIORITY 2: Symbol-free mode - show serial number
                 leftSectionHTML = `
                 <div class="slip-left">
                     <div class="slip-left-content">
@@ -789,16 +813,8 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                         <div class="serial-value">${serialNo}</div>
                     </div>
                 </div>`;
-            } else if (order.customization.isCustomPoster) {
-                // Custom poster mode: fill entire column with uploaded image
-                // Use CSS variable to avoid repeating large base64 string for each voter
-                // This takes priority over multi-symbol mode
-                leftSectionHTML = `
-                <div class="slip-left custom-poster">
-                    <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
-                </div>`;
             } else if (isMultiSymbol) {
-                // Multi-symbol mode: show all symbols horizontally
+                // PRIORITY 3: Multi-symbol mode - show all symbols horizontally
                 leftSectionHTML = `
                 <div class="slip-left multi-symbol">
                     <div class="multi-symbol-header">${fontSizeMulti.headerText}</div>

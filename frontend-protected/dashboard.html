@@ -184,12 +184,20 @@
             margin-bottom: 1rem;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .btn-create {
             background: white;
             color: var(--kerala-green);
             padding: 1rem 2.5rem;
             font-size: 1.1rem;
             font-weight: 700;
+            position: relative;
         }
 
         .btn-create:hover {
@@ -197,6 +205,52 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             background: var(--kerala-gold);
             color: white;
+        }
+
+        .btn-multi {
+            background: white;
+            color: #2d3748;
+            border: 2px solid #e2e8f0;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            position: relative;
+            overflow: visible;
+        }
+
+        .btn-multi:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--kerala-green);
+        }
+
+        .new-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.5);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .btn-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            opacity: 0.8;
         }
 
         /* Orders Section */
@@ -596,7 +650,17 @@
             <h2>Create New Voter Slips</h2>
             <p>Generate customized voter slips for your election campaign</p>
             <br>
-            <a href="create-slip.html" class="btn btn-create">+ Create New Slip</a>
+            <div class="btn-group">
+                <a href="create-slip.html" class="btn btn-create">
+                    <i class="fas fa-plus"></i> Create New Slip
+                    <span class="btn-label">ഒരു ചിഹ്നം മാത്രം</span>
+                </a>
+                <a href="create-multi-slip.html" class="btn btn-multi">
+                    <i class="fas fa-layer-group"></i> Multi-Symbol Slip
+                    <span class="btn-label">ഒരു സ്ലിപ്പിൽ മൂന്ന് ചിഹ്നം വരെ</span>
+                    <span class="new-badge">NEW</span>
+                </a>
+            </div>
         </div>
         <!-- Stats Cards -->
         <div class="stats-grid">

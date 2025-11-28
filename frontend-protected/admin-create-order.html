@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order for User - Admin Panel</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--kerala-cream);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2e7d32;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--kerala-green);
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.9);
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .selected-user-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid var(--kerala-green);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .selected-user-card h3 {
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .user-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-detail-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* User Selection Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .user-item {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-item:hover {
+            background: #e6f7ff;
+            border-color: var(--kerala-green);
+            transform: translateX(4px);
+        }
+
+        .user-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-item-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .user-item-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-item-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .user-item-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .user-item-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .user-item-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-item-detail i {
+            color: var(--kerala-green);
+            width: 16px;
+        }
+
+        /* Order Type Selection */
+        .order-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .order-type-card {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .order-type-card:hover {
+            border-color: var(--kerala-green);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+
+        .order-type-card.selected {
+            border-color: var(--kerala-green);
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+
+        .order-type-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--kerala-green);
+        }
+
+        .order-type-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-type-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .info-box {
+            background: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff7e6;
+            border-left: 4px solid #fa8c16;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .redirect-message {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .redirect-message i {
+            font-size: 4rem;
+            color: var(--kerala-green);
+            margin-bottom: 1rem;
+        }
+
+        #orderTypeSection, #redirectSection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-user-plus"></i> Create Order for User</h1>
+                <p>Assign orders directly to users in your system</p>
+            </div>
+            <a href="admin.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Admin
+            </a>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Step 1: User Selection -->
+        <div class="card" id="userSelectionSection">
+            <h2 style="color: var(--kerala-green); margin-bottom: 1rem;">
+                <i class="fas fa-user-check"></i> Step 1: Select User
+            </h2>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Select a user</strong> from your database to create an order for them. The order will appear in their dashboard.
+            </div>
+
+            <button class="btn btn-primary" onclick="openUserModal()" style="width: 100%; padding: 1.5rem; font-size: 1.1rem;">
+                <i class="fas fa-search"></i> Browse & Select User
+            </button>
+        </div>
+
+        <!-- Selected User Display -->
+        <div class="selected-user-card" id="selectedUserCard" style="display: none;">
+            <h3><i class="fas fa-user-check"></i> Selected User</h3>
+            <div class="user-details" id="selectedUserDetails"></div>
+            <button class="btn btn-secondary" onclick="changeUser()" style="margin-top: 1rem;">
+                <i class="fas fa-sync"></i> Change User
+            </button>
+        </div>
+
+        <!-- Step 2: Order Type Selection -->
+        <div class="card" id="orderTypeSection">
+            <h2 style="color: var(--kerala-green); margin-bottom: 1rem;">
+                <i class="fas fa-clipboard-list"></i> Step 2: Select Order Type
+            </h2>
+            
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Choose the type of voter slip you want to create for <strong id="selectedUserName"></strong>
+            </div>
+
+            <div class="order-type-grid">
+                <div class="order-type-card" onclick="selectOrderType('single')">
+                    <div class="order-type-icon"><i class="fas fa-flag"></i></div>
+                    <div class="order-type-title">Single Symbol</div>
+                    <div class="order-type-desc">Create slips with one candidate symbol</div>
+                </div>
+
+                <div class="order-type-card" onclick="selectOrderType('multi')">
+                    <div class="order-type-icon"><i class="fas fa-layer-group"></i></div>
+                    <div class="order-type-title">Multi-Symbol</div>
+                    <div class="order-type-desc">Create slips with 2-3 candidate symbols</div>
+                </div>
+
+                <div class="order-type-card" onclick="selectOrderType('custom')">
+                    <div class="order-type-icon"><i class="fas fa-image"></i></div>
+                    <div class="order-type-title">Custom Poster</div>
+                    <div class="order-type-desc">Upload custom candidate poster</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Redirect to Order Creation -->
+        <div class="card" id="redirectSection">
+            <div class="redirect-message">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>Redirecting to Order Creation...</h3>
+                <p>Please wait while we set up the order form for the selected user.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Selection Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> Select User</h2>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="userSearch" placeholder="🔍 Search by name, email, or phone..." oninput="filterUsers()">
+                </div>
+                <div class="user-list" id="userList">
+                    <div style="text-align: center; padding: 2rem; color: #999;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Loading users...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>const token=localStorage['getItem']('token');!token&&(window['location']['href']='login.html');let allUsers=[],selectedUser=null,selectedOrderType=null;async function loadUsers(){try{const a=await fetch('/api/admin/users',{'headers':{'Authorization':'Bearer\x20'+token}});if(!a['ok'])throw new Error('Failed\x20to\x20load\x20users');const b=await a['json']();allUsers=Array['isArray'](b)?b:b['users']||[],displayUsers(allUsers);}catch(c){console['error']('Error\x20loading\x20users:',c),document['getElementById']('userList')['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20padding:\x202rem;\x20color:\x20#e53e3e;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x202rem;\x20margin-bottom:\x201rem;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Failed\x20to\x20load\x20users.\x20Please\x20refresh\x20the\x20page.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';}}function displayUsers(a){const b=document['getElementById']('userList');if(!Array['isArray'](a)){console['error']('Users\x20is\x20not\x20an\x20array:',a),b['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20padding:\x202rem;\x20color:\x20#e53e3e;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-exclamation-triangle\x22\x20style=\x22font-size:\x202rem;\x20margin-bottom:\x201rem;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Error\x20loading\x20users.\x20Invalid\x20data\x20format.</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';return;}if(a['length']===0x0){b['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:\x20center;\x20padding:\x202rem;\x20color:\x20#999;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-user-slash\x22\x20style=\x22font-size:\x202rem;\x20margin-bottom:\x201rem;\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>No\x20users\x20found</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';return;}b['innerHTML']=a['map'](c=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item\x22\x20onclick=\x27selectUser('+JSON['stringify'](c)['replace'](/'/g,'&apos;')+')\x27>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-name\x22>'+c['name']+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-status\x20'+(c['isActive']?'active':'inactive')+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(c['isActive']?'●\x20Active':'●\x20Inactive')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-details\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-detail\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-envelope\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+c['email']+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-detail\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-phone\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+c['phone']+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-item-detail\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-rupee-sign\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>₹'+c['pricePerVoter']['toFixed'](0x2)+'/voter</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20')['join']('');}function filterUsers(){const searchTerm=document['getElementById']('userSearch')['value']['toLowerCase'](),filteredUsers=allUsers['filter'](a=>a['name']['toLowerCase']()['includes'](searchTerm)||a['email']['toLowerCase']()['includes'](searchTerm)||a['phone']['includes'](searchTerm));displayUsers(filteredUsers);}function openUserModal(){document['getElementById']('userModal')['classList']['add']('show'),allUsers['length']===0x0&&loadUsers();}function closeUserModal(){document['getElementById']('userModal')['classList']['remove']('show'),document['getElementById']('userSearch')['value']='',displayUsers(allUsers);}function selectUser(a){selectedUser=a,document['getElementById']('selectedUserDetails')['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-label\x22>Name</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-value\x22>'+a['name']+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-label\x22>Email</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-value\x22>'+a['email']+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-label\x22>Phone</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-value\x22>'+a['phone']+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-label\x22>Price\x20per\x20Voter</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-value\x22>₹'+a['pricePerVoter']['toFixed'](0x2)+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-label\x22>Status</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22user-detail-value\x22\x20style=\x22color:\x20'+(a['isActive']?'#38a169':'#e53e3e')+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+(a['isActive']?'✓\x20Active':'✗\x20Inactive')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',document['getElementById']('selectedUserCard')['style']['display']='block',document['getElementById']('orderTypeSection')['style']['display']='block',document['getElementById']('selectedUserName')['textContent']=a['name'],document['getElementById']('userSelectionSection')['style']['display']='none',closeUserModal(),document['getElementById']('orderTypeSection')['scrollIntoView']({'behavior':'smooth'});}function changeUser(){selectedUser=null,selectedOrderType=null,document['getElementById']('selectedUserCard')['style']['display']='none',document['getElementById']('orderTypeSection')['style']['display']='none',document['getElementById']('redirectSection')['style']['display']='none',document['getElementById']('userSelectionSection')['style']['display']='block',window['scrollTo']({'top':0x0,'behavior':'smooth'});}function selectOrderType(a){selectedOrderType=a,sessionStorage['setItem']('adminSelectedUser',JSON['stringify'](selectedUser)),document['getElementById']('redirectSection')['style']['display']='block',document['getElementById']('redirectSection')['scrollIntoView']({'behavior':'smooth'}),setTimeout(()=>{let b='';switch(a){case'single':b='create-slip.html?adminCreateFor='+selectedUser['_id'];break;case'multi':b='create-multi-slip.html?adminCreateFor='+selectedUser['_id'];break;case'custom':b='create-custom-symbol-slip.html?adminCreateFor='+selectedUser['_id'];break;}window['location']['href']=b;},0x5dc);}function showSuccess(a){const b=document['getElementById']('successMessage'),c=document['getElementById']('errorMessage');c['style']['display']='none',b['textContent']=a,b['style']['display']='block',window['scrollTo']({'top':0x0,'behavior':'smooth'});}function showError(a){const b=document['getElementById']('successMessage'),c=document['getElementById']('errorMessage');b['style']['display']='none',c['textContent']=a,c['style']['display']='block',window['scrollTo']({'top':0x0,'behavior':'smooth'});}</script>
+</body>
+</html>
