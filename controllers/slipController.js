@@ -251,16 +251,31 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 try {
                     const originalBuffer = fs.readFileSync(symbolPath);
                     const originalSize = originalBuffer.length;
+                    const ext = path.extname(symbolPath).toLowerCase();
                     
-                    // Compress and resize image using sharp
-                    const compressedBuffer = await sharp(originalBuffer)
-                        .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
-                        .jpeg({ quality: 85 })
-                        .toBuffer();
+                    // Compress and resize while preserving format (important for PNG transparency)
+                    let compressedBuffer;
+                    let mimeType;
+                    
+                    if (ext === '.png') {
+                        // Preserve PNG format for transparency
+                        compressedBuffer = await sharp(originalBuffer)
+                            .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                            .png({ quality: 85, compressionLevel: 9 })
+                            .toBuffer();
+                        mimeType = 'image/png';
+                    } else {
+                        // Convert JPG/JPEG to compressed JPEG
+                        compressedBuffer = await sharp(originalBuffer)
+                            .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                            .jpeg({ quality: 85 })
+                            .toBuffer();
+                        mimeType = 'image/jpeg';
+                    }
                     
                     const compressedSize = compressedBuffer.length;
-                    base64Url = `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
-                    console.log(`  ✅ Symbol ${idx + 1}: ${symbolData.symbolName} (${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB, ${((compressedSize/originalSize)*100).toFixed(0)}%)`);
+                    base64Url = `data:${mimeType};base64,${compressedBuffer.toString('base64')}`;
+                    console.log(`  ✅ Symbol ${idx + 1}: ${symbolData.symbolName} (${ext}, ${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB, ${((compressedSize/originalSize)*100).toFixed(0)}%)`);
                 } catch (err) {
                     console.error(`  ❌ Failed to read symbol ${idx + 1}:`, err.message);
                 }
@@ -302,17 +317,31 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
             try {
                 const originalBuffer = fs.readFileSync(symbolPath);
                 const originalSize = originalBuffer.length;
+                const ext = path.extname(symbolPath).toLowerCase();
                 
-                // Compress and resize image using sharp
-                const compressedBuffer = await sharp(originalBuffer)
-                    .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
-                    .jpeg({ quality: 85 })
-                    .toBuffer();
+                // Compress and resize while preserving format (important for PNG transparency)
+                let compressedBuffer;
+                let mimeType;
+                
+                if (ext === '.png') {
+                    // Preserve PNG format for transparency
+                    compressedBuffer = await sharp(originalBuffer)
+                        .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                        .png({ quality: 85, compressionLevel: 9 })
+                        .toBuffer();
+                    mimeType = 'image/png';
+                } else {
+                    // Convert JPG/JPEG to compressed JPEG
+                    compressedBuffer = await sharp(originalBuffer)
+                        .resize(400, 600, { fit: 'inside', withoutEnlargement: true })
+                        .jpeg({ quality: 85 })
+                        .toBuffer();
+                    mimeType = 'image/jpeg';
+                }
                 
                 const compressedSize = compressedBuffer.length;
-                const mimeType = 'image/jpeg';
                 symbolUrl = `data:${mimeType};base64,${compressedBuffer.toString('base64')}`;
-                console.log(`✅ Symbol compressed: ${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB (${((compressedSize/originalSize)*100).toFixed(0)}%)`);
+                console.log(`✅ Symbol compressed: ${ext}, ${(originalSize / 1024).toFixed(0)}KB → ${(compressedSize / 1024).toFixed(0)}KB (${((compressedSize/originalSize)*100).toFixed(0)}%)`);
             } catch (err) {
                 console.error('❌ Failed to read symbol file:', err.message);
             }
