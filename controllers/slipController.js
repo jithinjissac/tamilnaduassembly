@@ -788,6 +788,14 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                         <div class="serial-value">${serialNo}</div>
                     </div>
                 </div>`;
+            } else if (order.customization.isCustomPoster) {
+                // Custom poster mode: fill entire column with uploaded image
+                // Use CSS variable to avoid repeating large base64 string for each voter
+                // This takes priority over multi-symbol mode
+                leftSectionHTML = `
+                <div class="slip-left custom-poster">
+                    <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
+                </div>`;
             } else if (isMultiSymbol) {
                 // Multi-symbol mode: show all symbols horizontally
                 leftSectionHTML = `
@@ -809,13 +817,6 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 
                 leftSectionHTML += `
                     </div>
-                </div>`;
-            } else if (order.customization.isCustomPoster) {
-                // Custom poster mode: fill entire column with uploaded image
-                // Use CSS variable to avoid repeating large base64 string for each voter
-                leftSectionHTML = `
-                <div class="slip-left custom-poster">
-                    <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
                 </div>`;
             } else {
                 // Single symbol mode: original layout
