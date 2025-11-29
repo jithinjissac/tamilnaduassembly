@@ -100,11 +100,11 @@ export const createPaymentOrder = async (req, res) => {
         }
 
     } catch (error) {
-        logger.error('Create payment order error:', error.message);
+        logger.error('Create payment order error:', error.message || error);
         res.status(500).json({ 
             status: 'error',
             message: 'Failed to create payment order',
-            error: error.message 
+            error: error.message || String(error)
         });
     }
 };
@@ -188,7 +188,7 @@ async function createCashfreeOrderInternal(req, res, order, cashfreeSettings) {
         });
 
     } catch (error) {
-        logger.error('Create Cashfree order error:', error.message);
+        logger.error('Create Cashfree order error:', error.message || error);
         if (error.response) {
             logger.error('Cashfree API Response:', JSON.stringify({
                 status: error.response.status,
@@ -239,7 +239,7 @@ async function createRazorpayOrderInternal(req, res, order, razorpaySettings) {
         });
 
     } catch (error) {
-        logger.error('Create Razorpay order error:', error.message);
+        logger.error('Create Razorpay order error:', error.message || error);
         throw error;
     }
 }
@@ -312,7 +312,7 @@ async function createPayUMoneyOrderInternal(req, res, order, payumoneySettings) 
         });
 
     } catch (error) {
-        logger.error('Create PayUMoney order error:', error.message);
+        logger.error('Create PayUMoney order error:', error.message || error);
         throw error;
     }
 }
