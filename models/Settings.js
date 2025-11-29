@@ -31,7 +31,7 @@ settingsSchema.index({ lastModified: -1 });  // Fast history sorting
 // Default settings for email only
 export const defaultSettings = {
     payment: {
-        activeGateway: 'razorpay', // 'razorpay' or 'cashfree'
+        activeGateway: 'razorpay', // 'razorpay', 'cashfree', or 'payumoney'
         razorpay: {
             enabled: true,
             keyId: process.env.RAZORPAY_KEY_ID || '',
@@ -42,6 +42,12 @@ export const defaultSettings = {
             appId: process.env.CASHFREE_APP_ID || '',
             secretKey: process.env.CASHFREE_SECRET_KEY || '',
             environment: process.env.CASHFREE_ENV || 'production' // 'sandbox' or 'production'
+        },
+        payumoney: {
+            enabled: false,
+            merchantKey: process.env.PAYUMONEY_MERCHANT_KEY || '',
+            merchantSalt: process.env.PAYUMONEY_MERCHANT_SALT || '',
+            environment: process.env.PAYUMONEY_ENV || 'production' // 'test' or 'production'
         }
     },
     email: {

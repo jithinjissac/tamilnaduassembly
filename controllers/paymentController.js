@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import razorpay from '../config/razorpay.js';
 import { initializeCashfree, getCashfree } from '../config/cashfree.js';
+import { initializePayUMoney, getPayUMoney, generatePaymentHash, verifyPaymentHash } from '../config/payumoney.js';
 import { Cashfree } from 'cashfree-pg';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
@@ -50,6 +51,12 @@ async function getPaymentSettings() {
                 appId: process.env.CASHFREE_APP_ID || '',
                 secretKey: process.env.CASHFREE_SECRET_KEY || '',
                 environment: process.env.CASHFREE_ENV || 'production'
+            },
+            payumoney: {
+                enabled: false,
+                merchantKey: process.env.PAYUMONEY_MERCHANT_KEY || '',
+                merchantSalt: process.env.PAYUMONEY_MERCHANT_SALT || '',
+                environment: process.env.PAYUMONEY_ENV || 'production'
             }
         };
     }
@@ -86,6 +93,8 @@ export const createPaymentOrder = async (req, res) => {
         // Route to appropriate gateway
         if (activeGateway === 'cashfree') {
             return await createCashfreeOrderInternal(req, res, order, paymentSettings.cashfree || {});
+        } else if (activeGateway === 'payumoney') {
+            return await createPayUMoneyOrderInternal(req, res, order, paymentSettings.payumoney || {});
         } else {
             return await createRazorpayOrderInternal(req, res, order, paymentSettings.razorpay || {});
         }
@@ -231,6 +240,79 @@ async function createRazorpayOrderInternal(req, res, order, razorpaySettings) {
 
     } catch (error) {
         logger.error('Create Razorpay order error:', error.message);
+        throw error;
+    }
+}
+
+// Internal function for PayUMoney order creation
+async function createPayUMoneyOrderInternal(req, res, order, payumoneySettings) {
+    try {
+        // Check if PayUMoney is configured
+        if (!payumoneySettings.merchantKey || !payumoneySettings.merchantSalt) {
+            return res.status(503).json({ 
+                status: 'error',
+                message: 'PayUMoney not configured. Please configure in Payment Settings.' 
+            });
+        }
+
+        // Initialize PayUMoney
+        initializePayUMoney(
+            payumoneySettings.merchantKey,
+            payumoneySettings.merchantSalt,
+            payumoneySettings.environment
+        );
+
+        // Get user details
+        const user = await User.findById(order.userId);
+
+        // Generate unique transaction ID (txnid)
+        const txnid = `${order.orderId}_${Date.now()}`;
+
+        // Determine PayUMoney payment URL based on environment
+        const paymentUrl = payumoneySettings.environment === 'test' 
+            ? 'https://test.payu.in/_payment'
+            : 'https://secure.payu.in/_payment';
+
+        // Build payment parameters
+        const paymentParams = {
+            key: payumoneySettings.merchantKey,
+            txnid: txnid,
+            amount: order.amount.toFixed(2),
+            productinfo: `Voter Slip Order - ${order.orderId}`,
+            firstname: user.name.split(' ')[0] || user.name,
+            email: user.email,
+            phone: user.phone || '9999999999',
+            surl: `${process.env.BACKEND_URL || 'https://easyslip.in'}/api/payment/payumoney/success`,
+            furl: `${process.env.BACKEND_URL || 'https://easyslip.in'}/api/payment/payumoney/failure`,
+            service_provider: 'payu_paisa',
+            udf1: order.orderId, // Store our internal order ID
+            udf2: '',
+            udf3: '',
+            udf4: '',
+            udf5: ''
+        };
+
+        // Generate payment hash
+        const hash = generatePaymentHash(paymentParams, payumoneySettings.merchantSalt);
+        paymentParams.hash = hash;
+
+        // Update order with PayUMoney transaction ID
+        order.payumoneyTxnId = txnid;
+        await order.save();
+
+        logger.info('PayUMoney order created:', order.orderId);
+
+        res.json({
+            status: 'success',
+            gateway: 'payumoney',
+            paymentUrl: paymentUrl,
+            params: paymentParams,
+            orderId: order.orderId,
+            amount: order.amount
+        });
+
+    } catch (error) {
+        logger.error('Create PayUMoney order error:', error.message);
         throw error;
     }
 }
@@ -665,6 +747,119 @@ export const verifyCashfreePayment = async (req, res) => {
             message: 'Payment verification failed',
             error: error.message 
         });
+    }
+};
+
+// PayUMoney Success Callback
+export const handlePayUMoneySuccess = async (req, res) => {
+    try {
+        const paymentResponse = req.body;
+        
+        logger.debug('PayUMoney success callback received:', paymentResponse.txnid);
+
+        // Get payment settings to retrieve merchant salt
+        const paymentSettings = await getPaymentSettings();
+        const payumoneySettings = paymentSettings.payumoney;
+
+        if (!payumoneySettings || !payumoneySettings.merchantSalt) {
+            logger.error('PayUMoney settings not found for verification');
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=config_error`);
+        }
+
+        // Verify payment hash
+        const isValid = verifyPaymentHash(paymentResponse, payumoneySettings.merchantSalt);
+
+        if (!isValid) {
+            logger.error('PayUMoney payment hash verification failed:', paymentResponse.txnid);
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=invalid_hash`);
+        }
+
+        // Extract our internal order ID from udf1
+        const orderId = paymentResponse.udf1;
+        
+        if (!orderId) {
+            logger.error('Order ID not found in PayUMoney response');
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=missing_order`);
+        }
+
+        // Find order
+        const order = await Order.findOne({ orderId });
+
+        if (!order) {
+            logger.error('Order not found:', orderId);
+            return res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?orderId=${orderId}`);
+        }
+
+        // Check if payment was successful
+        if (paymentResponse.status === 'success' && order.paymentStatus !== 'completed') {
+            // Update order
+            order.paymentStatus = 'completed';
+            order.payumoneyPaymentId = paymentResponse.mihpayid;
+            order.payumoneyTxnId = paymentResponse.txnid;
+            order.paidAt = new Date();
+            
+            try {
+                await order.save();
+                logger.info(`✅ PayUMoney payment completed for order ${order.orderId}`);
+            } catch (saveError) {
+                logger.error(`❌ Failed to save order ${order.orderId} after PayUMoney payment:`, saveError);
+                throw saveError;
+            }
+
+            // Send emails
+            const user = await User.findById(order.userId);
+            if (user) {
+                sendPaymentSuccessEmail(user, order).catch(err => {
+                    logger.error('Failed to send payment success email:', err.message);
+                });
+
+                const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${order.orderId}.pdf`);
+                if (fs.existsSync(permanentPdfPath)) {
+                    sendPDFReadyEmail(user, order).catch(err => {
+                        logger.error('Failed to send PDF ready email:', err.message);
+                    });
+                }
+            }
+
+            // Redirect to success page
+            return res.redirect(`${process.env.FRONTEND_URL}/order-success.html?orderId=${orderId}`);
+        }
+
+        // Payment already processed or failed
+        return res.redirect(`${process.env.FRONTEND_URL}/order-success.html?orderId=${orderId}`);
+
+    } catch (error) {
+        logger.error('PayUMoney success callback error:', error.message);
+        res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=server_error`);
+    }
+};
+
+// PayUMoney Failure Callback
+export const handlePayUMoneyFailure = async (req, res) => {
+    try {
+        const paymentResponse = req.body;
+        
+        logger.warn('PayUMoney payment failed:', paymentResponse.txnid, 'reason:', paymentResponse.error_Message);
+
+        // Extract our internal order ID from udf1
+        const orderId = paymentResponse.udf1;
+
+        if (orderId) {
+            // Update order status
+            const order = await Order.findOne({ orderId });
+            if (order) {
+                order.paymentStatus = 'failed';
+                await order.save();
+                logger.info('Order marked as failed:', orderId);
+            }
+        }
+
+        // Redirect to failure page
+        res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?orderId=${orderId || 'unknown'}&reason=${encodeURIComponent(paymentResponse.error_Message || 'payment_failed')}`);
+
+    } catch (error) {
+        logger.error('PayUMoney failure callback error:', error.message);
+        res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=server_error`);
     }
 };
 

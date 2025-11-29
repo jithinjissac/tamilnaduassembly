@@ -34,5 +34,15 @@ router.post('/webhook', paymentController.webhook);
 // @access  Public
 router.post('/cashfree/webhook', paymentController.cashfreeWebhook);
 
+// @route   POST /api/payment/payumoney/success
+// @desc    PayUMoney success callback
+// @access  Public
+router.post('/payumoney/success', paymentController.handlePayUMoneySuccess);
+
+// @route   POST /api/payment/payumoney/failure
+// @desc    PayUMoney failure callback
+// @access  Public
+router.post('/payumoney/failure', paymentController.handlePayUMoneyFailure);
+
 export default router;
 

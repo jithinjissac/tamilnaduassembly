@@ -1250,12 +1250,12 @@ s0.parentNode.insertBefore(s1,s0);
                             <h4 style="margin: 0; color: #2d3748;">Symbol ${i + 1}</h4>
                         </div>
                         
-                        <div class="symbol-preview" id="symbolPreview${i}" style="display: none; padding: 1rem; background: white; border-radius: 8px; border: 2px solid #48bb78; margin-bottom: 1rem;">
+                        <div class="symbol-preview" id="symbolPreview${i}" style="display: none; padding: 1rem; background: white; border-radius: 8px; border: 2px solid #48bb78; margin-bottom: 1.25rem;">
                             <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img id="symbolImage${i}" src="" style="width: 60px; height: 60px; object-fit: contain;">
+                                <img id="symbolImage${i}" src="" style="width: 52px; height: 52px; object-fit: contain; filter: brightness(0.95);">
                                 <div style="flex: 1;">
-                                    <div id="symbolName${i}" style="font-weight: 600; color: #2d3748;"></div>
-                                    <div id="symbolNameMal${i}" style="font-family: 'Noto Sans Malayalam'; color: #FFB81C; font-size: 0.95rem;"></div>
+                                    <div id="symbolName${i}" style="font-weight: 400; font-size: 0.95rem; color: #4a5568; letter-spacing: 0.01em;"></div>
+                                    <div id="symbolNameMal${i}" style="font-family: 'Noto Sans Malayalam'; color: #111827; font-size: 1.05rem; font-weight: 600; margin-top: 0.4rem; letter-spacing: 0.015em;"></div>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-secondary" onclick="openSymbolPicker(${i})" style="padding: 0.5rem 1rem;">
                                     <i class="fas fa-sync-alt"></i> Change
@@ -1267,20 +1267,20 @@ s0.parentNode.insertBefore(s1,s0);
                             <i class="fas fa-hand-pointer"></i> Select Symbol ${i + 1}
                         </button>
                         
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label style="font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; display: block;">
+                        <div class="form-group" style="margin-bottom: 0; margin-top: 1.25rem;">
+                            <label style="font-weight: 600; color: #111827; margin-bottom: 0.75rem; display: block; font-size: 1.05rem; letter-spacing: 0.01em;">
                                 Local Body Type (Malayalam)
                                 <span style="color: #e53e3e; font-size: 0.9rem;">*</span>
                             </label>
                             <select id="localBodyName${i}" class="form-control" 
-                                    style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Noto Sans Malayalam', sans-serif; font-size: 1rem;"
+                                    style="padding: 0.85rem; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Noto Sans Malayalam', sans-serif; font-size: 1.05rem; color: #111827; margin-bottom: 0.75rem;"
                                     onchange="updateLocalBodyName(${i}, this.value)">
                                 <option value="">Select local body type...</option>
                                 <option value="G">ഗ്രാമപഞ്ചായത്ത്</option>
                                 <option value="B">ബ്ലോക്ക് പഞ്ചായത്ത്</option>
                                 <option value="D">ജില്ലാ പഞ്ചായത്ത്</option>
                             </select>
-                            <small style="color: #718096; margin-top: 0.25rem; display: block;">Select the local body level type (will appear below the symbol)</small>
+                            <small style="color: #111827; margin-top: 0.65rem; display: block; font-size: 0.95rem;">Select the local body level type (will appear below the symbol)</small>
                         </div>
                     </div>
                 `;

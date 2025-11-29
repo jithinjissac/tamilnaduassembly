@@ -2206,6 +2206,8 @@ s0.parentNode.insertBefore(s1,s0);
                 // Route to appropriate payment gateway
                 if (result.gateway === 'cashfree') {
                     initiateCashfreePayment(result);
+                } else if (result.gateway === 'payumoney') {
+                    initiatePayUMoneyPayment(result);
                 } else {
                     initiateRazorpayPayment(result);
                 }
@@ -2350,6 +2352,65 @@ s0.parentNode.insertBefore(s1,s0);
                 messageIcon.style.color = '#c33';
                 messageTitle.textContent = 'Payment Failed';
                 messageText.textContent = error.message || 'Failed to process Cashfree payment';
+                messageAction.innerHTML = '<button onclick="location.reload()" class="btn btn-payment" style="margin-top: 1rem; max-width: 200px;"><i class="fas fa-redo"></i> Retry</button>';
+                messageBox.style.display = 'block';
+
+                document.getElementById('paymentBtn').disabled = false;
+                document.getElementById('payBtnText').textContent = 'Make Payment';
+            }
+        }
+
+        function initiatePayUMoneyPayment(result) {
+            try {
+                console.log('Initiating PayUMoney payment with:', result);
+                
+                if (!result.paymentUrl || !result.params) {
+                    throw new Error('Invalid PayUMoney payment data');
+                }
+
+                // Track payment initiation
+                if (window.trackActivity) {
+                    window.trackActivity('payumoney_payment_initiated', {
+                        orderId: result.orderId,
+                        amount: result.amount
+                    });
+                }
+
+                // Create a form and auto-submit to PayUMoney
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = result.paymentUrl;
+                
+                // Add all payment parameters as hidden fields
+                Object.entries(result.params).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+                
+                // Append form to body and submit
+                document.body.appendChild(form);
+                console.log('🚀 Submitting PayUMoney payment form...');
+                form.submit();
+                
+            } catch (error) {
+                console.error('❌ PayUMoney payment error:', error);
+                
+                // Show error with retry button
+                const messageBox = document.getElementById('messageBox');
+                const messageIcon = document.getElementById('messageIcon');
+                const messageTitle = document.getElementById('messageTitle');
+                const messageText = document.getElementById('messageText');
+                const messageAction = document.getElementById('messageAction');
+
+                messageBox.style.background = '#fee';
+                messageBox.style.border = '2px solid #c33';
+                messageIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                messageIcon.style.color = '#c33';
+                messageTitle.textContent = 'Payment Failed';
+                messageText.textContent = error.message || 'Failed to process PayUMoney payment';
                 messageAction.innerHTML = '<button onclick="location.reload()" class="btn btn-payment" style="margin-top: 1rem; max-width: 200px;"><i class="fas fa-redo"></i> Retry</button>';
                 messageBox.style.display = 'block';
 

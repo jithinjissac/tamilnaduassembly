@@ -148,6 +148,9 @@ const OrderSchema = new mongoose.Schema({
     cashfreeOrderId: String,
     cashfreeSessionId: String,
     cashfreePaymentId: String,
+    // PayUMoney payment fields
+    payumoneyTxnId: String,
+    payumoneyPaymentId: String,
     createdAt: {
         type: Date,
         default: Date.now
