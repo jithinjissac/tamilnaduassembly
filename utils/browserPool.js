@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { getProxyConfigWithFallback } from './proxyConfig.js';
 
 /**
  * Browser Pool Manager
@@ -232,7 +233,8 @@ class BrowserPool {
     console.log(`🚀 Launching browser #${browserIndex}...`);
 
     try {
-      const browser = await chromium.launch({
+      const proxyConfig = getProxyConfigWithFallback();
+      const launchOptions = {
         headless: true, // Must be true for production servers without display
         args: [
           '--no-sandbox',
@@ -246,7 +248,13 @@ class BrowserPool {
           '--disable-gpu' // Required for headless mode on Linux
         ],
         timeout: 30000
-      });
+      };
+      
+      if (proxyConfig) {
+        launchOptions.proxy = proxyConfig;
+      }
+      
+      const browser = await chromium.launch(launchOptions);
 
       // Handle browser disconnection
       browser.on('disconnected', () => {

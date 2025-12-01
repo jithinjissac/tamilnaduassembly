@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import { parseVotersTable } from './parser.js';
+import { getProxyConfigWithFallback } from './proxyConfig.js';
 
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 
@@ -22,10 +23,17 @@ export async function extractVoterList(params) {
 
   try {
     console.log('Launching browser...');
-    browser = await chromium.launch({ 
+    const proxyConfig = getProxyConfigWithFallback();
+    const launchOptions = { 
       headless: false, // Set to false to see browser GUI
       args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    };
+    
+    if (proxyConfig) {
+      launchOptions.proxy = proxyConfig;
+    }
+    
+    browser = await chromium.launch(launchOptions);
 
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'

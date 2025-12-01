@@ -404,7 +404,7 @@ s0.parentNode.insertBefore(s1,s0);
             </div>
         </div>
 
-        <div class="download-info">
+        <div class="download-info" id="downloadInfoSection" style="display: none;">
             <h3><i class="fas fa-download"></i> Your File is Ready to Download</h3>
             <p>Download the complete voter slips PDF now</p>
             <p><strong>Print directly on A4 paper</strong></p>
@@ -430,7 +430,7 @@ s0.parentNode.insertBefore(s1,s0);
             </button>
             <!-- Google Drive download button (shown when available for in-app browsers) -->
             <button class="btn" onclick="downloadFromGoogleDrive()" id="googleDriveBtn" style="display: none; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); margin-left: 0.5rem;">
-                <i class="fab fa-google-drive"></i> Download from Google Drive
+                <i class="fab fa-google-drive"></i> Download Slip from Google Drive
             </button>
             <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
                 <i class="fas fa-file-invoice"></i> Download Invoice
@@ -511,6 +511,9 @@ s0.parentNode.insertBefore(s1,s0);
 
         let orderData = null;
         let downloadInProgress = false;
+        let paymentCheckCount = 0;
+        const MAX_PAYMENT_CHECKS = 90; // Check for 3 minutes (90 * 2 seconds)
+        let paymentCheckInterval = null;
 
         // Function to check authentication and order ownership
         async function verifyOrderAccess() {
@@ -988,8 +991,14 @@ s0.parentNode.insertBefore(s1,s0);
                 // Display order details
                 displayOrderDetails(orderData);
 
-                // Start checking PDF generation status
-                checkPDFStatus();
+                // If payment is not completed, start polling for payment status
+                if (data.paymentStatus !== 'completed') {
+                    console.log('[PAYMENT] Payment not completed, starting status polling...');
+                    startPaymentStatusPolling();
+                } else {
+                    // Start checking PDF generation status
+                    checkPDFStatus();
+                }
 
             } catch (error) {
                 console.error('Error loading order:', error);
@@ -1005,7 +1014,74 @@ s0.parentNode.insertBefore(s1,s0);
 
         let statusCheckInterval = null;
         let statusCheckCount = 0;
-        const MAX_STATUS_CHECKS = 5; // 5 checks * 2 seconds = 10 seconds
+        const MAX_STATUS_CHECKS = 90; // Stop after 3 minutes (90 * 2 seconds)
+
+        function startPaymentStatusPolling() {
+            checkPaymentStatus();
+            paymentCheckInterval = setInterval(checkPaymentStatus, 2000); // Check every 2 seconds
+        }
+
+        async function checkPaymentStatus() {
+            try {
+                paymentCheckCount++;
+                console.log(`[PAYMENT] Checking payment status (${paymentCheckCount}/${MAX_PAYMENT_CHECKS})...`);
+
+                const response = await fetch(`/api/orders/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('[PAYMENT] Failed to check payment status:', response.status);
+                    return;
+                }
+
+                const orderStatus = await response.json();
+                console.log('[PAYMENT] Order status:', orderStatus.paymentStatus);
+
+                if (orderStatus.paymentStatus === 'completed') {
+                    console.log('[PAYMENT] ✅ Payment completed! Updating UI...');
+                    
+                    // Stop payment polling
+                    if (paymentCheckInterval) {
+                        clearInterval(paymentCheckInterval);
+                        paymentCheckInterval = null;
+                    }
+
+                    // Update order data
+                    orderData = orderStatus;
+
+                    // Update UI
+                    const successTitle = document.querySelector('.success-title');
+                    const successMessage = document.querySelector('.success-message');
+                    const downloadInfoSection = document.getElementById('downloadInfoSection');
+                    
+                    if (successTitle) successTitle.textContent = '🎉 Payment Successful!';
+                    if (successMessage) successMessage.textContent = 'Your payment has been received and confirmed!';
+                    if (downloadInfoSection) downloadInfoSection.style.display = 'block';
+
+                    // Start checking PDF status
+                    checkPDFStatus();
+                } else if (paymentCheckCount >= MAX_PAYMENT_CHECKS) {
+                    // Timeout after 3 minutes
+                    console.log('[PAYMENT] Payment verification timeout reached');
+                    
+                    if (paymentCheckInterval) {
+                        clearInterval(paymentCheckInterval);
+                        paymentCheckInterval = null;
+                    }
+
+                    showMessage(
+                        'warning',
+                        'Payment Verification Pending',
+                        'We are still verifying your payment. Please check back in a few minutes or contact support if the issue persists.'
+                    );
+                }
+            } catch (error) {
+                console.error('[PAYMENT] Error checking payment status:', error);
+            }
+        }
 
         async function checkPDFStatus() {
             try {
@@ -1035,6 +1111,7 @@ s0.parentNode.insertBefore(s1,s0);
                     // PDF is ready - hide progress, show download button
                     console.log('[PDF STATUS] PDF is ready!');
                     generatingStatus.classList.remove('show');
+                    document.getElementById('downloadInfoSection').style.display = 'block';
                     downloadBtn.disabled = false;
                     downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
                     
@@ -1085,6 +1162,7 @@ s0.parentNode.insertBefore(s1,s0);
                     
                     // PDF is being generated - show progress
                     console.log('[PDF STATUS] PDF is being generated...', status.progress);
+                    document.getElementById('downloadInfoSection').style.display = 'none';
                     generatingStatus.classList.add('show');
                     downloadBtn.disabled = true;
                     downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing PDF...';

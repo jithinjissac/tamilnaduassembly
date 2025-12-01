@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getProxyConfigWithFallback } from '../utils/proxyConfig.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,10 +33,17 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
   let browser;
   let page;
   try {
-    browser = await chromium.launch({ 
+    const proxyConfig = getProxyConfigWithFallback();
+    const launchOptions = { 
       headless: true, 
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--lang=ml-IN']
-    });
+    };
+    
+    if (proxyConfig) {
+      launchOptions.proxy = proxyConfig;
+    }
+    
+    browser = await chromium.launch(launchOptions);
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
       locale: 'ml-IN',

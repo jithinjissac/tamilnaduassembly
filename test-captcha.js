@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { getProxyConfigWithFallback } from './utils/proxyConfig.js';
 
 console.log('Testing Playwright captcha capture...');
 
@@ -6,10 +7,17 @@ console.log('Testing Playwright captcha capture...');
   let browser;
   try {
     console.log('Launching browser...');
-    browser = await chromium.launch({ 
+    const proxyConfig = getProxyConfigWithFallback();
+    const launchOptions = { 
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    };
+    
+    if (proxyConfig) {
+      launchOptions.proxy = proxyConfig;
+    }
+    
+    browser = await chromium.launch(launchOptions);
 
     console.log('Creating context...');
     const context = await browser.newContext({

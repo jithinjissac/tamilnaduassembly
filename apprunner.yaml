@@ -1,22 +1,36 @@
+# AWS App Runner configuration file
+# This file defines the build and runtime configuration for deploying to AWS App Runner
+
 version: 1.0
-runtime: nodejs20
+runtime: nodejs16
+
 build:
   commands:
     pre-build:
-      - echo "Installing dependencies..."
-    build:
-      - npm install
-      - npx playwright install-deps
-      - npx playwright install chromium
-    post-build:
-      - echo "Build completed"
+      - npm install --production
+      - mkdir -p generated-pdfs uploads
+
 run:
-  command: npm start
+  command: node server.js
   network:
     port: 3000
-    env: APP_PORT
+    env: PORT
   env:
     - name: NODE_ENV
       value: "production"
-    - name: PORT
-      value: "3000"
+    - name: USE_PROTECTED
+      value: "true"
+    # Database - Set in AWS App Runner console or via secrets
+    # - name: MONGODB_URI
+    # - name: JWT_SECRET
+    # - name: FRONTEND_URL
+    # Razorpay
+    # - name: RAZORPAY_KEY_ID
+    # - name: RAZORPAY_KEY_SECRET
+    # - name: RAZORPAY_WEBHOOK_SECRET
+    # Google Drive
+    # - name: GOOGLE_DRIVE_CLIENT_ID
+    # - name: GOOGLE_DRIVE_CLIENT_SECRET
+    # - name: GOOGLE_DRIVE_REFRESH_TOKEN
+    # - name: GOOGLE_DRIVE_FOLDER_ID
+    # - name: GCS_BUCKET_NAME

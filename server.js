@@ -50,12 +50,13 @@ console.log(`📁 Serving frontend from: ${frontendDir}`);
 
 app.use(express.static(path.join(__dirname, frontendDir), {
     setHeaders: (res, filePath) => {
-        // Disable caching for HTML files to ensure users get latest access control fixes
+        // Disable caching for all files to ensure users always get latest version
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        
+        // Add development-friendly CSP for HTML files
         if (filePath.endsWith('.html')) {
-            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.setHeader('Pragma', 'no-cache');
-            res.setHeader('Expires', '0');
-            
             // Add development-friendly CSP for DevTools and external resources
             if (process.env.NODE_ENV !== 'production') {
                 res.setHeader('Content-Security-Policy', 
@@ -152,8 +153,32 @@ app.use('/api/system', systemRoutes);
 import symbolRoutes from './routes/symbols.js';
 app.use('/api', symbolRoutes);
 
-// Serve symbols directory
+// Serve symbols directory with fallback for missing images
 app.use('/symbols', express.static(path.join(__dirname, 'public', 'symbols')));
+
+// Fallback route for missing symbol images - serve a placeholder
+app.get('/symbols/*', (req, res) => {
+    const requestedSymbol = req.params[0];
+    logger.warn(`Symbol image not found: ${requestedSymbol}`);
+    console.log(`⚠️ Missing symbol: /symbols/${requestedSymbol}`);
+    
+    const placeholderPath = path.join(__dirname, 'public', 'placeholder-symbol.png');
+    if (fs.existsSync(placeholderPath)) {
+        res.sendFile(placeholderPath);
+    } else {
+        // Create a simple SVG placeholder on-the-fly
+        const svg = `
+            <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#f0f0f0"/>
+                <text x="50" y="50" text-anchor="middle" dominant-baseline="middle" 
+                      font-family="Arial" font-size="12" fill="#666">
+                    Symbol Missing
+                </text>
+            </svg>
+        `;
+        res.type('image/svg+xml').send(svg);
+    }
+});
 
 // Serve lottie animations directory
 app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
