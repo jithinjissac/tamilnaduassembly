@@ -113,8 +113,22 @@ app.get('/sitemap.xml', (req, res) => {
     res.sendFile(path.join(__dirname, frontendDir, 'sitemap.xml'));
 });
 
-// Serve captcha cache directory
-app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache')));
+// Serve captcha cache directory - Allow public access without authentication
+// Add logging middleware to debug captcha access
+app.use('/captcha-cache', (req, res, next) => {
+  console.log(`[CAPTCHA ACCESS] Request: ${req.path} from ${req.ip}`);
+  next();
+});
+
+app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache'), {
+  maxAge: '1m', // Cache for 1 minute
+  etag: false, // Disable ETag to prevent caching issues
+  lastModified: true,
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+}));
 
 // Serve debug screenshots directory
 app.use('/debug-screenshots', express.static(path.join(__dirname, 'public', 'debug-screenshots')));

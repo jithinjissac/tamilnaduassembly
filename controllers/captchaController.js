@@ -178,7 +178,7 @@ router.get('/initCaptchaSession', async (req, res) => {
       return res.json({
         success: true,
         sessionId: result.sessionId,
-        captchaImageUrl: result.captchaImageUrl,
+        captchaUrl: result.captchaImageUrl, // Use captchaUrl for consistency
         timings: result.timings
       });
     }
@@ -360,7 +360,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         return {
           status: 'success',
           sessionId,
-          captchaUrl: `/captcha-cache/captcha-${sessionId}.png`,
+          captchaUrl: `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`,
           message: 'Captcha session initialized',
           timings: {
             total: totalTime,
