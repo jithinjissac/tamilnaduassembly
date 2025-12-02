@@ -137,7 +137,7 @@ export const getLocationFromIP = async (ip) => {
             isp: data.org || 'Unknown ISP'
         };
     } catch (error) {
-        console.error('❌ Location lookup error:', error.message);
+        // Silently handle location lookup errors (rate limiting, etc.)
         return {
             ip: ip || 'unknown',
             country: 'Unknown',
