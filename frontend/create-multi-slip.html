@@ -57,6 +57,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="symbol-picker.js"></script>
     <script src="activity-tracker.js"></script>
+    <!-- Tawk.to Script - Commented out, replaced with WhatsApp
+    <script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.onLoad = function(){
+    Tawk_API.minimize();
+};
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+    -->
+    
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/917907638842?text=Hi%20need%20your%20help" target="_blank" id="whatsappFloat" title="Chat with us on WhatsApp" style="position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); z-index: 9999; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(37, 211, 102, 0.6)'; document.getElementById('whatsappTooltip').style.opacity='1'; document.getElementById('whatsappTooltip').style.visibility='visible';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37, 211, 102, 0.4)'; document.getElementById('whatsappTooltip').style.opacity='0'; document.getElementById('whatsappTooltip').style.visibility='hidden';">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <div id="whatsappTooltip" style="position: fixed; bottom: 30px; right: 90px; background: #2d3748; color: white; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; white-space: nowrap; z-index: 9998; opacity: 0; visibility: hidden; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        Need help? Chat with us!
+        <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid #2d3748;"></div>
+    </div>
+    
     <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -894,10 +920,11 @@ s0.parentNode.insertBefore(s1,s0);
         </div>
         <div style="flex: 1;">
             <div style="font-weight: 600; color: #92400E; margin-bottom: 0.25rem; font-size: 1rem;">
-                <i class="fas fa-info-circle"></i> High Traffic Notice
+                <i class="fas fa-info-circle"></i> High Traffic Notice / ഉയർന്ന ട്രാഫിക് അറിയിപ്പ്
             </div>
             <div style="color: #78350F; font-size: 0.9rem; line-height: 1.5;">
-                Due to heavy traffic, you may experience slowness in loading captcha and voter details. If you're unable to proceed, please try again after some time. We apologize for the inconvenience.
+                Due to heavy traffic, you may experience slowness in loading captcha and voter details. If you're unable to proceed, please try again after some time. We apologize for the inconvenience.<br>
+                <span style="font-family: 'Noto Sans Malayalam', sans-serif; font-weight: 500;">കൂടുതൽ ട്രാഫിക് കാരണം, ക്യാപ്ച്ചയും വോട്ടർ വിവരങ്ങളും ലോഡ് ചെയ്യുന്നതിൽ തടസങ്ങളുണ്ടാവാം. തുടരാൻ കഴിയുന്നില്ലെങ്കിൽ, കുറച്ച് സമയത്തിന് ശേഷം വീണ്ടും ശ്രമിക്കുക. അസൗകര്യത്തിൽ ഞങ്ങൾ ഖേദിക്കുന്നു.</span>
             </div>
         </div>
         <button onclick="document.getElementById('trafficNotice').style.display='none'" style="background: none; border: none; color: #92400E; cursor: pointer; font-size: 1.25rem; padding: 0; line-height: 1; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
@@ -2582,9 +2609,18 @@ s0.parentNode.insertBefore(s1,s0);
                         <h3 style="margin: 0 0 1rem 0; color: #2d3748;">Station ${current} of ${total}</h3>
                         <p style="margin: 0 0 1.5rem 0; color: #718096; font-size: 0.95rem;">${stationName}</p>
                         
-                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
-                            <img src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto;">
+                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; text-align: center; position: relative;">
+                            <img id="modalCaptchaImage" src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
+                            <div id="modalCaptchaLoader" style="display: none; padding: 2rem;">
+                                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
+                            </div>
                         </div>
+                        
+                        <button type="button" id="reloadModalCaptcha" 
+                                style="width: 100%; padding: 0.5rem; background: #f7fafc; color: #2d3748; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">
+                            <i class="fas fa-sync-alt"></i> Reload Captcha
+                        </button>
                         
                         <input type="text" id="bulkCaptchaInput" placeholder="Enter Captcha" 
                                style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;">
@@ -2604,8 +2640,41 @@ s0.parentNode.insertBefore(s1,s0);
 
                 const input = modal.querySelector('#bulkCaptchaInput');
                 const submitBtn = modal.querySelector('#submitBulkCaptcha');
+                const reloadBtn = modal.querySelector('#reloadModalCaptcha');
+                const captchaImg = modal.querySelector('#modalCaptchaImage');
+                const captchaLoader = modal.querySelector('#modalCaptchaLoader');
                 
                 input.focus();
+
+                // Reload captcha handler
+                reloadBtn.onclick = async () => {
+                    try {
+                        reloadBtn.disabled = true;
+                        reloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                        captchaImg.style.display = 'none';
+                        captchaLoader.style.display = 'block';
+                        
+                        const response = await fetch('/api/initCaptchaSession');
+                        if (!response.ok) throw new Error('Failed to load captcha');
+                        
+                        const data = await response.json();
+                        if (data.status === 'success') {
+                            window.currentSessionId = data.sessionId;
+                            window.currentCaptchaImage = data.captchaUrl;
+                            captchaImg.src = data.captchaUrl;
+                            captchaImg.style.display = 'block';
+                            captchaLoader.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error reloading captcha:', error);
+                        alert('Failed to reload captcha. Please try again.');
+                        captchaImg.style.display = 'block';
+                        captchaLoader.style.display = 'none';
+                    } finally {
+                        reloadBtn.disabled = false;
+                        reloadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Reload Captcha';
+                    }
+                };
 
                 const submit = () => {
                     const value = input.value.trim();
