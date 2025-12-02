@@ -255,3 +255,60 @@ process.on('SIGTERM', async () => {
   await closeBrowser();
   process.exit(0);
 });
+
+// Auto-restart on uncaught exceptions (browser crashes, etc.)
+process.on('uncaughtException', async (error) => {
+  logger.error('❌ Uncaught Exception:', error);
+  
+  // Check if it's a browser-related error
+  const isBrowserError = error.message?.toLowerCase().includes('browser') ||
+                         error.message?.toLowerCase().includes('playwright') ||
+                         error.message?.toLowerCase().includes('puppeteer') ||
+                         error.message?.toLowerCase().includes('chromium') ||
+                         error.message?.toLowerCase().includes('target closed');
+  
+  if (isBrowserError) {
+    logger.error('🔄 Browser error detected - attempting cleanup and restart...');
+    try {
+      await closeBrowser();
+    } catch (cleanupError) {
+      logger.error('Cleanup error:', cleanupError);
+    }
+    
+    // In production (Railway), exit with code 1 to trigger restart
+    if (process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT) {
+      logger.info('🔄 Exiting to trigger Railway auto-restart...');
+      process.exit(1);
+    }
+  } else {
+    logger.error('Non-browser error - logging but continuing...');
+  }
+});
+
+// Auto-restart on unhandled promise rejections
+process.on('unhandledRejection', async (reason, promise) => {
+  logger.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  
+  // Check if it's a browser-related error
+  const isBrowserError = reason?.message?.toLowerCase().includes('browser') ||
+                         reason?.message?.toLowerCase().includes('playwright') ||
+                         reason?.message?.toLowerCase().includes('puppeteer') ||
+                         reason?.message?.toLowerCase().includes('chromium') ||
+                         reason?.message?.toLowerCase().includes('target closed') ||
+                         reason?.message?.toLowerCase().includes('session closed');
+  
+  if (isBrowserError) {
+    logger.error('🔄 Browser error in promise rejection - attempting cleanup and restart...');
+    try {
+      await closeBrowser();
+    } catch (cleanupError) {
+      logger.error('Cleanup error:', cleanupError);
+    }
+    
+    // In production (Railway), exit with code 1 to trigger restart
+    if (process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT) {
+      logger.info('🔄 Exiting to trigger Railway auto-restart...');
+      process.exit(1);
+    }
+  }
+});
