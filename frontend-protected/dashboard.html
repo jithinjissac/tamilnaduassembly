@@ -23,6 +23,19 @@
     <link rel="stylesheet" href="kerala-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tawk.to Script - Commented out, replaced with WhatsApp
+    <script type="text/javascript">var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){Tawk_API['minimize']();},(function(){var a=document['createElement']('script'),b=document['getElementsByTagName']('script')[0x0];a['async']=!![],a['src']='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh',a['charset']='UTF-8',a['setAttribute']('crossorigin','*'),b['parentNode']['insertBefore'](a,b);}());</script>
+    -->
+    
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/917907638842?text=Hi%20need%20your%20help" target="_blank" id="whatsappFloat" title="Chat with us on WhatsApp" style="position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); z-index: 9999; text-decoration: none; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(37, 211, 102, 0.6)'; document.getElementById('whatsappTooltip').style.opacity='1'; document.getElementById('whatsappTooltip').style.visibility='visible';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(37, 211, 102, 0.4)'; document.getElementById('whatsappTooltip').style.opacity='0'; document.getElementById('whatsappTooltip').style.visibility='hidden';">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <div id="whatsappTooltip" style="position: fixed; bottom: 30px; right: 90px; background: #2d3748; color: white; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; white-space: nowrap; z-index: 9998; opacity: 0; visibility: hidden; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        Need help? Chat with us!
+        <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid #2d3748;"></div>
+    </div>
+    
     <!--Start of Tawk.to Script-->
 <script type="text/javascript">var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();Tawk_API['onLoad']=function(){Tawk_API['minimize']();},(function(){var a=document['createElement']('script'),b=document['getElementsByTagName']('script')[0x0];a['async']=!![],a['src']='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh',a['charset']='UTF-8',a['setAttribute']('crossorigin','*'),b['parentNode']['insertBefore'](a,b);}());</script>
 <!--End of Tawk.to Script-->
@@ -642,6 +655,35 @@
             </div>
         </div>
     </header>
+
+    <!-- Traffic Notice -->
+    <div id="trafficNotice" style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-left: 4px solid #F59E0B; padding: 1rem 1.5rem; margin: 1rem auto; max-width: 1200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: start; gap: 1rem; animation: slideDown 0.5s ease-out;">
+        <div style="flex-shrink: 0; font-size: 1.5rem; color: #F59E0B;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div style="flex: 1;">
+            <div style="font-weight: 600; color: #92400E; margin-bottom: 0.25rem; font-size: 1rem;">
+                <i class="fas fa-info-circle"></i> High Traffic Notice / ഉയർന്ന ട്രാഫിക് അറിയിപ്പ്
+            </div>
+            <div style="color: #78350F; font-size: 0.9rem; line-height: 1.5;">
+                Due to heavy traffic, you may experience slowness in loading captcha and voter details. If you're unable to proceed, please try again after some time. We apologize for the inconvenience.<br>
+                <span style="font-family: 'Noto Sans Malayalam', sans-serif; font-weight: 500;">കൂടുതൽ ട്രാഫിക് കാരണം, ക്യാപ്ച്ചയും വോട്ടർ വിവരങ്ങളും ലോഡ് ചെയ്യുന്നതിൽ തടസങ്ങളുണ്ടാവാം. തുടരാൻ കഴിയുന്നില്ലെങ്കിൽ, കുറച്ച് സമയത്തിന് ശേഷം വീണ്ടും ശ്രമിക്കുക. അസൗകര്യത്തിൽ ഞങ്ങൾ ഖേദിക്കുന്നു.</span>
+            </div>
+        </div>
+        <button onclick="document.getElementById('trafficNotice').style.display='none'" style="background: none; border: none; color: #92400E; cursor: pointer; font-size: 1.25rem; padding: 0; line-height: 1; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <style>
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 768px) {
+        #trafficNotice { margin: 0.5rem; padding: 0.75rem 1rem; font-size: 0.9rem; }
+        #trafficNotice > div:first-child { font-size: 1.25rem; }
+    }
+    </style>
 
     <!-- Main Container -->
     <div class="container">

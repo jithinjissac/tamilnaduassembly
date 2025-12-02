@@ -1160,15 +1160,15 @@ s0.parentNode.insertBefore(s1,s0);
 
                     <div class="form-group">
                         <label>Captcha</label>
-                        <div style="position: relative; min-height: 80px;">
+                        <div style="min-height: 120px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: center;">
                             <!-- Captcha Loader -->
-                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
+                            <div id="captchaLoader" style="display: none;">
                                 <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
                                 <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
                             </div>
                             
                             <!-- Captcha Image -->
-                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto;">
+                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto; border-radius: 4px;">
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
                             <span id="loadCaptchaText">Load Captcha</span>

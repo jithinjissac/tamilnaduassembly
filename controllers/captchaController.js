@@ -217,7 +217,7 @@ router.get('/initCaptchaSession', async (req, res) => {
       }
       
       // Set higher default timeout for slow government website
-      page.setDefaultTimeout(90000); // 90 seconds
+      page.setDefaultTimeout(120000); // 120 seconds (2 minutes)
 
       // Block unnecessary resources for faster loading (like ad blockers)
       await page.route('**/*', (route) => {
@@ -244,7 +244,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         console.log('[CAPTCHA] Setting locale to Malayalam...');
         await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
           waitUntil: 'domcontentloaded',
-          timeout: 60000 
+          timeout: 120000 // Increased to 120 seconds
         });
         
         console.log('[CAPTCHA] Malayalam locale set via URL, waiting...');
@@ -265,7 +265,7 @@ router.get('/initCaptchaSession', async (req, res) => {
           try {
             await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
               waitUntil: 'domcontentloaded', // Much faster than 'load'
-              timeout: 60000
+              timeout: 120000 // Increased to 120 seconds
             });
             pageLoaded = true;
             const pageLoadTime = Date.now() - pageLoadStartTime;
@@ -275,9 +275,9 @@ router.get('/initCaptchaSession', async (req, res) => {
             const attemptTime = Date.now() - pageLoadStartTime;
             console.log(`[CAPTCHA] ⏱️  Page load timeout after ${attemptTime}ms, retries remaining: ${retries}`);
             if (retries === 0) {
-              throw new Error('SEC website is too slow. Please try again later.');
+              throw new Error('Kerala SEC website is currently unreachable or experiencing heavy traffic. Please try again in a few minutes.');
             }
-            await page.waitForTimeout(1000); // Reduced retry wait
+            await page.waitForTimeout(2000); // Wait 2 seconds before retry
           }
         }
 
@@ -303,7 +303,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             console.log(`[CAPTCHA] Trying selector: ${selector}`);
             captchaElement = await page.waitForSelector(selector, { 
               state: 'visible',
-              timeout: 10000
+              timeout: 30000
             });
             
             if (captchaElement) {
@@ -341,7 +341,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         const totalTime = Date.now() - startTime;
         console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
 
-        // Store the session using session manager
+        // Store the session using session manager with extended timeout (10 minutes for form filling)
         sessionManager.create(sessionId, context, page, {
           userId: req.user?.id || 'anonymous',
           createdFor: 'captcha',
@@ -353,6 +353,9 @@ router.get('/initCaptchaSession', async (req, res) => {
             screenshot: screenshotTime
           }
         });
+        
+        // Extend session timeout to 10 minutes to give user time to fill form
+        sessionManager.extend(sessionId, 10 * 60 * 1000); // 10 minutes
 
         return {
           status: 'success',
@@ -787,18 +790,19 @@ router.post('/submitWithCaptcha', async (req, res) => {
       pollingStationMalayalam: pollingStationMalayalam || null
     });
 
-    // Keep browser open for 5 seconds so you can see the result
-    console.log('[CAPTCHA] ⏳ Keeping browser open for 5 seconds for inspection...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Keep browser open and captcha file for 1 minute for user to view results
+    console.log('[CAPTCHA] ⏳ Keeping browser and captcha file for 60 seconds...');
+    await new Promise(resolve => setTimeout(resolve, 60000)); // Changed from 5s to 60s
     console.log('[CAPTCHA] ✅ Now cleaning up session...');
 
     // NOW cleanup session after delay
     await sessionManager.cleanup(sessionId);
 
-    // Delete captcha file
+    // Delete captcha file after 1 minute
     const captchaPath = path.join(__dirname, '..', 'public', 'captcha-cache', `captcha-${sessionId}.png`);
     if (fs.existsSync(captchaPath)) {
       fs.unlinkSync(captchaPath);
+      console.log(`🗑️ Captcha file deleted: captcha-${sessionId}.png`);
     }
 
   } catch (error) {
