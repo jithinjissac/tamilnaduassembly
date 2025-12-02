@@ -32,6 +32,48 @@ const PORT = process.env.PORT || 3000;
 // Connect to database
 connectDB();
 
+// Log browser automation setup
+console.log('\n🎭 Browser Automation Setup:');
+try {
+  const { execSync } = await import('child_process');
+  
+  // Check Playwright
+  try {
+    const playwrightVersion = execSync('npx playwright --version', { encoding: 'utf8' }).trim();
+    console.log(`  ✅ Playwright: ${playwrightVersion}`);
+  } catch (e) {
+    console.log('  ⚠️ Playwright: Not installed or not in PATH');
+  }
+  
+  // Check Puppeteer
+  try {
+    const puppeteer = await import('puppeteer');
+    console.log(`  ✅ Puppeteer: v${puppeteer.default._launcher?._preferredRevision || 'installed'}`);
+  } catch (e) {
+    console.log('  ⚠️ Puppeteer: Not available');
+  }
+  
+  // Check Chromium browser
+  try {
+    const browserCheck = execSync('which chromium || which chromium-browser || which google-chrome || echo "checking..."', { 
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore']
+    }).trim();
+    if (browserCheck && browserCheck !== 'checking...') {
+      console.log(`  ✅ Chromium browser: Found at ${browserCheck}`);
+    } else {
+      console.log('  📦 Chromium browser: Using Playwright bundled version');
+    }
+  } catch (e) {
+    console.log('  📦 Chromium browser: Using Playwright bundled version');
+  }
+  
+  console.log('  🌐 Proxy configured:', process.env.USE_PROXY === 'true' ? process.env.PROXY_SERVER : 'disabled');
+} catch (error) {
+  console.log('  ⚠️ Could not check browser automation tools');
+}
+console.log('');
+
 // Ensure required directories exist on startup (important for Railway)
 const requiredDirs = [
   path.join(__dirname, 'public', 'captcha-cache'),
@@ -50,6 +92,14 @@ requiredDirs.forEach(dir => {
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Handle client request aborts gracefully
+app.use((req, res, next) => {
+  req.on('aborted', () => {
+    logger.info(`Client aborted request: ${req.method} ${req.path}`);
+  });
+  next();
+});
 
 // Request logging middleware (throttled based on LOG_LEVEL and REQUEST_LOG_INTERVAL)
 app.use(requestLogger);
@@ -240,11 +290,22 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  // Ignore client-side aborted requests (user navigated away or canceled)
+  if (err.code === 'ECONNABORTED' || err.code === 'ECONNRESET' || err.type === 'request.aborted') {
+    logger.info(`Client aborted request: ${req.method} ${req.path}`);
+    return; // Don't send response, connection is already closed
+  }
+
+  // Log other errors normally
   console.error(err.stack);
-  res.status(500).json({ 
-    status: 'error', 
-    message: err.message || 'Internal server error' 
-  });
+  
+  // Only send response if connection is still open
+  if (!res.headersSent) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: err.message || 'Internal server error' 
+    });
+  }
 });
 
 // Start server
@@ -286,6 +347,11 @@ process.on('SIGTERM', async () => {
 
 // Auto-restart on uncaught exceptions (browser crashes, etc.)
 process.on('uncaughtException', async (error) => {
+  // Ignore client-side aborted requests (BadRequestError: request aborted)
+  if (error.type === 'request.aborted' || error.message?.includes('request aborted')) {
+    return; // Silent ignore - this is normal when users navigate away
+  }
+
   logger.error('❌ Uncaught Exception:', error);
   
   // Check if it's a browser-related error
@@ -315,6 +381,11 @@ process.on('uncaughtException', async (error) => {
 
 // Auto-restart on unhandled promise rejections
 process.on('unhandledRejection', async (reason, promise) => {
+  // Ignore client-side aborted requests
+  if (reason?.type === 'request.aborted' || reason?.message?.includes('request aborted')) {
+    return; // Silent ignore
+  }
+
   logger.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
   
   // Check if it's a browser-related error
