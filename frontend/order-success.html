@@ -366,18 +366,12 @@ s0.parentNode.insertBefore(s1,s0);
         <p class="success-subtitle">Your order is ready</p>
 
         <!-- Error/Warning Message Display -->
-        <div id="messageBox" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; margin: 0; padding: 1.5rem 2rem; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: slideDown 0.3s ease;">
+        <div id="messageBox" style="display: none; margin: 2rem auto; padding: 1.5rem; border-radius: 12px; max-width: 500px; text-align: center;">
             <div id="messageIcon" style="font-size: 3rem; margin-bottom: 1rem;"></div>
             <h3 id="messageTitle" style="margin: 0 0 0.5rem 0;"></h3>
             <p id="messageText" style="margin: 0 0 1rem 0; color: #666;"></p>
             <div id="messageAction"></div>
         </div>
-        <style>
-            @keyframes slideDown {
-                from { opacity: 0; transform: translate(-50%, -20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-            }
-        </style>
 
         <div class="order-id-highlight" id="orderIdDisplay">
             Loading order...
@@ -410,7 +404,7 @@ s0.parentNode.insertBefore(s1,s0);
             </div>
         </div>
 
-        <div class="download-info" id="downloadInfoSection" style="display: none;">
+        <div class="download-info">
             <h3><i class="fas fa-download"></i> Your File is Ready to Download</h3>
             <p>Download the complete voter slips PDF now</p>
             <p><strong>Print directly on A4 paper</strong></p>
@@ -436,7 +430,7 @@ s0.parentNode.insertBefore(s1,s0);
             </button>
             <!-- Google Drive download button (shown when available for in-app browsers) -->
             <button class="btn" onclick="downloadFromGoogleDrive()" id="googleDriveBtn" style="display: none; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); margin-left: 0.5rem;">
-                <i class="fab fa-google-drive"></i> Download Slip from Google Drive
+                <i class="fab fa-google-drive"></i> Download from Google Drive
             </button>
             <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
                 <i class="fas fa-file-invoice"></i> Download Invoice
@@ -517,9 +511,6 @@ s0.parentNode.insertBefore(s1,s0);
 
         let orderData = null;
         let downloadInProgress = false;
-        let paymentCheckCount = 0;
-        const MAX_PAYMENT_CHECKS = 90; // Check for 3 minutes (90 * 2 seconds)
-        let paymentCheckInterval = null;
 
         // Function to check authentication and order ownership
         async function verifyOrderAccess() {
@@ -700,87 +691,8 @@ s0.parentNode.insertBefore(s1,s0);
             messageText.textContent = text;
             messageBox.style.display = 'block';
 
-            // Scroll to top to ensure message is visible
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
             // If redirect URL is provided, add countdown and redirect
             if (redirectUrl) {
-                let countdown = Math.floor(delay / 1000);
-                messageAction.innerHTML = `Redirecting in ${countdown} seconds...`;
-                messageAction.style.display = 'block';
-
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    if (countdown > 0) {
-                        messageAction.innerHTML = `Redirecting in ${countdown} seconds...`;
-                    } else {
-                        clearInterval(countdownInterval);
-                        window.location.href = redirectUrl;
-                    }
-                }, 1000);
-            } else {
-                messageAction.style.display = 'none';
-            }
-        }
-
-        function showPaymentFailure(reason) {
-            // Hide success elements
-            const successIcon = document.querySelector('.success-icon');
-            const successTitle = document.querySelector('.success-title');
-            const successMessage = document.querySelector('.success-message');
-            const orderDetails = document.querySelector('.order-details');
-            const downloadSection = document.getElementById('downloadInfoSection');
-            const actionButtons = document.querySelector('.action-buttons');
-
-            if (successIcon) {
-                successIcon.innerHTML = '<i class="fas fa-times-circle" style="font-size: 5rem; color: #f44336;"></i>';
-            }
-            if (successTitle) {
-                successTitle.textContent = '❌ Payment Failed';
-                successTitle.style.color = '#f44336';
-            }
-            if (successMessage) {
-                successMessage.innerHTML = `
-                    <p style="color: #666; margin-bottom: 1rem;">Your payment could not be processed.</p>
-                    <p style="color: #888; font-size: 0.95rem;"><strong>Reason:</strong> ${reason}</p>
-                `;
-            }
-            if (downloadSection) downloadSection.style.display = 'none';
-            if (actionButtons) actionButtons.style.display = 'none';
-
-            // Add retry button
-            if (orderDetails) {
-                const retryHTML = `
-                    <div style="margin-top: 2rem; padding: 1.5rem; background: #fff3cd; border-left: 4px solid #ff9800; border-radius: 8px;">
-                        <h3 style="margin: 0 0 1rem 0; color: #856404;">What would you like to do?</h3>
-                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button onclick="retryPayment()" style="flex: 1; min-width: 200px; padding: 1rem; background: var(--kerala-green); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                                <i class="fas fa-redo"></i> Try Again
-                            </button>
-                            <button onclick="contactSupport()" style="flex: 1; min-width: 200px; padding: 1rem; background: #2196F3; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                                <i class="fas fa-headset"></i> Contact Support
-                            </button>
-                            <button onclick="window.location.href='dashboard.html'" style="flex: 1; min-width: 200px; padding: 1rem; background: #666; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                                <i class="fas fa-home"></i> Go to Dashboard
-                            </button>
-                        </div>
-                    </div>
-                `;
-                orderDetails.insertAdjacentHTML('afterend', retryHTML);
-            }
-        }
-
-        function retryPayment() {
-            window.location.href = `create-slip.html?retry=${orderId}`;
-        }
-
-        function contactSupport() {
-            if (typeof Tawk_API !== 'undefined' && Tawk_API.maximize) {
-                Tawk_API.maximize();
-            } else {
-                window.location.href = 'contact.html';
-            }
-        }
                 let countdown = Math.floor(delay / 1000);
                 messageAction.innerHTML = `<p style="color: #666; font-size: 0.9rem;">Please wait... Redirecting in ${countdown} seconds</p>`;
                 
@@ -1076,14 +988,8 @@ s0.parentNode.insertBefore(s1,s0);
                 // Display order details
                 displayOrderDetails(orderData);
 
-                // If payment is not completed, start polling for payment status
-                if (data.paymentStatus !== 'completed') {
-                    console.log('[PAYMENT] Payment not completed, starting status polling...');
-                    startPaymentStatusPolling();
-                } else {
-                    // Start checking PDF generation status
-                    checkPDFStatus();
-                }
+                // Start checking PDF generation status
+                checkPDFStatus();
 
             } catch (error) {
                 console.error('Error loading order:', error);
@@ -1099,94 +1005,7 @@ s0.parentNode.insertBefore(s1,s0);
 
         let statusCheckInterval = null;
         let statusCheckCount = 0;
-        const MAX_STATUS_CHECKS = 90; // Stop after 3 minutes (90 * 2 seconds)
-
-        function startPaymentStatusPolling() {
-            checkPaymentStatus();
-            paymentCheckInterval = setInterval(checkPaymentStatus, 2000); // Check every 2 seconds
-        }
-
-        async function checkPaymentStatus() {
-            try {
-                paymentCheckCount++;
-                console.log(`[PAYMENT] Checking payment status (${paymentCheckCount}/${MAX_PAYMENT_CHECKS})...`);
-
-                const response = await fetch(`/api/orders/${orderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    console.error('[PAYMENT] Failed to check payment status:', response.status);
-                    return;
-                }
-
-                const orderStatus = await response.json();
-                console.log('[PAYMENT] Order status:', orderStatus.paymentStatus);
-
-                if (orderStatus.paymentStatus === 'completed') {
-                    console.log('[PAYMENT] ✅ Payment completed! Updating UI...');
-                    
-                    // Stop payment polling
-                    if (paymentCheckInterval) {
-                        clearInterval(paymentCheckInterval);
-                        paymentCheckInterval = null;
-                    }
-
-                    // Update order data
-                    orderData = orderStatus;
-
-                    // Update UI
-                    const successTitle = document.querySelector('.success-title');
-                    const successMessage = document.querySelector('.success-message');
-                    const downloadInfoSection = document.getElementById('downloadInfoSection');
-                    const pdfGeneratingStatus = document.getElementById('pdfGeneratingStatus');
-                    
-                    if (successTitle) successTitle.textContent = '🎉 Payment Successful!';
-                    if (successMessage) successMessage.textContent = 'Your payment has been received and confirmed!';
-                    
-                    // Show PDF generating spinner
-                    if (pdfGeneratingStatus) {
-                        pdfGeneratingStatus.classList.add('show');
-                        pdfGeneratingStatus.style.display = 'block';
-                    }
-                    
-                    // Hide download section until PDF is ready
-                    if (downloadInfoSection) downloadInfoSection.style.display = 'none';
-
-                    // Start checking PDF status
-                    checkPDFStatus();
-                } else if (orderStatus.paymentStatus === 'failed') {
-                    console.log('[PAYMENT] ❌ Payment failed!');
-                    
-                    // Stop payment polling
-                    if (paymentCheckInterval) {
-                        clearInterval(paymentCheckInterval);
-                        paymentCheckInterval = null;
-                    }
-
-                    // Show payment failure UI
-                    showPaymentFailure(orderStatus.paymentFailureReason || 'Payment was declined or cancelled');
-                } else if (paymentCheckCount >= MAX_PAYMENT_CHECKS) {
-                    // Timeout after 3 minutes
-                    console.log('[PAYMENT] Payment verification timeout reached');
-                    
-                    if (paymentCheckInterval) {
-                        clearInterval(paymentCheckInterval);
-                        paymentCheckInterval = null;
-                    }
-
-                    showMessage(
-                        'warning',
-                        'Payment Verification Pending',
-                        'We are still verifying your payment. Please check back in a few minutes or contact support if the issue persists.'
-                    );
-                }
-            } catch (error) {
-                console.error('[PAYMENT] Error checking payment status:', error);
-            }
-        }
+        const MAX_STATUS_CHECKS = 5; // 5 checks * 2 seconds = 10 seconds
 
         async function checkPDFStatus() {
             try {
@@ -1216,8 +1035,6 @@ s0.parentNode.insertBefore(s1,s0);
                     // PDF is ready - hide progress, show download button
                     console.log('[PDF STATUS] PDF is ready!');
                     generatingStatus.classList.remove('show');
-                    generatingStatus.style.display = 'none';
-                    document.getElementById('downloadInfoSection').style.display = 'block';
                     downloadBtn.disabled = false;
                     downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
                     
@@ -1268,7 +1085,6 @@ s0.parentNode.insertBefore(s1,s0);
                     
                     // PDF is being generated - show progress
                     console.log('[PDF STATUS] PDF is being generated...', status.progress);
-                    document.getElementById('downloadInfoSection').style.display = 'none';
                     generatingStatus.classList.add('show');
                     downloadBtn.disabled = true;
                     downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing PDF...';
