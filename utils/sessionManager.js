@@ -21,20 +21,22 @@ class SessionManager {
    * @param {Object} context - Browser context
    * @param {Object} page - Playwright page
    * @param {Object} metadata - Additional session metadata
+   * @param {number} customTimeout - Optional custom timeout in milliseconds
    */
-  create(sessionId, context, page, metadata = {}) {
+  create(sessionId, context, page, metadata = {}, customTimeout = null) {
+    const timeout = customTimeout || this.sessionTimeout;
     const session = {
       sessionId,
       context,
       page,
       metadata,
       createdAt: Date.now(),
-      expiresAt: Date.now() + this.sessionTimeout,
+      expiresAt: Date.now() + timeout,
       lastAccessed: Date.now()
     };
 
     this.sessions.set(sessionId, session);
-    console.log(`✅ Session created: ${sessionId} (expires in ${this.sessionTimeout / 1000}s)`);
+    console.log(`✅ Session created: ${sessionId} (expires in ${timeout / 1000}s)`);
     
     return session;
   }
@@ -73,19 +75,25 @@ class SessionManager {
     const session = this.sessions.get(sessionId);
     
     if (!session) {
+      const allSessionIds = Array.from(this.sessions.keys());
       console.log(`⚠️ Session not found: ${sessionId}`);
+      console.log(`📋 Active sessions: ${allSessionIds.length > 0 ? allSessionIds.join(', ') : 'none'}`);
       return null;
     }
 
     // Check expiration
-    if (Date.now() > session.expiresAt) {
-      console.log(`⏰ Session expired: ${sessionId}`);
+    const now = Date.now();
+    const timeRemaining = session.expiresAt - now;
+    
+    if (timeRemaining <= 0) {
+      console.log(`⏰ Session expired: ${sessionId} (expired ${Math.abs(Math.round(timeRemaining / 1000))}s ago)`);
       this.cleanup(sessionId);
       return null;
     }
 
     // Update last accessed time
-    session.lastAccessed = Date.now();
+    session.lastAccessed = now;
+    console.log(`✅ Session retrieved: ${sessionId} (expires in ${Math.round(timeRemaining / 1000)}s)`);
     return session;
   }
 
@@ -97,8 +105,12 @@ class SessionManager {
   extend(sessionId, additionalTime = null) {
     const session = this.sessions.get(sessionId);
     if (session) {
+      const oldExpiry = session.expiresAt;
       session.expiresAt = Date.now() + (additionalTime || this.sessionTimeout);
-      console.log(`⏱️ Session extended: ${sessionId}`);
+      const timeAdded = Math.round((session.expiresAt - oldExpiry) / 1000);
+      console.log(`⏱️ Session extended: ${sessionId} (added ${timeAdded}s, now expires in ${Math.round((session.expiresAt - Date.now()) / 1000)}s)`);
+    } else {
+      console.warn(`⚠️ Cannot extend session ${sessionId} - session not found`);
     }
   }
 
@@ -151,12 +163,12 @@ class SessionManager {
    * @private
    */
   startCleanup() {
-    // Run cleanup every minute
+    // Run cleanup every 5 minutes to avoid premature cleanup
     this.cleanupInterval = setInterval(() => {
       this._runCleanup();
-    }, 60000);
+    }, 5 * 60 * 1000); // 5 minutes
 
-    console.log('🧹 Session cleanup scheduler started');
+    console.log('🧹 Session cleanup scheduler started (runs every 5 minutes)');
   }
 
   /**

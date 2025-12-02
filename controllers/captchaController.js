@@ -363,7 +363,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         const totalTime = Date.now() - startTime;
         console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
 
-        // Store the session using session manager with extended timeout (10 minutes for form filling)
+        // Store the session using session manager with 10 minute timeout for form filling
+        const sessionTimeout = 10 * 60 * 1000; // 10 minutes
         sessionManager.create(sessionId, context, page, {
           userId: req.user?.id || 'anonymous',
           createdFor: 'captcha',
@@ -374,10 +375,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             captchaSearch: Date.now() - captchaSearchStartTime,
             screenshot: screenshotTime
           }
-        });
-        
-        // Extend session timeout to 10 minutes to give user time to fill form
-        sessionManager.extend(sessionId, 10 * 60 * 1000); // 10 minutes
+        }, sessionTimeout); // Pass custom timeout directly
 
         return {
           status: 'success',
