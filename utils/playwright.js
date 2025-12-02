@@ -44,7 +44,7 @@ export async function extractVoterList(params) {
     // First, navigate to home page with Malayalam locale parameter to set cookie
     console.log('Setting locale to Malayalam via URL parameter...');
     await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 60000 
     });
     
@@ -59,7 +59,7 @@ export async function extractVoterList(params) {
     // Now navigate to the voter list page - it will be in Malayalam
     console.log('Navigating to SEC voter list page (should be in Malayalam now)...');
     await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 60000 
     });
     

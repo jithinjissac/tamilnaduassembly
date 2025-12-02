@@ -1,9 +1,36 @@
 import express from 'express';
 import axios from 'axios';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { getProxyConfigWithFallback } from '../utils/proxyConfig.js';
 
 const router = express.Router();
 
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
+
+// Create axios instance with proxy configuration
+function createAxiosInstance() {
+  const proxyConfig = getProxyConfigWithFallback();
+  const config = {
+    timeout: 60000,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'ml-IN,ml;q=0.9,en-US;q=0.8,en;q=0.7',
+      'Accept': 'application/json, text/javascript, */*; q=0.01',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Referer': `${SEC_BASE_URL}/public/voters/list`,
+      'Cookie': 'set_locale=ml; device_view=full'
+    }
+  };
+
+  if (proxyConfig) {
+    const proxyAgent = new HttpsProxyAgent(proxyConfig.server);
+    config.httpsAgent = proxyAgent;
+    config.proxy = false; // Disable axios built-in proxy, use agent instead
+    console.log('[DROPDOWN] Using proxy agent:', proxyConfig.server);
+  }
+
+  return axios.create(config);
+}
 
 // District data (static - matches SEC Kerala exactly)
 const DISTRICTS = [
@@ -57,21 +84,13 @@ router.post('/getLocalBodies', async (req, res) => {
       });
     }
 
-    // SEC Kerala expects form-urlencoded with parameter name "objid"
-    const formData = new URLSearchParams();
-    formData.append('objid', district_id);
-
-    const response = await axios.post(
+    const axiosInstance = createAxiosInstance();
+    const response = await axiosInstance.post(
       `${SEC_BASE_URL}/public/getalllbcmp/byd`,
-      formData.toString(),
+      `objid=${district_id}`,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'X-Requested-With': 'XMLHttpRequest',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-          'Referer': `${SEC_BASE_URL}/public/voters/list`,
-          'Cookie': 'set_locale=ml; device_view=full'
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
       }
     );
@@ -106,21 +125,13 @@ router.post('/getWards', async (req, res) => {
       });
     }
 
-    // SEC Kerala expects form-urlencoded with parameter name "objid"
-    const formData = new URLSearchParams();
-    formData.append('objid', local_body_id);
-
-    const response = await axios.post(
+    const axiosInstance = createAxiosInstance();
+    const response = await axiosInstance.post(
       `${SEC_BASE_URL}/public/getwardSbox`,
-      formData.toString(),
+      `objid=${local_body_id}`,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'X-Requested-With': 'XMLHttpRequest',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-          'Referer': `${SEC_BASE_URL}/public/voters/list`,
-          'Cookie': 'set_locale=ml; device_view=full'
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
       }
     );
@@ -155,21 +166,13 @@ router.post('/getPollingStations', async (req, res) => {
       });
     }
 
-    // SEC Kerala expects form-urlencoded with parameter name "objid"
-    const formData = new URLSearchParams();
-    formData.append('objid', ward_id);
-
-    const response = await axios.post(
+    const axiosInstance = createAxiosInstance();
+    const response = await axiosInstance.post(
       `${SEC_BASE_URL}/public/getps/byward`,
-      formData.toString(),
+      `objid=${ward_id}`,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'X-Requested-With': 'XMLHttpRequest',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-          'Referer': `${SEC_BASE_URL}/public/voters/list`,
-          'Cookie': 'set_locale=ml; device_view=full'
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
         }
       }
     );
@@ -191,46 +194,21 @@ router.post('/getPollingStations', async (req, res) => {
 /**
  * GET /api/getCaptcha
  * Proxies the captcha image from SEC Kerala to avoid CORS issues
- * Note: We need to establish a session first by visiting the voters list page
  */
 router.get('/getCaptcha', async (req, res) => {
   try {
-    // First, create a session by visiting the voters list page
-    const sessionResponse = await axios.get(`${SEC_BASE_URL}/public/voters/list`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
-      }
-    });
-
-    // Extract session cookies
-    const cookies = sessionResponse.headers['set-cookie'];
-    let sessionCookie = 'set_locale=ml; device_view=full';
-    
-    if (cookies) {
-      // Extract PHPSESSID from cookies
-      const phpSessId = cookies.find(c => c.startsWith('PHPSESSID='));
-      if (phpSessId) {
-        sessionCookie += `; ${phpSessId.split(';')[0]}`;
-      }
-    }
-
-    // Now fetch the captcha with the session cookie
     const timestamp = Date.now();
     const captchaUrl = `${SEC_BASE_URL}/generate-captcha/_captcha_captcha?n=${timestamp}`;
-
-    const response = await axios.get(captchaUrl, {
-      responseType: 'arraybuffer',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-        'Referer': `${SEC_BASE_URL}/public/voters/list`,
-        'Cookie': sessionCookie
-      }
+    
+    const axiosInstance = createAxiosInstance();
+    const response = await axiosInstance.get(captchaUrl, {
+      responseType: 'arraybuffer'
     });
 
     // Set proper headers for image
     res.set('Content-Type', 'image/png');
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.send(Buffer.from(response.data, 'binary'));
+    res.send(Buffer.from(response.data));
   } catch (error) {
     console.error('Error fetching captcha:', error.message);
     res.status(500).json({ 

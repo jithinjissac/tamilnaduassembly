@@ -38,7 +38,7 @@ console.log('Testing Playwright captcha capture...');
 
     console.log('Navigating to SEC page...');
     await page.goto('https://sec.kerala.gov.in/public/voters/list', { 
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 60000 
     });
 
