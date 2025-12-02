@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm install && npm run protect:safe"
+    "buildCommand": "npm install && npx playwright install --with-deps chromium && npm run protect:safe"
   },
   "deploy": {
     "startCommand": "cross-env USE_PROTECTED=true NODE_ENV=production node server.js",
