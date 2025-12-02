@@ -943,20 +943,6 @@ s0.parentNode.insertBefore(s1,s0);
             }
             
             document.getElementById('orderDetails').style.display = 'block';
-            
-            // Set Google Drive link if available
-            if (data.googleDriveUrl) {
-                const googleDriveBtn = document.getElementById('googleDriveBtn');
-                if (googleDriveBtn) {
-                    googleDriveBtn.setAttribute('data-drive-link', data.googleDriveUrl);
-                    googleDriveBtn.style.display = 'inline-block';
-                    console.log('✅ Google Drive link set from order data:', data.googleDriveUrl);
-                }
-                const googleDriveNote = document.getElementById('googleDriveNote');
-                if (googleDriveNote) {
-                    googleDriveNote.style.display = 'block';
-                }
-            }
         }
 
         // Verify Cashfree payment after redirect
@@ -1091,7 +1077,7 @@ s0.parentNode.insertBefore(s1,s0);
                 displayOrderDetails(orderData);
 
                 // If payment is not completed, start polling for payment status
-                if (orderData.paymentStatus !== 'completed') {
+                if (data.paymentStatus !== 'completed') {
                     console.log('[PAYMENT] Payment not completed, starting status polling...');
                     startPaymentStatusPolling();
                 } else {
