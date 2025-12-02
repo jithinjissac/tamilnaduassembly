@@ -455,7 +455,8 @@ s0.parentNode.insertBefore(s1,s0);
         </div>
 
         <div style="margin-bottom: 2rem;">
-            <a href="https://wa.me/917907638842?text=Hello%2C%20I%20need%20help%20with%20my%20order" 
+            <a href="#" 
+               id="whatsappSupportLink"
                target="_blank" 
                class="btn" 
                style="width: 100%; display: block; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; text-decoration: none;">
@@ -855,6 +856,34 @@ s0.parentNode.insertBefore(s1,s0);
             }
             
             document.getElementById('orderDetails').style.display = 'block';
+            
+            // Update WhatsApp link with order details
+            updateWhatsAppLink(data);
+        }
+        
+        // Update WhatsApp support link with order details
+        function updateWhatsAppLink(data) {
+            const whatsappLink = document.getElementById('whatsappSupportLink');
+            if (!whatsappLink || !data) return;
+            
+            const location = `${data.location?.wardName || data.location?.ward || ''}, ${data.location?.localBodyName || data.location?.localBody || ''}`;
+            const partyName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            const previewUrl = `${window.location.origin}/preview.html?orderId=${data.orderId}`;
+            
+            const message = `Hello, I need help with my order
+            
+Order ID: ${data.orderId}
+Party/Symbol: ${partyName}
+Location: ${location}
+Total Voters: ${data.totalVoters || 0}
+Amount Paid: ₹${(data.amount || 0).toFixed(2)}
+
+Preview Link: ${previewUrl}
+
+Please assist me.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            whatsappLink.href = `https://wa.me/917907638842?text=${encodedMessage}`;
         }
 
         // Verify Cashfree payment after redirect
@@ -1225,15 +1254,66 @@ s0.parentNode.insertBefore(s1,s0);
                 console.error('Download error:', error);
                 downloadInProgress = false;
                 
+                const downloadBtn = document.getElementById('downloadBtn');
+                
                 if (error.name === 'AbortError') {
-                    showMessage('error', 'Download Timeout', 'Download is taking too long. Please try again.');
+                    showMessage('error', 'Download Timeout', 'Download is taking too long. Attempting to regenerate PDF...');
+                    // Try to regenerate PDF
+                    await regeneratePDF();
                 } else {
-                    showMessage('error', 'Download Failed', 'Please try again. If the problem persists, contact support.');
+                    showMessage('error', 'Download Failed', 'Attempting to regenerate PDF...');
+                    // Try to regenerate PDF on any download failure
+                    await regeneratePDF();
                 }
                 
-                document.getElementById('downloadBtn').disabled = false;
+                downloadBtn.disabled = false;
             } finally {
                 document.getElementById('downloadLoading').classList.remove('show');
+            }
+        }
+        
+        // Regenerate PDF if download fails
+        async function regeneratePDF() {
+            try {
+                console.log('🔄 Attempting to regenerate PDF for order:', orderId);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Regenerating PDF...';
+                downloadBtn.disabled = true;
+                
+                // Call the regenerate endpoint
+                const response = await fetch(`/api/slips/regenerate/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ PDF regeneration initiated:', result);
+                    
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+                    
+                    // Wait a bit for PDF to generate
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // Try download again
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    downloadBtn.disabled = false;
+                    
+                    showMessage('success', 'PDF Regenerated', 'Please click Download PDF again to get your file.');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Regeneration failed');
+                }
+            } catch (error) {
+                console.error('❌ PDF regeneration error:', error);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                downloadBtn.disabled = false;
+                
+                showMessage('error', 'Regeneration Failed', 'Please contact support for assistance.');
             }
         }
         
