@@ -262,9 +262,14 @@ class BrowserPool {
       
       if (proxyConfig) {
         launchOptions.proxy = proxyConfig;
+        console.log(`📡 Browser will use proxy: ${proxyConfig.server}`);
+      } else {
+        console.log('📡 Browser launching without proxy');
       }
       
+      console.log(`🎬 Launching Chromium with options:`, JSON.stringify(launchOptions, null, 2));
       const browser = await chromium.launch(launchOptions);
+      console.log(`✅ Chromium browser launched successfully`);
 
       // Handle browser disconnection
       browser.on('disconnected', () => {
@@ -283,6 +288,13 @@ class BrowserPool {
       
     } catch (error) {
       console.error(`❌ Failed to launch browser #${browserIndex}:`, error.message);
+      console.error(`❌ Error stack:`, error.stack);
+      console.error(`❌ Error details:`, {
+        name: error.name,
+        code: error.code,
+        errno: error.errno,
+        syscall: error.syscall
+      });
       throw error;
     }
   }

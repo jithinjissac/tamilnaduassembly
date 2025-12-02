@@ -140,12 +140,26 @@ class SessionManager {
     if (!session) return;
 
     try {
-      // Import browserPool to release context
+      // Import required modules
       const { browserPool } = await import('./browserPool.js');
+      const fs = await import('fs').then(m => m.promises);
+      const path = await import('path');
       
       // Release context back to pool
       if (session.context) {
         await browserPool.releaseContext(session.context);
+      }
+      
+      // Delete associated captcha file to free disk space (important for Railway)
+      try {
+        const captchaPath = path.join(process.cwd(), 'public', 'captcha-cache', `captcha-${sessionId}.png`);
+        await fs.unlink(captchaPath);
+        console.log(`🗑️ Deleted captcha file: captcha-${sessionId}.png`);
+      } catch (fileError) {
+        // File might not exist or already deleted, ignore
+        if (fileError.code !== 'ENOENT') {
+          console.warn(`⚠️ Could not delete captcha file for ${sessionId}:`, fileError.message);
+        }
       }
       
       this.sessions.delete(sessionId);
