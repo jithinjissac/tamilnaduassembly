@@ -790,12 +790,18 @@ s0.parentNode.insertBefore(s1,s0);
         <p class="page-subtitle">Preview your voter slips before payment</p>
 
         <!-- Error/Warning Message Display -->
-        <div id="messageBox" style="display: none; margin: 2rem auto; padding: 1.5rem; border-radius: 12px; max-width: 500px; text-align: center;">
+        <div id="messageBox" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; margin: 0; padding: 1.5rem 2rem; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: slideDown 0.3s ease;">
             <div id="messageIcon" style="font-size: 3rem; margin-bottom: 1rem;"></div>
             <h3 id="messageTitle" style="margin: 0 0 0.5rem 0;"></h3>
             <p id="messageText" style="margin: 0 0 1rem 0; color: #666;"></p>
             <div id="messageAction"></div>
         </div>
+        <style>
+            @keyframes slideDown {
+                from { opacity: 0; transform: translate(-50%, -20px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
+            }
+        </style>
 
         <div class="content-grid">
             <!-- Preview Section -->
@@ -1164,6 +1170,9 @@ s0.parentNode.insertBefore(s1,s0);
             messageTitle.textContent = title;
             messageText.textContent = text;
             messageBox.style.display = 'block';
+
+            // Scroll to top to ensure message is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             // If redirect URL is provided, add countdown and redirect
             if (redirectUrl) {

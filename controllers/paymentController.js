@@ -406,6 +406,15 @@ export const verifyPayment = async (req, res) => {
             });
         }
 
+        // Check if already paid - prevent duplicate payment verification
+        if (order.paymentStatus === 'completed') {
+            logger.warn(`⚠️ Duplicate payment verification attempt for order ${orderId}`);
+            return res.status(400).json({ 
+                status: 'error',
+                message: 'Payment already verified for this order' 
+            });
+        }
+
         // Verify signature
         const sign = razorpay_order_id + '|' + razorpay_payment_id;
         const expectedSign = crypto
@@ -645,6 +654,15 @@ export const verifyCashfreePayment = async (req, res) => {
             });
         }
 
+        // Check if already paid - prevent duplicate payment verification
+        if (order.paymentStatus === 'completed') {
+            logger.warn(`⚠️ Duplicate Cashfree payment verification attempt for order ${orderId}`);
+            return res.status(400).json({ 
+                status: 'error',
+                message: 'Payment already verified for this order' 
+            });
+        }
+
         // Get payment settings
         const paymentSettings = await getPaymentSettings();
         const cashfreeSettings = paymentSettings.cashfree;
@@ -788,6 +806,12 @@ export const handlePayUMoneySuccess = async (req, res) => {
         if (!order) {
             logger.error('Order not found:', orderId);
             return res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?orderId=${orderId}`);
+        }
+
+        // Check if already paid - prevent duplicate payment processing
+        if (order.paymentStatus === 'completed') {
+            logger.warn(`⚠️ Duplicate PayUMoney payment attempt for order ${orderId}`);
+            return res.redirect(`${process.env.FRONTEND_URL}/order-success.html?orderId=${orderId}`);
         }
 
         // Check if payment was successful
