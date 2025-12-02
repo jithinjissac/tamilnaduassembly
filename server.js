@@ -32,6 +32,20 @@ const PORT = process.env.PORT || 3000;
 // Connect to database
 connectDB();
 
+// Ensure required directories exist on startup (important for Railway)
+const requiredDirs = [
+  path.join(__dirname, 'public', 'captcha-cache'),
+  path.join(__dirname, 'public', 'debug-screenshots'),
+  path.join(__dirname, 'public', 'temp-pdfs')
+];
+
+requiredDirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`✅ Created directory: ${path.relative(__dirname, dir)}`);
+  }
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));

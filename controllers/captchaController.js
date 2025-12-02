@@ -331,13 +331,35 @@ router.get('/initCaptchaSession', async (req, res) => {
         
         // Ensure directory exists
         const captchaDir = path.dirname(captchaPath);
-        await fs.promises.mkdir(captchaDir, { recursive: true });
+        try {
+          await fs.promises.mkdir(captchaDir, { recursive: true });
+          console.log('[CAPTCHA] Directory verified:', captchaDir);
+        } catch (dirError) {
+          console.error('[CAPTCHA] ❌ Failed to create directory:', dirError.message);
+          console.error('[CAPTCHA] Directory path:', captchaDir);
+          console.error('[CAPTCHA] Process CWD:', process.cwd());
+          throw new Error(`Cannot create captcha directory: ${dirError.message}`);
+        }
 
         // Take screenshot of the captcha element
-        await captchaElement.screenshot({ path: captchaPath });
+        try {
+          await captchaElement.screenshot({ path: captchaPath });
+          const screenshotTime = Date.now() - screenshotStartTime;
+          console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
+          
+          // Verify file exists
+          const fileExists = await fs.promises.access(captchaPath).then(() => true).catch(() => false);
+          if (!fileExists) {
+            throw new Error('Screenshot saved but file not accessible');
+          }
+          console.log('[CAPTCHA] ✅ File verified accessible at:', captchaPath);
+        } catch (screenshotError) {
+          console.error('[CAPTCHA] ❌ Screenshot failed:', screenshotError.message);
+          console.error('[CAPTCHA] Target path:', captchaPath);
+          throw new Error(`Failed to save captcha screenshot: ${screenshotError.message}`);
+        }
+        
         const screenshotTime = Date.now() - screenshotStartTime;
-        console.log(`✅ Captcha screenshot saved: captcha-${sessionId}.png (took ${screenshotTime}ms)`);
-
         const totalTime = Date.now() - startTime;
         console.log(`[CAPTCHA] ⏱️  Total session initialization time: ${totalTime}ms`);
 
