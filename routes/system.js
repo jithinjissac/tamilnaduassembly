@@ -1,6 +1,6 @@
 import express from 'express';
 import os from 'os';
-import { browserPool } from '../utils/browserPool.js';
+import { seleniumPool } from '../utils/seleniumPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { getAllQueueStats } from '../utils/requestQueue.js';
 import { adminAuth } from '../middleware/auth.js';
@@ -19,7 +19,7 @@ router.use(adminAuth);
  */
 router.get('/stats', (req, res) => {
   try {
-    const browserStats = browserPool.getStats();
+    const driverStats = seleniumPool.getStats();
     const sessionStats = sessionManager.getStats();
     const queueStats = getAllQueueStats();
     
@@ -30,10 +30,10 @@ router.get('/stats', (req, res) => {
     const usedMem = totalMem - freeMem;
     
     const stats = {
-      browserPool: {
-        ...browserStats,
-        maxBrowsers: browserPool.maxBrowsers,
-        utilizationPercent: Math.round((browserStats.totalContexts / (browserStats.totalBrowsers * 4)) * 100) // Assuming 4 contexts per browser is good utilization
+      seleniumPool: {
+        ...driverStats,
+        maxDrivers: seleniumPool.maxDrivers,
+        utilizationPercent: Math.round((driverStats.active / seleniumPool.maxDrivers) * 100)
       },
       sessions: {
         ...sessionStats,
@@ -96,15 +96,15 @@ router.get('/stats', (req, res) => {
  */
 router.get('/health', (req, res) => {
   try {
-    const browserStats = browserPool.getStats();
+    const driverStats = seleniumPool.getStats();
     const sessionStats = sessionManager.getStats();
     const queueStats = getAllQueueStats();
 
-    const healthy = browserStats.connectedBrowsers > 0;
+    const healthy = driverStats.active >= 0;
 
     res.status(healthy ? 200 : 503).json({
       status: healthy ? 'healthy' : 'unhealthy',
-      browsers: `${browserStats.connectedBrowsers}/${browserStats.totalBrowsers}`,
+      drivers: `${driverStats.active}/${seleniumPool.maxDrivers}`,
       sessions: sessionStats.active,
       queues: {
         captcha: queueStats.captcha.running,

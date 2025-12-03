@@ -1,5 +1,6 @@
 import express from 'express';
-import { chromium } from 'playwright';
+import { Builder, By, until } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,165 +31,167 @@ function hasMalayalam(str) {
 }
 
 async function fetchStationsPlaywright({ district, localBody, ward }) {
-  let browser;
-  let page;
+  let driver;
   try {
     const proxyConfig = getProxyConfigWithFallback();
-    const launchOptions = { 
-      headless: true, 
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--lang=ml-IN']
-    };
+    const options = new chrome.Options();
     
-    if (proxyConfig) {
-      launchOptions.proxy = proxyConfig;
+    options.addArguments('--headless=new');
+    options.addArguments('--no-sandbox');
+    options.addArguments('--disable-setuid-sandbox');
+    options.addArguments('--lang=ml-IN');
+    options.addArguments('--disable-blink-features=AutomationControlled');
+    options.setUserPreferences({ 
+      'intl.accept_languages': 'ml-IN,ml,en-US,en',
+      'language': 'ml-IN'
+    });
+    
+    if (proxyConfig && proxyConfig.server) {
+      options.addArguments(`--proxy-server=${proxyConfig.server}`);
     }
     
-    browser = await chromium.launch(launchOptions);
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
-      locale: 'ml-IN',
-      extraHTTPHeaders: {
-        'Accept-Language': 'ml-IN,ml;q=0.9,en-US;q=0.7,en;q=0.6'
-      }
-    });
+    driver = await new Builder()
+      .forBrowser('chrome')
+      .setChromeOptions(options)
+      .build();
 
-    // Pre-set Malayalam cookies
-    await context.addCookies([
-      { name: 'set_locale', value: 'ml', domain: '.sec.kerala.gov.in', path: '/' },
-      { name: 'device_view', value: 'full', domain: '.sec.kerala.gov.in', path: '/' },
-      { name: 'language', value: 'ml', domain: '.sec.kerala.gov.in', path: '/' }
-    ]);
-
-    page = await context.newPage();
+    // Execute anti-detection script
+    await driver.executeScript(`
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined
+      });
+    `);
     
-    // Navigate with locale query param if supported
+    // Navigate with locale query param
     const urlWithLocale = `${SEC_BASE_URL}/public/voters/list?locale=ml&lang=ml`;
-    await page.goto(urlWithLocale, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(1500);
+    await driver.get(urlWithLocale);
+    await driver.sleep(1500);
 
     // Explicitly set language to Malayalam if language dropdown exists
     try {
-      const langSelect = await page.$('#view_voters_list_language');
-      if (langSelect) {
-        await page.selectOption('#view_voters_list_language', 'M');
-        await page.waitForTimeout(800);
-        console.log('[PLAYWRIGHT_STATIONS] Set language dropdown to Malayalam (M)');
-      }
+      const langSelect = await driver.findElement(By.id('view_voters_list_language'));
+      await driver.executeScript("arguments[0].value = 'M'; arguments[0].dispatchEvent(new Event('change'));", langSelect);
+      await driver.sleep(800);
+      console.log('[PLAYWRIGHT_STATIONS] Set language dropdown to Malayalam (M)');
     } catch (e) {
       console.log('[PLAYWRIGHT_STATIONS] Could not set language dropdown:', e.message);
     }
 
-    // Make selects visible (defensive in case of display:none)
-    await page.evaluate(() => {
+    // Make selects visible
+    await driver.executeScript(`
       document.querySelectorAll('select').forEach(sel => {
         sel.style.display = 'block';
         sel.style.visibility = 'visible';
         sel.disabled = false;
       });
-    });
+    `);
 
     // Select cascade: district -> local body -> ward
-    await page.selectOption('#view_voters_list_district', district);
-    await page.waitForTimeout(2500);
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#view_voters_list_localBody');
-      return el && el.options.length > 1;
-    }, { timeout: 15000 });
+    const districtSelect = await driver.findElement(By.id('view_voters_list_district'));
+    await driver.executeScript(`arguments[0].value = '${district}'; arguments[0].dispatchEvent(new Event('change'));`, districtSelect);
+    await driver.sleep(2500);
+    await driver.wait(async () => {
+      const localBodyEl = await driver.findElement(By.id('view_voters_list_localBody'));
+      const options = await localBodyEl.findElements(By.css('option'));
+      return options.length > 1;
+    }, 15000);
 
-    await page.selectOption('#view_voters_list_localBody', localBody);
-    await page.waitForTimeout(2500);
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#view_voters_list_ward');
-      return el && el.options.length > 1;
-    }, { timeout: 15000 });
+    const localBodySelect = await driver.findElement(By.id('view_voters_list_localBody'));
+    await driver.executeScript(`arguments[0].value = '${localBody}'; arguments[0].dispatchEvent(new Event('change'));`, localBodySelect);
+    await driver.sleep(2500);
+    await driver.wait(async () => {
+      const wardEl = await driver.findElement(By.id('view_voters_list_ward'));
+      const options = await wardEl.findElements(By.css('option'));
+      return options.length > 1;
+    }, 15000);
 
-    await page.selectOption('#view_voters_list_ward', ward);
-    await page.waitForTimeout(2500);
+    const wardSelect = await driver.findElement(By.id('view_voters_list_ward'));
+    await driver.executeScript(`arguments[0].value = '${ward}'; arguments[0].dispatchEvent(new Event('change'));`, wardSelect);
+    await driver.sleep(2500);
 
-    // Re-confirm language selection after cascade (SEC might reset it)
+    // Re-confirm language selection after cascade
     try {
-      const langSelect = await page.$('#view_voters_list_language');
-      if (langSelect) {
-        const currentValue = await page.$eval('#view_voters_list_language', el => el.value);
-        if (currentValue !== 'M') {
-          await page.selectOption('#view_voters_list_language', 'M');
-          await page.waitForTimeout(500);
-          console.log('[PLAYWRIGHT_STATIONS] Re-confirmed language as Malayalam after ward selection');
-        }
+      const langSelect = await driver.findElement(By.id('view_voters_list_language'));
+      const currentValue = await langSelect.getAttribute('value');
+      if (currentValue !== 'M') {
+        await driver.executeScript("arguments[0].value = 'M'; arguments[0].dispatchEvent(new Event('change'));", langSelect);
+        await driver.sleep(500);
+        console.log('[PLAYWRIGHT_STATIONS] Re-confirmed language as Malayalam after ward selection');
       }
     } catch (e) {
       console.log('[PLAYWRIGHT_STATIONS] Could not re-confirm language:', e.message);
     }
 
     // Wait for polling station options
-    await page.waitForFunction(() => {
-      const el = document.querySelector('#view_voters_list_pollingStation');
-      return el && el.options.length > 1;
-    }, { timeout: 15000 });
+    await driver.wait(async () => {
+      const stationEl = await driver.findElement(By.id('view_voters_list_pollingStation'));
+      const options = await stationEl.findElements(By.css('option'));
+      return options.length > 1;
+    }, 15000);
 
-    // ===== NEW APPROACH: Submit initial form to get Malayalam polling stations =====
-    console.log('[PLAYWRIGHT_STATIONS] Submitting initial form to reveal Malayalam polling stations...');
-    
     // Take screenshot BEFORE form submission
+    console.log('[PLAYWRIGHT_STATIONS] Submitting initial form to reveal Malayalam polling stations...');
     const timestamp = Date.now();
     const screenshotBefore = path.join(debugDir, `polling-before-submit-${timestamp}.png`);
-    await page.screenshot({ path: screenshotBefore, fullPage: true });
+    const beforeImg = await driver.takeScreenshot();
+    fs.writeFileSync(screenshotBefore, beforeImg, 'base64');
     console.log('[PLAYWRIGHT_STATIONS] Screenshot BEFORE submission saved:', screenshotBefore);
     
-    // Fill in a dummy captcha (or try to submit without it if possible)
+    // Try form submission for Malayalam extraction
     try {
       // Select first polling station option
-      const firstStation = await page.evaluate(() => {
+      const firstStation = await driver.executeScript(`
         const sel = document.querySelector('#view_voters_list_pollingStation');
         if (sel && sel.options.length > 1) {
-          return sel.options[1].value; // First real option (skip empty)
+          return sel.options[1].value;
         }
         return null;
-      });
+      `);
 
       if (firstStation) {
-        await page.selectOption('#view_voters_list_pollingStation', firstStation);
-        await page.waitForTimeout(500);
+        const stationSelect = await driver.findElement(By.id('view_voters_list_pollingStation'));
+        await driver.executeScript(`arguments[0].value = '${firstStation}'; arguments[0].dispatchEvent(new Event('change'));`, stationSelect);
+        await driver.sleep(500);
       }
 
       // Try to get captcha input and fill dummy value
-      const captchaInput = await page.$('#view_voters_list_captcha');
-      if (captchaInput) {
-        await page.fill('#view_voters_list_captcha', '0000'); // Dummy - will fail but triggers form processing
+      try {
+        const captchaInput = await driver.findElement(By.id('view_voters_list_captcha'));
+        await captchaInput.sendKeys('0000');
+      } catch (e) {
+        console.log('[PLAYWRIGHT_STATIONS] No captcha input found');
       }
 
       // Submit the form
-      const submitButton = await page.$('button[type="submit"], input[type="submit"], .btn-primary');
-      if (submitButton) {
+      try {
+        const submitButton = await driver.findElement(By.css('button[type="submit"], input[type="submit"], .btn-primary'));
         await submitButton.click();
         console.log('[PLAYWRIGHT_STATIONS] Form submitted, waiting for response...');
         
-        // Wait for either success page or error response
-        await page.waitForTimeout(3000);
+        await driver.sleep(3000);
         
         // Take screenshot AFTER form submission
         const screenshotAfter = path.join(debugDir, `polling-after-submit-${timestamp}.png`);
-        await page.screenshot({ path: screenshotAfter, fullPage: true });
+        const afterImg = await driver.takeScreenshot();
+        fs.writeFileSync(screenshotAfter, afterImg, 'base64');
         console.log('[PLAYWRIGHT_STATIONS] Screenshot AFTER submission saved:', screenshotAfter);
         
-        // Save page HTML for inspection
-        const htmlContent = await page.content();
+        // Save page HTML
+        const htmlContent = await driver.getPageSource();
         const htmlFile = path.join(debugDir, `polling-response-${timestamp}.html`);
         fs.writeFileSync(htmlFile, htmlContent, 'utf8');
         console.log('[PLAYWRIGHT_STATIONS] HTML response saved:', htmlFile);
         
-        // Check if form2 appeared or if there's new content with polling station data
-        const hasForm2 = await page.$('#form2');
-        const hasError = await page.$('.alert-danger, .error-message');
+        // Check page status
+        const hasForm2 = await driver.findElements(By.id('form2')).then(els => els.length > 0);
+        const hasError = await driver.findElements(By.css('.alert-danger, .error-message')).then(els => els.length > 0);
         
-        console.log('[PLAYWRIGHT_STATIONS] Page status - hasForm2:', !!hasForm2, 'hasError:', !!hasError);
+        console.log('[PLAYWRIGHT_STATIONS] Page status - hasForm2:', hasForm2, 'hasError:', hasError);
         
         if (hasForm2) {
           console.log('[PLAYWRIGHT_STATIONS] Form2 detected - extracting polling stations from response');
           
-          // Extract polling station from form2 or response headers/hidden fields
-          const pollingStationFromResponse = await page.evaluate(() => {
-            // Try multiple selectors where polling station name might appear in Malayalam
+          const pollingStationFromResponse = await driver.executeScript(`
             const selectors = [
               '#form2 input[name="polling_station"]',
               '#form2 input[name="pollingStation"]',
@@ -210,20 +213,18 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
               } catch (e) {}
             }
             
-            // Try to find polling station in any text content with Malayalam
             const allText = document.body.innerText;
-            const malayalamLines = allText.split('\n')
+            const malayalamLines = allText.split('\\n')
               .filter(line => /[\u0D00-\u0D7F]/.test(line) && line.length > 10);
             
             return { malayalamContent: malayalamLines.slice(0, 5) };
-          });
+          `);
           
           console.log('[PLAYWRIGHT_STATIONS] Response data:', JSON.stringify(pollingStationFromResponse, null, 2));
         }
         
-        // Extract all form fields and visible text for analysis
-        const pageAnalysis = await page.evaluate(() => {
-          // Get all form fields
+        // Extract page analysis
+        const pageAnalysis = await driver.executeScript(`
           const formFields = [];
           document.querySelectorAll('input, select, textarea').forEach(el => {
             const name = el.name || el.id || 'unnamed';
@@ -234,7 +235,6 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
             }
           });
           
-          // Get visible text with Malayalam
           const visibleText = [];
           document.querySelectorAll('div, p, span, td, th, label').forEach(el => {
             const text = el.textContent?.trim();
@@ -246,28 +246,29 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
           });
           
           return { formFields, visibleText: visibleText.slice(0, 20) };
-        });
+        `);
         
         console.log('[PLAYWRIGHT_STATIONS] Page analysis:', JSON.stringify(pageAnalysis, null, 2));
+      } catch (submitErr) {
+        console.log('[PLAYWRIGHT_STATIONS] Submit button click failed:', submitErr.message);
       }
     } catch (submitError) {
       console.log('[PLAYWRIGHT_STATIONS] Form submission for Malayalam extraction failed (expected):', submitError.message);
       
-      // Take error screenshot
       const screenshotError = path.join(debugDir, `polling-error-${timestamp}.png`);
-      await page.screenshot({ path: screenshotError, fullPage: true });
+      const errorImg = await driver.takeScreenshot();
+      fs.writeFileSync(screenshotError, errorImg, 'base64');
       console.log('[PLAYWRIGHT_STATIONS] Error screenshot saved:', screenshotError);
     }
-    // ===== END NEW APPROACH =====
 
     // Extract options from the dropdown (original method as fallback)
-    const stations = await page.evaluate(() => {
+    const stations = await driver.executeScript(`
       const sel = document.querySelector('#view_voters_list_pollingStation');
       if (!sel) return [];
       return Array.from(sel.options)
         .filter(o => o.value)
         .map(o => ({ value: o.value, text: o.textContent.trim() }));
-    });
+    `);
 
     // Log what we got
     const malayalamCount = stations.filter(s => /[\u0D00-\u0D7F]/.test(s.text)).length;
@@ -275,7 +276,7 @@ async function fetchStationsPlaywright({ district, localBody, ward }) {
 
     return stations;
   } finally {
-    if (browser) await browser.close();
+    if (driver) await driver.quit();
   }
 }
 

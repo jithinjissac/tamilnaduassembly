@@ -1,4 +1,6 @@
-import { chromium } from 'playwright';
+import { Builder, By, until } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome.js';
+import fs from 'fs';
 import { parseVotersTable } from './parser.js';
 import { getProxyConfigWithFallback } from './proxyConfig.js';
 
@@ -18,123 +20,125 @@ const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 export async function extractVoterList(params) {
   const { district, local_body, ward, polling_station, language, captcha } = params;
 
-  let browser;
   let page;
 
   try {
     console.log('Launching browser...');
     const proxyConfig = getProxyConfigWithFallback();
-    const launchOptions = { 
-      headless: false, // Set to false to see browser GUI
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    };
+    const options = new chrome.Options();
     
-    if (proxyConfig) {
-      launchOptions.proxy = proxyConfig;
+    options.addArguments('--no-sandbox');
+    options.addArguments('--disable-setuid-sandbox');
+    options.addArguments('--disable-blink-features=AutomationControlled');
+    
+    if (proxyConfig && proxyConfig.server) {
+      options.addArguments(`--proxy-server=${proxyConfig.server}`);
     }
     
-    browser = await chromium.launch(launchOptions);
+    page = await new Builder()
+      .forBrowser('chrome')
+      .setChromeOptions(options)
+      .build();
 
-    const context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
-    });
-
-    page = await context.newPage();
+    // Execute anti-detection script
+    await page.executeScript(`
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined
+      });
+    `);
 
     // First, navigate to home page with Malayalam locale parameter to set cookie
     console.log('Setting locale to Malayalam via URL parameter...');
-    await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 60000 
-    });
+    await page.get(`${SEC_BASE_URL}/?set_locale=ml`);
     
     console.log('Malayalam locale set via URL, waiting...');
-    await page.waitForTimeout(2000);
+    await page.sleep(2000);
     
     // Verify cookie is set
-    const cookies = await context.cookies();
+    const cookies = await page.manage().getCookies();
     const localeCookie = cookies.find(c => c.name === 'set_locale');
     console.log('📍 Locale cookie:', localeCookie ? localeCookie.value : 'NOT SET');
     
     // Now navigate to the voter list page - it will be in Malayalam
     console.log('Navigating to SEC voter list page (should be in Malayalam now)...');
-    await page.goto(`${SEC_BASE_URL}/public/voters/list`, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 60000 
-    });
+    await page.get(`${SEC_BASE_URL}/public/voters/list`);
     
     // Wait for the page to be fully loaded and interactive
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000); // Give extra time for JavaScript to initialize
+    await page.sleep(3000); // Give extra time for JavaScript to initialize
     console.log('Page loaded with Malayalam locale');
 
     // Wait for the district dropdown to be visible and enabled
     console.log('Waiting for district dropdown to be visible...');
-    await page.waitForSelector('#view_voters_list_district', { state: 'visible', timeout: 10000 });
+    await page.wait(until.elementLocated(By.id('view_voters_list_district')), 10000);
     
     // Take screenshot after page load to verify language
-    await page.screenshot({ path: 'page-loaded.png', fullPage: true });
+    const screenshot = await page.takeScreenshot();
+    await fs.promises.writeFile('page-loaded.png', screenshot, 'base64');
     console.log('Screenshot saved: page-loaded.png');
 
     console.log('Filling form fields...');
     
-    // Check if element is visible, if not, try to make it visible
-    const districtVisible = await page.isVisible('#view_voters_list_district');
-    if (!districtVisible) {
-      console.log('District dropdown not visible, attempting to show it...');
-      // Try to scroll into view and remove any potential overlays
-      await page.evaluate(() => {
-        const select = document.querySelector('#view_voters_list_district');
-        if (select) {
-          select.scrollIntoView();
-          select.style.display = 'block';
-          select.style.visibility = 'visible';
-        }
-      });
-      await page.waitForTimeout(1000);
-    }
+    // Make district dropdown visible if needed
+    await page.executeScript(`
+      const select = document.querySelector('#view_voters_list_district');
+      if (select) {
+        select.scrollIntoView();
+        select.style.display = 'block';
+        select.style.visibility = 'visible';
+      }
+    `);
+    await page.sleep(1000);
 
     // Select district
     console.log('Selecting district...');
-    await page.selectOption('#view_voters_list_district', district);
+    const districtSelect = await page.findElement(By.id('view_voters_list_district'));
+    await page.executeScript(`arguments[0].value = '${district}'; arguments[0].dispatchEvent(new Event('change'));`, districtSelect);
     console.log('District selected, waiting for local bodies...');
-    await page.waitForTimeout(2000);
+    await page.sleep(2000);
 
     // Wait for local body options to load
-    await page.waitForSelector('#view_voters_list_localBody option:not([value=""])', { timeout: 15000 });
-    await page.selectOption('#view_voters_list_localBody', local_body);
+    await page.wait(until.elementLocated(By.css('#view_voters_list_localBody option:not([value=""])')), 15000);
+    const localBodySelect = await page.findElement(By.id('view_voters_list_localBody'));
+    await page.executeScript(`arguments[0].value = '${local_body}'; arguments[0].dispatchEvent(new Event('change'));`, localBodySelect);
     console.log('Local body selected, waiting for wards...');
-    await page.waitForTimeout(2000);
+    await page.sleep(2000);
 
     // Wait for ward options to load
-    await page.waitForSelector('#view_voters_list_ward option:not([value=""])', { timeout: 15000 });
-    await page.selectOption('#view_voters_list_ward', ward);
+    await page.wait(until.elementLocated(By.css('#view_voters_list_ward option:not([value=""])')), 15000);
+    const wardSelect = await page.findElement(By.id('view_voters_list_ward'));
+    await page.executeScript(`arguments[0].value = '${ward}'; arguments[0].dispatchEvent(new Event('change'));`, wardSelect);
     console.log('Ward selected, waiting for polling stations...');
-    await page.waitForTimeout(2000);
+    await page.sleep(2000);
 
     // Wait for polling station options to load
-    await page.waitForSelector('#view_voters_list_pollingStation option:not([value=""])', { timeout: 15000 });
-    await page.selectOption('#view_voters_list_pollingStation', polling_station);
+    await page.wait(until.elementLocated(By.css('#view_voters_list_pollingStation option:not([value=""])')), 15000);
+    const stationSelect = await page.findElement(By.id('view_voters_list_pollingStation'));
+    await page.executeScript(`arguments[0].value = '${polling_station}'; arguments[0].dispatchEvent(new Event('change'));`, stationSelect);
     console.log('Polling station selected');
-    await page.waitForTimeout(1000);
+    await page.sleep(1000);
 
     // Select language
-    await page.selectOption('#view_voters_list_language', language);
-    await page.waitForTimeout(500);
+    const langSelect = await page.findElement(By.id('view_voters_list_language'));
+    await page.executeScript(`arguments[0].value = '${language}'; arguments[0].dispatchEvent(new Event('change'));`, langSelect);
+    await page.sleep(500);
 
     // Fill captcha
-    await page.fill('#view_voters_list_captcha', captcha);
+    const captchaInput = await page.findElement(By.id('view_voters_list_captcha'));
+    await captchaInput.sendKeys(captcha);
     console.log('Captcha entered');
-    await page.waitForTimeout(500);
+    await page.sleep(500);
 
     // Take screenshot before submitting
-    await page.screenshot({ path: 'before-submit.png', fullPage: true });
+    const beforeSubmitImg = await page.takeScreenshot();
+    await fs.promises.writeFile('before-submit.png', beforeSubmitImg, 'base64');
     console.log('Screenshot saved: before-submit.png');
 
     console.log('Submitting form...');
     
     // Get the CSRF token from the form
-    const csrfToken = await page.$eval('#view_voters_list__token', el => el.value).catch(() => '');
+    const csrfToken = await page.executeScript(
+      "return document.querySelector('#view_voters_list__token')?.value || '';"
+    );
     console.log('CSRF Token obtained:', csrfToken ? 'Yes' : 'No');
 
     // Instead of clicking the button, submit via fetch API with exact format
@@ -150,24 +154,27 @@ export async function extractVoterList(params) {
 
     console.log('Submitting form data...');
     
-    // Submit the form using page.evaluate to make XHR request
-    const submitResult = await page.evaluate(async (params) => {
-      const response = await fetch(params.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'X-Requested-With': 'XMLHttpRequest',
-          'Cookie': 'set_locale=ml' // Include Malayalam locale in request
-        },
-        body: params.data,
-        credentials: 'include' // Include cookies in request
-      });
-      return {
-        ok: response.ok,
-        status: response.status,
-        html: await response.text()
-      };
-    }, { url: `${SEC_BASE_URL}/public/voters/list`, data: formData.toString() });
+    // Submit the form using executeScript to make XHR request
+    const submitResult = await page.executeScript(
+      async (params) => {
+        const response = await fetch(params.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cookie': 'set_locale=ml'
+          },
+          body: params.data,
+          credentials: 'include'
+        });
+        return {
+          ok: response.ok,
+          status: response.status,
+          html: await response.text()
+        };
+      },
+      { url: `${SEC_BASE_URL}/public/voters/list`, data: formData.toString() }
+    );
 
     if (!submitResult.ok) {
       throw new Error(`Form submission failed with status ${submitResult.status}`);
@@ -176,26 +183,28 @@ export async function extractVoterList(params) {
     console.log('Form submitted successfully via XHR');
     
     // Save the response HTML for debugging
-    const fs = await import('fs');
     await fs.promises.writeFile('response.html', submitResult.html, 'utf-8');
     console.log('Response HTML saved to response.html');
     
     // Inject the response HTML into the page to see the rendered form with Malayalam
     try {
       console.log('Injecting response HTML into page for screenshot...');
-      await page.evaluate((html) => {
-        // Create a container for the response
-        const container = document.createElement('div');
-        container.id = 'response-preview';
-        container.innerHTML = html;
-        document.body.appendChild(container);
-      }, submitResult.html);
+      await page.executeScript(
+        (html) => {
+          const container = document.createElement('div');
+          container.id = 'response-preview';
+          container.innerHTML = html;
+          document.body.appendChild(container);
+        },
+        submitResult.html
+      );
       
-      await page.waitForTimeout(2000); // Wait for page to fully render
+      await page.sleep(2000);
       
       // Take screenshot after form submission and page load
       const timestamp = Date.now();
-      await page.screenshot({ path: `after-submit-${timestamp}.png`, fullPage: true });
+      const afterSubmitImg = await page.takeScreenshot();
+      await fs.promises.writeFile(`after-submit-${timestamp}.png`, afterSubmitImg, 'base64');
       console.log(`📸 Screenshot saved after submission: after-submit-${timestamp}.png`);
     } catch (screenshotError) {
       console.error('Failed to save screenshot:', screenshotError);
@@ -291,7 +300,8 @@ export async function extractVoterList(params) {
     // Take screenshot for debugging if possible
     if (page) {
       try {
-        await page.screenshot({ path: 'error-screenshot.png', fullPage: true });
+        const errorImg = await page.takeScreenshot();
+        await fs.promises.writeFile('error-screenshot.png', errorImg, 'base64');
         console.log('Error screenshot saved as error-screenshot.png');
       } catch (screenshotError) {
         console.error('Could not save screenshot:', screenshotError);
@@ -304,8 +314,8 @@ export async function extractVoterList(params) {
     };
 
   } finally {
-    if (browser) {
-      await browser.close();
+    if (page) {
+      await page.quit();
       console.log('Browser closed');
     }
   }

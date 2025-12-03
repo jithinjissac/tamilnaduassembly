@@ -101,17 +101,17 @@ if (!fs.existsSync(CONFIG.CAPTCHA_DIR)) {
 /**
  * Helper: Load SEC page with retry logic
  */
-async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
+async function loadSECPage(driver, url, retries = CONFIG.MAX_PAGE_RETRIES) {
   const startTime = Date.now();
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       console.log(`[CAPTCHA] Loading ${url} (attempt ${attempt + 1}/${retries + 1})...`);
       
-      await page.goto(url, { 
-        waitUntil: 'domcontentloaded',
-        timeout: CONFIG.PAGE_LOAD_TIMEOUT
-      });
+      await driver.get(url);
+      
+      // Wait for body element to ensure page loaded
+      await driver.wait(until.elementLocated(By.css('body')), CONFIG.PAGE_LOAD_TIMEOUT);
       
       const loadTime = Date.now() - startTime;
       console.log(`[CAPTCHA] ✅ Page loaded in ${loadTime}ms`);
@@ -126,7 +126,7 @@ async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
       }
       
       // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await driver.sleep(2000);
     }
   }
 }
@@ -134,17 +134,21 @@ async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
 /**
  * Helper: Find captcha element
  */
-async function findCaptchaElement(page) {
+async function findCaptchaElement(driver) {
   const startTime = Date.now();
   
   for (const selector of CONFIG.CAPTCHA_SELECTORS) {
     try {
-      const element = await page.waitForSelector(selector, { 
-        state: 'visible',
-        timeout: CONFIG.CAPTCHA_WAIT_TIMEOUT
-      });
+      // Wait for element to be visible
+      const element = await driver.wait(
+        until.elementLocated(By.css(selector)),
+        CONFIG.CAPTCHA_WAIT_TIMEOUT
+      );
       
-      if (element) {
+      // Verify element is visible
+      const isDisplayed = await element.isDisplayed();
+      
+      if (element && isDisplayed) {
         const findTime = Date.now() - startTime;
         console.log(`[CAPTCHA] ✅ Found captcha: ${selector} (${findTime}ms)`);
         return element;
@@ -164,8 +168,9 @@ async function findCaptchaElement(page) {
 async function saveCaptchaScreenshot(element, sessionId) {
   const filename = `captcha-${sessionId}.png`;
   
-  // Take screenshot to buffer
-  const screenshotBuffer = await element.screenshot();
+  // Take screenshot to buffer (base64 encoded)
+  const screenshotBase64 = await element.takeScreenshot();
+  const screenshotBuffer = Buffer.from(screenshotBase64, 'base64');
   
   const storageType = CLOUD_STORAGE_PATH ? 'Cloud Storage Mount' : 
                       USE_CLOUD_STORAGE ? 'Cloud Storage API' : 
@@ -270,44 +275,35 @@ async function saveCaptchaScreenshot(element, sessionId) {
 }
 
 /**
- * Helper: Setup page optimizations
+ * Helper: Setup page optimizations (Selenium uses Chrome options instead)
  */
-async function setupPageOptimizations(page) {
-  // Set timeout
-  page.setDefaultTimeout(CONFIG.PAGE_LOAD_TIMEOUT);
-  
-  // Block unnecessary resources
-  await page.route('**/*', (route) => {
-    const url = route.request().url();
-    const resourceType = route.request().resourceType();
-    
-    const shouldBlock = 
-      resourceType === 'font' ||
-      resourceType === 'media' ||
-      url.includes('google-analytics') ||
-      url.includes('googletagmanager') ||
-      url.includes('facebook') ||
-      url.includes('doubleclick');
-    
-    shouldBlock ? route.abort() : route.continue();
+async function setupPageOptimizations(driver) {
+  // Selenium timeouts are set via driver.manage().setTimeouts()
+  await driver.manage().setTimeouts({
+    implicit: CONFIG.PAGE_LOAD_TIMEOUT,
+    pageLoad: CONFIG.PAGE_LOAD_TIMEOUT,
+    script: CONFIG.PAGE_LOAD_TIMEOUT
   });
+  
+  // Resource blocking is handled via Chrome options in seleniumPool
+  // No additional setup needed here
 }
 
 /**
  * Helper: Set Malayalam locale
  */
-async function setMalayalamLocale(page) {
+async function setMalayalamLocale(driver) {
   console.log('[CAPTCHA] Setting Malayalam locale...');
   
-  await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
-    waitUntil: 'domcontentloaded',
-    timeout: CONFIG.PAGE_LOAD_TIMEOUT
-  });
+  await driver.get(`${SEC_BASE_URL}/?set_locale=ml`);
   
-  await page.waitForTimeout(500);
+  // Wait for body to load
+  await driver.wait(until.elementLocated(By.css('body')), CONFIG.PAGE_LOAD_TIMEOUT);
+  
+  await driver.sleep(500);
   
   // Verify locale cookie
-  const cookies = await page.context().cookies();
+  const cookies = await driver.manage().getCookies();
   const localeCookie = cookies.find(c => c.name === 'set_locale');
   console.log('[CAPTCHA] 📍 Locale cookie:', localeCookie?.value || 'NOT SET');
   
@@ -317,8 +313,8 @@ async function setMalayalamLocale(page) {
 /**
  * Helper: Make select visible
  */
-async function makeSelectVisible(page, selector) {
-  await page.evaluate((sel) => {
+async function makeSelectVisible(driver, selector) {
+  await driver.executeScript((sel) => {
     const element = document.querySelector(sel);
     if (element) {
       element.style.display = 'block';
@@ -334,15 +330,14 @@ async function makeSelectVisible(page, selector) {
 /**
  * Helper: Wait for dropdown to load
  */
-async function waitForDropdownLoaded(page, selector, timeout = 30000) {
-  await page.waitForFunction(
-    (sel) => {
+async function waitForDropdownLoaded(driver, selector, timeout = 30000) {
+  await driver.wait(async () => {
+    const result = await driver.executeScript((sel) => {
       const select = document.querySelector(sel);
       return select && select.options.length > 1;
-    },
-    selector,
-    { timeout }
-  );
+    }, selector);
+    return result;
+  }, timeout);
 }
 
 /**
@@ -483,33 +478,31 @@ router.get('/initCaptchaSession', async (req, res) => {
     console.log(`[CAPTCHA] 🚀 Initializing session ${sessionId}...`);
     
     const result = await captchaQueue.add(async () => {
-      let context = null;
-      let page = null;
+      let driver = null;
       
       try {
-        // Get browser context
-        const contextStartTime = Date.now();
-        context = await browserPool.getBrowserContext(sessionId);
-        console.log(`[CAPTCHA] ⏱️ Context acquired in ${Date.now() - contextStartTime}ms`);
+        // Get WebDriver instance
+        const driverStartTime = Date.now();
+        driver = await seleniumPool.getDriver(sessionId);
+        console.log(`[CAPTCHA] ⏱️ WebDriver acquired in ${Date.now() - driverStartTime}ms`);
         
-        // Create page
-        page = await context.newPage();
-        await setupPageOptimizations(page);
+        // Setup page optimizations
+        await setupPageOptimizations(driver);
         
         // Set Malayalam locale
-        await setMalayalamLocale(page);
+        await setMalayalamLocale(driver);
         
         // Load voter list page
-        const pageLoadTime = await loadSECPage(page, `${SEC_BASE_URL}/public/voters/list`);
+        const pageLoadTime = await loadSECPage(driver, `${SEC_BASE_URL}/public/voters/list`);
         
         // Find captcha element
-        const captchaElement = await findCaptchaElement(page);
+        const captchaElement = await findCaptchaElement(driver);
         
         // Save screenshot
         const captchaUrl = await saveCaptchaScreenshot(captchaElement, sessionId);
         
         // Store session
-        sessionManager.create(sessionId, context, page, {
+        sessionManager.create(sessionId, driver, driver, {
           userId: req.user?.id || 'anonymous',
           createdFor: 'captcha',
           timings: {
@@ -534,8 +527,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         
       } catch (error) {
         // Cleanup on error
-        if (context) {
-          await browserPool.releaseContext(context);
+        if (driver) {
+          await seleniumPool.releaseDriver(sessionId);
         }
         throw error;
       }
@@ -578,11 +571,11 @@ router.post('/submitWithCaptcha', async (req, res) => {
       });
     }
     
-    const { page } = session;
+    const { driver } = session;
     const startTime = Date.now();
     
     // Make all selects visible
-    await page.evaluate(() => {
+    await driver.executeScript(() => {
       document.querySelectorAll('select').forEach(select => {
         select.style.display = 'block';
         select.style.visibility = 'visible';
@@ -593,40 +586,47 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     // Fill form step by step
     console.log('[CAPTCHA] Selecting district...');
-    await makeSelectVisible(page, CONFIG.FORM_SELECTORS.district);
-    await page.selectOption(CONFIG.FORM_SELECTORS.district, district);
-    await page.waitForTimeout(1500);
+    await makeSelectVisible(driver, CONFIG.FORM_SELECTORS.district);
+    const districtSelect = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.district));
+    await districtSelect.sendKeys(district);
+    await driver.sleep(1500);
     
     console.log('[CAPTCHA] Waiting for local bodies...');
-    await waitForDropdownLoaded(page, CONFIG.FORM_SELECTORS.localBody);
-    await makeSelectVisible(page, CONFIG.FORM_SELECTORS.localBody);
-    await page.selectOption(CONFIG.FORM_SELECTORS.localBody, local_body);
-    await page.waitForTimeout(1500);
+    await waitForDropdownLoaded(driver, CONFIG.FORM_SELECTORS.localBody);
+    await makeSelectVisible(driver, CONFIG.FORM_SELECTORS.localBody);
+    const localBodySelect = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.localBody));
+    await localBodySelect.sendKeys(local_body);
+    await driver.sleep(1500);
     
     console.log('[CAPTCHA] Waiting for wards...');
-    await waitForDropdownLoaded(page, CONFIG.FORM_SELECTORS.ward);
-    await makeSelectVisible(page, CONFIG.FORM_SELECTORS.ward);
-    await page.selectOption(CONFIG.FORM_SELECTORS.ward, ward);
-    await page.waitForTimeout(1500);
+    await waitForDropdownLoaded(driver, CONFIG.FORM_SELECTORS.ward);
+    await makeSelectVisible(driver, CONFIG.FORM_SELECTORS.ward);
+    const wardSelect = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.ward));
+    await wardSelect.sendKeys(ward);
+    await driver.sleep(1500);
     
     console.log('[CAPTCHA] Waiting for polling stations...');
-    await waitForDropdownLoaded(page, CONFIG.FORM_SELECTORS.pollingStation);
-    await makeSelectVisible(page, CONFIG.FORM_SELECTORS.pollingStation);
-    await page.selectOption(CONFIG.FORM_SELECTORS.pollingStation, polling_station);
-    await page.waitForTimeout(500);
+    await waitForDropdownLoaded(driver, CONFIG.FORM_SELECTORS.pollingStation);
+    await makeSelectVisible(driver, CONFIG.FORM_SELECTORS.pollingStation);
+    const pollingStationSelect = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.pollingStation));
+    await pollingStationSelect.sendKeys(polling_station);
+    await driver.sleep(500);
     
     console.log('[CAPTCHA] Selecting language...');
-    await page.selectOption(CONFIG.FORM_SELECTORS.language, language);
-    await page.waitForTimeout(300);
+    const languageSelect = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.language));
+    await languageSelect.sendKeys(language);
+    await driver.sleep(300);
     
     console.log('[CAPTCHA] Filling captcha...');
-    await page.fill(CONFIG.FORM_SELECTORS.captcha, captcha);
-    await page.waitForTimeout(300);
+    const captchaInput = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.captcha));
+    await captchaInput.sendKeys(captcha);
+    await driver.sleep(300);
     
     // Submit form
     console.log('[CAPTCHA] Submitting form...');
     try {
-      await page.click(CONFIG.FORM_SELECTORS.submitButton);
+      const submitButton = await driver.findElement(By.css(CONFIG.FORM_SELECTORS.submitButton));
+      await submitButton.click();
     } catch (clickError) {
       console.error('[CAPTCHA] ❌ Submit button click failed:', clickError.message);
       
@@ -644,12 +644,12 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     // Wait for response
     console.log('[CAPTCHA] ⏳ Waiting for response...');
-    await page.waitForTimeout(5000);
+    await driver.sleep(5000);
     
     // Get page content
     let html;
     try {
-      html = await page.content();
+      html = await driver.getPageSource();
     } catch (contentError) {
       console.error('[CAPTCHA] ❌ Failed to get page content:', contentError.message);
       

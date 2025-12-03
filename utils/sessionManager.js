@@ -21,22 +21,20 @@ class SessionManager {
    * @param {Object} context - Browser context
    * @param {Object} page - Playwright page
    * @param {Object} metadata - Additional session metadata
-   * @param {number} customTimeout - Optional custom timeout in milliseconds
    */
-  create(sessionId, context, page, metadata = {}, customTimeout = null) {
-    const timeout = customTimeout || this.sessionTimeout;
+  create(sessionId, context, page, metadata = {}) {
     const session = {
       sessionId,
       context,
       page,
       metadata,
       createdAt: Date.now(),
-      expiresAt: Date.now() + timeout,
+      expiresAt: Date.now() + this.sessionTimeout,
       lastAccessed: Date.now()
     };
 
     this.sessions.set(sessionId, session);
-    console.log(`✅ Session created: ${sessionId} (expires in ${timeout / 1000}s)`);
+    console.log(`✅ Session created: ${sessionId} (expires in ${this.sessionTimeout / 1000}s)`);
     
     return session;
   }
@@ -75,25 +73,19 @@ class SessionManager {
     const session = this.sessions.get(sessionId);
     
     if (!session) {
-      const allSessionIds = Array.from(this.sessions.keys());
       console.log(`⚠️ Session not found: ${sessionId}`);
-      console.log(`📋 Active sessions: ${allSessionIds.length > 0 ? allSessionIds.join(', ') : 'none'}`);
       return null;
     }
 
     // Check expiration
-    const now = Date.now();
-    const timeRemaining = session.expiresAt - now;
-    
-    if (timeRemaining <= 0) {
-      console.log(`⏰ Session expired: ${sessionId} (expired ${Math.abs(Math.round(timeRemaining / 1000))}s ago)`);
+    if (Date.now() > session.expiresAt) {
+      console.log(`⏰ Session expired: ${sessionId}`);
       this.cleanup(sessionId);
       return null;
     }
 
     // Update last accessed time
-    session.lastAccessed = now;
-    console.log(`✅ Session retrieved: ${sessionId} (expires in ${Math.round(timeRemaining / 1000)}s)`);
+    session.lastAccessed = Date.now();
     return session;
   }
 
@@ -105,12 +97,8 @@ class SessionManager {
   extend(sessionId, additionalTime = null) {
     const session = this.sessions.get(sessionId);
     if (session) {
-      const oldExpiry = session.expiresAt;
       session.expiresAt = Date.now() + (additionalTime || this.sessionTimeout);
-      const timeAdded = Math.round((session.expiresAt - oldExpiry) / 1000);
-      console.log(`⏱️ Session extended: ${sessionId} (added ${timeAdded}s, now expires in ${Math.round((session.expiresAt - Date.now()) / 1000)}s)`);
-    } else {
-      console.warn(`⚠️ Cannot extend session ${sessionId} - session not found`);
+      console.log(`⏱️ Session extended: ${sessionId}`);
     }
   }
 
@@ -140,26 +128,12 @@ class SessionManager {
     if (!session) return;
 
     try {
-      // Import required modules
-      const { browserPool } = await import('./browserPool.js');
-      const fs = await import('fs').then(m => m.promises);
-      const path = await import('path');
+      // Import seleniumPool to release driver
+      const { seleniumPool } = await import('./seleniumPool.js');
       
-      // Release context back to pool
-      if (session.context) {
-        await browserPool.releaseContext(session.context);
-      }
-      
-      // Delete associated captcha file to free disk space (important for Railway)
-      try {
-        const captchaPath = path.join(process.cwd(), 'public', 'captcha-cache', `captcha-${sessionId}.png`);
-        await fs.unlink(captchaPath);
-        console.log(`🗑️ Deleted captcha file: captcha-${sessionId}.png`);
-      } catch (fileError) {
-        // File might not exist or already deleted, ignore
-        if (fileError.code !== 'ENOENT') {
-          console.warn(`⚠️ Could not delete captcha file for ${sessionId}:`, fileError.message);
-        }
+      // Release driver back to pool
+      if (session.context || session.driver) {
+        await seleniumPool.releaseDriver(sessionId);
       }
       
       this.sessions.delete(sessionId);
@@ -177,12 +151,12 @@ class SessionManager {
    * @private
    */
   startCleanup() {
-    // Run cleanup every 5 minutes to avoid premature cleanup
+    // Run cleanup every minute
     this.cleanupInterval = setInterval(() => {
       this._runCleanup();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 60000);
 
-    console.log('🧹 Session cleanup scheduler started (runs every 5 minutes)');
+    console.log('🧹 Session cleanup scheduler started');
   }
 
   /**
