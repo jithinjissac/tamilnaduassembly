@@ -277,7 +277,7 @@ async function getCustomSECError() {
 /**
  * Helper: Cleanup session and captcha
  */
-async function cleanupSession(sessionId, deleteFile = true) {
+async function cleanupSession(sessionId, deleteFile = false) {
   try {
     await sessionManager.cleanup(sessionId);
     
@@ -291,6 +291,23 @@ async function cleanupSession(sessionId, deleteFile = true) {
   } catch (error) {
     console.error('[CAPTCHA] Error during cleanup:', error.message);
   }
+}
+
+/**
+ * Schedule captcha file deletion after delay (to allow frontend to load it)
+ */
+function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
+  setTimeout(() => {
+    const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
+    if (fs.existsSync(captchaPath)) {
+      try {
+        fs.unlinkSync(captchaPath);
+        console.log(`[CAPTCHA] 🗑️ Scheduled cleanup: captcha-${sessionId}.png deleted`);
+      } catch (error) {
+        console.error(`[CAPTCHA] Error deleting captcha file:`, error.message);
+      }
+    }
+  }, delayMs);
 }
 
 /**
@@ -339,6 +356,9 @@ router.get('/initCaptchaSession', async (req, res) => {
             pageLoad: pageLoadTime
           }
         }, CONFIG.SESSION_TIMEOUT);
+        
+        // Schedule file deletion after 5 minutes (gives frontend time to load)
+        scheduleFileDeletion(sessionId, 5 * 60 * 1000);
         
         return {
           status: 'success',
