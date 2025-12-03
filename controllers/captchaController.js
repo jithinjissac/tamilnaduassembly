@@ -164,6 +164,7 @@ async function findCaptchaElement(driver) {
 
 /**
  * Helper: Save captcha screenshot
+ * Returns both URL and base64 data
  */
 async function saveCaptchaScreenshot(element, sessionId) {
   const filename = `captcha-${sessionId}.png`;
@@ -189,7 +190,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
     
     // Return path relative to mounted bucket for serving via Cloud Run
     // Cloud Run will serve files from /slipsdata as public URL
-    return `/slipsdata/captcha-cache/${filename}?t=${Date.now()}`;
+    return {
+      url: `/slipsdata/captcha-cache/${filename}?t=${Date.now()}`,
+      base64: `data:image/png;base64,${screenshotBase64}`
+    };
   }
   
   if (USE_CLOUD_STORAGE) {
@@ -223,7 +227,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
       // Schedule deletion after 5 minutes
       scheduleCloudFileDeletion(sessionId, 5 * 60 * 1000);
       
-      return publicUrl + `?t=${Date.now()}`;
+      return {
+        url: publicUrl + `?t=${Date.now()}`,
+        base64: `data:image/png;base64,${screenshotBase64}`
+      };
       
     } catch (cloudError) {
       console.error(`[CAPTCHA] ❌ Cloud Storage upload failed:`, cloudError.message);
@@ -260,7 +267,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
         // Schedule local file deletion
         scheduleFileDeletion(sessionId, 5 * 60 * 1000);
         
-        return `/captcha-cache/${filename}?t=${Date.now()}`;
+        return {
+          url: `/captcha-cache/${filename}?t=${Date.now()}`,
+          base64: `data:image/png;base64,${screenshotBase64}`
+        };
       }
     }
     
@@ -498,21 +508,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Find captcha element
         const captchaElement = await findCaptchaElement(driver);
         
-        // Extract direct captcha URL from the element
-        let directCaptchaUrl = null;
-        try {
-          directCaptchaUrl = await captchaElement.getAttribute('src');
-          if (directCaptchaUrl && !directCaptchaUrl.startsWith('http')) {
-            // Handle relative URLs
-            directCaptchaUrl = SEC_BASE_URL + directCaptchaUrl;
-          }
-          console.log(`[CAPTCHA] 🔗 Direct captcha URL extracted: ${directCaptchaUrl}`);
-        } catch (e) {
-          console.warn(`[CAPTCHA] ⚠️ Could not extract direct captcha URL:`, e.message);
-        }
-        
-        // Save screenshot as fallback
-        const screenshotUrl = await saveCaptchaScreenshot(captchaElement, sessionId);
+        // Save captcha screenshot
+        const screenshot = await saveCaptchaScreenshot(captchaElement, sessionId);
         
         // Store session
         sessionManager.create(sessionId, driver, driver, {
@@ -530,9 +527,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         return {
           status: 'success',
           sessionId,
-          captchaUrl: directCaptchaUrl || screenshotUrl, // Primary: direct URL, Fallback: screenshot
-          captchaUrlDirect: directCaptchaUrl, // Direct SEC URL (may have CORS issues)
-          captchaUrlScreenshot: screenshotUrl, // Screenshot fallback (always works)
+          captchaUrl: screenshot.url,
+          captchaBase64: screenshot.base64,
           message: 'Captcha session initialized',
           timings: {
             total: Date.now() - startTime,

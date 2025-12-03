@@ -1520,71 +1520,32 @@ s0.parentNode.insertBefore(s1,s0);
                 }
                 
                 sessionId = data.sessionId;
-                const captchaUrlDirect = data.captchaUrlDirect;
-                const captchaUrlScreenshot = data.captchaUrlScreenshot;
-                const primaryUrl = data.captchaUrl; // Primary URL (direct or screenshot)
+                const captchaUrl = data.captchaUrl;
+                const captchaBase64 = data.captchaBase64;
                 
-                console.log('[CAPTCHA] Direct URL:', captchaUrlDirect);
-                console.log('[CAPTCHA] Screenshot URL:', captchaUrlScreenshot);
-                console.log('[CAPTCHA] Primary URL:', primaryUrl);
+                console.log('[CAPTCHA] URL:', captchaUrl);
+                console.log('[CAPTCHA] Has base64:', !!captchaBase64);
                 
                 // Hide loader, show container
                 if (captchaLoader) captchaLoader.style.display = 'none';
                 if (captchaContainer) captchaContainer.style.display = 'block';
                 
-                // Update status
-                if (statusText) {
-                    statusText.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading image...';
-                }
-                
-                // Hybrid approach: Try direct URL first, fallback to screenshot
-                const img = new Image();
-                
-                img.onload = () => {
-                    console.log('[CAPTCHA] ✅ Image loaded successfully from direct URL');
-                    if (captchaImg) captchaImg.src = img.src;
-                    if (statusText) {
-                        statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
-                    }
-                    if (loadBtnText) {
-                        loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
-                    }
-                };
-                
-                img.onerror = () => {
-                    console.warn('[CAPTCHA] ❌ Failed to load from direct URL, trying screenshot fallback...');
-                    
-                    // Fallback to screenshot
-                    const fallbackImg = new Image();
-                    fallbackImg.crossOrigin = 'anonymous';
-                    
-                    fallbackImg.onload = () => {
-                        console.log('[CAPTCHA] ✅ Image loaded successfully from screenshot fallback');
-                        if (captchaImg) captchaImg.src = fallbackImg.src;
+                // Use base64 directly (always works, no network request needed)
+                if (captchaBase64) {
+                    console.log('[CAPTCHA] Loading from base64 data...');
+                    if (captchaImg) {
+                        captchaImg.src = captchaBase64;
+                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
                         if (statusText) {
-                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded (fallback)';
+                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
                         }
                         if (loadBtnText) {
                             loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
                         }
-                    };
-                    
-                    fallbackImg.onerror = () => {
-                        console.error('[CAPTCHA] ❌ Both direct and screenshot URLs failed');
-                        if (statusText) {
-                            statusText.innerHTML = '<i class="fas fa-times-circle" style="color: #f56565;"></i> Failed to load';
-                        }
-                        throw new Error('Failed to load captcha image from both sources');
-                    };
-                    
-                    // Try screenshot URL with cache buster
-                    if (captchaUrlScreenshot) {
-                        fallbackImg.src = captchaUrlScreenshot + (captchaUrlScreenshot.includes('?') ? '&' : '?') + 't=' + Date.now();
                     }
-                };
-                
-                // Start with primary URL (direct if available)
-                img.src = primaryUrl + (primaryUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+                } else {
+                    throw new Error('No captcha data received');
+                }
                 
             } catch (error) {
                 console.error('[CAPTCHA] Error:', error);
