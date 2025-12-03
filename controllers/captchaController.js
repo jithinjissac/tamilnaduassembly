@@ -300,7 +300,32 @@ async function cleanupSession(sessionId, deleteFile = false) {
 function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
   // Storage service handles auto-deletion, this is kept for backward compatibility
   console.log(`[CAPTCHA] Auto-deletion scheduled for session ${sessionId} in ${delayMs/1000}s`);
-}       await setupPageOptimizations(page);
+}
+
+/**
+ * GET /api/initCaptchaSession
+ * Initialize browser session and capture captcha
+ */
+router.get('/initCaptchaSession', async (req, res) => {
+  const sessionId = Date.now().toString();
+  const startTime = Date.now();
+  
+  try {
+    console.log(`[CAPTCHA] 🚀 Initializing session ${sessionId}...`);
+    
+    const result = await captchaQueue.add(async () => {
+      let context = null;
+      let page = null;
+      
+      try {
+        // Get browser context
+        const contextStartTime = Date.now();
+        context = await browserPool.getBrowserContext(sessionId);
+        console.log(`[CAPTCHA] ⏱️ Context acquired in ${Date.now() - contextStartTime}ms`);
+        
+        // Create page
+        page = await context.newPage();
+        await setupPageOptimizations(page);
         
         // Set Malayalam locale
         await setMalayalamLocale(page);
