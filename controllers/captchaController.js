@@ -12,10 +12,30 @@ const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 
 // Initialize Google Cloud Storage
-const storage = new Storage();
-const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
-const bucket = storage.bucket(bucketName);
-const USE_CLOUD_STORAGE = process.env.USE_CLOUD_STORAGE === 'true' || process.env.NODE_ENV === 'production';
+let storage;
+let bucket;
+let USE_CLOUD_STORAGE = false;
+
+try {
+  // Check if we should use cloud storage
+  const shouldUseCloud = process.env.USE_CLOUD_STORAGE === 'true' || 
+                         process.env.NODE_ENV === 'production' ||
+                         process.env.RAILWAY_ENVIRONMENT === 'production';
+  
+  if (shouldUseCloud) {
+    storage = new Storage();
+    const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
+    bucket = storage.bucket(bucketName);
+    USE_CLOUD_STORAGE = true;
+    console.log(`☁️ [CLOUD STORAGE] Enabled - Bucket: ${bucketName}`);
+  } else {
+    console.log(`💾 [LOCAL STORAGE] Using filesystem for captcha images`);
+  }
+} catch (error) {
+  console.error(`❌ [CLOUD STORAGE] Failed to initialize:`, error.message);
+  console.log(`💾 [LOCAL STORAGE] Falling back to filesystem`);
+  USE_CLOUD_STORAGE = false;
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -126,79 +146,88 @@ async function saveCaptchaScreenshot(element, sessionId) {
   // Take screenshot to buffer
   const screenshotBuffer = await element.screenshot();
   
+  console.log(`[CAPTCHA] 📸 Screenshot captured (${screenshotBuffer.length} bytes) - Using: ${USE_CLOUD_STORAGE ? 'Cloud Storage' : 'Local Filesystem'}`);
+  
   if (USE_CLOUD_STORAGE) {
-    // Upload to Google Cloud Storage
-    console.log(`[CAPTCHA] ☁️ Uploading to Cloud Storage: ${filename}`);
-    
-    const file = bucket.file(`captcha-cache/${filename}`);
-    
-    await file.save(screenshotBuffer, {
-      metadata: {
-        contentType: 'image/png',
-        cacheControl: 'no-cache, no-store, must-revalidate',
-        metadata: {
-          sessionId: sessionId,
-          createdAt: new Date().toISOString()
-        }
-      }
-    });
-    
-    // Make file publicly readable
-    await file.makePublic();
-    
-    // Generate public URL
-    const publicUrl = `https://storage.googleapis.com/${bucketName}/captcha-cache/${filename}`;
-    
-    console.log(`[CAPTCHA] ✅ Uploaded to Cloud Storage (${screenshotBuffer.length} bytes)`);
-    console.log(`[CAPTCHA] 🔗 Public URL: ${publicUrl}`);
-    
-    // Schedule deletion after 5 minutes
-    scheduleCloudFileDeletion(sessionId, 5 * 60 * 1000);
-    
-    return publicUrl + `?t=${Date.now()}`;
-    
-  } else {
-    // Local file system (development)
-    const captchaPath = path.join(CONFIG.CAPTCHA_DIR, filename);
-    
-    await fs.promises.writeFile(captchaPath, screenshotBuffer);
-    
-    // Wait a moment to ensure file is fully written
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Verify file exists and has content
-    let retries = 3;
-    while (retries > 0) {
-      if (fs.existsSync(captchaPath)) {
-        const stats = fs.statSync(captchaPath);
-        if (stats.size > 0) {
-          console.log(`[CAPTCHA] ✅ Screenshot saved locally: ${filename} (${stats.size} bytes)`);
-          console.log(`[CAPTCHA] 📁 File location: ${captchaPath}`);
-          
-          // Verify file is readable
-          try {
-            fs.accessSync(captchaPath, fs.constants.R_OK);
-            console.log(`[CAPTCHA] ✅ File is readable`);
-          } catch (err) {
-            console.error(`[CAPTCHA] ❌ File exists but not readable:`, err.message);
-          }
-          
-          // Schedule local file deletion
-          scheduleFileDeletion(sessionId, 5 * 60 * 1000);
-          
-          return `/captcha-cache/${filename}?t=${Date.now()}`;
-        }
-      }
+    try {
+      // Upload to Google Cloud Storage
+      console.log(`[CAPTCHA] ☁️ Uploading to Cloud Storage: ${filename}`);
       
-      retries--;
-      if (retries > 0) {
-        console.log(`[CAPTCHA] ⚠️ File not ready, retrying... (${retries} attempts left)`);
-        await new Promise(resolve => setTimeout(resolve, 200));
+      const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
+      const file = bucket.file(`captcha-cache/${filename}`);
+    
+      await file.save(screenshotBuffer, {
+        metadata: {
+          contentType: 'image/png',
+          cacheControl: 'no-cache, no-store, must-revalidate',
+          metadata: {
+            sessionId: sessionId,
+            createdAt: new Date().toISOString()
+          }
+        }
+      });
+      
+      // Make file publicly readable
+      await file.makePublic();
+      
+      // Generate public URL
+      const publicUrl = `https://storage.googleapis.com/${bucketName}/captcha-cache/${filename}`;
+      
+      console.log(`[CAPTCHA] ✅ Uploaded to Cloud Storage (${screenshotBuffer.length} bytes)`);
+      console.log(`[CAPTCHA] 🔗 Public URL: ${publicUrl}`);
+      
+      // Schedule deletion after 5 minutes
+      scheduleCloudFileDeletion(sessionId, 5 * 60 * 1000);
+      
+      return publicUrl + `?t=${Date.now()}`;
+      
+    } catch (cloudError) {
+      console.error(`[CAPTCHA] ❌ Cloud Storage upload failed:`, cloudError.message);
+      console.log(`[CAPTCHA] 💾 Falling back to local filesystem`);
+      // Fall through to local storage
+    }
+  }
+  
+  // Local file system (development or fallback)
+  const captchaPath = path.join(CONFIG.CAPTCHA_DIR, filename);
+  
+  await fs.promises.writeFile(captchaPath, screenshotBuffer);
+  
+  // Wait a moment to ensure file is fully written
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  // Verify file exists and has content
+  let retries = 3;
+  while (retries > 0) {
+    if (fs.existsSync(captchaPath)) {
+      const stats = fs.statSync(captchaPath);
+      if (stats.size > 0) {
+        console.log(`[CAPTCHA] ✅ Screenshot saved locally: ${filename} (${stats.size} bytes)`);
+        console.log(`[CAPTCHA] 📁 File location: ${captchaPath}`);
+        
+        // Verify file is readable
+        try {
+          fs.accessSync(captchaPath, fs.constants.R_OK);
+          console.log(`[CAPTCHA] ✅ File is readable`);
+        } catch (err) {
+          console.error(`[CAPTCHA] ❌ File exists but not readable:`, err.message);
+        }
+        
+        // Schedule local file deletion
+        scheduleFileDeletion(sessionId, 5 * 60 * 1000);
+        
+        return `/captcha-cache/${filename}?t=${Date.now()}`;
       }
     }
     
-    throw new Error('Captcha screenshot failed - file not created or empty after retries');
+    retries--;
+    if (retries > 0) {
+      console.log(`[CAPTCHA] ⚠️ File not ready, retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
   }
+  
+  throw new Error('Captcha screenshot failed - file not created or empty after retries');
 }
 
 /**
