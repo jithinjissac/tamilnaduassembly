@@ -169,9 +169,48 @@ async function findCaptchaElement(driver) {
 async function saveCaptchaScreenshot(element, sessionId) {
   const filename = `captcha-${sessionId}.png`;
   
-  // Take screenshot to buffer (base64 encoded)
-  const screenshotBase64 = await element.takeScreenshot();
-  const screenshotBuffer = Buffer.from(screenshotBase64, 'base64');
+  // Get the actual image source from the captcha element
+  let screenshotBase64 = null;
+  let screenshotBuffer = null;
+  
+  try {
+    // First try to get the image src and download it directly
+    const imgSrc = await element.getAttribute('src');
+    console.log(`[CAPTCHA] Image src: ${imgSrc}`);
+    
+    if (imgSrc && imgSrc.startsWith('data:image')) {
+      // Already base64 data URI
+      screenshotBase64 = imgSrc.split(',')[1];
+      screenshotBuffer = Buffer.from(screenshotBase64, 'base64');
+      console.log(`[CAPTCHA] 📸 Captcha is already base64 (${screenshotBuffer.length} bytes)`);
+    } else if (imgSrc) {
+      // Regular URL - download the image
+      const axios = require('axios');
+      const fullUrl = imgSrc.startsWith('http') ? imgSrc : `${SEC_BASE_URL}${imgSrc}`;
+      console.log(`[CAPTCHA] 🌐 Downloading captcha from: ${fullUrl}`);
+      
+      const response = await axios.get(fullUrl, {
+        responseType: 'arraybuffer',
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      screenshotBuffer = Buffer.from(response.data);
+      screenshotBase64 = screenshotBuffer.toString('base64');
+      console.log(`[CAPTCHA] ✅ Downloaded captcha (${screenshotBuffer.length} bytes)`);
+    }
+  } catch (downloadError) {
+    console.warn(`[CAPTCHA] ⚠️ Failed to download image directly:`, downloadError.message);
+  }
+  
+  // Fallback to element screenshot if download failed
+  if (!screenshotBase64) {
+    console.log(`[CAPTCHA] 📸 Taking element screenshot as fallback...`);
+    screenshotBase64 = await element.takeScreenshot();
+    screenshotBuffer = Buffer.from(screenshotBase64, 'base64');
+  }
   
   const storageType = CLOUD_STORAGE_PATH ? 'Cloud Storage Mount' : 
                       USE_CLOUD_STORAGE ? 'Cloud Storage API' : 
