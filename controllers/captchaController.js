@@ -498,8 +498,21 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Find captcha element
         const captchaElement = await findCaptchaElement(driver);
         
-        // Save screenshot
-        const captchaUrl = await saveCaptchaScreenshot(captchaElement, sessionId);
+        // Extract direct captcha URL from the element
+        let directCaptchaUrl = null;
+        try {
+          directCaptchaUrl = await captchaElement.getAttribute('src');
+          if (directCaptchaUrl && !directCaptchaUrl.startsWith('http')) {
+            // Handle relative URLs
+            directCaptchaUrl = SEC_BASE_URL + directCaptchaUrl;
+          }
+          console.log(`[CAPTCHA] 🔗 Direct captcha URL extracted: ${directCaptchaUrl}`);
+        } catch (e) {
+          console.warn(`[CAPTCHA] ⚠️ Could not extract direct captcha URL:`, e.message);
+        }
+        
+        // Save screenshot as fallback
+        const screenshotUrl = await saveCaptchaScreenshot(captchaElement, sessionId);
         
         // Store session
         sessionManager.create(sessionId, driver, driver, {
@@ -517,7 +530,9 @@ router.get('/initCaptchaSession', async (req, res) => {
         return {
           status: 'success',
           sessionId,
-          captchaUrl,
+          captchaUrl: directCaptchaUrl || screenshotUrl, // Primary: direct URL, Fallback: screenshot
+          captchaUrlDirect: directCaptchaUrl, // Direct SEC URL (may have CORS issues)
+          captchaUrlScreenshot: screenshotUrl, // Screenshot fallback (always works)
           message: 'Captcha session initialized',
           timings: {
             total: Date.now() - startTime,

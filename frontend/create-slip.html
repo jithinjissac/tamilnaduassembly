@@ -1520,69 +1520,71 @@ s0.parentNode.insertBefore(s1,s0);
                 }
                 
                 sessionId = data.sessionId;
-                const captchaUrl = data.captchaUrl;
+                const captchaUrlDirect = data.captchaUrlDirect;
+                const captchaUrlScreenshot = data.captchaUrlScreenshot;
+                const primaryUrl = data.captchaUrl; // Primary URL (direct or screenshot)
                 
-                console.log('[CAPTCHA] Loading image:', captchaUrl);
+                console.log('[CAPTCHA] Direct URL:', captchaUrlDirect);
+                console.log('[CAPTCHA] Screenshot URL:', captchaUrlScreenshot);
+                console.log('[CAPTCHA] Primary URL:', primaryUrl);
                 
                 // Hide loader, show container
                 if (captchaLoader) captchaLoader.style.display = 'none';
                 if (captchaContainer) captchaContainer.style.display = 'block';
                 
-                // Simple image loading with status updates
-                let retryCount = 0;
-                const maxRetries = 5;
-                const retryDelay = 800;
+                // Update status
+                if (statusText) {
+                    statusText.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading image...';
+                }
                 
-                const tryLoadImage = () => {
-                    return new Promise((resolve, reject) => {
-                        retryCount++;
-                        
-                        // Update status
-                        if (statusText) {
-                            statusText.innerHTML = retryCount === 1 
-                                ? '<i class="fas fa-spinner fa-pulse"></i> Loading image...'
-                                : `<i class="fas fa-spinner fa-pulse"></i> Loading... (attempt ${retryCount}/${maxRetries})`;
-                        }
-                        
-                        const img = new Image();
-                        img.crossOrigin = 'anonymous'; // Allow cross-origin, no caching
-                        
-                        img.onload = () => {
-                            console.log('[CAPTCHA] Image loaded successfully on attempt', retryCount);
-                            // Set the actual image source
-                            captchaImg.src = captchaUrl;
-                            if (statusText) {
-                                statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
-                            }
-                            if (loadBtnText) {
-                                loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
-                            }
-                            resolve();
-                        };
-                        
-                        img.onerror = () => {
-                            console.log('[CAPTCHA] Image load failed on attempt', retryCount);
-                            if (retryCount < maxRetries) {
-                                if (statusText) {
-                                    statusText.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Retrying...`;
-                                }
-                                setTimeout(() => {
-                                    tryLoadImage().then(resolve).catch(reject);
-                                }, retryDelay);
-                            } else {
-                                if (statusText) {
-                                    statusText.innerHTML = '<i class="fas fa-times-circle" style="color: #f56565;"></i> Failed to load';
-                                }
-                                reject(new Error('Image failed to load after ' + maxRetries + ' attempts'));
-                            }
-                        };
-                        
-                        // Start loading with cache buster
-                        img.src = captchaUrl + (captchaUrl.includes('?') ? '&' : '?') + 'retry=' + retryCount + '&t=' + Date.now();
-                    });
+                // Hybrid approach: Try direct URL first, fallback to screenshot
+                const img = new Image();
+                
+                img.onload = () => {
+                    console.log('[CAPTCHA] ✅ Image loaded successfully from direct URL');
+                    if (captchaImg) captchaImg.src = img.src;
+                    if (statusText) {
+                        statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                    }
+                    if (loadBtnText) {
+                        loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                    }
                 };
                 
-                await tryLoadImage();
+                img.onerror = () => {
+                    console.warn('[CAPTCHA] ❌ Failed to load from direct URL, trying screenshot fallback...');
+                    
+                    // Fallback to screenshot
+                    const fallbackImg = new Image();
+                    fallbackImg.crossOrigin = 'anonymous';
+                    
+                    fallbackImg.onload = () => {
+                        console.log('[CAPTCHA] ✅ Image loaded successfully from screenshot fallback');
+                        if (captchaImg) captchaImg.src = fallbackImg.src;
+                        if (statusText) {
+                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded (fallback)';
+                        }
+                        if (loadBtnText) {
+                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                        }
+                    };
+                    
+                    fallbackImg.onerror = () => {
+                        console.error('[CAPTCHA] ❌ Both direct and screenshot URLs failed');
+                        if (statusText) {
+                            statusText.innerHTML = '<i class="fas fa-times-circle" style="color: #f56565;"></i> Failed to load';
+                        }
+                        throw new Error('Failed to load captcha image from both sources');
+                    };
+                    
+                    // Try screenshot URL with cache buster
+                    if (captchaUrlScreenshot) {
+                        fallbackImg.src = captchaUrlScreenshot + (captchaUrlScreenshot.includes('?') ? '&' : '?') + 't=' + Date.now();
+                    }
+                };
+                
+                // Start with primary URL (direct if available)
+                img.src = primaryUrl + (primaryUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
                 
             } catch (error) {
                 console.error('[CAPTCHA] Error:', error);

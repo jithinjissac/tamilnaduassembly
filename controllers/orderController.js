@@ -41,8 +41,8 @@ export const createOrder = [
             const errors = validationResult(req);
             let validationErrors = errors.array();
             
-            // Skip symbol validation for symbolFree, multiSymbol, or customPoster mode
-            if (!customization?.symbolFree && !customization?.multiSymbol && !customization?.isCustomPoster && !customization?.isCustomUpload) {
+            // Skip symbol validation for symbolFree or multiSymbol mode
+            if (!customization?.symbolFree && !customization?.multiSymbol) {
                 if (!customization?.symbolImage) {
                     validationErrors.push({
                         msg: 'Symbol image is required',
@@ -138,9 +138,6 @@ export const createOrder = [
 
             // Debug: Log customization before symbol-free handling
             console.log('[DEBUG] Customization received:', JSON.stringify(customization));
-            console.log('[DEBUG] isCustomPoster:', customization.isCustomPoster);
-            console.log('[DEBUG] isCustomUpload:', customization.isCustomUpload);
-            console.log('[DEBUG] multiSymbol:', customization.multiSymbol);
 
             // If multi-symbol mode is enabled
             if (customization.multiSymbol) {
