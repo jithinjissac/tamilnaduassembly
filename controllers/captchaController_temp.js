@@ -6,16 +6,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as cheerio from 'cheerio';
-import { Storage } from '@google-cloud/storage';
 
 const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
-
-// Initialize Google Cloud Storage
-const storage = new Storage();
-const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
-const bucket = storage.bucket(bucketName);
-const USE_CLOUD_STORAGE = process.env.USE_CLOUD_STORAGE === 'true' || process.env.NODE_ENV === 'production';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,7 +47,7 @@ const CONFIG = {
 // Ensure captcha directory exists
 if (!fs.existsSync(CONFIG.CAPTCHA_DIR)) {
   fs.mkdirSync(CONFIG.CAPTCHA_DIR, { recursive: true });
-  console.log('✅ Captcha directory created:', CONFIG.CAPTCHA_DIR);
+  console.log('Ô£à Captcha directory created:', CONFIG.CAPTCHA_DIR);
 }
 
 /**
@@ -73,12 +66,12 @@ async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
       });
       
       const loadTime = Date.now() - startTime;
-      console.log(`[CAPTCHA] ✅ Page loaded in ${loadTime}ms`);
+      console.log(`[CAPTCHA] Ô£à Page loaded in ${loadTime}ms`);
       return loadTime;
       
     } catch (error) {
       const attemptTime = Date.now() - startTime;
-      console.log(`[CAPTCHA] ⚠️ Load failed after ${attemptTime}ms (attempt ${attempt + 1})`);
+      console.log(`[CAPTCHA] ÔÜá´©Å Load failed after ${attemptTime}ms (attempt ${attempt + 1})`);
       
       if (attempt === retries) {
         throw new Error(`SEC website unreachable after ${retries + 1} attempts`);
@@ -105,7 +98,7 @@ async function findCaptchaElement(page) {
       
       if (element) {
         const findTime = Date.now() - startTime;
-        console.log(`[CAPTCHA] ✅ Found captcha: ${selector} (${findTime}ms)`);
+        console.log(`[CAPTCHA] Ô£à Found captcha: ${selector} (${findTime}ms)`);
         return element;
       }
     } catch (e) {
@@ -121,84 +114,42 @@ async function findCaptchaElement(page) {
  * Helper: Save captcha screenshot
  */
 async function saveCaptchaScreenshot(element, sessionId) {
-  const filename = `captcha-${sessionId}.png`;
+  const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
   
-  // Take screenshot to buffer
-  const screenshotBuffer = await element.screenshot();
+  await element.screenshot({ path: captchaPath });
   
-  if (USE_CLOUD_STORAGE) {
-    // Upload to Google Cloud Storage
-    console.log(`[CAPTCHA] ☁️ Uploading to Cloud Storage: ${filename}`);
-    
-    const file = bucket.file(`captcha-cache/${filename}`);
-    
-    await file.save(screenshotBuffer, {
-      metadata: {
-        contentType: 'image/png',
-        cacheControl: 'no-cache, no-store, must-revalidate',
-        metadata: {
-          sessionId: sessionId,
-          createdAt: new Date().toISOString()
+  // Wait a moment to ensure file is fully written
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  // Verify file exists and has content
+  let retries = 3;
+  while (retries > 0) {
+    if (fs.existsSync(captchaPath)) {
+      const stats = fs.statSync(captchaPath);
+      if (stats.size > 0) {
+        console.log(`[CAPTCHA] Ô£à Screenshot saved: captcha-${sessionId}.png (${stats.size} bytes)`);
+        console.log(`[CAPTCHA] ­ƒôü File location: ${captchaPath}`);
+        
+        // Verify file is readable
+        try {
+          fs.accessSync(captchaPath, fs.constants.R_OK);
+          console.log(`[CAPTCHA] Ô£à File is readable`);
+        } catch (err) {
+          console.error(`[CAPTCHA] ÔØî File exists but not readable:`, err.message);
         }
-      }
-    });
-    
-    // Make file publicly readable
-    await file.makePublic();
-    
-    // Generate public URL
-    const publicUrl = `https://storage.googleapis.com/${bucketName}/captcha-cache/${filename}`;
-    
-    console.log(`[CAPTCHA] ✅ Uploaded to Cloud Storage (${screenshotBuffer.length} bytes)`);
-    console.log(`[CAPTCHA] 🔗 Public URL: ${publicUrl}`);
-    
-    // Schedule deletion after 5 minutes
-    scheduleCloudFileDeletion(sessionId, 5 * 60 * 1000);
-    
-    return publicUrl + `?t=${Date.now()}`;
-    
-  } else {
-    // Local file system (development)
-    const captchaPath = path.join(CONFIG.CAPTCHA_DIR, filename);
-    
-    await fs.promises.writeFile(captchaPath, screenshotBuffer);
-    
-    // Wait a moment to ensure file is fully written
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    // Verify file exists and has content
-    let retries = 3;
-    while (retries > 0) {
-      if (fs.existsSync(captchaPath)) {
-        const stats = fs.statSync(captchaPath);
-        if (stats.size > 0) {
-          console.log(`[CAPTCHA] ✅ Screenshot saved locally: ${filename} (${stats.size} bytes)`);
-          console.log(`[CAPTCHA] 📁 File location: ${captchaPath}`);
-          
-          // Verify file is readable
-          try {
-            fs.accessSync(captchaPath, fs.constants.R_OK);
-            console.log(`[CAPTCHA] ✅ File is readable`);
-          } catch (err) {
-            console.error(`[CAPTCHA] ❌ File exists but not readable:`, err.message);
-          }
-          
-          // Schedule local file deletion
-          scheduleFileDeletion(sessionId, 5 * 60 * 1000);
-          
-          return `/captcha-cache/${filename}?t=${Date.now()}`;
-        }
-      }
-      
-      retries--;
-      if (retries > 0) {
-        console.log(`[CAPTCHA] ⚠️ File not ready, retrying... (${retries} attempts left)`);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        return `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`;
       }
     }
     
-    throw new Error('Captcha screenshot failed - file not created or empty after retries');
+    retries--;
+    if (retries > 0) {
+      console.log(`[CAPTCHA] ÔÜá´©Å File not ready, retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
   }
+  
+  throw new Error('Captcha screenshot failed - file not created or empty after retries');
 }
 
 /**
@@ -241,7 +192,7 @@ async function setMalayalamLocale(page) {
   // Verify locale cookie
   const cookies = await page.context().cookies();
   const localeCookie = cookies.find(c => c.name === 'set_locale');
-  console.log('[CAPTCHA] 📍 Locale cookie:', localeCookie?.value || 'NOT SET');
+  console.log('[CAPTCHA] ­ƒôì Locale cookie:', localeCookie?.value || 'NOT SET');
   
   return localeCookie?.value === 'ml';
 }
@@ -293,7 +244,7 @@ function extractMalayalamPollingStation(html, pollingStationValue) {
     }
     
     if (pollingStationMalayalam) {
-      console.log('[CAPTCHA] ✅ Malayalam polling station:', pollingStationMalayalam);
+      console.log('[CAPTCHA] Ô£à Malayalam polling station:', pollingStationMalayalam);
       return pollingStationMalayalam;
     }
   } catch (error) {
@@ -324,31 +275,17 @@ async function getCustomSECError() {
 }
 
 /**
- * Helper: Cleanup session
+ * Helper: Cleanup session and captcha
  */
 async function cleanupSession(sessionId, deleteFile = false) {
   try {
     await sessionManager.cleanup(sessionId);
     
     if (deleteFile) {
-      if (USE_CLOUD_STORAGE) {
-        const filename = `captcha-cache/captcha-${sessionId}.png`;
-        const file = bucket.file(filename);
-        
-        try {
-          await file.delete();
-          console.log(`[CAPTCHA] 🗑️ Cloud file deleted: ${filename}`);
-        } catch (error) {
-          if (error.code !== 404) {
-            console.error(`[CAPTCHA] Error deleting cloud file:`, error.message);
-          }
-        }
-      } else {
-        const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
-        if (fs.existsSync(captchaPath)) {
-          fs.unlinkSync(captchaPath);
-          console.log(`[CAPTCHA] 🗑️ Local file deleted: captcha-${sessionId}.png`);
-        }
+      const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
+      if (fs.existsSync(captchaPath)) {
+        fs.unlinkSync(captchaPath);
+        console.log(`[CAPTCHA] ­ƒùæ´©Å Captcha file deleted: captcha-${sessionId}.png`);
       }
     }
   } catch (error) {
@@ -365,28 +302,9 @@ function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
     if (fs.existsSync(captchaPath)) {
       try {
         fs.unlinkSync(captchaPath);
-        console.log(`[CAPTCHA] 🗑️ Scheduled cleanup: captcha-${sessionId}.png deleted`);
+        console.log(`[CAPTCHA] ­ƒùæ´©Å Scheduled cleanup: captcha-${sessionId}.png deleted`);
       } catch (error) {
         console.error(`[CAPTCHA] Error deleting captcha file:`, error.message);
-      }
-    }
-  }, delayMs);
-}
-
-/**
- * Schedule cloud file deletion after delay
- */
-function scheduleCloudFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
-  setTimeout(async () => {
-    const filename = `captcha-cache/captcha-${sessionId}.png`;
-    const file = bucket.file(filename);
-    
-    try {
-      await file.delete();
-      console.log(`[CAPTCHA] ☁️🗑️ Scheduled cloud cleanup: ${filename} deleted`);
-    } catch (error) {
-      if (error.code !== 404) {
-        console.error(`[CAPTCHA] Error deleting cloud file:`, error.message);
       }
     }
   }, delayMs);
@@ -401,7 +319,7 @@ router.get('/initCaptchaSession', async (req, res) => {
   const startTime = Date.now();
   
   try {
-    console.log(`[CAPTCHA] 🚀 Initializing session ${sessionId}...`);
+    console.log(`[CAPTCHA] ­ƒÜÇ Initializing session ${sessionId}...`);
     
     const result = await captchaQueue.add(async () => {
       let context = null;
@@ -411,7 +329,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Get browser context
         const contextStartTime = Date.now();
         context = await browserPool.getBrowserContext(sessionId);
-        console.log(`[CAPTCHA] ⏱️ Context acquired in ${Date.now() - contextStartTime}ms`);
+        console.log(`[CAPTCHA] ÔÅ▒´©Å Context acquired in ${Date.now() - contextStartTime}ms`);
         
         // Create page
         page = await context.newPage();
@@ -465,7 +383,7 @@ router.get('/initCaptchaSession', async (req, res) => {
     res.json(result);
     
   } catch (error) {
-    console.error('[CAPTCHA] ❌ Error initializing session:', error);
+    console.error('[CAPTCHA] ÔØî Error initializing session:', error);
     
     const isShutdownError = error.message?.includes('shutting down') || 
                            error.message?.includes('has been closed');
@@ -487,7 +405,7 @@ router.get('/initCaptchaSession', async (req, res) => {
 router.post('/submitWithCaptcha', async (req, res) => {
   const { sessionId, district, local_body, ward, polling_station, language, captcha } = req.body;
   
-  console.log(`[CAPTCHA] 📝 Submitting form for session ${sessionId}...`);
+  console.log(`[CAPTCHA] ­ƒôØ Submitting form for session ${sessionId}...`);
   
   try {
     // Get session
@@ -549,7 +467,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     try {
       await page.click(CONFIG.FORM_SELECTORS.submitButton);
     } catch (clickError) {
-      console.error('[CAPTCHA] ❌ Submit button click failed:', clickError.message);
+      console.error('[CAPTCHA] ÔØî Submit button click failed:', clickError.message);
       
       const customError = await getCustomSECError();
       await cleanupSession(sessionId);
@@ -564,7 +482,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     }
     
     // Wait for response
-    console.log('[CAPTCHA] ⏳ Waiting for response...');
+    console.log('[CAPTCHA] ÔÅ│ Waiting for response...');
     await page.waitForTimeout(5000);
     
     // Get page content
@@ -572,7 +490,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
     try {
       html = await page.content();
     } catch (contentError) {
-      console.error('[CAPTCHA] ❌ Failed to get page content:', contentError.message);
+      console.error('[CAPTCHA] ÔØî Failed to get page content:', contentError.message);
       
       const customError = await getCustomSECError();
       await cleanupSession(sessionId);
@@ -586,7 +504,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
       });
     }
     
-    console.log('[CAPTCHA] ✅ Form submitted in', Date.now() - startTime, 'ms');
+    console.log('[CAPTCHA] Ô£à Form submitted in', Date.now() - startTime, 'ms');
     
     // Check for server errors
     const hasServerError = html.includes('500 Internal Server Error') ||
@@ -621,12 +539,12 @@ router.post('/submitWithCaptcha', async (req, res) => {
     
     // Schedule cleanup after 60 seconds
     setTimeout(async () => {
-      console.log('[CAPTCHA] ⏰ Scheduled cleanup executing...');
+      console.log('[CAPTCHA] ÔÅ░ Scheduled cleanup executing...');
       await cleanupSession(sessionId);
     }, 60000);
     
   } catch (error) {
-    console.error('[CAPTCHA] ❌ Error submitting form:', error);
+    console.error('[CAPTCHA] ÔØî Error submitting form:', error);
     
     res.status(500).json({
       status: 'error',

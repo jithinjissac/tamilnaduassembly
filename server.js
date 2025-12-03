@@ -76,7 +76,7 @@ console.log('');
 
 // Ensure required directories exist on startup (important for Railway)
 const requiredDirs = [
-  process.env.CAPTCHA_VOLUME_PATH || path.join(__dirname, 'public', 'captcha-cache'),
+  path.join(__dirname, 'public', 'captcha-cache'),
   path.join(__dirname, 'public', 'debug-screenshots'),
   path.join(__dirname, 'public', 'temp-pdfs')
 ];
@@ -197,14 +197,11 @@ app.use('/captcha-cache', (req, res, next) => {
   next();
 });
 
-app.use('/captcha-cache', express.static(
-  process.env.CAPTCHA_VOLUME_PATH || path.join(__dirname, 'public', 'captcha-cache'), 
-  {
-    maxAge: 0,
-    etag: false,
-    lastModified: false
-  }
-));
+app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache'), {
+  maxAge: 0,
+  etag: false,
+  lastModified: false
+}));
 
 // Serve debug screenshots directory
 app.use('/debug-screenshots', express.static(path.join(__dirname, 'public', 'debug-screenshots')));
@@ -303,7 +300,7 @@ app.get('/health', (req, res) => {
 // Debug endpoint to check captcha directory status
 app.get('/api/debug/captcha-status', (req, res) => {
   try {
-    const captchaDir = process.env.CAPTCHA_VOLUME_PATH || path.join(__dirname, 'public', 'captcha-cache');
+    const captchaDir = path.join(__dirname, 'public', 'captcha-cache');
     const exists = fs.existsSync(captchaDir);
     
     let files = [];
