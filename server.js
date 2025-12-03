@@ -203,6 +203,31 @@ app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha
   lastModified: false
 }));
 
+// Serve mounted Cloud Storage bucket (Cloud Run volume mount)
+// If bucket is mounted at /slipsdata, serve captcha files from there
+const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+if (fs.existsSync(mountedBucketPath)) {
+  console.log(`☁️ [SERVER] Serving mounted bucket from: ${mountedBucketPath}`);
+  
+  app.use('/slipsdata', (req, res, next) => {
+    console.log(`[BUCKET ACCESS] Request: ${req.path} from ${req.ip}`);
+    
+    // CORS and no-cache headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    next();
+  });
+  
+  app.use('/slipsdata', express.static(mountedBucketPath, {
+    maxAge: 0,
+    etag: false,
+    lastModified: false
+  }));
+}
+
 // Serve debug screenshots directory
 app.use('/debug-screenshots', express.static(path.join(__dirname, 'public', 'debug-screenshots')));
 

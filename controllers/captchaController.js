@@ -15,26 +15,46 @@ const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
 let storage;
 let bucket;
 let USE_CLOUD_STORAGE = false;
+let CLOUD_STORAGE_PATH = null; // For mounted volumes
 
 try {
-  // Check if we should use cloud storage
-  const shouldUseCloud = process.env.USE_CLOUD_STORAGE === 'true' || 
-                         process.env.NODE_ENV === 'production' ||
-                         process.env.RAILWAY_ENVIRONMENT === 'production';
+  // Check if bucket is mounted as a volume (Cloud Run volume mount)
+  const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
   
-  if (shouldUseCloud) {
-    storage = new Storage();
-    const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
-    bucket = storage.bucket(bucketName);
+  if (fs.existsSync(mountedBucketPath)) {
+    // Bucket is mounted as filesystem - use it directly
+    CLOUD_STORAGE_PATH = path.join(mountedBucketPath, 'captcha-cache');
+    
+    // Create captcha-cache directory in mounted bucket
+    if (!fs.existsSync(CLOUD_STORAGE_PATH)) {
+      fs.mkdirSync(CLOUD_STORAGE_PATH, { recursive: true });
+      console.log(`☁️ [CLOUD STORAGE MOUNT] Created directory: ${CLOUD_STORAGE_PATH}`);
+    }
+    
     USE_CLOUD_STORAGE = true;
-    console.log(`☁️ [CLOUD STORAGE] Enabled - Bucket: ${bucketName}`);
+    console.log(`☁️ [CLOUD STORAGE MOUNT] Using mounted bucket at: ${mountedBucketPath}`);
+    console.log(`📁 [CLOUD STORAGE MOUNT] Captcha path: ${CLOUD_STORAGE_PATH}`);
   } else {
-    console.log(`💾 [LOCAL STORAGE] Using filesystem for captcha images`);
+    // No mounted volume, check if we should use Storage API
+    const shouldUseCloud = process.env.USE_CLOUD_STORAGE === 'true' || 
+                           process.env.NODE_ENV === 'production' ||
+                           process.env.RAILWAY_ENVIRONMENT === 'production';
+    
+    if (shouldUseCloud) {
+      storage = new Storage();
+      const bucketName = process.env.GCS_BUCKET_NAME || 'slipsdata';
+      bucket = storage.bucket(bucketName);
+      USE_CLOUD_STORAGE = true;
+      console.log(`☁️ [CLOUD STORAGE API] Enabled - Bucket: ${bucketName}`);
+    } else {
+      console.log(`💾 [LOCAL STORAGE] Using filesystem for captcha images`);
+    }
   }
 } catch (error) {
   console.error(`❌ [CLOUD STORAGE] Failed to initialize:`, error.message);
   console.log(`💾 [LOCAL STORAGE] Falling back to filesystem`);
   USE_CLOUD_STORAGE = false;
+  CLOUD_STORAGE_PATH = null;
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -146,7 +166,25 @@ async function saveCaptchaScreenshot(element, sessionId) {
   // Take screenshot to buffer
   const screenshotBuffer = await element.screenshot();
   
-  console.log(`[CAPTCHA] 📸 Screenshot captured (${screenshotBuffer.length} bytes) - Using: ${USE_CLOUD_STORAGE ? 'Cloud Storage' : 'Local Filesystem'}`);
+  const storageType = CLOUD_STORAGE_PATH ? 'Cloud Storage Mount' : 
+                      USE_CLOUD_STORAGE ? 'Cloud Storage API' : 
+                      'Local Filesystem';
+  console.log(`[CAPTCHA] 📸 Screenshot captured (${screenshotBuffer.length} bytes) - Using: ${storageType}`);
+  
+  // If bucket is mounted as a volume, use it as regular filesystem
+  if (CLOUD_STORAGE_PATH) {
+    const captchaPath = path.join(CLOUD_STORAGE_PATH, filename);
+    
+    await fs.promises.writeFile(captchaPath, screenshotBuffer);
+    console.log(`[CAPTCHA] ☁️✅ Saved to mounted bucket: ${captchaPath} (${screenshotBuffer.length} bytes)`);
+    
+    // Schedule deletion after 5 minutes
+    scheduleFileDeletion(sessionId, 5 * 60 * 1000, CLOUD_STORAGE_PATH);
+    
+    // Return path relative to mounted bucket for serving via Cloud Run
+    // Cloud Run will serve files from /slipsdata as public URL
+    return `/slipsdata/captcha-cache/${filename}?t=${Date.now()}`;
+  }
   
   if (USE_CLOUD_STORAGE) {
     try {
@@ -360,13 +398,20 @@ async function cleanupSession(sessionId, deleteFile = false) {
     await sessionManager.cleanup(sessionId);
     
     if (deleteFile) {
-      if (USE_CLOUD_STORAGE) {
+      // Try mounted bucket first
+      if (CLOUD_STORAGE_PATH) {
+        const captchaPath = path.join(CLOUD_STORAGE_PATH, `captcha-${sessionId}.png`);
+        if (fs.existsSync(captchaPath)) {
+          fs.unlinkSync(captchaPath);
+          console.log(`[CAPTCHA] 🗑️ Mounted bucket file deleted: captcha-${sessionId}.png`);
+        }
+      } else if (USE_CLOUD_STORAGE && bucket) {
         const filename = `captcha-cache/captcha-${sessionId}.png`;
         const file = bucket.file(filename);
         
         try {
           await file.delete();
-          console.log(`[CAPTCHA] 🗑️ Cloud file deleted: ${filename}`);
+          console.log(`[CAPTCHA] 🗑️ Cloud API file deleted: ${filename}`);
         } catch (error) {
           if (error.code !== 404) {
             console.error(`[CAPTCHA] Error deleting cloud file:`, error.message);
@@ -388,13 +433,17 @@ async function cleanupSession(sessionId, deleteFile = false) {
 /**
  * Schedule captcha file deletion after delay (to allow frontend to load it)
  */
-function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
+function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000, customPath = null) {
   setTimeout(() => {
-    const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
+    const captchaPath = customPath 
+      ? path.join(customPath, `captcha-${sessionId}.png`)
+      : path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
+      
     if (fs.existsSync(captchaPath)) {
       try {
         fs.unlinkSync(captchaPath);
-        console.log(`[CAPTCHA] 🗑️ Scheduled cleanup: captcha-${sessionId}.png deleted`);
+        const location = customPath ? 'mounted bucket' : 'local';
+        console.log(`[CAPTCHA] 🗑️ Scheduled cleanup: captcha-${sessionId}.png deleted from ${location}`);
       } catch (error) {
         console.error(`[CAPTCHA] Error deleting captcha file:`, error.message);
       }
