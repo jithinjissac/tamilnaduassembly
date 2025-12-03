@@ -43,15 +43,15 @@ const CONFIG = {
     submitButton: 'button[data-success-path="/public/voters/list"]'
   }
 };
-  }
-};
 
 // Log storage configuration on startup
 console.log('[CAPTCHA] Storage:', getStorageInfo());
 
 /**
  * Helper: Load SEC page with retry logic
- */onst startTime = Date.now();
+ */
+async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
+  const startTime = Date.now();
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
