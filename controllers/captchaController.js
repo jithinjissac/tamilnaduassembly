@@ -2,6 +2,7 @@ import express from 'express';
 import { browserPool } from '../utils/browserPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { captchaQueue } from '../utils/requestQueue.js';
+import { saveCaptcha, deleteCaptcha, getStorageInfo } from '../utils/storageService.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -20,7 +21,6 @@ const CONFIG = {
   FORM_SUBMIT_TIMEOUT: 90000,     // 90s for form submission
   SESSION_TIMEOUT: 10 * 60 * 1000, // 10 minutes
   MAX_PAGE_RETRIES: 2,            // Retry page load twice
-  CAPTCHA_DIR: path.join(__dirname, '..', 'public', 'captcha-cache'),
   
   // Selectors
   CAPTCHA_SELECTORS: [
@@ -43,18 +43,15 @@ const CONFIG = {
     submitButton: 'button[data-success-path="/public/voters/list"]'
   }
 };
+  }
+};
 
-// Ensure captcha directory exists
-if (!fs.existsSync(CONFIG.CAPTCHA_DIR)) {
-  fs.mkdirSync(CONFIG.CAPTCHA_DIR, { recursive: true });
-  console.log('✅ Captcha directory created:', CONFIG.CAPTCHA_DIR);
-}
+// Log storage configuration on startup
+console.log('[CAPTCHA] Storage:', getStorageInfo());
 
 /**
  * Helper: Load SEC page with retry logic
- */
-async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
-  const startTime = Date.now();
+ */onst startTime = Date.now();
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -113,47 +110,26 @@ async function findCaptchaElement(page) {
 /**
  * Helper: Save captcha screenshot
  */
-async function saveCaptchaScreenshot(element, sessionId) {
-  const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
-  
-  await element.screenshot({ path: captchaPath });
-  
-  // Wait a moment to ensure file is fully written
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  // Verify file exists and has content
-  let retries = 3;
-  while (retries > 0) {
-    if (fs.existsSync(captchaPath)) {
-      const stats = fs.statSync(captchaPath);
-      if (stats.size > 0) {
-        console.log(`[CAPTCHA] ✅ Screenshot saved: captcha-${sessionId}.png (${stats.size} bytes)`);
-        console.log(`[CAPTCHA] 📁 File location: ${captchaPath}`);
-        
-        // Verify file is readable
-        try {
-          fs.accessSync(captchaPath, fs.constants.R_OK);
-          console.log(`[CAPTCHA] ✅ File is readable`);
-        } catch (err) {
-          console.error(`[CAPTCHA] ❌ File exists but not readable:`, err.message);
-        }
-        
-        return `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`;
-      }
-    }
-    
-    retries--;
-    if (retries > 0) {
-      console.log(`[CAPTCHA] ⚠️ File not ready, retrying... (${retries} attempts left)`);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-  }
-  
-  throw new Error('Captcha screenshot failed - file not created or empty after retries');
-}
-
 /**
- * Helper: Setup page optimizations
+ * Helper: Save captcha screenshot using storage service
+ */
+async function saveCaptchaScreenshot(element, sessionId) {
+  try {
+    // Take screenshot as buffer
+    const buffer = await element.screenshot();
+    
+    // Save using storage service (GCS or local)
+    const captchaUrl = await saveCaptcha(buffer, sessionId);
+    
+    console.log(`[CAPTCHA] ✅ Screenshot saved for session ${sessionId}`);
+    console.log(`[CAPTCHA] 📎 URL: ${captchaUrl}`);
+    
+    return captchaUrl;
+  } catch (error) {
+    console.error('[CAPTCHA] ❌ Screenshot save failed:', error.message);
+    throw new Error('Failed to save captcha screenshot');
+  }
+}* Helper: Setup page optimizations
  */
 async function setupPageOptimizations(page) {
   // Set timeout
@@ -301,39 +277,27 @@ function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
     const captchaPath = path.join(CONFIG.CAPTCHA_DIR, `captcha-${sessionId}.png`);
     if (fs.existsSync(captchaPath)) {
       try {
-        fs.unlinkSync(captchaPath);
-        console.log(`[CAPTCHA] 🗑️ Scheduled cleanup: captcha-${sessionId}.png deleted`);
-      } catch (error) {
-        console.error(`[CAPTCHA] Error deleting captcha file:`, error.message);
-      }
+async function cleanupSession(sessionId, deleteFile = false) {
+  try {
+    await sessionManager.cleanup(sessionId);
+    
+    if (deleteFile) {
+      await deleteCaptcha(sessionId);
     }
-  }, delayMs);
-}
-
-/**
- * GET /api/initCaptchaSession
- * Initialize browser session and capture captcha
- */
-router.get('/initCaptchaSession', async (req, res) => {
-  const sessionId = Date.now().toString();
+  } catch (error) {
+    console.error('[CAPTCHA] Error during cleanup:', error.message);
+  }
+} const sessionId = Date.now().toString();
   const startTime = Date.now();
   
-  try {
-    console.log(`[CAPTCHA] 🚀 Initializing session ${sessionId}...`);
-    
-    const result = await captchaQueue.add(async () => {
-      let context = null;
-      let page = null;
-      
-      try {
-        // Get browser context
-        const contextStartTime = Date.now();
-        context = await browserPool.getBrowserContext(sessionId);
-        console.log(`[CAPTCHA] ⏱️ Context acquired in ${Date.now() - contextStartTime}ms`);
-        
-        // Create page
-        page = await context.newPage();
-        await setupPageOptimizations(page);
+/**
+ * Schedule captcha file deletion after delay (to allow frontend to load it)
+ * Note: This is now handled by storageService.js automatically
+ */
+function scheduleFileDeletion(sessionId, delayMs = 5 * 60 * 1000) {
+  // Storage service handles auto-deletion, this is kept for backward compatibility
+  console.log(`[CAPTCHA] Auto-deletion scheduled for session ${sessionId} in ${delayMs/1000}s`);
+}       await setupPageOptimizations(page);
         
         // Set Malayalam locale
         await setMalayalamLocale(page);
