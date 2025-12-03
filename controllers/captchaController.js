@@ -129,7 +129,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
     console.error('[CAPTCHA] ❌ Screenshot save failed:', error.message);
     throw new Error('Failed to save captcha screenshot');
   }
-}* Helper: Setup page optimizations
+}
+
+/**
+ * Helper: Setup page optimizations
  */
 async function setupPageOptimizations(page) {
   // Set timeout
