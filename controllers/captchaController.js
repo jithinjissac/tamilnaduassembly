@@ -520,6 +520,10 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Schedule file deletion after 5 minutes (gives frontend time to load)
         scheduleFileDeletion(sessionId, 5 * 60 * 1000);
         
+        console.log(`[CAPTCHA] ✅ Session ${sessionId} created successfully`);
+        console.log(`[CAPTCHA] 📤 Returning captchaUrl: ${captchaUrl}`);
+        console.log(`[CAPTCHA] ⏰ Session will timeout in ${CONFIG.SESSION_TIMEOUT / 1000}s`);
+        
         return {
           status: 'success',
           sessionId,
@@ -566,16 +570,34 @@ router.post('/submitWithCaptcha', async (req, res) => {
   const { sessionId, district, local_body, ward, polling_station, language, captcha } = req.body;
   
   console.log(`[CAPTCHA] 📝 Submitting form for session ${sessionId}...`);
+  console.log(`[CAPTCHA] 🔍 Checking session availability...`);
   
   try {
     // Get session
     const session = sessionManager.get(sessionId);
     if (!session) {
+      console.error(`[CAPTCHA] ❌ Session ${sessionId} not found or expired`);
+      console.log(`[CAPTCHA] 📊 Active sessions: ${sessionManager.getActiveSessions().length}`);
+      
+      // List active session IDs for debugging
+      const activeSessions = sessionManager.getActiveSessions();
+      if (activeSessions.length > 0) {
+        console.log(`[CAPTCHA] 🔑 Active session IDs:`, activeSessions.map(s => s.sessionId).join(', '));
+      }
+      
       return res.status(400).json({
         status: 'error',
-        message: 'Invalid or expired session. Please refresh captcha.'
+        message: 'Invalid or expired session. Please refresh captcha.',
+        sessionId: sessionId,
+        debug: {
+          requestedSessionId: sessionId,
+          activeSessionsCount: activeSessions.length,
+          activeSessions: activeSessions.map(s => s.sessionId)
+        }
       });
     }
+    
+    console.log(`[CAPTCHA] ✅ Session ${sessionId} found and valid`);
     
     const { page } = session;
     const startTime = Date.now();
