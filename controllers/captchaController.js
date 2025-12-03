@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as cheerio from 'cheerio';
 import { Storage } from '@google-cloud/storage';
+import axios from 'axios';
 
 const router = express.Router();
 const SEC_BASE_URL = process.env.SEC_BASE_URL || 'https://sec.kerala.gov.in';
@@ -185,7 +186,6 @@ async function saveCaptchaScreenshot(element, sessionId) {
       console.log(`[CAPTCHA] 📸 Captcha is already base64 (${screenshotBuffer.length} bytes)`);
     } else if (imgSrc) {
       // Regular URL - download the image
-      const axios = require('axios');
       const fullUrl = imgSrc.startsWith('http') ? imgSrc : `${SEC_BASE_URL}${imgSrc}`;
       console.log(`[CAPTCHA] 🌐 Downloading captcha from: ${fullUrl}`);
       
