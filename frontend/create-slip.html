@@ -1028,8 +1028,13 @@ s0.parentNode.insertBefore(s1,s0);
                                 <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
                             </div>
                             
-                            <!-- Captcha Image -->
-                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto; border-radius: 4px;">
+                            <!-- Captcha Image Container with retry display -->
+                            <div id="captchaImageContainer" style="display: none;">
+                                <img id="captchaImage" src="" alt="Captcha" style="max-width: 100%; height: auto; border-radius: 4px; display: block; margin: 0 auto;">
+                                <div id="captchaLoadStatus" style="margin-top: 0.5rem; font-size: 0.75rem; color: #718096;">
+                                    <i class="fas fa-check-circle" style="color: #48bb78;"></i> <span id="captchaLoadStatusText">Loaded</span>
+                                </div>
+                            </div>
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
                             <span id="loadCaptchaText">Load Captcha</span>
@@ -1482,18 +1487,25 @@ s0.parentNode.insertBefore(s1,s0);
         });
 
         async function loadCaptcha() {
+            const captchaImg = document.getElementById('captchaImage');
+            const captchaContainer = document.getElementById('captchaImageContainer');
+            const captchaLoader = document.getElementById('captchaLoader');
+            const statusText = document.getElementById('captchaLoadStatusText');
+            const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+            const loadBtnText = document.getElementById('loadCaptchaText');
+            
             try {
-                // Hide captcha image and show loader
-                document.getElementById('captchaImage').src = '';
-                document.getElementById('captchaImage').style.display = 'none';
-                document.getElementById('captchaLoader').style.display = 'block';
+                // Show loader, hide image
+                if (captchaContainer) captchaContainer.style.display = 'none';
+                if (captchaLoader) captchaLoader.style.display = 'block';
+                if (captchaImg) captchaImg.src = '';
                 
-                // Disable button and show loading text
-                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
-                const loadBtnText = document.getElementById('loadCaptchaText');
+                // Disable button
                 if (loadBtn) loadBtn.disabled = true;
                 if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 
+                // Fetch captcha session
+                console.log('[CAPTCHA] Fetching captcha session...');
                 const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
@@ -1501,61 +1513,87 @@ s0.parentNode.insertBefore(s1,s0);
                 }
                 
                 const data = await response.json();
+                console.log('[CAPTCHA] Response:', data);
                 
-                if (data.status === 'success') {
-                    sessionId = data.sessionId;
-                    
-                    // Load captcha image with retry mechanism
-                    const captchaImg = document.getElementById('captchaImage');
-                    const captchaUrl = data.captchaUrl;
-                    
-                    // Function to load image with retries
-                    const loadImageWithRetry = async (url, retries = 3, delay = 500) => {
-                        for (let i = 0; i < retries; i++) {
-                            try {
-                                await new Promise((resolve, reject) => {
-                                    const img = new Image();
-                                    img.onload = () => resolve();
-                                    img.onerror = () => reject(new Error('Image load failed'));
-                                    img.src = url;
-                                });
-                                
-                                // Image loaded successfully
-                                document.getElementById('captchaLoader').style.display = 'none';
-                                captchaImg.src = url;
-                                captchaImg.style.display = 'block';
-                                
-                                // Update button text
-                                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
-                                return;
-                                
-                            } catch (error) {
-                                if (i < retries - 1) {
-                                    console.log(`Captcha image load attempt ${i + 1} failed, retrying in ${delay}ms...`);
-                                    await new Promise(resolve => setTimeout(resolve, delay));
-                                } else {
-                                    throw new Error('Failed to load captcha image after ' + retries + ' attempts');
-                                }
-                            }
-                        }
-                    };
-                    
-                    await loadImageWithRetry(captchaUrl);
-                    
-                } else {
+                if (data.status !== 'success' || !data.captchaUrl) {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
+                
+                sessionId = data.sessionId;
+                const captchaUrl = data.captchaUrl;
+                
+                console.log('[CAPTCHA] Loading image:', captchaUrl);
+                
+                // Hide loader, show container
+                if (captchaLoader) captchaLoader.style.display = 'none';
+                if (captchaContainer) captchaContainer.style.display = 'block';
+                
+                // Simple image loading with status updates
+                let retryCount = 0;
+                const maxRetries = 5;
+                const retryDelay = 800;
+                
+                const tryLoadImage = () => {
+                    return new Promise((resolve, reject) => {
+                        retryCount++;
+                        
+                        // Update status
+                        if (statusText) {
+                            statusText.innerHTML = retryCount === 1 
+                                ? '<i class="fas fa-spinner fa-pulse"></i> Loading image...'
+                                : `<i class="fas fa-spinner fa-pulse"></i> Loading... (attempt ${retryCount}/${maxRetries})`;
+                        }
+                        
+                        const img = new Image();
+                        
+                        img.onload = () => {
+                            console.log('[CAPTCHA] Image loaded successfully on attempt', retryCount);
+                            // Set the actual image source
+                            captchaImg.src = captchaUrl;
+                            if (statusText) {
+                                statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                            }
+                            if (loadBtnText) {
+                                loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                            }
+                            resolve();
+                        };
+                        
+                        img.onerror = () => {
+                            console.log('[CAPTCHA] Image load failed on attempt', retryCount);
+                            if (retryCount < maxRetries) {
+                                if (statusText) {
+                                    statusText.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Retrying...`;
+                                }
+                                setTimeout(() => {
+                                    tryLoadImage().then(resolve).catch(reject);
+                                }, retryDelay);
+                            } else {
+                                if (statusText) {
+                                    statusText.innerHTML = '<i class="fas fa-times-circle" style="color: #f56565;"></i> Failed to load';
+                                }
+                                reject(new Error('Image failed to load after ' + maxRetries + ' attempts'));
+                            }
+                        };
+                        
+                        // Start loading with cache buster
+                        img.src = captchaUrl + (captchaUrl.includes('?') ? '&' : '?') + 'retry=' + retryCount + '&t=' + Date.now();
+                    });
+                };
+                
+                await tryLoadImage();
+                
             } catch (error) {
-                console.error('Error loading captcha:', error);
+                console.error('[CAPTCHA] Error:', error);
                 
                 // Hide loader
-                document.getElementById('captchaLoader').style.display = 'none';
+                if (captchaLoader) captchaLoader.style.display = 'none';
+                if (captchaContainer) captchaContainer.style.display = 'none';
                 
                 showError('Failed to load captcha. Please try again.');
+                
             } finally {
                 // Re-enable button
-                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
-                const loadBtnText = document.getElementById('loadCaptchaText');
                 if (loadBtn) loadBtn.disabled = false;
                 if (loadBtnText && loadBtnText.innerHTML.includes('Loading')) {
                     loadBtnText.innerHTML = 'Load Captcha';
