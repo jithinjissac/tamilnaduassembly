@@ -119,20 +119,37 @@ async function saveCaptchaScreenshot(element, sessionId) {
   await element.screenshot({ path: captchaPath });
   
   // Wait a moment to ensure file is fully written
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => setTimeout(resolve, 200));
   
   // Verify file exists and has content
-  if (!fs.existsSync(captchaPath)) {
-    throw new Error('Captcha screenshot failed - file not created');
+  let retries = 3;
+  while (retries > 0) {
+    if (fs.existsSync(captchaPath)) {
+      const stats = fs.statSync(captchaPath);
+      if (stats.size > 0) {
+        console.log(`[CAPTCHA] ✅ Screenshot saved: captcha-${sessionId}.png (${stats.size} bytes)`);
+        console.log(`[CAPTCHA] 📁 File location: ${captchaPath}`);
+        
+        // Verify file is readable
+        try {
+          fs.accessSync(captchaPath, fs.constants.R_OK);
+          console.log(`[CAPTCHA] ✅ File is readable`);
+        } catch (err) {
+          console.error(`[CAPTCHA] ❌ File exists but not readable:`, err.message);
+        }
+        
+        return `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`;
+      }
+    }
+    
+    retries--;
+    if (retries > 0) {
+      console.log(`[CAPTCHA] ⚠️ File not ready, retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
   }
   
-  const stats = fs.statSync(captchaPath);
-  if (stats.size === 0) {
-    throw new Error('Captcha screenshot failed - file is empty');
-  }
-  
-  console.log(`[CAPTCHA] ✅ Screenshot saved: captcha-${sessionId}.png (${stats.size} bytes)`);
-  return `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`;
+  throw new Error('Captcha screenshot failed - file not created or empty after retries');
 }
 
 /**

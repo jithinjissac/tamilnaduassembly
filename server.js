@@ -181,17 +181,26 @@ app.get('/sitemap.xml', (req, res) => {
 // Add logging middleware to debug captcha access
 app.use('/captcha-cache', (req, res, next) => {
   console.log(`[CAPTCHA ACCESS] Request: ${req.path} from ${req.ip}`);
+  
+  // CORS headers - allow from any origin
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Completely disable caching
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  
   next();
 });
 
 app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha-cache'), {
-  maxAge: '1m', // Cache for 1 minute
-  etag: false, // Disable ETag to prevent caching issues
-  lastModified: true,
-  setHeaders: (res, path) => {
-    res.setHeader('Cache-Control', 'public, max-age=60');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
+  maxAge: 0,
+  etag: false,
+  lastModified: false
 }));
 
 // Serve debug screenshots directory
@@ -286,6 +295,60 @@ app.get('/', (req, res) => {
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Kerala SEC Voter Slip SaaS is running' });
+});
+
+// Debug endpoint to check captcha directory status
+app.get('/api/debug/captcha-status', (req, res) => {
+  try {
+    const captchaDir = path.join(__dirname, 'public', 'captcha-cache');
+    const exists = fs.existsSync(captchaDir);
+    
+    let files = [];
+    let fileDetails = [];
+    let isWritable = false;
+    
+    if (exists) {
+      files = fs.readdirSync(captchaDir);
+      
+      // Get details of first 5 files
+      fileDetails = files.slice(0, 5).map(file => {
+        const filePath = path.join(captchaDir, file);
+        const stats = fs.statSync(filePath);
+        return {
+          name: file,
+          size: stats.size,
+          created: stats.birthtime,
+          modified: stats.mtime
+        };
+      });
+      
+      // Check if directory is writable
+      try {
+        fs.accessSync(captchaDir, fs.constants.W_OK);
+        isWritable = true;
+      } catch (err) {
+        isWritable = false;
+      }
+    }
+    
+    res.json({
+      success: true,
+      directory: captchaDir,
+      exists,
+      writable: isWritable,
+      fileCount: files.length,
+      recentFiles: fileDetails,
+      nodeEnv: process.env.NODE_ENV || 'development',
+      platform: process.platform,
+      cwd: process.cwd()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack
+    });
+  }
 });
 
 // Error handling middleware

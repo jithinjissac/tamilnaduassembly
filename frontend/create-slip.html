@@ -1545,6 +1545,7 @@ s0.parentNode.insertBefore(s1,s0);
                         }
                         
                         const img = new Image();
+                        img.crossOrigin = 'anonymous'; // Allow cross-origin, no caching
                         
                         img.onload = () => {
                             console.log('[CAPTCHA] Image loaded successfully on attempt', retryCount);
