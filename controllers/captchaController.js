@@ -118,12 +118,20 @@ async function saveCaptchaScreenshot(element, sessionId) {
   
   await element.screenshot({ path: captchaPath });
   
-  // Verify file exists
+  // Wait a moment to ensure file is fully written
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Verify file exists and has content
   if (!fs.existsSync(captchaPath)) {
     throw new Error('Captcha screenshot failed - file not created');
   }
   
-  console.log(`[CAPTCHA] ✅ Screenshot saved: captcha-${sessionId}.png`);
+  const stats = fs.statSync(captchaPath);
+  if (stats.size === 0) {
+    throw new Error('Captcha screenshot failed - file is empty');
+  }
+  
+  console.log(`[CAPTCHA] ✅ Screenshot saved: captcha-${sessionId}.png (${stats.size} bytes)`);
   return `/captcha-cache/captcha-${sessionId}.png?t=${Date.now()}`;
 }
 

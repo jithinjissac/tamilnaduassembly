@@ -55,8 +55,8 @@ s0.parentNode.insertBefore(s1,s0);
         <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 8px solid #2d3748;"></div>
     </div>
     
-    <!-- Tawk.to Script - Commented out
-    <script type="text/javascript">
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 Tawk_API.onLoad = function(){
     Tawk_API.minimize();
@@ -70,7 +70,6 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-    -->
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-G0M40G1DK1"></script>
 <script>
@@ -1506,13 +1505,43 @@ s0.parentNode.insertBefore(s1,s0);
                 if (data.status === 'success') {
                     sessionId = data.sessionId;
                     
-                    // Hide loader and show captcha image
-                    document.getElementById('captchaLoader').style.display = 'none';
-                    document.getElementById('captchaImage').src = data.captchaUrl;
-                    document.getElementById('captchaImage').style.display = 'block';
+                    // Load captcha image with retry mechanism
+                    const captchaImg = document.getElementById('captchaImage');
+                    const captchaUrl = data.captchaUrl;
                     
-                    // Update button text
-                    if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                    // Function to load image with retries
+                    const loadImageWithRetry = async (url, retries = 3, delay = 500) => {
+                        for (let i = 0; i < retries; i++) {
+                            try {
+                                await new Promise((resolve, reject) => {
+                                    const img = new Image();
+                                    img.onload = () => resolve();
+                                    img.onerror = () => reject(new Error('Image load failed'));
+                                    img.src = url;
+                                });
+                                
+                                // Image loaded successfully
+                                document.getElementById('captchaLoader').style.display = 'none';
+                                captchaImg.src = url;
+                                captchaImg.style.display = 'block';
+                                
+                                // Update button text
+                                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                                return;
+                                
+                            } catch (error) {
+                                if (i < retries - 1) {
+                                    console.log(`Captcha image load attempt ${i + 1} failed, retrying in ${delay}ms...`);
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                } else {
+                                    throw new Error('Failed to load captcha image after ' + retries + ' attempts');
+                                }
+                            }
+                        }
+                    };
+                    
+                    await loadImageWithRetry(captchaUrl);
+                    
                 } else {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
