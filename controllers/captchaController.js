@@ -41,12 +41,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Constants for timeouts and retries
+// Increased timeouts for Cloud Run production environment
+const IS_PRODUCTION = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT === 'production';
 const CONFIG = {
-  PAGE_LOAD_TIMEOUT: 60000,       // 60s for page load
-  CAPTCHA_WAIT_TIMEOUT: 15000,    // 15s to find captcha
-  FORM_SUBMIT_TIMEOUT: 90000,     // 90s for form submission
+  PAGE_LOAD_TIMEOUT: IS_PRODUCTION ? 90000 : 60000,       // 90s for Cloud Run (allow retries within 5min), 60s local
+  LOCALE_SET_TIMEOUT: 30000,      // 30s for Malayalam locale setting
+  CAPTCHA_WAIT_TIMEOUT: 20000,    // 20s to find captcha
+  FORM_SUBMIT_TIMEOUT: 120000,    // 120s for form submission
   SESSION_TIMEOUT: 10 * 60 * 1000, // 10 minutes
-  MAX_PAGE_RETRIES: 2,            // Retry page load twice
+  MAX_PAGE_RETRIES: IS_PRODUCTION ? 2 : 2,  // 2 retries (3 total attempts)
+  RETRY_DELAY_BASE: 3000,         // Base delay for exponential backoff (3s)
   CAPTCHA_DIR: path.join(__dirname, '..', 'public', 'captcha-cache'),
   
   // Selectors
@@ -78,7 +82,7 @@ if (!fs.existsSync(CONFIG.CAPTCHA_DIR)) {
 }
 
 /**
- * Helper: Load SEC page with retry logic
+ * Helper: Load SEC page with retry logic and exponential backoff
  */
 async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
   const startTime = Date.now();
@@ -87,10 +91,29 @@ async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
     try {
       console.log(`[CAPTCHA] Loading ${url} (attempt ${attempt + 1}/${retries + 1})...`);
       
-      await page.goto(url, { 
-        waitUntil: 'domcontentloaded',
-        timeout: CONFIG.PAGE_LOAD_TIMEOUT
-      });
+      // Try multiple strategies: domcontentloaded first, then networkidle if that fails
+      const strategies = ['domcontentloaded', 'load'];
+      let loaded = false;
+      
+      for (const strategy of strategies) {
+        try {
+          await page.goto(url, { 
+            waitUntil: strategy,
+            timeout: CONFIG.PAGE_LOAD_TIMEOUT
+          });
+          loaded = true;
+          break;
+        } catch (strategyError) {
+          console.log(`[CAPTCHA] Strategy '${strategy}' failed, trying next...`);
+          if (strategy === strategies[strategies.length - 1]) {
+            throw strategyError; // Re-throw if last strategy fails
+          }
+        }
+      }
+      
+      if (!loaded) {
+        throw new Error('All page load strategies failed');
+      }
       
       const loadTime = Date.now() - startTime;
       console.log(`[CAPTCHA] ✅ Page loaded in ${loadTime}ms`);
@@ -98,14 +121,18 @@ async function loadSECPage(page, url, retries = CONFIG.MAX_PAGE_RETRIES) {
       
     } catch (error) {
       const attemptTime = Date.now() - startTime;
-      console.log(`[CAPTCHA] ⚠️ Load failed after ${attemptTime}ms (attempt ${attempt + 1})`);
       
-      if (attempt === retries) {
-        throw new Error(`SEC website unreachable after ${retries + 1} attempts`);
+      if (attempt < retries) {
+        // Exponential backoff: 2s, 4s, 8s...
+        const delay = CONFIG.RETRY_DELAY_BASE * Math.pow(2, attempt);
+        console.log(`[CAPTCHA] ⏳ Attempt ${attempt + 1} failed after ${attemptTime}ms, retrying in ${delay}ms...`);
+        console.log(`[CAPTCHA] Error: ${error.message}`);
+        await page.waitForTimeout(delay);
+      } else {
+        // Final attempt failed
+        console.log(`[CAPTCHA] ❌ All ${retries + 1} attempts failed after ${attemptTime}ms`);
+        throw new Error(`Kerala SEC portal unreachable after ${retries + 1} attempts: ${error.message}`);
       }
-      
-      // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
 }
@@ -262,24 +289,46 @@ async function setupPageOptimizations(page) {
 }
 
 /**
- * Helper: Set Malayalam locale
+ * Helper: Set Malayalam locale with retry
  */
-async function setMalayalamLocale(page) {
+async function setMalayalamLocale(page, maxRetries = 2) {
   console.log('[CAPTCHA] Setting Malayalam locale...');
   
-  await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
-    waitUntil: 'domcontentloaded',
-    timeout: CONFIG.PAGE_LOAD_TIMEOUT
-  });
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      console.log(`[CAPTCHA] Malayalam locale attempt ${attempt + 1}/${maxRetries}...`);
+      
+      await page.goto(`${SEC_BASE_URL}/?set_locale=ml`, { 
+        waitUntil: 'domcontentloaded',
+        timeout: 30000 // 30 seconds for locale setting only
+      });
+      
+      await page.waitForTimeout(500);
+      
+      // Verify locale cookie
+      const cookies = await page.context().cookies();
+      const localeCookie = cookies.find(c => c.name === 'set_locale');
+      
+      if (localeCookie?.value === 'ml') {
+        console.log('[CAPTCHA] ✅ Malayalam locale set successfully');
+        return true;
+      } else {
+        console.log('[CAPTCHA] ⚠️ Locale cookie value:', localeCookie?.value || 'NOT SET');
+      }
+      
+    } catch (error) {
+      console.warn(`[CAPTCHA] ⚠️ Malayalam locale attempt ${attempt + 1} failed:`, error.message);
+      
+      if (attempt < maxRetries - 1) {
+        const delay = 2000 * (attempt + 1); // 2s, 4s
+        console.log(`[CAPTCHA] Retrying locale in ${delay}ms...`);
+        await page.waitForTimeout(delay);
+      }
+    }
+  }
   
-  await page.waitForTimeout(500);
-  
-  // Verify locale cookie
-  const cookies = await page.context().cookies();
-  const localeCookie = cookies.find(c => c.name === 'set_locale');
-  console.log('[CAPTCHA] 📍 Locale cookie:', localeCookie?.value || 'NOT SET');
-  
-  return localeCookie?.value === 'ml';
+  console.log('[CAPTCHA] ⚠️ Malayalam locale setting failed after retries, continuing with default locale...');
+  return false; // Don't fail the whole process
 }
 
 /**
@@ -517,12 +566,32 @@ router.get('/initCaptchaSession', async (req, res) => {
     const isShutdownError = error.message?.includes('shutting down') || 
                            error.message?.includes('has been closed');
     
-    res.status(isShutdownError ? 503 : 500).json({ 
+    const isTimeoutError = error.message?.includes('Timeout') || 
+                          error.message?.includes('timeout');
+    
+    const isNetworkError = error.message?.includes('net::') ||
+                          error.message?.includes('ERR_');
+    
+    let userMessage = 'Failed to initialize captcha session';
+    let statusCode = 500;
+    
+    if (isTimeoutError) {
+      userMessage = 'Kerala SEC portal is responding slowly. Please try again in a few moments.';
+      statusCode = 504; // Gateway Timeout
+    } else if (isNetworkError) {
+      userMessage = 'Unable to connect to Kerala SEC portal. Please check your internet connection and try again.';
+      statusCode = 502; // Bad Gateway
+    } else if (isShutdownError) {
+      userMessage = 'Service temporarily unavailable. Please try again.';
+      statusCode = 503; // Service Unavailable
+    }
+    
+    res.status(statusCode).json({ 
       status: 'error', 
-      message: isShutdownError 
-        ? 'Service temporarily unavailable. Please try again.'
-        : error.message || 'Failed to initialize captcha session',
-      retryable: isShutdownError
+      message: userMessage,
+      technicalDetails: IS_PRODUCTION ? undefined : error.message, // Only show in dev
+      retryable: true,
+      retryAfter: isTimeoutError ? 10 : 5 // Suggest retry delay in seconds
     });
   }
 });
