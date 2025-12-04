@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Reports - EasySlip Admin</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: var(--kerala-cream);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .page-header h1 {
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #718096;
+        }
+
+        .filters-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,109,59,0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .summary-card h3 {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+        }
+
+        .summary-card .subvalue {
+            font-size: 0.875rem;
+            color: #a0aec0;
+            margin-top: 0.25rem;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-header h2 {
+            color: var(--kerala-green);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: #e2e8f0;
+        }
+
+        th i {
+            margin-left: 0.5rem;
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .user-email {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .number {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .currency {
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0,109,59,0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-chart-bar"></i> User Reports
+            </div>
+            <div class="nav-links">
+                <a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-users"></i> User-wise Reports</h1>
+            <p>View detailed statistics for revenue, orders, and voter slips per user</p>
+        </div>
+
+        <div class="filters-card">
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div class="form-group">
+                    <label for="sortBy">Sort By</label>
+                    <select id="sortBy">
+                        <option value="revenue">Total Revenue</option>
+                        <option value="orders">Total Orders</option>
+                        <option value="slips">Voter Slips</option>
+                        <option value="avgOrder">Avg Order Value</option>
+                        <option value="recent">Most Recent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sortOrder">Order</label>
+                    <select id="sortOrder">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="loadReports()">
+                    <i class="fas fa-search"></i> Apply Filters
+                </button>
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button class="btn btn-secondary" onclick="exportToCSV()" style="margin-left: auto;">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
+            </div>
+        </div>
+
+        <div id="summarySection" style="display: none;">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Users</h3>
+                    <div class="value" id="totalUsers">0</div>
+                    <div class="subvalue">with completed orders</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Revenue</h3>
+                    <div class="value currency" id="totalRevenue">₹0</div>
+                    <div class="subvalue" id="avgRevenuePerUser">Avg: ₹0 per user</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Orders</h3>
+                    <div class="value" id="totalOrders">0</div>
+                    <div class="subvalue" id="avgOrdersPerUser">Avg: 0 per user</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Voter Slips</h3>
+                    <div class="value" id="totalSlips">0</div>
+                    <div class="subvalue" id="avgSlipsPerUser">Avg: 0 per user</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h2>User Statistics</h2>
+                <div id="recordCount" style="color: #718096; font-size: 0.875rem;"></div>
+            </div>
+
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading user reports...</p>
+            </div>
+
+            <div id="tableContainer" style="display: none;">
+                <table id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>User</th>
+                            <th>Status</th>
+                            <th>Total Orders</th>
+                            <th>Total Revenue</th>
+                            <th>Voter Slips</th>
+                            <th>Avg Order</th>
+                            <th>First Order</th>
+                            <th>Last Order</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noData" class="no-data" style="display: none;">
+                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                <p>No user data found for the selected filters</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        let reportData = [];
+
+        // Load reports on page load
+        window.addEventListener('load', () => {
+            loadReports();
+        });
+
+        async function loadReports() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const sortBy = document.getElementById('sortBy').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            const loadingState = document.getElementById('loadingState');
+            const tableContainer = document.getElementById('tableContainer');
+            const noData = document.getElementById('noData');
+            const summarySection = document.getElementById('summarySection');
+
+            loadingState.style.display = 'block';
+            tableContainer.style.display = 'none';
+            noData.style.display = 'none';
+            summarySection.style.display = 'none';
+
+            try {
+                const params = new URLSearchParams({
+                    sortBy,
+                    order: sortOrder
+                });
+                
+                if (startDate) params.append('startDate', startDate);
+                if (endDate) params.append('endDate', endDate);
+
+                const response = await fetch(`/api/admin/reports/users?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    reportData = result.data.users;
+                    displayReports(result.data);
+                } else {
+                    alert(result.message || 'Failed to load reports');
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                alert('Network error. Please try again.');
+            } finally {
+                loadingState.style.display = 'none';
+            }
+        }
+
+        function displayReports(data) {
+            const { users, summary } = data;
+            const tableBody = document.getElementById('tableBody');
+            const tableContainer = document.getElementById('tableContainer');
+            const noData = document.getElementById('noData');
+            const summarySection = document.getElementById('summarySection');
+
+            if (users.length === 0) {
+                noData.style.display = 'block';
+                return;
+            }
+
+            // Update summary
+            document.getElementById('totalUsers').textContent = summary.totalUsers.toLocaleString();
+            document.getElementById('totalRevenue').textContent = `₹${summary.totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalOrders').textContent = summary.totalOrders.toLocaleString();
+            document.getElementById('totalSlips').textContent = summary.totalVoterSlips.toLocaleString();
+            document.getElementById('avgRevenuePerUser').textContent = `Avg: ₹${summary.avgRevenuePerUser.toLocaleString('en-IN', {minimumFractionDigits: 2})} per user`;
+            document.getElementById('avgOrdersPerUser').textContent = `Avg: ${summary.avgOrdersPerUser.toFixed(1)} per user`;
+            document.getElementById('avgSlipsPerUser').textContent = `Avg: ${Math.round(summary.avgSlipsPerUser).toLocaleString()} per user`;
+            summarySection.style.display = 'block';
+
+            // Update table
+            tableBody.innerHTML = users.map((user, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="user-info">
+                            <span class="user-name">${escapeHtml(user.name)}</span>
+                            <span class="user-email">${escapeHtml(user.email)}</span>
+                            ${user.phone ? `<span class="user-email">${escapeHtml(user.phone)}</span>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${user.isActive ? 'badge-success' : 'badge-danger'}">
+                            ${user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td class="number">${user.totalOrders.toLocaleString()}</td>
+                    <td class="number currency">₹${user.totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                    <td class="number">${user.totalVoterSlips.toLocaleString()}</td>
+                    <td class="number">₹${user.avgOrderValue.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                    <td>${new Date(user.firstOrderDate).toLocaleDateString()}</td>
+                    <td>${new Date(user.lastOrderDate).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('recordCount').textContent = `Showing ${users.length} users`;
+            tableContainer.style.display = 'block';
+        }
+
+        function resetFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('sortBy').value = 'revenue';
+            document.getElementById('sortOrder').value = 'desc';
+            loadReports();
+        }
+
+        function exportToCSV() {
+            if (reportData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const headers = ['#', 'Name', 'Email', 'Phone', 'Status', 'Total Orders', 'Total Revenue', 'Voter Slips', 'Avg Order Value', 'First Order', 'Last Order'];
+            
+            const rows = reportData.map((user, index) => [
+                index + 1,
+                user.name,
+                user.email,
+                user.phone || '',
+                user.isActive ? 'Active' : 'Inactive',
+                user.totalOrders,
+                user.totalRevenue,
+                user.totalVoterSlips,
+                user.avgOrderValue,
+                new Date(user.firstOrderDate).toLocaleDateString(),
+                new Date(user.lastOrderDate).toLocaleDateString()
+            ]);
+
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `user-reports-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

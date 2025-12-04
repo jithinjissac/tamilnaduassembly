@@ -1701,4 +1701,128 @@ function formatDuration(seconds) {
     }
 }
 
+// Get User-wise Reports (Revenue, Orders, Slips)
+export const getUserReports = async (req, res) => {
+    try {
+        const { startDate, endDate, sortBy = 'revenue', order = 'desc' } = req.query;
+
+        // Build date filter
+        let dateFilter = {};
+        if (startDate || endDate) {
+            dateFilter.createdAt = {};
+            if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+            if (endDate) dateFilter.createdAt.$lte = new Date(endDate);
+        }
+
+        // Aggregate user-wise statistics
+        const userStats = await Order.aggregate([
+            { $match: { paymentStatus: 'completed', ...dateFilter } },
+            {
+                $group: {
+                    _id: '$userId',
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: '$amount' },
+                    totalVoterSlips: { $sum: '$totalVoters' },
+                    avgOrderValue: { $avg: '$amount' },
+                    firstOrderDate: { $min: '$createdAt' },
+                    lastOrderDate: { $max: '$createdAt' },
+                    pendingOrders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+                    },
+                    completedOrders: {
+                        $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            { $unwind: '$userInfo' },
+            {
+                $project: {
+                    userId: '$_id',
+                    name: '$userInfo.name',
+                    email: '$userInfo.email',
+                    phone: '$userInfo.phone',
+                    isActive: '$userInfo.isActive',
+                    customPricing: '$userInfo.customPricing',
+                    totalOrders: 1,
+                    totalRevenue: { $round: ['$totalRevenue', 2] },
+                    totalVoterSlips: 1,
+                    avgOrderValue: { $round: ['$avgOrderValue', 2] },
+                    firstOrderDate: 1,
+                    lastOrderDate: 1,
+                    pendingOrders: 1,
+                    completedOrders: 1
+                }
+            }
+        ]);
+
+        // Sort results
+        const sortField = {
+            'revenue': 'totalRevenue',
+            'orders': 'totalOrders',
+            'slips': 'totalVoterSlips',
+            'avgOrder': 'avgOrderValue',
+            'recent': 'lastOrderDate'
+        }[sortBy] || 'totalRevenue';
+
+        const sortDirection = order === 'asc' ? 1 : -1;
+        userStats.sort((a, b) => {
+            const aVal = a[sortField];
+            const bVal = b[sortField];
+            return (aVal > bVal ? 1 : -1) * sortDirection;
+        });
+
+        // Calculate summary statistics
+        const summary = {
+            totalUsers: userStats.length,
+            totalRevenue: userStats.reduce((sum, u) => sum + u.totalRevenue, 0),
+            totalOrders: userStats.reduce((sum, u) => sum + u.totalOrders, 0),
+            totalVoterSlips: userStats.reduce((sum, u) => sum + u.totalVoterSlips, 0),
+            avgRevenuePerUser: userStats.length > 0 
+                ? userStats.reduce((sum, u) => sum + u.totalRevenue, 0) / userStats.length 
+                : 0,
+            avgOrdersPerUser: userStats.length > 0 
+                ? userStats.reduce((sum, u) => sum + u.totalOrders, 0) / userStats.length 
+                : 0,
+            avgSlipsPerUser: userStats.length > 0 
+                ? userStats.reduce((sum, u) => sum + u.totalVoterSlips, 0) / userStats.length 
+                : 0
+        };
+
+        // Round summary values
+        summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+        summary.avgRevenuePerUser = Math.round(summary.avgRevenuePerUser * 100) / 100;
+        summary.avgOrdersPerUser = Math.round(summary.avgOrdersPerUser * 100) / 100;
+        summary.avgSlipsPerUser = Math.round(summary.avgSlipsPerUser * 100) / 100;
+
+        res.json({
+            status: 'success',
+            data: {
+                users: userStats,
+                summary,
+                filters: {
+                    startDate: startDate || null,
+                    endDate: endDate || null,
+                    sortBy,
+                    order
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Get user reports error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch user reports',
+            error: error.message
+        });
+    }
+};
+
 

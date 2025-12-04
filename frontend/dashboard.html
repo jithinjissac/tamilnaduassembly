@@ -988,7 +988,8 @@ s0.parentNode.insertBefore(s1,s0);
                                 ${order.paymentStatus === 'completed' 
                                     ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>
                                        <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;"><i class="fas fa-file-invoice"></i> Invoice</button>`
-                                    : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>`
+                                    : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>
+                                       <button class="btn btn-download" onclick="verifyPayment('${order.orderId}')" style="background: #8b5cf6;" title="Verify payment status from gateway"><i class="fas fa-check-circle"></i> Verify</button>`
                                 }
                             </div>
                         </div>
@@ -1212,6 +1213,56 @@ s0.parentNode.insertBefore(s1,s0);
             } catch (error) {
                 console.error('Download error:', error);
                 alert('Download failed. Network error. Please try again.');
+            }
+        }
+
+        // Verify payment status
+        async function verifyPayment(orderId) {
+            const clickedBtn = event.target.closest('.btn-download');
+            const originalHTML = clickedBtn ? clickedBtn.innerHTML : '';
+            
+            if (clickedBtn) {
+                clickedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+                clickedBtn.disabled = true;
+            }
+
+            try {
+                const response = await fetch('/api/payment/verify-status', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ identifier: orderId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    if (data.updated) {
+                        alert(`✅ Payment verified!\n\nYour payment has been confirmed and the order status has been updated to ${data.order.paymentStatus}.\n\nRefreshing your orders...`);
+                        // Reload orders to show updated status
+                        await loadOrders();
+                    } else {
+                        const statusMsg = data.order.paymentStatus === 'completed' 
+                            ? '✅ Payment already completed' 
+                            : data.order.paymentStatus === 'pending'
+                            ? '⏳ Payment is still pending'
+                            : '❌ Payment failed';
+                        
+                        alert(`${statusMsg}\n\nOrder: ${data.order.orderId}\nStatus: ${data.order.paymentStatus.toUpperCase()}\nAmount: ₹${data.order.totalPrice.toFixed(2)}`);
+                    }
+                } else {
+                    alert(data.message || 'Failed to verify payment status');
+                }
+            } catch (error) {
+                console.error('Payment verification error:', error);
+                alert('Failed to verify payment. Please try again.');
+            } finally {
+                if (clickedBtn) {
+                    clickedBtn.innerHTML = originalHTML;
+                    clickedBtn.disabled = false;
+                }
             }
         }
 

@@ -901,23 +901,32 @@ export const verifyPaymentStatus = async (req, res) => {
             });
         }
 
+        // Check if user is admin
+        const user = await User.findById(userId);
+        const isAdmin = user && user.role === 'admin';
+
         // Find order by orderId or razorpayPaymentId
+        // Admins can check any order, regular users only their own
         let order;
         if (identifier.startsWith('ORD-')) {
-            order = await Order.findOne({ orderId: identifier, userId });
+            order = await Order.findOne(isAdmin ? { orderId: identifier } : { orderId: identifier, userId });
         } else if (identifier.startsWith('pay_')) {
-            order = await Order.findOne({ razorpayPaymentId: identifier, userId });
+            order = await Order.findOne(isAdmin ? { razorpayPaymentId: identifier } : { razorpayPaymentId: identifier, userId });
         } else if (identifier.startsWith('order_')) {
-            order = await Order.findOne({ razorpayOrderId: identifier, userId });
+            order = await Order.findOne(isAdmin ? { razorpayOrderId: identifier } : { razorpayOrderId: identifier, userId });
         } else {
             // Try both orderId and payment ID
-            order = await Order.findOne({
+            const baseQuery = {
                 $or: [
-                    { orderId: identifier, userId },
-                    { razorpayPaymentId: identifier, userId },
-                    { razorpayOrderId: identifier, userId }
+                    { orderId: identifier },
+                    { razorpayPaymentId: identifier },
+                    { razorpayOrderId: identifier }
                 ]
-            });
+            };
+            if (!isAdmin) {
+                baseQuery.userId = userId;
+            }
+            order = await Order.findOne(baseQuery);
         }
 
         if (!order) {

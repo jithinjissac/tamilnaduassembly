@@ -19,6 +19,7 @@ import {
     downloadOrderPDF,
     regenerateOrderPDF,
     getAnalytics,
+    getUserReports,
     deleteOrder,
     deleteOrders,
     upload,
@@ -67,6 +68,7 @@ router.delete('/orders/:orderId', deleteOrder);
 
 // Analytics
 router.get('/analytics', getAnalytics);
+router.get('/reports/users', getUserReports);
 
 // User Activity & Session Tracking
 router.get('/users/:userId/activity', getUserActivity);
