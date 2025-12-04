@@ -441,6 +441,12 @@
                     <div class="order-type-title">Custom Poster</div>
                     <div class="order-type-desc">Upload custom candidate poster</div>
                 </div>
+
+                <div class="order-type-card" onclick="selectOrderType('manual')">
+                    <div class="order-type-icon"><i class="fas fa-code"></i></div>
+                    <div class="order-type-title">Manual Entry</div>
+                    <div class="order-type-desc">Paste HTML from SEC website</div>
+                </div>
             </div>
         </div>
 
@@ -668,6 +674,9 @@
                         break;
                     case 'custom':
                         redirectUrl = 'create-custom-symbol-slip.html?adminCreateFor=' + selectedUser._id;
+                        break;
+                    case 'manual':
+                        redirectUrl = 'manual-slip.html?adminCreateFor=' + selectedUser._id;
                         break;
                 }
                 window.location.href = redirectUrl;

@@ -1314,6 +1314,9 @@ s0.parentNode.insertBefore(s1,s0);
                 const localBody = localBodySelect.options[localBodySelect.selectedIndex].text;
                 const ward = wardSelect.options[wardSelect.selectedIndex].text;
 
+                // Get slips per page selection
+                const slipsPerPage = parseInt(document.querySelector('input[name="slipsPerPage"]:checked')?.value || '5');
+
                 const orderData = {
                     voters: extractedVoters,
                     customization: {
@@ -1323,6 +1326,7 @@ s0.parentNode.insertBefore(s1,s0);
                         symbolId: selectedSymbol?.id || null,
                         candidateName: selectedSymbol?.candidateName || '',
                         partyName: selectedSymbol?.partyName || '',
+                        slipsPerPage: slipsPerPage,
                         multiSymbol: false,
                         isCustomPoster: false,
                         isCustomUpload: false
