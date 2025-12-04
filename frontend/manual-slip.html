@@ -1321,9 +1321,9 @@ s0.parentNode.insertBefore(s1,s0);
                     voters: extractedVoters,
                     customization: {
                         symbolFree: symbolFreeMode,
-                        symbolImage: selectedSymbol?.image || null,
+                        symbolImage: selectedSymbol?.imageUrl || null,
                         symbolName: selectedSymbol?.name || null,
-                        symbolId: selectedSymbol?.id || null,
+                        symbolId: selectedSymbol?._id || null,
                         candidateName: selectedSymbol?.candidateName || '',
                         partyName: selectedSymbol?.partyName || '',
                         slipsPerPage: slipsPerPage,
