@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import { browserPool } from '../utils/browserPool.js';
 import { sessionManager } from '../utils/sessionManager.js';
 import { captchaQueue } from '../utils/requestQueue.js';
