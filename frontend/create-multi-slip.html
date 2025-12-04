@@ -1682,15 +1682,22 @@ s0.parentNode.insertBefore(s1,s0);
                 console.log('[CAPTCHA] Fetching captcha session...');
                 const response = await fetch('/api/initCaptchaSession');
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 console.log('[CAPTCHA] Response:', data);
                 
-                if (data.status !== 'success' || !data.captchaUrl) {
-                    throw new Error(data.message || 'Failed to load captcha');
+                if (!response.ok || data.status !== 'success') {
+                    // Show user-friendly error message from backend
+                    const errorMsg = data.message || 'Failed to load captcha';
+                    
+                    // If retryable, suggest retry with delay
+                    if (data.retryable && data.retryAfter) {
+                        throw new Error(`${errorMsg} (Retry in ${data.retryAfter} seconds)`);
+                    }
+                    throw new Error(errorMsg);
+                }
+                
+                if (!data.captchaUrl && !data.captchaBase64) {
+                    throw new Error('No captcha data received from server');
                 }
                 
                 sessionId = data.sessionId;
@@ -1704,9 +1711,21 @@ s0.parentNode.insertBefore(s1,s0);
                 if (captchaLoader) captchaLoader.style.display = 'none';
                 if (captchaContainer) captchaContainer.style.display = 'block';
                 
-                // Prioritize URL (direct from bucket), fallback to base64
-                if (captchaUrl) {
-                    console.log('[CAPTCHA] Loading from URL:', captchaUrl);
+                // Prioritize base64 (always works), try URL as backup
+                if (captchaBase64) {
+                    console.log('[CAPTCHA] Loading from base64 data...');
+                    if (captchaImg) {
+                        captchaImg.src = captchaBase64;
+                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
+                        if (statusText) {
+                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                        }
+                        if (loadBtnText) {
+                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                        }
+                    }
+                } else if (captchaUrl) {
+                    console.log('[CAPTCHA] No base64, trying URL:', captchaUrl);
                     if (captchaImg) {
                         captchaImg.src = captchaUrl;
                         captchaImg.onload = () => {
@@ -1719,23 +1738,9 @@ s0.parentNode.insertBefore(s1,s0);
                             }
                         };
                         captchaImg.onerror = () => {
-                            console.warn('[CAPTCHA] URL failed, trying base64...');
-                            if (captchaBase64) {
-                                captchaImg.src = captchaBase64;
-                            }
+                            console.error('[CAPTCHA] ❌ URL failed and no base64 available');
+                            throw new Error('Failed to load captcha image');
                         };
-                    }
-                } else if (captchaBase64) {
-                    console.log('[CAPTCHA] Loading from base64 data...');
-                    if (captchaImg) {
-                        captchaImg.src = captchaBase64;
-                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
-                        if (statusText) {
-                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
-                        }
-                        if (loadBtnText) {
-                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
-                        }
                     }
                 } else {
                     throw new Error('No captcha data received');
@@ -2380,9 +2385,20 @@ s0.parentNode.insertBefore(s1,s0);
                     } else {
                         // Additional stations: Load new captcha and get user input
                         console.log(`📋 Station ${index + 1}: Loading new captcha session...`);
+                        
+                        // Show loading indicator
+                        const loadingMsg = document.createElement('div');
+                        loadingMsg.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; text-align: center;';
+                        loadingMsg.innerHTML = '<div class="spinner" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div><p style="color: #4a5568;">Loading captcha...</p>';
+                        document.body.appendChild(loadingMsg);
+                        
                         const captchaLoaded = await loadCaptchaForBulk();
                         
+                        // Remove loading indicator
+                        document.body.removeChild(loadingMsg);
+                        
                         if (!captchaLoaded) {
+                            alert('Failed to load captcha. Please try again.');
                             failedStations.push({ station: station.text, reason: 'Failed to load captcha' });
                             return extractOneStation(index + 1);
                         }
@@ -2621,6 +2637,7 @@ s0.parentNode.insertBefore(s1,s0);
         // Load captcha for bulk extraction (without displaying)
         async function loadCaptchaForBulk() {
             try {
+                console.log('[BULK CAPTCHA] Fetching captcha session...');
                 const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
@@ -2628,19 +2645,31 @@ s0.parentNode.insertBefore(s1,s0);
                 }
                 
                 const data = await response.json();
+                console.log('[BULK CAPTCHA] Response:', data);
                 
                 if (data.status === 'success') {
                     // Store both globally and in window for access by other functions
                     sessionId = data.sessionId;
                     window.currentSessionId = data.sessionId;
-                    // Store captcha image URL for dialog
-                    window.currentCaptchaImage = data.captchaUrl;
-                    console.log(`✅ New captcha session loaded: ${data.sessionId}`);
+                    
+                    // Store captcha image URL - prioritize URL, fallback to base64
+                    if (data.captchaUrl) {
+                        window.currentCaptchaImage = data.captchaUrl;
+                        console.log('[BULK CAPTCHA] ✅ Loaded from URL:', data.captchaUrl);
+                    } else if (data.captchaBase64) {
+                        window.currentCaptchaImage = data.captchaBase64;
+                        console.log('[BULK CAPTCHA] ✅ Loaded from base64');
+                    } else {
+                        console.error('[BULK CAPTCHA] ❌ No captcha data received');
+                        return false;
+                    }
+                    
                     return true;
                 }
+                console.error('[BULK CAPTCHA] ❌ Status not success:', data.message);
                 return false;
             } catch (error) {
-                console.error('Error loading captcha:', error);
+                console.error('[BULK CAPTCHA] ❌ Error loading captcha:', error);
                 return false;
             }
         }
@@ -2648,6 +2677,14 @@ s0.parentNode.insertBefore(s1,s0);
         // Show captcha dialog for user input
         function showCaptchaDialog(stationName, current, total) {
             return new Promise((resolve) => {
+                // Check if captcha image is available
+                if (!window.currentCaptchaImage) {
+                    console.error('[BULK CAPTCHA] No captcha image available for modal');
+                    alert('Failed to load captcha. Please try again.');
+                    resolve(null);
+                    return;
+                }
+                
                 // Create modal overlay
                 const modal = document.createElement('div');
                 modal.style.cssText = `
@@ -2668,8 +2705,13 @@ s0.parentNode.insertBefore(s1,s0);
                         <h3 style="margin: 0 0 1rem 0; color: #2d3748;">Station ${current} of ${total}</h3>
                         <p style="margin: 0 0 1.5rem 0; color: #718096; font-size: 0.95rem;">${stationName}</p>
                         
-                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; text-align: center; position: relative;">
-                            <img id="bulkCaptchaImage" src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto;">
+                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; text-align: center; position: relative; min-height: 120px; background: #f8f9fa;">
+                            <img id="bulkCaptchaImage" src="${window.currentCaptchaImage}" alt="Captcha" 
+                                 style="max-width: 100%; height: auto; display: block; margin: 0 auto;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; color: #e53e3e; padding: 1rem;">
+                                <i class="fas fa-exclamation-triangle"></i> Failed to load captcha
+                            </div>
                             <button id="refreshBulkCaptcha" 
                                     style="position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem 1rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <i class="fas fa-sync-alt"></i> Refresh

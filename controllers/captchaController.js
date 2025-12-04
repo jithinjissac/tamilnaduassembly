@@ -289,10 +289,10 @@ async function setupPageOptimizations(page) {
 }
 
 /**
- * Helper: Set Malayalam locale with retry
+ * Helper: Set Malayalam locale with retry (STRICT - must succeed)
  */
-async function setMalayalamLocale(page, maxRetries = 2) {
-  console.log('[CAPTCHA] Setting Malayalam locale...');
+async function setMalayalamLocale(page, maxRetries = 3) {
+  console.log('[CAPTCHA] Setting Malayalam locale (STRICT MODE)...');
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -314,21 +314,24 @@ async function setMalayalamLocale(page, maxRetries = 2) {
         return true;
       } else {
         console.log('[CAPTCHA] ⚠️ Locale cookie value:', localeCookie?.value || 'NOT SET');
+        throw new Error(`Locale cookie not set correctly: ${localeCookie?.value || 'MISSING'}`);
       }
       
     } catch (error) {
       console.warn(`[CAPTCHA] ⚠️ Malayalam locale attempt ${attempt + 1} failed:`, error.message);
       
       if (attempt < maxRetries - 1) {
-        const delay = 2000 * (attempt + 1); // 2s, 4s
+        const delay = 2000 * (attempt + 1); // 2s, 4s, 6s
         console.log(`[CAPTCHA] Retrying locale in ${delay}ms...`);
         await page.waitForTimeout(delay);
       }
     }
   }
   
-  console.log('[CAPTCHA] ⚠️ Malayalam locale setting failed after retries, continuing with default locale...');
-  return false; // Don't fail the whole process
+  // STRICT MODE: Throw error if Malayalam locale could not be set
+  const errorMsg = `Failed to set Malayalam locale after ${maxRetries} attempts. Malayalam locale is required.`;
+  console.error('[CAPTCHA] ❌', errorMsg);
+  throw new Error(errorMsg);
 }
 
 /**

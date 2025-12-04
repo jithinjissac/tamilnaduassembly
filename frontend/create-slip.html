@@ -1508,15 +1508,22 @@ s0.parentNode.insertBefore(s1,s0);
                 console.log('[CAPTCHA] Fetching captcha session...');
                 const response = await fetch('/api/initCaptchaSession');
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 console.log('[CAPTCHA] Response:', data);
                 
-                if (data.status !== 'success' || !data.captchaUrl) {
-                    throw new Error(data.message || 'Failed to load captcha');
+                if (!response.ok || data.status !== 'success') {
+                    // Show user-friendly error message from backend
+                    const errorMsg = data.message || 'Failed to load captcha';
+                    
+                    // If retryable, suggest retry with delay
+                    if (data.retryable && data.retryAfter) {
+                        throw new Error(`${errorMsg} (Retry in ${data.retryAfter} seconds)`);
+                    }
+                    throw new Error(errorMsg);
+                }
+                
+                if (!data.captchaUrl && !data.captchaBase64) {
+                    throw new Error('No captcha data received from server');
                 }
                 
                 sessionId = data.sessionId;
@@ -1530,9 +1537,21 @@ s0.parentNode.insertBefore(s1,s0);
                 if (captchaLoader) captchaLoader.style.display = 'none';
                 if (captchaContainer) captchaContainer.style.display = 'block';
                 
-                // Prioritize URL (direct from bucket), fallback to base64
-                if (captchaUrl) {
-                    console.log('[CAPTCHA] Loading from URL:', captchaUrl);
+                // Prioritize base64 (always works), try URL as backup
+                if (captchaBase64) {
+                    console.log('[CAPTCHA] Loading from base64 data...');
+                    if (captchaImg) {
+                        captchaImg.src = captchaBase64;
+                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
+                        if (statusText) {
+                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                        }
+                        if (loadBtnText) {
+                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                        }
+                    }
+                } else if (captchaUrl) {
+                    console.log('[CAPTCHA] No base64, trying URL:', captchaUrl);
                     if (captchaImg) {
                         captchaImg.src = captchaUrl;
                         captchaImg.onload = () => {
@@ -1545,23 +1564,9 @@ s0.parentNode.insertBefore(s1,s0);
                             }
                         };
                         captchaImg.onerror = () => {
-                            console.warn('[CAPTCHA] URL failed, trying base64...');
-                            if (captchaBase64) {
-                                captchaImg.src = captchaBase64;
-                            }
+                            console.error('[CAPTCHA] ❌ URL failed and no base64 available');
+                            throw new Error('Failed to load captcha image');
                         };
-                    }
-                } else if (captchaBase64) {
-                    console.log('[CAPTCHA] Loading from base64 data...');
-                    if (captchaImg) {
-                        captchaImg.src = captchaBase64;
-                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
-                        if (statusText) {
-                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
-                        }
-                        if (loadBtnText) {
-                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
-                        }
                     }
                 } else {
                     throw new Error('No captcha data received');
