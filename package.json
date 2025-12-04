@@ -58,6 +58,7 @@
     "playwright": "^1.57.0",
     "puppeteer": "^24.29.1",
     "razorpay": "^2.9.6",
+    "selenium-webdriver": "^4.38.0",
     "sharp": "^0.34.5",
     "snappy": "^7.3.3",
     "ua-parser-js": "^2.0.6"
