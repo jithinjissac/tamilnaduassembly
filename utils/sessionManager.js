@@ -87,7 +87,7 @@ class SessionManager {
     // Update last accessed time and extend expiration
     session.lastAccessed = Date.now();
     session.expiresAt = Date.now() + this.sessionTimeout;
-    console.log(`⏱️ Session accessed and extended: ${sessionId} (new expiry in ${this.sessionTimeout / 1000}s)`);
+    // Session extended silently - only log on creation and cleanup
     return session;
   }
 
@@ -154,12 +154,12 @@ class SessionManager {
    * @private
    */
   startCleanup() {
-    // Run cleanup every minute
+    // Run cleanup every 2 minutes for less aggressive cleanup
     this.cleanupInterval = setInterval(() => {
       this._runCleanup();
-    }, 60000);
+    }, 120000);
 
-    console.log('🧹 Session cleanup scheduler started');
+    console.log('🧹 Session cleanup scheduler started (checking every 2 minutes)');
   }
 
   /**
@@ -169,9 +169,11 @@ class SessionManager {
   async _runCleanup() {
     const now = Date.now();
     const expired = [];
+    const gracePeriod = 30000; // 30 seconds grace period
 
     for (const [sessionId, session] of this.sessions.entries()) {
-      if (now > session.expiresAt) {
+      // Only cleanup if expired + grace period has passed
+      if (now > (session.expiresAt + gracePeriod)) {
         expired.push(sessionId);
       }
     }

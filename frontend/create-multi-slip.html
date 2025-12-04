@@ -1102,19 +1102,31 @@ s0.parentNode.insertBefore(s1,s0);
 
                     <div class="form-group">
                         <label>Captcha</label>
-                        <div style="min-height: 120px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: center;">
+                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; background: #f8f9fa; position: relative;">
                             <!-- Captcha Loader -->
-                            <div id="captchaLoader" style="display: none;">
+                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
                                 <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
                                 <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
                             </div>
                             
                             <!-- Captcha Image -->
-                            <img id="captchaImage" src="" alt="Captcha" style="display: none; max-width: 100%; height: auto; border-radius: 4px;">
+                            <div id="captchaContainer" style="display: none; text-align: center; position: relative;">
+                                <img id="captchaImage" src="" alt="Captcha" style="max-width: 100%; height: auto; border-radius: 4px; display: block; margin: 0 auto;">
+                                <button type="button" onclick="loadCaptcha()" 
+                                        style="position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem 1rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                            
+                            <!-- Initial Load Button (shown when no captcha loaded) -->
+                            <div id="captchaLoadPrompt" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-shield-alt" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+                                <p style="color: #718096; margin-bottom: 1rem;">Click below to load captcha</p>
+                                <button type="button" class="btn btn-primary" onclick="loadCaptcha()" style="padding: 0.75rem 2rem;">
+                                    <i class="fas fa-shield-alt"></i> Load Captcha
+                                </button>
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
-                            <span id="loadCaptchaText">Load Captcha</span>
-                        </button>
                         <input type="text" id="captcha" placeholder="Enter Captcha" style="margin-top: 1rem;">
                         <div class="error-message" id="captchaError"></div>
                     </div>
@@ -1657,16 +1669,10 @@ s0.parentNode.insertBefore(s1,s0);
 
         async function loadCaptcha() {
             try {
-                // Hide captcha image and show loader
-                document.getElementById('captchaImage').src = '';
-                document.getElementById('captchaImage').style.display = 'none';
+                // Hide all states
+                document.getElementById('captchaLoadPrompt').style.display = 'none';
+                document.getElementById('captchaContainer').style.display = 'none';
                 document.getElementById('captchaLoader').style.display = 'block';
-                
-                // Disable button and show loading text
-                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
-                const loadBtnText = document.getElementById('loadCaptchaText');
-                if (loadBtn) loadBtn.disabled = true;
-                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 
                 const response = await fetch('/api/initCaptchaSession');
                 
@@ -1679,31 +1685,32 @@ s0.parentNode.insertBefore(s1,s0);
                 if (data.status === 'success') {
                     sessionId = data.sessionId;
                     
-                    // Hide loader and show captcha image
-                    document.getElementById('captchaLoader').style.display = 'none';
-                    document.getElementById('captchaImage').src = data.captchaUrl;
-                    document.getElementById('captchaImage').style.display = 'block';
+                    // Update captcha image
+                    const captchaImg = document.getElementById('captchaImage');
                     
-                    // Update button text
-                    if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                    // Prioritize URL loading with base64 fallback
+                    if (data.captchaUrl) {
+                        captchaImg.src = data.captchaUrl + '?t=' + Date.now(); // Cache busting
+                    } else if (data.captchaBase64) {
+                        captchaImg.src = data.captchaBase64;
+                    }
+                    
+                    // Show captcha container, hide loader
+                    document.getElementById('captchaLoader').style.display = 'none';
+                    document.getElementById('captchaContainer').style.display = 'block';
+                    
+                    console.log('✅ Captcha loaded successfully:', sessionId);
                 } else {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
             } catch (error) {
                 console.error('Error loading captcha:', error);
                 
-                // Hide loader
+                // Hide loader, show prompt again
                 document.getElementById('captchaLoader').style.display = 'none';
+                document.getElementById('captchaLoadPrompt').style.display = 'block';
                 
-                showError('Failed to load captcha. Please try again.');
-            } finally {
-                // Re-enable button
-                const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
-                const loadBtnText = document.getElementById('loadCaptchaText');
-                if (loadBtn) loadBtn.disabled = false;
-                if (loadBtnText && loadBtnText.innerHTML.includes('Loading')) {
-                    loadBtnText.innerHTML = 'Load Captcha';
-                }
+                showError('captchaError', 'Failed to load captcha. Please try again.');
             }
         }
 
@@ -2617,28 +2624,29 @@ s0.parentNode.insertBefore(s1,s0);
                         <p style="margin: 0 0 1.5rem 0; color: #718096; font-size: 0.95rem;">${stationName}</p>
                         
                         <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; text-align: center; position: relative;">
-                            <img id="modalCaptchaImage" src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">
-                            <div id="modalCaptchaLoader" style="display: none; padding: 2rem;">
-                                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
-                                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
-                            </div>
+                            <img id="bulkCaptchaImage" src="${window.currentCaptchaImage}" alt="Captcha" style="max-width: 100%; height: auto;">
+                            <button id="refreshBulkCaptcha" 
+                                    style="position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem 1rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
                         </div>
                         
-                        <button type="button" id="reloadModalCaptcha" 
-                                style="width: 100%; padding: 0.5rem; background: #f7fafc; color: #2d3748; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">
-                            <i class="fas fa-sync-alt"></i> Reload Captcha
-                        </button>
-                        
                         <input type="text" id="bulkCaptchaInput" placeholder="Enter Captcha" 
-                               style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;">
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 1rem;">
                         
-                        <button id="submitBulkCaptcha" 
-                                style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05rem;">
-                            Continue
-                        </button>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button id="cancelBulkCaptcha" 
+                                    style="flex: 1; padding: 0.875rem; background: #e2e8f0; color: #4a5568; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05rem;">
+                                Cancel
+                            </button>
+                            <button id="submitBulkCaptcha" 
+                                    style="flex: 2; padding: 0.875rem; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.05rem;">
+                                Continue
+                            </button>
+                        </div>
                         
                         <p style="margin: 1rem 0 0 0; color: #718096; font-size: 0.85rem; text-align: center;">
-                            Press Enter to continue
+                            Press Enter to continue or Escape to cancel
                         </p>
                     </div>
                 `;
@@ -2647,41 +2655,11 @@ s0.parentNode.insertBefore(s1,s0);
 
                 const input = modal.querySelector('#bulkCaptchaInput');
                 const submitBtn = modal.querySelector('#submitBulkCaptcha');
-                const reloadBtn = modal.querySelector('#reloadModalCaptcha');
-                const captchaImg = modal.querySelector('#modalCaptchaImage');
-                const captchaLoader = modal.querySelector('#modalCaptchaLoader');
+                const cancelBtn = modal.querySelector('#cancelBulkCaptcha');
+                const refreshBtn = modal.querySelector('#refreshBulkCaptcha');
+                const captchaImg = modal.querySelector('#bulkCaptchaImage');
                 
                 input.focus();
-
-                // Reload captcha handler
-                reloadBtn.onclick = async () => {
-                    try {
-                        reloadBtn.disabled = true;
-                        reloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                        captchaImg.style.display = 'none';
-                        captchaLoader.style.display = 'block';
-                        
-                        const response = await fetch('/api/initCaptchaSession');
-                        if (!response.ok) throw new Error('Failed to load captcha');
-                        
-                        const data = await response.json();
-                        if (data.status === 'success') {
-                            window.currentSessionId = data.sessionId;
-                            window.currentCaptchaImage = data.captchaUrl;
-                            captchaImg.src = data.captchaUrl;
-                            captchaImg.style.display = 'block';
-                            captchaLoader.style.display = 'none';
-                        }
-                    } catch (error) {
-                        console.error('Error reloading captcha:', error);
-                        alert('Failed to reload captcha. Please try again.');
-                        captchaImg.style.display = 'block';
-                        captchaLoader.style.display = 'none';
-                    } finally {
-                        reloadBtn.disabled = false;
-                        reloadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Reload Captcha';
-                    }
-                };
 
                 const submit = () => {
                     const value = input.value.trim();
@@ -2689,9 +2667,36 @@ s0.parentNode.insertBefore(s1,s0);
                     resolve(value || null);
                 };
 
+                const cancel = () => {
+                    document.body.removeChild(modal);
+                    resolve(null);
+                };
+
+                const refreshCaptcha = async () => {
+                    refreshBtn.disabled = true;
+                    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                    
+                    const loaded = await loadCaptchaForBulk();
+                    if (loaded) {
+                        captchaImg.src = window.currentCaptchaImage + '?t=' + Date.now();
+                        input.value = '';
+                        input.focus();
+                    }
+                    
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                };
+
                 submitBtn.onclick = submit;
+                cancelBtn.onclick = cancel;
+                refreshBtn.onclick = refreshCaptcha;
+                
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') submit();
+                });
+                
+                modal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') cancel();
                 });
             });
         }
