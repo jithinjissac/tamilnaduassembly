@@ -467,6 +467,7 @@ router.get('/initCaptchaSession', async (req, res) => {
         const screenshot = await saveCaptchaScreenshot(captchaElement, sessionId);
         
         // Store session
+        console.log(`[CAPTCHA] 💾 Creating session: ${sessionId}`);
         sessionManager.create(sessionId, context, page, {
           userId: req.user?.id || 'anonymous',
           createdFor: 'captcha',
@@ -475,6 +476,15 @@ router.get('/initCaptchaSession', async (req, res) => {
             pageLoad: pageLoadTime
           }
         });
+        
+        // Verify session was created
+        const verifySession = sessionManager.get(sessionId);
+        if (verifySession) {
+          console.log(`[CAPTCHA] ✅ Session verified in manager: ${sessionId}`);
+          console.log(`[CAPTCHA] ⏱️ Session expires at: ${new Date(verifySession.expiresAt).toLocaleTimeString()}`);
+        } else {
+          console.log(`[CAPTCHA] ❌ Session NOT found in manager after creation: ${sessionId}`);
+        }
         
         // Schedule file deletion after 5 minutes (gives frontend time to load)
         scheduleFileDeletion(sessionId, 5 * 60 * 1000);
@@ -527,6 +537,7 @@ router.post('/submitWithCaptcha', async (req, res) => {
   
   console.log(`[CAPTCHA] 📝 Submitting form for session ${sessionId}...`);
   console.log(`[CAPTCHA] 🔍 Request body:`, { sessionId, district, local_body, ward, polling_station, language, captcha: captcha ? '***' : 'missing' });
+  console.log(`[CAPTCHA] 🕐 Current time: ${new Date().toLocaleTimeString()}`);
   
   try {
     // Validate required fields
@@ -546,14 +557,19 @@ router.post('/submitWithCaptcha', async (req, res) => {
     }
     
     // Get session
+    console.log(`[CAPTCHA] 🔍 Looking for session: ${sessionId}`);
     const session = sessionManager.get(sessionId);
     if (!session) {
       console.log(`[CAPTCHA] ❌ Session not found or expired: ${sessionId}`);
+      console.log(`[CAPTCHA] 📊 Active sessions:`, sessionManager.getStats());
       return res.status(400).json({
         status: 'error',
         message: 'Invalid or expired session. Please refresh captcha.'
       });
     }
+    
+    console.log(`[CAPTCHA] ✅ Session found: ${sessionId}`);
+    console.log(`[CAPTCHA] ⏱️ Session expires at: ${new Date(session.expiresAt).toLocaleTimeString()}`);
     
     const { page } = session;
     const startTime = Date.now();
