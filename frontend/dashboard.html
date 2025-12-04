@@ -1250,7 +1250,7 @@ s0.parentNode.insertBefore(s1,s0);
                             ? '⏳ Payment is still pending'
                             : '❌ Payment failed';
                         
-                        alert(`${statusMsg}\n\nOrder: ${data.order.orderId}\nStatus: ${data.order.paymentStatus.toUpperCase()}\nAmount: ₹${data.order.totalPrice.toFixed(2)}`);
+                        alert(`${statusMsg}\n\nOrder: ${data.order.orderId}\nStatus: ${data.order.paymentStatus.toUpperCase()}\nAmount: ₹${(data.order.amount || data.order.totalPrice || 0).toFixed(2)}`);
                     }
                 } else {
                     alert(data.message || 'Failed to verify payment status');
