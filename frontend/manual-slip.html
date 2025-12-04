@@ -1306,9 +1306,13 @@ s0.parentNode.insertBefore(s1,s0);
         // Create order and redirect to preview
         async function createOrderAndRedirect(pollingStationMalayalam) {
             try {
-                const district = document.getElementById('district').value;
-                const localBody = document.getElementById('localBody').value;
-                const ward = document.getElementById('ward').value;
+                const districtSelect = document.getElementById('district');
+                const localBodySelect = document.getElementById('localBody');
+                const wardSelect = document.getElementById('ward');
+
+                const district = districtSelect.options[districtSelect.selectedIndex].text;
+                const localBody = localBodySelect.options[localBodySelect.selectedIndex].text;
+                const ward = wardSelect.options[wardSelect.selectedIndex].text;
 
                 const orderData = {
                     voters: extractedVoters,
@@ -1327,13 +1331,14 @@ s0.parentNode.insertBefore(s1,s0);
                         district,
                         localBody,
                         ward,
-                        pollingStation: selectedStations[0].value,
+                        pollingStation: selectedStations[0].text,
                         pollingStationMalayalam: pollingStationMalayalam
                     },
                     adminCreateFor: selectedUserForAdmin?._id || null
                 };
 
                 console.log('[MANUAL-SLIP] 📦 Creating order with', extractedVoters.length, 'voters');
+                console.log('[MANUAL-SLIP] 📦 Order data:', orderData);
 
                 const response = await fetch('/api/orders/create', {
                     method: 'POST',
@@ -1345,18 +1350,42 @@ s0.parentNode.insertBefore(s1,s0);
                 });
 
                 const data = await response.json();
+                console.log('[MANUAL-SLIP] 📥 Order creation response:', data);
 
-                if (data.status === 'error') {
-                    throw new Error(data.message || 'Failed to create order');
+                if (!response.ok || data.status === 'error') {
+                    throw new Error(data.message || `Failed to create order (Status: ${response.status})`);
                 }
 
-                console.log('[MANUAL-SLIP] ✅ Order created:', data.orderId);
+                const orderId = data.orderId || data.order?.orderId || data.order?._id;
+                
+                if (!orderId) {
+                    console.error('[MANUAL-SLIP] ❌ No orderId in response:', data);
+                    throw new Error('Order created but no orderId returned');
+                }
+
+                console.log('[MANUAL-SLIP] ✅ Order created successfully, redirecting to preview...');
+                console.log('[MANUAL-SLIP] ✅ Order ID:', orderId);
 
                 // Redirect to preview
-                window.location.href = `preview.html?orderId=${data.orderId}`;
+                window.location.href = `preview.html?orderId=${orderId}`;
 
             } catch (error) {
                 console.error('[MANUAL-SLIP] ❌ Error creating order:', error);
+                
+                // Hide loading overlay
+                const loadingOverlay = document.getElementById('extractionLoading');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('show');
+                }
+                
+                // Re-enable button
+                const parseBtn = document.getElementById('parseBtn');
+                if (parseBtn) {
+                    parseBtn.disabled = false;
+                }
+                
+                // Show error
+                showError('htmlError', error.message || 'Failed to create order');
                 throw error;
             }
         }
