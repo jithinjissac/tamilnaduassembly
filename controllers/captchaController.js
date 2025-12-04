@@ -526,11 +526,29 @@ router.post('/submitWithCaptcha', async (req, res) => {
   const { sessionId, district, local_body, ward, polling_station, language, captcha } = req.body;
   
   console.log(`[CAPTCHA] 📝 Submitting form for session ${sessionId}...`);
+  console.log(`[CAPTCHA] 🔍 Request body:`, { sessionId, district, local_body, ward, polling_station, language, captcha: captcha ? '***' : 'missing' });
   
   try {
+    // Validate required fields
+    if (!sessionId || !district || !local_body || !ward || !polling_station || !captcha) {
+      console.log(`[CAPTCHA] ❌ Missing required fields:`, {
+        hasSessionId: !!sessionId,
+        hasDistrict: !!district,
+        hasLocalBody: !!local_body,
+        hasWard: !!ward,
+        hasPollingStation: !!polling_station,
+        hasCaptcha: !!captcha
+      });
+      return res.status(400).json({
+        status: 'error',
+        message: 'Missing required fields. Please fill all fields and try again.'
+      });
+    }
+    
     // Get session
     const session = sessionManager.get(sessionId);
     if (!session) {
+      console.log(`[CAPTCHA] ❌ Session not found or expired: ${sessionId}`);
       return res.status(400).json({
         status: 'error',
         message: 'Invalid or expired session. Please refresh captcha.'
@@ -588,9 +606,9 @@ router.post('/submitWithCaptcha', async (req, res) => {
       await page.click(CONFIG.FORM_SELECTORS.submitButton);
     } catch (clickError) {
       console.error('[CAPTCHA] ❌ Submit button click failed:', clickError.message);
+      console.log('[CAPTCHA] 🔄 Session kept alive for retry');
       
       const customError = await getCustomSECError();
-      await cleanupSession(sessionId);
       
       return res.status(503).json({
         status: 'error',
@@ -611,9 +629,9 @@ router.post('/submitWithCaptcha', async (req, res) => {
       html = await page.content();
     } catch (contentError) {
       console.error('[CAPTCHA] ❌ Failed to get page content:', contentError.message);
+      console.log('[CAPTCHA] 🔄 Session kept alive for retry');
       
       const customError = await getCustomSECError();
-      await cleanupSession(sessionId);
       
       return res.status(503).json({
         status: 'error',
@@ -635,8 +653,8 @@ router.post('/submitWithCaptcha', async (req, res) => {
                           html.includes('temporarily unavailable');
     
     if (hasServerError) {
+      console.log('[CAPTCHA] 🔄 Session kept alive for retry');
       const customError = await getCustomSECError();
-      await cleanupSession(sessionId);
       
       return res.status(503).json({
         status: 'error',
@@ -657,11 +675,12 @@ router.post('/submitWithCaptcha', async (req, res) => {
       pollingStationMalayalam
     });
     
-    // Schedule cleanup after 60 seconds
-    setTimeout(async () => {
-      console.log('[CAPTCHA] ⏰ Scheduled cleanup executing...');
-      await cleanupSession(sessionId);
-    }, 60000);
+    // Don't cleanup session immediately - let it expire naturally (10 minutes)
+    // This allows users to:
+    // 1. Download the PDF without rushing
+    // 2. Extract multiple polling stations sequentially
+    // Session will be auto-cleaned by sessionManager after 10 minutes of inactivity
+    console.log('[CAPTCHA] ✅ Form submitted successfully. Session will auto-expire in 10 minutes.');
     
   } catch (error) {
     console.error('[CAPTCHA] ❌ Error submitting form:', error);

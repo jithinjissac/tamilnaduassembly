@@ -84,8 +84,10 @@ class SessionManager {
       return null;
     }
 
-    // Update last accessed time
+    // Update last accessed time and extend expiration
     session.lastAccessed = Date.now();
+    session.expiresAt = Date.now() + this.sessionTimeout;
+    console.log(`⏱️ Session accessed and extended: ${sessionId} (new expiry in ${this.sessionTimeout / 1000}s)`);
     return session;
   }
 
@@ -128,12 +130,13 @@ class SessionManager {
     if (!session) return;
 
     try {
-      // Import seleniumPool to release driver
-      const { seleniumPool } = await import('./seleniumPool.js');
+      // Import browserPool to release context
+      const { browserPool } = await import('./browserPool.js');
       
-      // Release driver back to pool
-      if (session.context || session.driver) {
-        await seleniumPool.releaseDriver(sessionId);
+      // Release browser context back to pool
+      if (session.context) {
+        await browserPool.releaseContext(session.context);
+        console.log(`🔓 Browser context released for session: ${sessionId}`);
       }
       
       this.sessions.delete(sessionId);
