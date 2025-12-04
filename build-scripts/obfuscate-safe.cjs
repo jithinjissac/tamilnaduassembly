@@ -145,6 +145,7 @@ const htmlFiles = [
     'login.html',
     'register.html',
     'create-slip.html',
+    'manual-slip.html',
     'create-multi-slip.html',
     'create-custom-symbol-slip.html',
     'settings.html',

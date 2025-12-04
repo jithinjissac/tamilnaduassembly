@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
+import manualSlipRoutes from './controllers/manualSlipController.js';
 import { requestLogger, logger } from './utils/logger.js';
 
 // ES Module imports for new modules
@@ -307,6 +308,7 @@ app.get('/razorpay-verification.html', (req, res) => {
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
+app.use('/api/manual-slip', manualSlipRoutes);
 
 // Playwright Stations Route (Malayalam polling stations)
 import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
