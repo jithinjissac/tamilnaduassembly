@@ -1102,31 +1102,24 @@ s0.parentNode.insertBefore(s1,s0);
 
                     <div class="form-group">
                         <label>Captcha</label>
-                        <div style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; background: #f8f9fa; position: relative;">
+                        <div style="min-height: 120px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: center;">
                             <!-- Captcha Loader -->
-                            <div id="captchaLoader" style="display: none; text-align: center; padding: 2rem;">
+                            <div id="captchaLoader" style="display: none;">
                                 <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
                                 <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Loading captcha...</p>
                             </div>
                             
-                            <!-- Captcha Image -->
-                            <div id="captchaContainer" style="display: none; text-align: center; position: relative;">
+                            <!-- Captcha Image Container with retry display -->
+                            <div id="captchaImageContainer" style="display: none;">
                                 <img id="captchaImage" src="" alt="Captcha" style="max-width: 100%; height: auto; border-radius: 4px; display: block; margin: 0 auto;">
-                                <button type="button" onclick="loadCaptcha()" 
-                                        style="position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem 1rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                                    <i class="fas fa-sync-alt"></i> Refresh
-                                </button>
-                            </div>
-                            
-                            <!-- Initial Load Button (shown when no captcha loaded) -->
-                            <div id="captchaLoadPrompt" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-shield-alt" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
-                                <p style="color: #718096; margin-bottom: 1rem;">Click below to load captcha</p>
-                                <button type="button" class="btn btn-primary" onclick="loadCaptcha()" style="padding: 0.75rem 2rem;">
-                                    <i class="fas fa-shield-alt"></i> Load Captcha
-                                </button>
+                                <div id="captchaLoadStatus" style="margin-top: 0.5rem; font-size: 0.75rem; color: #718096;">
+                                    <i class="fas fa-check-circle" style="color: #48bb78;"></i> <span id="captchaLoadStatusText">Loaded</span>
+                                </div>
                             </div>
                         </div>
+                        <button type="button" class="btn btn-secondary" onclick="loadCaptcha()" style="margin-top: 0.5rem;">
+                            <span id="loadCaptchaText">Load Captcha</span>
+                        </button>
                         <input type="text" id="captcha" placeholder="Enter Captcha" style="margin-top: 1rem;">
                         <div class="error-message" id="captchaError"></div>
                     </div>
@@ -1668,12 +1661,25 @@ s0.parentNode.insertBefore(s1,s0);
         });
 
         async function loadCaptcha() {
+            const captchaImg = document.getElementById('captchaImage');
+            const captchaContainer = document.getElementById('captchaImageContainer');
+            const captchaLoader = document.getElementById('captchaLoader');
+            const statusText = document.getElementById('captchaLoadStatusText');
+            const loadBtn = document.querySelector('button[onclick="loadCaptcha()"]');
+            const loadBtnText = document.getElementById('loadCaptchaText');
+            
             try {
-                // Hide all states
-                document.getElementById('captchaLoadPrompt').style.display = 'none';
-                document.getElementById('captchaContainer').style.display = 'none';
-                document.getElementById('captchaLoader').style.display = 'block';
+                // Show loader, hide image
+                if (captchaContainer) captchaContainer.style.display = 'none';
+                if (captchaLoader) captchaLoader.style.display = 'block';
+                if (captchaImg) captchaImg.src = '';
                 
+                // Disable button
+                if (loadBtn) loadBtn.disabled = true;
+                if (loadBtnText) loadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                
+                // Fetch captcha session
+                console.log('[CAPTCHA] Fetching captcha session...');
                 const response = await fetch('/api/initCaptchaSession');
                 
                 if (!response.ok) {
@@ -1681,36 +1687,75 @@ s0.parentNode.insertBefore(s1,s0);
                 }
                 
                 const data = await response.json();
+                console.log('[CAPTCHA] Response:', data);
                 
-                if (data.status === 'success') {
-                    sessionId = data.sessionId;
-                    
-                    // Update captcha image
-                    const captchaImg = document.getElementById('captchaImage');
-                    
-                    // Prioritize URL loading with base64 fallback
-                    if (data.captchaUrl) {
-                        captchaImg.src = data.captchaUrl + '?t=' + Date.now(); // Cache busting
-                    } else if (data.captchaBase64) {
-                        captchaImg.src = data.captchaBase64;
-                    }
-                    
-                    // Show captcha container, hide loader
-                    document.getElementById('captchaLoader').style.display = 'none';
-                    document.getElementById('captchaContainer').style.display = 'block';
-                    
-                    console.log('✅ Captcha loaded successfully:', sessionId);
-                } else {
+                if (data.status !== 'success' || !data.captchaUrl) {
                     throw new Error(data.message || 'Failed to load captcha');
                 }
-            } catch (error) {
-                console.error('Error loading captcha:', error);
                 
-                // Hide loader, show prompt again
-                document.getElementById('captchaLoader').style.display = 'none';
-                document.getElementById('captchaLoadPrompt').style.display = 'block';
+                sessionId = data.sessionId;
+                const captchaUrl = data.captchaUrl;
+                const captchaBase64 = data.captchaBase64;
+                
+                console.log('[CAPTCHA] URL:', captchaUrl);
+                console.log('[CAPTCHA] Has base64:', !!captchaBase64);
+                
+                // Hide loader, show container
+                if (captchaLoader) captchaLoader.style.display = 'none';
+                if (captchaContainer) captchaContainer.style.display = 'block';
+                
+                // Prioritize URL (direct from bucket), fallback to base64
+                if (captchaUrl) {
+                    console.log('[CAPTCHA] Loading from URL:', captchaUrl);
+                    if (captchaImg) {
+                        captchaImg.src = captchaUrl;
+                        captchaImg.onload = () => {
+                            console.log('[CAPTCHA] ✅ Captcha loaded from URL');
+                            if (statusText) {
+                                statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                            }
+                            if (loadBtnText) {
+                                loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                            }
+                        };
+                        captchaImg.onerror = () => {
+                            console.warn('[CAPTCHA] URL failed, trying base64...');
+                            if (captchaBase64) {
+                                captchaImg.src = captchaBase64;
+                            }
+                        };
+                    }
+                } else if (captchaBase64) {
+                    console.log('[CAPTCHA] Loading from base64 data...');
+                    if (captchaImg) {
+                        captchaImg.src = captchaBase64;
+                        console.log('[CAPTCHA] ✅ Captcha loaded from base64');
+                        if (statusText) {
+                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                        }
+                        if (loadBtnText) {
+                            loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                        }
+                    }
+                } else {
+                    throw new Error('No captcha data received');
+                }
+                
+            } catch (error) {
+                console.error('[CAPTCHA] Error:', error);
+                
+                // Hide loader
+                if (captchaLoader) captchaLoader.style.display = 'none';
+                if (captchaContainer) captchaContainer.style.display = 'none';
                 
                 showError('captchaError', 'Failed to load captcha. Please try again.');
+                
+            } finally {
+                // Re-enable button
+                if (loadBtn) loadBtn.disabled = false;
+                if (loadBtnText && !loadBtnText.innerHTML.includes('Refresh')) {
+                    loadBtnText.innerHTML = 'Load Captcha';
+                }
             }
         }
 
