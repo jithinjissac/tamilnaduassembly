@@ -166,13 +166,12 @@ async function saveCaptchaScreenshot(element, sessionId) {
             sessionId: sessionId,
             createdAt: new Date().toISOString()
           }
-        },
-        public: true
+        }
+        // Removed 'public: true' - incompatible with Uniform Bucket-Level Access
+        // Instead, ensure bucket has public read access via IAM permissions
       });
       
-      // No need to make public separately - already done above
-      
-      // Generate public URL
+      // Generate public URL (works if bucket has public access via IAM)
       const publicUrl = `https://storage.googleapis.com/${bucketName}/captcha-cache/${filename}`;
       
       console.log(`[CAPTCHA] ✅ Uploaded to Cloud Storage (${screenshotBuffer.length} bytes)`);
