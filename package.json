@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "npm run protect:safe && cross-env USE_PROTECTED=true NODE_ENV=production node server.js",
+    "start": "cross-env NODE_ENV=production node server.js",
     "start:dev": "node server.js",
     "start:production": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
     "start:pm2": "npm run protect:safe && pm2 start ecosystem.config.cjs",
@@ -19,6 +19,7 @@
     "protect:safe": "node build-scripts/obfuscate-safe.cjs",
     "serve:protected": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
     "verify:deployment": "node verify-deployment.js",
+    "postinstall": "playwright install chromium --with-deps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
