@@ -1530,8 +1530,28 @@ s0.parentNode.insertBefore(s1,s0);
                 if (captchaLoader) captchaLoader.style.display = 'none';
                 if (captchaContainer) captchaContainer.style.display = 'block';
                 
-                // Use base64 directly (always works, no network request needed)
-                if (captchaBase64) {
+                // Prioritize URL (direct from bucket), fallback to base64
+                if (captchaUrl) {
+                    console.log('[CAPTCHA] Loading from URL:', captchaUrl);
+                    if (captchaImg) {
+                        captchaImg.src = captchaUrl;
+                        captchaImg.onload = () => {
+                            console.log('[CAPTCHA] ✅ Captcha loaded from URL');
+                            if (statusText) {
+                                statusText.innerHTML = '<i class="fas fa-check-circle" style="color: #48bb78;"></i> Loaded';
+                            }
+                            if (loadBtnText) {
+                                loadBtnText.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Captcha';
+                            }
+                        };
+                        captchaImg.onerror = () => {
+                            console.warn('[CAPTCHA] URL failed, trying base64...');
+                            if (captchaBase64) {
+                                captchaImg.src = captchaBase64;
+                            }
+                        };
+                    }
+                } else if (captchaBase64) {
                     console.log('[CAPTCHA] Loading from base64 data...');
                     if (captchaImg) {
                         captchaImg.src = captchaBase64;

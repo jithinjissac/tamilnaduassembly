@@ -139,12 +139,14 @@ async function findCaptchaElement(page) {
 
 /**
  * Helper: Save captcha screenshot
+ * Returns both URL and base64 data
  */
 async function saveCaptchaScreenshot(element, sessionId) {
   const filename = `captcha-${sessionId}.png`;
   
   // Take screenshot to buffer
   const screenshotBuffer = await element.screenshot();
+  const screenshotBase64 = screenshotBuffer.toString('base64');
   
   console.log(`[CAPTCHA] 📸 Screenshot captured (${screenshotBuffer.length} bytes) - Using: ${USE_CLOUD_STORAGE ? 'Cloud Storage' : 'Local Filesystem'}`);
   
@@ -164,11 +166,11 @@ async function saveCaptchaScreenshot(element, sessionId) {
             sessionId: sessionId,
             createdAt: new Date().toISOString()
           }
-        }
+        },
+        public: true
       });
       
-      // Make file publicly readable
-      await file.makePublic();
+      // No need to make public separately - already done above
       
       // Generate public URL
       const publicUrl = `https://storage.googleapis.com/${bucketName}/captcha-cache/${filename}`;
@@ -179,7 +181,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
       // Schedule deletion after 5 minutes
       scheduleCloudFileDeletion(sessionId, 5 * 60 * 1000);
       
-      return publicUrl + `?t=${Date.now()}`;
+      return {
+        url: publicUrl + `?t=${Date.now()}`,
+        base64: `data:image/png;base64,${screenshotBase64}`
+      };
       
     } catch (cloudError) {
       console.error(`[CAPTCHA] ❌ Cloud Storage upload failed:`, cloudError.message);
@@ -216,7 +221,10 @@ async function saveCaptchaScreenshot(element, sessionId) {
         // Schedule local file deletion
         scheduleFileDeletion(sessionId, 5 * 60 * 1000);
         
-        return `/captcha-cache/${filename}?t=${Date.now()}`;
+        return {
+          url: `/captcha-cache/${filename}?t=${Date.now()}`,
+          base64: `data:image/png;base64,${screenshotBase64}`
+        };
       }
     }
     
@@ -455,8 +463,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         // Find captcha element
         const captchaElement = await findCaptchaElement(page);
         
-        // Save screenshot
-        const captchaUrl = await saveCaptchaScreenshot(captchaElement, sessionId);
+        // Save screenshot (returns {url, base64})
+        const screenshot = await saveCaptchaScreenshot(captchaElement, sessionId);
         
         // Store session
         sessionManager.create(sessionId, context, page, {
@@ -474,7 +482,8 @@ router.get('/initCaptchaSession', async (req, res) => {
         return {
           status: 'success',
           sessionId,
-          captchaUrl,
+          captchaUrl: screenshot.url,
+          captchaBase64: screenshot.base64,
           message: 'Captcha session initialized',
           timings: {
             total: Date.now() - startTime,
