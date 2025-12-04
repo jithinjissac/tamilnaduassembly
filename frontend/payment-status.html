@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Status Verification - EasySlip</title>
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: var(--kerala-cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        h1 {
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-card {
+            margin-top: 2rem;
+            padding: 2rem;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .status-card.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffc107;
+        }
+
+        .status-failed {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 2px solid #dc3545;
+        }
+
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-success .status-icon {
+            color: #28a745;
+        }
+
+        .status-pending .status-icon {
+            color: #ffc107;
+        }
+
+        .status-failed .status-icon {
+            color: #dc3545;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .status-details {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            font-family: 'Courier New', monospace;
+            text-align: right;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 109, 59, 0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            text-align: center;
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .info-box {
+            background: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+
+        .info-box p {
+            margin: 0;
+            color: #0c5489;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-value {
+                text-align: left;
+                margin-top: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-ticket-alt"></i> EasySlip
+            </div>
+            <a href="dashboard.html" style="color: white; text-decoration: none;">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h1><i class="fas fa-search-dollar"></i> Payment Status Verification</h1>
+            <p class="subtitle">Verify and sync payment status from Razorpay</p>
+
+            <div class="info-box">
+                <p><strong>How it works:</strong> Enter your Order ID or Razorpay Payment ID to check the latest payment status directly from Razorpay. If the payment was successful but not updated in our system, it will be automatically synced.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="searchInput">Order ID or Razorpay Payment ID</label>
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="e.g., ORD-20231201-ABCD1234 or pay_XXXXXXXXXXXXX"
+                       autocomplete="off">
+                <small style="color: #718096; display: block; margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> You can find your Order ID in the order confirmation email or dashboard
+                </small>
+            </div>
+
+            <button class="btn btn-primary" onclick="checkPaymentStatus()" id="checkBtn">
+                <i class="fas fa-search"></i> Check Payment Status
+            </button>
+
+            <div id="loadingState" style="display: none; text-align: center; margin-top: 2rem;">
+                <div class="spinner"></div>
+                <p class="loading-text">Verifying payment status with Razorpay...</p>
+            </div>
+
+            <div id="statusCard" class="status-card">
+                <!-- Status will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Allow Enter key to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPaymentStatus();
+            }
+        });
+
+        async function checkPaymentStatus() {
+            const searchInput = document.getElementById('searchInput').value.trim();
+            
+            if (!searchInput) {
+                alert('Please enter an Order ID or Razorpay Payment ID');
+                return;
+            }
+
+            const checkBtn = document.getElementById('checkBtn');
+            const loadingState = document.getElementById('loadingState');
+            const statusCard = document.getElementById('statusCard');
+
+            // Reset state
+            statusCard.classList.remove('show');
+            checkBtn.disabled = true;
+            loadingState.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/payment/verify-status', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ identifier: searchInput })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    displayStatus(data);
+                } else {
+                    displayError(data.message || 'Failed to verify payment status');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Network error. Please try again.');
+            } finally {
+                checkBtn.disabled = false;
+                loadingState.style.display = 'none';
+            }
+        }
+
+        function displayStatus(data) {
+            const statusCard = document.getElementById('statusCard');
+            const { order, razorpayStatus, updated } = data;
+
+            let statusClass = 'status-pending';
+            let statusIcon = 'fa-clock';
+            let statusTitle = 'Payment Pending';
+            let statusColor = '#ffc107';
+
+            if (order.paymentStatus === 'completed') {
+                statusClass = 'status-success';
+                statusIcon = 'fa-check-circle';
+                statusTitle = 'Payment Successful';
+                statusColor = '#28a745';
+            } else if (order.paymentStatus === 'failed') {
+                statusClass = 'status-failed';
+                statusIcon = 'fa-times-circle';
+                statusTitle = 'Payment Failed';
+                statusColor = '#dc3545';
+            }
+
+            let updateNotice = '';
+            if (updated) {
+                updateNotice = `
+                    <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <i class="fas fa-sync-alt" style="color: #28a745;"></i>
+                        <strong style="color: #155724;">Payment status updated!</strong> 
+                        <span style="color: #155724;">The order has been synced with the latest payment information from Razorpay.</span>
+                    </div>
+                `;
+            }
+
+            statusCard.className = `status-card ${statusClass} show`;
+            statusCard.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas ${statusIcon} status-icon"></i>
+                    <div class="status-title">${statusTitle}</div>
+                </div>
+
+                ${updateNotice}
+
+                <div class="status-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Order ID:</span>
+                        <span class="detail-value">${order.orderId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Status:</span>
+                        <span class="detail-value" style="color: ${statusColor}; font-weight: 600;">
+                            ${order.paymentStatus.toUpperCase()}
+                        </span>
+                    </div>
+                    ${order.razorpayOrderId ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Razorpay Order ID:</span>
+                        <span class="detail-value">${order.razorpayOrderId}</span>
+                    </div>
+                    ` : ''}
+                    ${order.razorpayPaymentId ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Razorpay Payment ID:</span>
+                        <span class="detail-value">${order.razorpayPaymentId}</span>
+                    </div>
+                    ` : ''}
+                    ${order.cashfreeOrderId ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Cashfree Order ID:</span>
+                        <span class="detail-value">${order.cashfreeOrderId}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value">₹${order.totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Created:</span>
+                        <span class="detail-value">${new Date(order.createdAt).toLocaleString()}</span>
+                    </div>
+                    ${razorpayStatus ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Razorpay Status:</span>
+                        <span class="detail-value">${razorpayStatus}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${order.paymentStatus === 'completed' ? `
+                    <button class="btn btn-secondary" onclick="window.location.href='preview.html?orderId=${order.orderId}'">
+                        <i class="fas fa-file-pdf"></i> View Order & Download PDF
+                    </button>
+                ` : ''}
+                ${order.paymentStatus === 'pending' && order.razorpayOrderId ? `
+                    <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">
+                        <i class="fas fa-redo"></i> Return to Dashboard to Retry Payment
+                    </button>
+                ` : ''}
+            `;
+        }
+
+        function displayError(message) {
+            const statusCard = document.getElementById('statusCard');
+            statusCard.className = 'status-card status-failed show';
+            statusCard.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-exclamation-triangle status-icon"></i>
+                    <div class="status-title">Verification Failed</div>
+                    <p style="margin-top: 1rem; color: #721c24;">${message}</p>
+                </div>
+                <button class="btn btn-secondary" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>

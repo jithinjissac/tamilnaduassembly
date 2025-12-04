@@ -44,5 +44,15 @@ router.post('/payumoney/success', paymentController.handlePayUMoneySuccess);
 // @access  Public
 router.post('/payumoney/failure', paymentController.handlePayUMoneyFailure);
 
+// @route   POST /api/payment/verify-status
+// @desc    Verify payment status from Razorpay and update order
+// @access  Private
+router.post('/verify-status', auth, paymentController.verifyPaymentStatus);
+
+// @route   POST /api/payment/cron/manual-check
+// @desc    Manually trigger payment status cron job (Admin only)
+// @access  Private (Admin)
+router.post('/cron/manual-check', auth, paymentController.manualPaymentStatusCheck);
+
 export default router;
 

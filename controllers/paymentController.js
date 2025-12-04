@@ -7,6 +7,7 @@ import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Settings from '../models/Settings.js';
 import { sendPaymentSuccessEmail, sendPDFReadyEmail } from '../utils/emailService.js';
+import { manualPaymentCheck } from '../utils/paymentStatusCron.js';
 import { createLogger } from '../utils/logger.js';
 import fs from 'fs';
 import path from 'path';
@@ -884,6 +885,203 @@ export const handlePayUMoneyFailure = async (req, res) => {
     } catch (error) {
         logger.error('PayUMoney failure callback error:', error.message);
         res.redirect(`${process.env.FRONTEND_URL}/payment-failed.html?reason=server_error`);
+    }
+};
+
+// Verify Payment Status from Razorpay and Update Order
+export const verifyPaymentStatus = async (req, res) => {
+    try {
+        const { identifier } = req.body; // Can be orderId or razorpayPaymentId
+        const userId = req.userId;
+
+        if (!identifier) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Order ID or Payment ID is required'
+            });
+        }
+
+        // Find order by orderId or razorpayPaymentId
+        let order;
+        if (identifier.startsWith('ORD-')) {
+            order = await Order.findOne({ orderId: identifier, userId });
+        } else if (identifier.startsWith('pay_')) {
+            order = await Order.findOne({ razorpayPaymentId: identifier, userId });
+        } else if (identifier.startsWith('order_')) {
+            order = await Order.findOne({ razorpayOrderId: identifier, userId });
+        } else {
+            // Try both orderId and payment ID
+            order = await Order.findOne({
+                $or: [
+                    { orderId: identifier, userId },
+                    { razorpayPaymentId: identifier, userId },
+                    { razorpayOrderId: identifier, userId }
+                ]
+            });
+        }
+
+        if (!order) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Order not found or you do not have access to this order'
+            });
+        }
+
+        let updated = false;
+        let razorpayStatus = null;
+
+        // If order has Razorpay payment ID, fetch status from Razorpay
+        if (order.razorpayPaymentId) {
+            try {
+                const payment = await razorpay.payments.fetch(order.razorpayPaymentId);
+                razorpayStatus = payment.status;
+
+                logger.info('Razorpay payment status:', payment.status, 'for order:', order.orderId);
+
+                // Update order if Razorpay shows captured/authorized but our DB shows pending
+                if ((payment.status === 'captured' || payment.status === 'authorized') && order.paymentStatus !== 'completed') {
+                    order.paymentStatus = 'completed';
+                    order.status = 'processing';
+                    order.paidAt = payment.captured_at ? new Date(payment.captured_at * 1000) : new Date();
+                    
+                    // Store additional payment details
+                    if (!order.razorpaySignature && payment.id) {
+                        order.razorpayPaymentId = payment.id;
+                    }
+                    if (payment.order_id && !order.razorpayOrderId) {
+                        order.razorpayOrderId = payment.order_id;
+                    }
+
+                    await order.save();
+                    updated = true;
+
+                    logger.info('✅ Order status updated to completed:', order.orderId);
+
+                    // Send payment success email
+                    try {
+                        const user = await User.findById(userId);
+                        if (user) {
+                            await sendPaymentSuccessEmail(user.email, order.orderId);
+                        }
+                    } catch (emailError) {
+                        logger.error('Failed to send payment success email:', emailError.message);
+                    }
+                } else if (payment.status === 'failed' && order.paymentStatus === 'pending') {
+                    order.paymentStatus = 'failed';
+                    await order.save();
+                    updated = true;
+                    logger.info('Order status updated to failed:', order.orderId);
+                }
+            } catch (razorpayError) {
+                logger.error('Razorpay API error:', razorpayError.message);
+                // Continue even if Razorpay API fails - return current DB status
+            }
+        } else if (order.razorpayOrderId) {
+            // Try to fetch order details from Razorpay
+            try {
+                const razorpayOrder = await razorpay.orders.fetch(order.razorpayOrderId);
+                razorpayStatus = razorpayOrder.status;
+
+                logger.info('Razorpay order status:', razorpayOrder.status, 'for order:', order.orderId);
+
+                // Check if order was paid
+                if (razorpayOrder.status === 'paid' && order.paymentStatus !== 'completed') {
+                    // Fetch payments for this order
+                    const payments = await razorpay.orders.fetchPayments(order.razorpayOrderId);
+                    
+                    if (payments && payments.items && payments.items.length > 0) {
+                        const successfulPayment = payments.items.find(p => p.status === 'captured' || p.status === 'authorized');
+                        
+                        if (successfulPayment) {
+                            order.paymentStatus = 'completed';
+                            order.status = 'processing';
+                            order.razorpayPaymentId = successfulPayment.id;
+                            order.paidAt = successfulPayment.captured_at ? new Date(successfulPayment.captured_at * 1000) : new Date();
+                            
+                            await order.save();
+                            updated = true;
+
+                            logger.info('✅ Order status updated to completed from order check:', order.orderId);
+
+                            // Send payment success email
+                            try {
+                                const user = await User.findById(userId);
+                                if (user) {
+                                    await sendPaymentSuccessEmail(user.email, order.orderId);
+                                }
+                            } catch (emailError) {
+                                logger.error('Failed to send payment success email:', emailError.message);
+                            }
+                        }
+                    }
+                }
+            } catch (razorpayError) {
+                logger.error('Razorpay order API error:', razorpayError.message);
+            }
+        }
+
+        // Return order status
+        return res.json({
+            status: 'success',
+            order: {
+                orderId: order.orderId,
+                paymentStatus: order.paymentStatus,
+                razorpayOrderId: order.razorpayOrderId,
+                razorpayPaymentId: order.razorpayPaymentId,
+                cashfreeOrderId: order.cashfreeOrderId,
+                totalPrice: order.totalPrice,
+                createdAt: order.createdAt,
+                paidAt: order.paidAt
+            },
+            razorpayStatus,
+            updated,
+            message: updated ? 'Payment status updated successfully' : 'Payment status verified'
+        });
+
+    } catch (error) {
+        logger.error('Payment status verification error:', error.message);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to verify payment status'
+        });
+    }
+};
+
+// Manual Payment Status Check (Admin only)
+export const manualPaymentStatusCheck = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        // Check if user is admin
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'admin') {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Admin access required'
+            });
+        }
+
+        logger.info('Manual payment status check triggered by admin:', user.email);
+
+        // Trigger the cron job manually
+        manualPaymentCheck().then(() => {
+            logger.info('Manual payment check completed');
+        }).catch(error => {
+            logger.error('Manual payment check error:', error.message);
+        });
+
+        // Return immediately - job runs in background
+        res.json({
+            status: 'success',
+            message: 'Payment status check started. Check logs for results.'
+        });
+
+    } catch (error) {
+        logger.error('Manual payment check endpoint error:', error.message);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to trigger payment status check'
+        });
     }
 };
 

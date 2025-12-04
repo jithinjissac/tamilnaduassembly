@@ -19,6 +19,7 @@ import slipRoutes from './routes/slips.js';
 import systemRoutes from './routes/system.js';
 import { closeBrowser } from './controllers/slipController.js';
 import { cleanupExpiredPDFs } from './utils/pdfGenerator.js';
+import { startPaymentStatusCron } from './utils/paymentStatusCron.js';
 
 // Initialize environment variables
 dotenv.config();
@@ -420,6 +421,10 @@ app.listen(PORT, () => {
   
   // Run initial session cleanup
   cleanupInactiveSessions();
+  
+  // Start payment status cron job
+  logger.info('Starting payment status verification cron job...');
+  startPaymentStatusCron();
 });
 
 // Graceful shutdown
