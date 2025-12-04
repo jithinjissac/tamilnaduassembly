@@ -10,7 +10,7 @@ import { getProxyConfigWithFallback } from './proxyConfig.js';
  * - Closes idle browsers after 5 minutes of inactivity to save memory
  */
 class BrowserPool {
-  constructor(maxBrowsers = 30, idleTimeout = 5 * 60 * 1000) {
+  constructor(maxBrowsers = 50, idleTimeout = 5 * 60 * 1000) {
     this.maxBrowsers = maxBrowsers;
     this.idleTimeout = idleTimeout; // 5 minutes default
     this.browsers = [];
@@ -109,10 +109,10 @@ class BrowserPool {
     }
 
     // Better load balancing: Create new browser if existing ones are getting full
-    // Max 4 contexts per browser, but allow up to 20 browsers
+    // Max 6 contexts per browser to support 100+ concurrent users
     const shouldCreateNewBrowser = (
       this.browsers.length < this.maxBrowsers && // Not at max limit
-      minContexts >= 4 // Least loaded browser already has 4+ contexts
+      minContexts >= 6 // Least loaded browser already has 6+ contexts
     );
     
     if (shouldCreateNewBrowser) {
@@ -368,9 +368,9 @@ class BrowserPool {
 
 // Singleton instance
 // Optimized for 32 vCPU / 32 GB RAM server
-// Each browser uses ~400-500 MB RAM, 30 browsers = ~15 GB
-// Reduced from 50 to prevent EAGAIN (process limit) errors
-export const browserPool = new BrowserPool(30);
+// Each browser uses ~400-500 MB RAM, 50 browsers = ~25 GB
+// Increased to 50 to support 100+ concurrent users (50 browsers × 6 contexts = 300 concurrent sessions)
+export const browserPool = new BrowserPool(50);
 
 // Graceful shutdown
 process.on('SIGTERM', () => browserPool.shutdown());

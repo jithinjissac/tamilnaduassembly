@@ -293,8 +293,8 @@ class SessionManager {
   }
 }
 
-// Singleton instance
-export const sessionManager = new SessionManager();
+// Singleton instance with 10 minute timeout
+export const sessionManager = new SessionManager(10 * 60 * 1000);
 
 // Graceful shutdown
 process.on('SIGTERM', () => sessionManager.shutdown());

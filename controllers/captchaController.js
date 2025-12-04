@@ -474,7 +474,7 @@ router.get('/initCaptchaSession', async (req, res) => {
             total: Date.now() - startTime,
             pageLoad: pageLoadTime
           }
-        }, CONFIG.SESSION_TIMEOUT);
+        });
         
         // Schedule file deletion after 5 minutes (gives frontend time to load)
         scheduleFileDeletion(sessionId, 5 * 60 * 1000);
