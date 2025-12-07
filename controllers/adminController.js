@@ -1825,4 +1825,442 @@ export const getUserReports = async (req, res) => {
     }
 };
 
+// Get District-wise Analytics Report
+export const getDistrictReport = async (req, res) => {
+    try {
+        const { startDate, endDate, sortBy = 'totalRevenue', order = 'desc' } = req.query;
+
+        // District name mapping (Malayalam to English)
+        const districtMapping = {
+            'തിരുവനന്തപുരം': 'Thiruvananthapuram',
+            'കൊല്ലം': 'Kollam',
+            'പത്തനംതിട്ട': 'Pathanamthitta',
+            'ആലപ്പുഴ': 'Alappuzha',
+            'കോട്ടയം': 'Kottayam',
+            'ഇടുക്കി': 'Idukki',
+            'എറണാകുളം': 'Ernakulam',
+            'തൃശ്ശൂർ': 'Thrissur',
+            'പാലക്കാട്': 'Palakkad',
+            'മലപ്പുറം': 'Malappuram',
+            'കോഴിക്കോട്': 'Kozhikode',
+            'വയനാട്': 'Wayanad',
+            'കണ്ണൂർ': 'Kannur',
+            'കാസർഗോഡ്': 'Kasaragod'
+        };
+
+        // Build date filter
+        const dateFilter = {};
+        if (startDate || endDate) {
+            dateFilter.createdAt = {};
+            if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                dateFilter.createdAt.$lte = end;
+            }
+        }
+
+        // Aggregate by district (normalize district names to merge Malayalam and English)
+        const districtStats = await Order.aggregate([
+            {
+                $match: {
+                    paymentStatus: 'completed',
+                    ...dateFilter
+                }
+            },
+            {
+                $addFields: {
+                    normalizedDistrict: {
+                        $let: {
+                            vars: {
+                                // Extract first part before "/" if it exists, otherwise use full string
+                                firstPart: {
+                                    $trim: {
+                                        input: {
+                                            $arrayElemAt: [
+                                                { $split: [{ $ifNull: ['$location.district', ''] }, '/'] },
+                                                0
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            in: {
+                                $switch: {
+                                    branches: [
+                                        // English versions (case-insensitive)
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'thiruvananthapuram'] }, then: 'Thiruvananthapuram' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'kollam'] }, then: 'Kollam' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'pathanamthitta'] }, then: 'Pathanamthitta' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'alappuzha'] }, then: 'Alappuzha' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'kottayam'] }, then: 'Kottayam' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'idukki'] }, then: 'Idukki' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'ernakulam'] }, then: 'Ernakulam' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'thrissur'] }, then: 'Thrissur' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'palakkad'] }, then: 'Palakkad' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'malappuram'] }, then: 'Malappuram' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'kozhikode'] }, then: 'Kozhikode' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'wayanad'] }, then: 'Wayanad' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'kannur'] }, then: 'Kannur' },
+                                        { case: { $eq: [{ $toLower: '$$firstPart' }, 'kasaragod'] }, then: 'Kasaragod' },
+                                        // Malayalam versions
+                                        { case: { $eq: ['$$firstPart', 'തിരുവനന്തപുരം'] }, then: 'Thiruvananthapuram' },
+                                        { case: { $eq: ['$$firstPart', 'കൊല്ലം'] }, then: 'Kollam' },
+                                        { case: { $eq: ['$$firstPart', 'പത്തനംതിട്ട'] }, then: 'Pathanamthitta' },
+                                        { case: { $eq: ['$$firstPart', 'ആലപ്പുഴ'] }, then: 'Alappuzha' },
+                                        { case: { $eq: ['$$firstPart', 'കോട്ടയം'] }, then: 'Kottayam' },
+                                        { case: { $eq: ['$$firstPart', 'ഇടുക്കി'] }, then: 'Idukki' },
+                                        { case: { $eq: ['$$firstPart', 'എറണാകുളം'] }, then: 'Ernakulam' },
+                                        { case: { $eq: ['$$firstPart', 'തൃശ്ശൂര്‍'] }, then: 'Thrissur' },
+                                        { case: { $eq: ['$$firstPart', 'തൃശ്ശൂർ'] }, then: 'Thrissur' },
+                                        { case: { $eq: ['$$firstPart', 'പാലക്കാട്'] }, then: 'Palakkad' },
+                                        { case: { $eq: ['$$firstPart', 'മലപ്പുറം'] }, then: 'Malappuram' },
+                                        { case: { $eq: ['$$firstPart', 'കോഴിക്കോട്'] }, then: 'Kozhikode' },
+                                        { case: { $eq: ['$$firstPart', 'വയനാട്'] }, then: 'Wayanad' },
+                                        { case: { $eq: ['$$firstPart', 'കണ്ണൂര്‍'] }, then: 'Kannur' },
+                                        { case: { $eq: ['$$firstPart', 'കണ്ണൂർ'] }, then: 'Kannur' },
+                                        { case: { $eq: ['$$firstPart', 'കാസറഗോഡ്'] }, then: 'Kasaragod' },
+                                        { case: { $eq: ['$$firstPart', 'കാസർഗോഡ്'] }, then: 'Kasaragod' }
+                                    ],
+                                    default: '$$firstPart'
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$normalizedDistrict',
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: '$amount' },
+                    totalVoterSlips: { $sum: '$voterCount' },
+                    totalWards: { $addToSet: '$location.ward' },
+                    localBodies: { $addToSet: '$location.localBody' }
+                }
+            },
+            {
+                $project: {
+                    district: '$_id',
+                    totalOrders: 1,
+                    totalRevenue: { $round: ['$totalRevenue', 2] },
+                    totalVoterSlips: 1,
+                    totalWards: { $size: '$totalWards' },
+                    totalLocalBodies: { $size: '$localBodies' },
+                    avgRevenuePerOrder: { 
+                        $round: [{ $divide: ['$totalRevenue', '$totalOrders'] }, 2] 
+                    },
+                    avgSlipsPerOrder: { 
+                        $round: [{ $divide: ['$totalVoterSlips', '$totalOrders'] }, 0] 
+                    }
+                }
+            },
+            {
+                $sort: { [sortBy]: order === 'desc' ? -1 : 1 }
+            }
+        ]);
+
+        // Calculate summary
+        const summary = {
+            totalDistricts: districtStats.length,
+            totalRevenue: districtStats.reduce((sum, d) => sum + d.totalRevenue, 0),
+            totalOrders: districtStats.reduce((sum, d) => sum + d.totalOrders, 0),
+            totalVoterSlips: districtStats.reduce((sum, d) => sum + d.totalVoterSlips, 0),
+            totalWards: districtStats.reduce((sum, d) => sum + d.totalWards, 0),
+            totalLocalBodies: districtStats.reduce((sum, d) => sum + d.totalLocalBodies, 0)
+        };
+
+        summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+
+        res.json({
+            status: 'success',
+            data: {
+                districts: districtStats,
+                summary,
+                filters: {
+                    startDate: startDate || null,
+                    endDate: endDate || null,
+                    sortBy,
+                    order
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Get district report error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch district report',
+            error: error.message
+        });
+    }
+};
+
+// Get Symbol-wise Analytics Report
+export const getSymbolReport = async (req, res) => {
+    try {
+        const { startDate, endDate, sortBy = 'usageCount', order = 'desc' } = req.query;
+
+        // Build date filter
+        const dateFilter = {};
+        if (startDate || endDate) {
+            dateFilter.createdAt = {};
+            if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                dateFilter.createdAt.$lte = end;
+            }
+        }
+
+        // Get all symbols
+        const symbols = await Symbol.find({ isActive: true }).select('name malayalamName imagePath');
+        const symbolMap = {};
+        symbols.forEach(symbol => {
+            symbolMap[symbol._id.toString()] = {
+                name: symbol.name,
+                malayalamName: symbol.malayalamName,
+                imagePath: symbol.imagePath
+            };
+        });
+
+        // Aggregate by symbol
+        const symbolStats = await Order.aggregate([
+            {
+                $match: {
+                    paymentStatus: 'completed',
+                    symbolId: { $exists: true, $ne: null },
+                    ...dateFilter
+                }
+            },
+            {
+                $group: {
+                    _id: '$symbolId',
+                    usageCount: { $sum: 1 },
+                    totalRevenue: { $sum: '$amount' },
+                    totalVoterSlips: { $sum: '$voterCount' },
+                    districts: { $addToSet: '$location.district' },
+                    localBodies: { $addToSet: '$location.localBody' }
+                }
+            },
+            {
+                $project: {
+                    symbolId: '$_id',
+                    usageCount: 1,
+                    totalRevenue: { $round: ['$totalRevenue', 2] },
+                    totalVoterSlips: 1,
+                    districtsCount: { $size: '$districts' },
+                    localBodiesCount: { $size: '$localBodies' },
+                    avgRevenuePerOrder: { 
+                        $round: [{ $divide: ['$totalRevenue', '$usageCount'] }, 2] 
+                    },
+                    avgSlipsPerOrder: { 
+                        $round: [{ $divide: ['$totalVoterSlips', '$usageCount'] }, 0] 
+                    }
+                }
+            },
+            {
+                $sort: { [sortBy]: order === 'desc' ? -1 : 1 }
+            }
+        ]);
+
+        // Enrich with symbol details
+        const enrichedStats = symbolStats.map(stat => ({
+            ...stat,
+            symbolName: symbolMap[stat.symbolId.toString()]?.name || 'Unknown',
+            symbolMalayalamName: symbolMap[stat.symbolId.toString()]?.malayalamName || '',
+            symbolImage: symbolMap[stat.symbolId.toString()]?.imagePath || ''
+        }));
+
+        // Calculate summary
+        const summary = {
+            totalSymbolsUsed: symbolStats.length,
+            totalRevenue: symbolStats.reduce((sum, s) => sum + s.totalRevenue, 0),
+            totalOrders: symbolStats.reduce((sum, s) => sum + s.usageCount, 0),
+            totalVoterSlips: symbolStats.reduce((sum, s) => sum + s.totalVoterSlips, 0),
+            mostUsedSymbol: enrichedStats[0]?.symbolName || 'N/A',
+            highestRevenueSymbol: [...enrichedStats].sort((a, b) => b.totalRevenue - a.totalRevenue)[0]?.symbolName || 'N/A'
+        };
+
+        summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+
+        res.json({
+            status: 'success',
+            data: {
+                symbols: enrichedStats,
+                summary,
+                filters: {
+                    startDate: startDate || null,
+                    endDate: endDate || null,
+                    sortBy,
+                    order
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Get symbol report error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch symbol report',
+            error: error.message
+        });
+    }
+};
+
+// Get Detailed Report for a Specific District
+export const getDistrictDetailedReport = async (req, res) => {
+    try {
+        const { districtName } = req.params;
+        console.log('📍 District Detail Request for:', districtName);
+        const { startDate, endDate, sortBy = 'totalRevenue', order = 'desc' } = req.query;
+
+        // Build date filter
+        const dateFilter = {};
+        if (startDate || endDate) {
+            dateFilter.createdAt = {};
+            if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999);
+                dateFilter.createdAt.$lte = end;
+            }
+        }
+
+        // District name variations for matching
+        const districtVariations = [
+            districtName,
+            `${districtName} / `,  // Matches "Kottayam / കോട്ടയം"
+            new RegExp(`^${districtName}\\s*/`, 'i')  // Case-insensitive with /
+        ];
+
+        // Get local body level aggregation
+        const localBodyStats = await Order.aggregate([
+            {
+                $match: {
+                    paymentStatus: 'completed',
+                    $or: [
+                        { 'location.district': { $regex: `^${districtName}`, $options: 'i' } },
+                        { 'location.district': { $regex: `/${districtName}$`, $options: 'i' } }
+                    ],
+                    ...dateFilter
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        localBody: '$location.localBody',
+                        ward: '$location.ward'
+                    },
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: '$amount' },
+                    totalVoterSlips: { $sum: '$voterCount' },
+                    users: { $addToSet: '$userId' }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id.localBody',
+                    wards: {
+                        $push: {
+                            ward: '$_id.ward',
+                            totalOrders: '$totalOrders',
+                            totalRevenue: '$totalRevenue',
+                            totalVoterSlips: '$totalVoterSlips',
+                            uniqueUsers: { $size: '$users' }
+                        }
+                    },
+                    totalOrders: { $sum: '$totalOrders' },
+                    totalRevenue: { $sum: '$totalRevenue' },
+                    totalVoterSlips: { $sum: '$totalVoterSlips' },
+                    totalWards: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    localBody: '$_id',
+                    wards: 1,
+                    totalOrders: 1,
+                    totalRevenue: { $round: ['$totalRevenue', 2] },
+                    totalVoterSlips: 1,
+                    totalWards: 1,
+                    avgRevenuePerOrder: {
+                        $round: [{ $divide: ['$totalRevenue', '$totalOrders'] }, 2]
+                    },
+                    avgSlipsPerOrder: {
+                        $round: [{ $divide: ['$totalVoterSlips', '$totalOrders'] }, 0]
+                    }
+                }
+            },
+            {
+                $sort: { [sortBy]: order === 'desc' ? -1 : 1 }
+            }
+        ]);
+
+        // Get district summary
+        const districtSummary = await Order.aggregate([
+            {
+                $match: {
+                    paymentStatus: 'completed',
+                    $or: [
+                        { 'location.district': { $regex: `^${districtName}`, $options: 'i' } },
+                        { 'location.district': { $regex: `/${districtName}$`, $options: 'i' } }
+                    ],
+                    ...dateFilter
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: '$amount' },
+                    totalVoterSlips: { $sum: '$voterCount' },
+                    uniqueUsers: { $addToSet: '$userId' },
+                    uniqueWards: { $addToSet: '$location.ward' },
+                    uniqueLocalBodies: { $addToSet: '$location.localBody' },
+                    symbols: { $addToSet: '$symbolId' }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalOrders: 1,
+                    totalRevenue: { $round: ['$totalRevenue', 2] },
+                    totalVoterSlips: 1,
+                    uniqueUsers: { $size: '$uniqueUsers' },
+                    uniqueWards: { $size: '$uniqueWards' },
+                    uniqueLocalBodies: { $size: '$uniqueLocalBodies' },
+                    uniqueSymbols: { $size: '$symbols' },
+                    avgRevenuePerOrder: {
+                        $round: [{ $divide: ['$totalRevenue', '$totalOrders'] }, 2]
+                    },
+                    avgSlipsPerOrder: {
+                        $round: [{ $divide: ['$totalVoterSlips', '$totalOrders'] }, 0]
+                    }
+                }
+            }
+        ]);
+
+        res.json({
+            status: 'success',
+            data: {
+                district: districtName,
+                summary: districtSummary[0] || {},
+                localBodies: localBodyStats,
+                filters: {
+                    startDate: startDate || null,
+                    endDate: endDate || null,
+                    sortBy,
+                    order
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Get district detailed report error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch district detailed report',
+            error: error.message
+        });
+    }
+};
+
 

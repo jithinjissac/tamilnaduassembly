@@ -20,6 +20,9 @@ import {
     regenerateOrderPDF,
     getAnalytics,
     getUserReports,
+    getDistrictReport,
+    getDistrictDetailedReport,
+    getSymbolReport,
     deleteOrder,
     deleteOrders,
     upload,
@@ -66,9 +69,12 @@ router.get('/orders/:orderId/download', downloadOrderPDF);
 router.post('/orders/:orderId/regenerate-pdf', regenerateOrderPDF);
 router.delete('/orders/:orderId', deleteOrder);
 
-// Analytics
+// Analytics & Reports
 router.get('/analytics', getAnalytics);
 router.get('/reports/users', getUserReports);
+router.get('/reports/districts/:districtName/details', getDistrictDetailedReport);
+router.get('/reports/districts', getDistrictReport);
+router.get('/reports/symbols', getSymbolReport);
 
 // User Activity & Session Tracking
 router.get('/users/:userId/activity', getUserActivity);
