@@ -31,7 +31,8 @@ import {
     getSessionDetails,
     getAllActiveSessions,
     getUserActivityLog,
-    getRecentActivity
+    getRecentActivity,
+    updateAdminPassword
 } from '../controllers/adminController.js';
 import auth from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
@@ -83,5 +84,8 @@ router.get('/users/:userId/activity-log', getUserActivityLog);
 router.get('/sessions/:sessionId', getSessionDetails);
 router.get('/sessions', getAllActiveSessions);
 router.get('/activity/recent', getRecentActivity);
+
+// Admin Profile Management
+router.post('/update-password', updateAdminPassword);
 
 export default router;

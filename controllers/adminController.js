@@ -2263,4 +2263,64 @@ export const getDistrictDetailedReport = async (req, res) => {
     }
 };
 
+// Update Admin Password
+export const updateAdminPassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        
+        // Validation
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Current password and new password are required'
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'New password must be at least 6 characters'
+            });
+        }
+        
+        // Get admin user from database
+        const admin = await User.findById(req.user.userId);
+        
+        if (!admin) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Admin user not found'
+            });
+        }
+        
+        // Verify current password
+        const isPasswordValid = await admin.comparePassword(currentPassword);
+        
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Current password is incorrect'
+            });
+        }
+        
+        // Update password
+        admin.password = newPassword;
+        await admin.save();
+        
+        res.json({
+            status: 'success',
+            message: 'Password updated successfully'
+        });
+        
+    } catch (error) {
+        console.error('Update admin password error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to update password',
+            error: error.message
+        });
+    }
+};
+
+
 

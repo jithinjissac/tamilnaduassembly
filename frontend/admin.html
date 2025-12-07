@@ -689,6 +689,8 @@
             <h1>🎛️ Admin Dashboard</h1>
             <div class="header-actions">
                 <span class="user-info" id="adminName">Loading...</span>
+                <a href="/dashboard.html" class="btn btn-success" title="View User Dashboard"><i class="fas fa-user"></i> View as User</a>
+                <button class="btn btn-primary" onclick="showChangePasswordModal()" title="Change Admin Password"><i class="fas fa-key"></i> Change Password</button>
                 <button class="btn btn-logout" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -4357,6 +4359,107 @@ Login to https://easyslip.in to download your PDF.</textarea>
         function logout() {
             localStorage.removeItem('token');
             window.location.href = '/login.html';
+        }
+
+        // Change Password Modal
+        function showChangePasswordModal() {
+            const modalHtml = `
+                <div class="modal-overlay" id="changePasswordModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-key"></i> Change Admin Password</h3>
+                            <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password" required>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password (min 6 characters)" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password" required>
+                            </div>
+                            <div id="passwordError" style="color: #e74c3c; margin-bottom: 1rem; display: none;"></div>
+                            <div id="passwordSuccess" style="color: #10b981; margin-bottom: 1rem; display: none;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="updateAdminPassword()"><i class="fas fa-check"></i> Update Password</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeChangePasswordModal() {
+            const modal = document.getElementById('changePasswordModal');
+            if (modal) modal.remove();
+        }
+
+        async function updateAdminPassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            const errorDiv = document.getElementById('passwordError');
+            const successDiv = document.getElementById('passwordSuccess');
+            
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                errorDiv.textContent = 'All fields are required';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                errorDiv.textContent = 'New password must be at least 6 characters';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'New passwords do not match';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/update-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    successDiv.textContent = 'Password updated successfully!';
+                    successDiv.style.display = 'block';
+                    setTimeout(() => {
+                        closeChangePasswordModal();
+                        showAlert('Password updated successfully!', 'success');
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = data.message || 'Failed to update password';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                errorDiv.textContent = 'Server error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
         }
 
         // Enhanced Manglish to Malayalam Character-by-Character Mapping
