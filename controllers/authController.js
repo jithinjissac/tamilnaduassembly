@@ -356,7 +356,7 @@ export const forgotPassword = [
             await user.save();
 
             // Create reset URL
-            const resetUrl = `${process.env.FRONTEND_URL || 'https://easyslip.in'}/reset-password.html?token=${resetToken}`;
+            const resetUrl = `${process.env.FRONTEND_URL || 'https://easyslip.techiussolutions.in'}/reset-password.html?token=${resetToken}`;
 
             // Send email
             const emailHtml = `
@@ -403,7 +403,7 @@ export const forgotPassword = [
                     <div class="kerala-border" style="height: 4px;"></div>
                     <div class="footer">
                         <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
-                        <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
+                        <p>🌐 <a href="https://easyslip.techiussolutions.in" style="color: #006D3B; text-decoration: none;">https://easyslip.techiussolutions.in</a></p>
                         <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
                     </div>
                     <div class="kerala-border"></div>
