@@ -5,11 +5,19 @@ import path from 'path';
 import fs from 'fs';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
+
+console.log('✅ Core imports loaded');
+
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
 import manualSlipRoutes from './controllers/manualSlipController.js';
+
+console.log('✅ Controller imports loaded');
+
 import { requestLogger, logger } from './utils/logger.js';
+
+console.log('✅ Logger loaded');
 
 // ES Module imports for new modules
 import connectDB from './config/database.js';
@@ -18,19 +26,29 @@ import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
 import slipRoutes from './routes/slips.js';
 import systemRoutes from './routes/system.js';
+
+console.log('✅ Route imports loaded');
+
 import { closeBrowser } from './controllers/slipController.js';
 import { cleanupExpiredPDFs } from './utils/pdfGenerator.js';
 import { startPaymentStatusCron } from './utils/paymentStatusCron.js';
 
+console.log('✅ Service imports loaded');
+
 // Initialize environment variables
 dotenv.config();
+
+console.log('✅ Environment variables initialized');
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+
+console.log(`🚀 Starting server on port ${PORT}...`);
+console.log(`📍 Node environment: ${process.env.NODE_ENV || 'development'}`);
 
 // Database connection moved to after server starts (non-blocking)
 
@@ -426,7 +444,8 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server listening on 0.0.0.0:${PORT}`);
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Log level: ${process.env.LOG_LEVEL || 'info'}`);
   logger.info(`Request logging: Every ${process.env.REQUEST_LOG_INTERVAL || 10}th request`);
@@ -436,6 +455,7 @@ app.listen(PORT, () => {
   setImmediate(async () => {
     try {
       await connectDB();
+      console.log('✅ Database connected');
       logger.info('Database connected successfully');
       
       // Start database-dependent services after DB is ready
@@ -465,6 +485,15 @@ app.listen(PORT, () => {
   });
 });
 
+// Handle server startup errors
+server.on('error', (err) => {
+  console.error('❌ Server failed to start:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+  }
+  process.exit(1);
+});
+
 // Graceful shutdown
 process.on('SIGINT', async () => {
   logger.info('Shutting down gracefully...');
@@ -476,6 +505,17 @@ process.on('SIGTERM', async () => {
   logger.info('Shutting down gracefully...');
   await closeBrowser();
   process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+  logger.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error('Unhandled Rejection:', reason);
 });
 
 // Auto-restart on uncaught exceptions (browser crashes, etc.)

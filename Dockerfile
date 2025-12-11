@@ -37,8 +37,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies with optimizations
-RUN npm ci --only=production --no-audit --no-fund \
+# Use --ignore-scripts first to avoid long postinstall during build
+RUN npm ci --only=production --no-audit --no-fund --ignore-scripts \
     && npm cache clean --force
+
+# Install Playwright browsers separately (this is cached in Docker layer)
+RUN npx playwright install chromium --with-deps
 
 # Copy application code
 COPY . .
