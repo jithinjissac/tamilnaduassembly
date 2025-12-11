@@ -1,0 +1,72 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage
+.nyc_output
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Generated files
+generated-pdfs/*
+uploads/*
+public/captcha-cache/*
+public/debug-screenshots/*
+public/temp-pdfs/*
+
+# Misc
+.cache
+.temp
+tmp
+temp
+
+# Docker
+Dockerfile*
+docker-compose*
+
+# Scripts
+*.sh
+delete-orders-after-nov.js
+check-*.js
+create-*.js
+debug-*.js
+clear-*.js
+complete-*.js
+decode-*.js
+diagnose-*.js

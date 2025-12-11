@@ -3,14 +3,15 @@ import mongoose from 'mongoose';
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas', {
-            // Connection pool settings for 20 concurrent users
-            maxPoolSize: 25,          // Maximum connections in pool (25 for 20 users + buffer)
-            minPoolSize: 5,           // Minimum connections to maintain
+            // Connection pool settings optimized for Cloud Run
+            maxPoolSize: 10,          // Reduced for faster connection
+            minPoolSize: 2,           // Minimum connections
             maxIdleTimeMS: 30000,     // Close idle connections after 30s
             
-            // Timeout settings
-            serverSelectionTimeoutMS: 5000,  // Timeout for initial connection (5s)
-            socketTimeoutMS: 45000,          // Socket timeout (45s)
+            // Aggressive timeout settings for fast startup
+            serverSelectionTimeoutMS: 3000,  // Reduced to 3s
+            connectTimeoutMS: 3000,          // Connection timeout 3s
+            socketTimeoutMS: 30000,          // Socket timeout 30s
             
             // Retry settings
             retryWrites: true,
@@ -24,23 +25,27 @@ const connectDB = async () => {
         });
         
         console.log('✅ MongoDB Connected Successfully');
-        console.log(`📊 Connection Pool: Max ${25} connections (optimized for 20+ concurrent users)`);
+        console.log(`📊 Connection Pool: Max ${10} connections`);
         
-        // Log slow queries (queries taking more than 100ms)
-        mongoose.set('debug', (collectionName, method, query, doc) => {
-            const threshold = 100; // ms
-            const start = Date.now();
-            setImmediate(() => {
-                const duration = Date.now() - start;
-                if (duration > threshold) {
-                    console.warn(`⚠️ Slow Query (${duration}ms): ${collectionName}.${method}`, JSON.stringify(query));
-                }
+        // Disable debug logging in production for performance
+        if (process.env.NODE_ENV !== 'production') {
+            // Log slow queries (queries taking more than 100ms)
+            mongoose.set('debug', (collectionName, method, query, doc) => {
+                const threshold = 100; // ms
+                const start = Date.now();
+                setImmediate(() => {
+                    const duration = Date.now() - start;
+                    if (duration > threshold) {
+                        console.warn(`⚠️ Slow Query (${duration}ms): ${collectionName}.${method}`, JSON.stringify(query));
+                    }
+                });
             });
-        });
+        }
         
     } catch (error) {
         console.error('❌ MongoDB Connection Error:', error.message);
-        process.exit(1);
+        // Don't exit process in Cloud Run - let server continue for health checks
+        throw error;
     }
 };
 

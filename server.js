@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
@@ -31,63 +32,67 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to database
-connectDB();
+// Database connection moved to after server starts (non-blocking)
 
-// Log browser automation setup
-console.log('\n🎭 Browser Automation Setup:');
-try {
-  const { execSync } = await import('child_process');
-  
-  // Check Playwright
+// Log browser automation setup (completely non-blocking - deferred)
+setTimeout(async () => {
+  console.log('\n🎭 Browser Automation Setup:');
   try {
-    const playwrightVersion = execSync('npx playwright --version', { encoding: 'utf8' }).trim();
-    console.log(`  ✅ Playwright: ${playwrightVersion}`);
-  } catch (e) {
-    console.log('  ⚠️ Playwright: Not installed or not in PATH');
-  }
-  
-  // Check Puppeteer
-  try {
-    const puppeteer = await import('puppeteer');
-    console.log(`  ✅ Puppeteer: v${puppeteer.default._launcher?._preferredRevision || 'installed'}`);
-  } catch (e) {
-    console.log('  ⚠️ Puppeteer: Not available');
-  }
-  
-  // Check Chromium browser
-  try {
-    const browserCheck = execSync('which chromium || which chromium-browser || which google-chrome || echo "checking..."', { 
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'ignore']
-    }).trim();
-    if (browserCheck && browserCheck !== 'checking...') {
-      console.log(`  ✅ Chromium browser: Found at ${browserCheck}`);
-    } else {
+    const { execSync } = await import('child_process');
+    
+    // Check Playwright
+    try {
+      const playwrightVersion = execSync('npx playwright --version', { encoding: 'utf8', timeout: 1000 }).trim();
+      console.log(`  ✅ Playwright: ${playwrightVersion}`);
+    } catch (e) {
+      console.log('  ⚠️ Playwright: Not installed or not in PATH');
+    }
+    
+    // Check Puppeteer
+    try {
+      const puppeteer = await import('puppeteer');
+      console.log(`  ✅ Puppeteer: v${puppeteer.default._launcher?._preferredRevision || 'installed'}`);
+    } catch (e) {
+      console.log('  ⚠️ Puppeteer: Not available');
+    }
+    
+    // Check Chromium browser
+    try {
+      const browserCheck = execSync('which chromium || which chromium-browser || which google-chrome || echo "checking..."', { 
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+        timeout: 1000
+      }).trim();
+      if (browserCheck && browserCheck !== 'checking...') {
+        console.log(`  ✅ Chromium browser: Found at ${browserCheck}`);
+      } else {
+        console.log('  📦 Chromium browser: Using Playwright bundled version');
+      }
+    } catch (e) {
       console.log('  📦 Chromium browser: Using Playwright bundled version');
     }
-  } catch (e) {
-    console.log('  📦 Chromium browser: Using Playwright bundled version');
+    
+    console.log('  🌐 Proxy configured:', process.env.USE_PROXY === 'true' ? process.env.PROXY_SERVER : 'disabled');
+  } catch (error) {
+    console.log('  ⚠️ Could not check browser automation tools');
   }
-  
-  console.log('  🌐 Proxy configured:', process.env.USE_PROXY === 'true' ? process.env.PROXY_SERVER : 'disabled');
-} catch (error) {
-  console.log('  ⚠️ Could not check browser automation tools');
-}
-console.log('');
+  console.log('');
+}, 0);
 
-// Ensure required directories exist on startup (important for Railway)
+// Ensure required directories exist on startup (non-blocking)
 const requiredDirs = [
   path.join(__dirname, 'public', 'captcha-cache'),
   path.join(__dirname, 'public', 'debug-screenshots'),
   path.join(__dirname, 'public', 'temp-pdfs')
 ];
 
-requiredDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-    console.log(`✅ Created directory: ${path.relative(__dirname, dir)}`);
-  }
+setImmediate(() => {
+  requiredDirs.forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`✅ Created directory: ${path.relative(__dirname, dir)}`);
+    }
+  });
 });
 
 // Middleware
@@ -320,9 +325,30 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Health check
+// Optimized health check endpoint (no DB check for fast response)
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Kerala SEC Voter Slip SaaS is running' });
+  res.status(200).json({ 
+    status: 'OK', 
+    uptime: process.uptime(),
+    timestamp: Date.now()
+  });
+});
+
+// Readiness check (includes DB status)
+app.get('/ready', (req, res) => {
+  const dbReady = mongoose.connection.readyState === 1;
+  if (dbReady) {
+    res.status(200).json({ 
+      status: 'ready', 
+      database: 'connected',
+      uptime: process.uptime() 
+    });
+  } else {
+    res.status(503).json({ 
+      status: 'not ready', 
+      database: 'disconnected' 
+    });
+  }
 });
 
 // Debug endpoint to check captcha directory status
@@ -405,26 +431,38 @@ app.listen(PORT, () => {
   logger.info(`Log level: ${process.env.LOG_LEVEL || 'info'}`);
   logger.info(`Request logging: Every ${process.env.REQUEST_LOG_INTERVAL || 10}th request`);
   
-  // Cleanup expired PDFs on startup
-  logger.info('Running initial PDF cleanup...');
-  cleanupExpiredPDFs();
-  
-  // Periodic cleanup every 10 minutes
-  setInterval(() => {
-    cleanupExpiredPDFs();
-  }, 10 * 60 * 1000);
-  
-  // Cleanup inactive sessions every 5 minutes
-  setInterval(() => {
-    cleanupInactiveSessions();
-  }, 5 * 60 * 1000);
-  
-  // Run initial session cleanup
-  cleanupInactiveSessions();
-  
-  // Start payment status cron job
-  logger.info('Starting payment status verification cron job...');
-  startPaymentStatusCron();
+  // Connect to database AFTER server starts listening (non-blocking)
+  logger.info('Connecting to database...');
+  setImmediate(async () => {
+    try {
+      await connectDB();
+      logger.info('Database connected successfully');
+      
+      // Start database-dependent services after DB is ready
+      logger.info('Running initial PDF cleanup...');
+      cleanupExpiredPDFs();
+      
+      // Run initial session cleanup
+      cleanupInactiveSessions();
+      
+      // Start payment status cron job
+      logger.info('Starting payment status verification cron job...');
+      startPaymentStatusCron();
+      
+      // Periodic cleanup every 10 minutes
+      setInterval(() => {
+        cleanupExpiredPDFs();
+      }, 10 * 60 * 1000);
+      
+      // Cleanup inactive sessions every 5 minutes
+      setInterval(() => {
+        cleanupInactiveSessions();
+      }, 5 * 60 * 1000);
+      
+    } catch (error) {
+      logger.error('Failed to connect to database:', error);
+    }
+  });
 });
 
 // Graceful shutdown

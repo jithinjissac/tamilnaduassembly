@@ -1,10 +1,10 @@
-# Dockerfile for Kerala SEC Voter API with Playwright
+# Dockerfile for Kerala SEC Voter API with Playwright - Optimized for Cloud Run
 
-FROM node:20-bullseye
+FROM node:20-bullseye-slim
 
-# Install Playwright dependencies AND Noto Sans fonts for Malayalam support
-RUN apt-get update && apt-get install -y \
-    # Playwright/Chromium dependencies
+# Install only essential Playwright dependencies and Malayalam fonts
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Core Chromium dependencies (minimal set)
     libnss3 \
     libnspr4 \
     libatk1.0-0 \
@@ -22,32 +22,36 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libasound2 \
     libatspi2.0-0 \
-    # Noto Sans fonts for Malayalam/Indic languages
+    # Essential fonts only
     fonts-noto-core \
-    fonts-noto-ui-core \
-    fonts-noto-cjk \
     fonts-liberation \
     fontconfig \
     && fc-cache -fv \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better layer caching
 COPY package*.json ./
 
-# Install dependencies (postinstall will install Playwright)
-RUN npm ci --only=production
+# Install dependencies with optimizations
+RUN npm ci --only=production --no-audit --no-fund \
+    && npm cache clean --force
 
 # Copy application code
 COPY . .
 
 # Create directories for PDFs and uploads
-RUN mkdir -p generated-pdfs uploads
+RUN mkdir -p generated-pdfs uploads public/captcha-cache public/debug-screenshots public/temp-pdfs
+
+# Set environment variables for Cloud Run
+ENV PORT=8080 \
+    NODE_ENV=production
 
 # Expose port
-EXPOSE 3000
+EXPOSE 8080
 
 # Start application
 CMD ["node", "server.js"]
