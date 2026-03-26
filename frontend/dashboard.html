@@ -686,18 +686,24 @@ s0.parentNode.insertBefore(s1,s0);
     <div class="container">
          <!-- Action Section -->
         <div class="action-section">
-            <h2>Create New Voter Slips</h2>
+            <h2 id="actionTitle">Create New Voter Slips</h2>
             <p>Generate customized voter slips for your election campaign</p>
             <br>
-            <div class="btn-group">
-                <a href="create-slip.html" class="btn btn-create">
+            <div class="btn-group" id="actionButtons">
+                <!-- Local Body buttons (default) -->
+                <a href="create-slip.html" class="btn btn-create" id="btnLocalBody">
                     <i class="fas fa-plus"></i> Create New Slip
                     <span class="btn-label">ഒരു ചിഹ്നം മാത്രം</span>
                 </a>
-                <a href="create-multi-slip.html" class="btn btn-multi">
+                <a href="create-multi-slip.html" class="btn btn-multi" id="btnMultiSymbol">
                     <i class="fas fa-layer-group"></i> Multi-Symbol Slip
                     <span class="btn-label">ഒരു സ്ലിപ്പിൽ മൂന്ന് ചിഹ്നം വരെ</span>
                     <span class="new-badge">NEW</span>
+                </a>
+                <!-- Assembly button (hidden by default) -->
+                <a href="assembly-slips.html" class="btn btn-create" id="btnAssembly" style="display: none;">
+                    <i class="fas fa-landmark"></i> Create Assembly Slip
+                    <span class="btn-label">നിയമസഭാ തിരഞ്ഞെടുപ്പ് സ്ലിപ്പ്</span>
                 </a>
                 <a href="payment-status.html" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
                     <i class="fas fa-search-dollar"></i> Verify Payment
@@ -788,6 +794,42 @@ s0.parentNode.insertBefore(s1,s0);
     <script>
         let allOrders = [];
         let currentFilter = 'all';
+        let primaryModule = 'local-body'; // default
+
+        // Fetch primary election module setting
+        async function loadElectionModule() {
+            try {
+                const response = await fetch('/api/settings/election-module');
+                if (response.ok) {
+                    const data = await response.json();
+                    primaryModule = data.settings?.primaryElectionModule || 'local-body';
+                }
+            } catch (e) {
+                console.warn('Could not fetch election module setting, using default');
+            }
+            applyModuleUI();
+        }
+
+        function applyModuleUI() {
+            const btnLocalBody = document.getElementById('btnLocalBody');
+            const btnMultiSymbol = document.getElementById('btnMultiSymbol');
+            const btnAssembly = document.getElementById('btnAssembly');
+            const actionTitle = document.getElementById('actionTitle');
+
+            if (primaryModule === 'assembly') {
+                // Assembly mode
+                btnLocalBody.style.display = 'none';
+                btnMultiSymbol.style.display = 'none';
+                btnAssembly.style.display = '';
+                actionTitle.textContent = 'Create Assembly Voter Slips';
+            } else {
+                // Local body mode (default)
+                btnLocalBody.style.display = '';
+                btnMultiSymbol.style.display = '';
+                btnAssembly.style.display = 'none';
+                actionTitle.textContent = 'Create New Voter Slips';
+            }
+        }
 
         // Check authentication
         const token = localStorage.getItem('token');
@@ -855,7 +897,10 @@ s0.parentNode.insertBefore(s1,s0);
         // Load stats
         async function loadStats() {
             try {
-                const response = await fetch('/api/orders/stats/summary', {
+                const statsEndpoint = primaryModule === 'assembly' 
+                    ? '/api/assembly/orders/stats/summary' 
+                    : '/api/orders/stats/summary';
+                const response = await fetch(statsEndpoint, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -876,7 +921,10 @@ s0.parentNode.insertBefore(s1,s0);
         // Load orders
         async function loadOrders() {
             try {
-                const response = await fetch('/api/orders', {
+                const ordersEndpoint = primaryModule === 'assembly' 
+                    ? '/api/assembly/orders' 
+                    : '/api/orders';
+                const response = await fetch(ordersEndpoint, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -922,7 +970,12 @@ s0.parentNode.insertBefore(s1,s0);
 
             const cardsHTML = `
                 <div class="orders-grid">
-                    ${filteredOrders.map(order => `
+                    ${filteredOrders.map(order => {
+                        const locationLine1 = order.location?.wardName || order.location?.ward || order.constituency || '-';
+                        const locationLine2 = order.location?.localBodyName || order.location?.localBody || order.district || '-';
+                        const voters = order.voterCount || order.totalVoters || 0;
+                        const amount = order.amount || 0;
+                        return `
                         <div class="order-card">
                             <div class="order-card-header">
                                 <div>
@@ -937,18 +990,18 @@ s0.parentNode.insertBefore(s1,s0);
                             
                             <div class="order-card-body">
                                 <div class="order-location">
-                                    <div class="order-location-name"><i class="fas fa-map-marker-alt"></i> ${order.location.wardName || order.location.ward || '-'}</div>
-                                    <div class="order-location-body">${order.location.localBodyName || order.location.localBody || '-'}</div>
+                                    <div class="order-location-name"><i class="fas fa-map-marker-alt"></i> ${locationLine1}</div>
+                                    <div class="order-location-body">${locationLine2}</div>
                                 </div>
                                 
                                 <div class="order-info-row">
                                     <span class="order-info-label"><i class="fas fa-users"></i> Voters</span>
-                                    <span class="order-info-value">${order.voterCount}</span>
+                                    <span class="order-info-value">${voters}</span>
                                 </div>
                                 
                                 <div class="order-info-row">
                                     <span class="order-info-label"><i class="fas fa-rupee-sign"></i> Amount</span>
-                                    <span class="order-info-value" style="color: var(--kerala-green); font-size: 1.1rem;">₹${order.amount.toFixed(2)}</span>
+                                    <span class="order-info-value" style="color: var(--kerala-green); font-size: 1.1rem;">₹${amount.toFixed(2)}</span>
                                 </div>
                             </div>
                             
@@ -964,7 +1017,7 @@ s0.parentNode.insertBefore(s1,s0);
                                 }
                             </div>
                         </div>
-                    `).join('')}
+                    `;}).join('')}
                 </div>
             `;
 
@@ -1136,50 +1189,79 @@ s0.parentNode.insertBefore(s1,s0);
                     return;
                 }
 
-                const response = await fetch(`/api/slips/download/${orderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `voter-slips-${orderId}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
+                let blob;
+                const isAsm = orderId.startsWith('ASM-');
+                
+                if (isAsm) {
+                    // Assembly order: find previewId from the order, then generate PDF
+                    const orderResp = await fetch(`/api/assembly/orders/${orderId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!orderResp.ok) throw new Error('Failed to load order');
+                    const orderResult = await orderResp.json();
+                    const order = orderResult.order || orderResult;
                     
-                    // Track PDF download
-                    if (window.trackActivity) {
-                        window.trackActivity('pdf_downloaded', {
-                            orderId: orderId,
-                            fileName: `voter-slips-${orderId}.pdf`
-                        });
-                    }
+                    const genResp = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ previewId: order.previewId })
+                    });
+                    if (!genResp.ok) throw new Error('Failed to generate assembly PDF');
+                    const genData = await genResp.json();
+                    if (!genData.success || !genData.downloadUrl) throw new Error('Failed to generate assembly PDF');
+                    
+                    const pdfResp = await fetch(genData.downloadUrl);
+                    if (!pdfResp.ok) throw new Error('Failed to download PDF');
+                    blob = await pdfResp.blob();
                 } else {
-                    // Parse error response to show actual error
-                    try {
-                        const errorData = await response.json();
-                        console.error('Download error response:', errorData);
-                        
-                        if (response.status === 401) {
-                            alert('Session expired. Please login again.');
-                            window.location.href = 'login.html';
-                        } else if (response.status === 403) {
-                            alert(errorData.message || 'Download not allowed. Please complete payment.');
-                        } else if (response.status === 404) {
-                            alert('Order not found.');
-                        } else {
-                            alert(errorData.message || 'Download failed. Please try again.');
+                    const response = await fetch(`/api/slips/download/${orderId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
                         }
-                    } catch (parseError) {
-                        console.error('Error parsing response:', parseError);
-                        alert(`Download failed (${response.status}). Please try again.`);
+                    });
+
+                    if (!response.ok) {
+                        try {
+                            const errorData = await response.json();
+                            console.error('Download error response:', errorData);
+                            
+                            if (response.status === 401) {
+                                alert('Session expired. Please login again.');
+                                window.location.href = 'login.html';
+                            } else if (response.status === 403) {
+                                alert(errorData.message || 'Download not allowed. Please complete payment.');
+                            } else if (response.status === 404) {
+                                alert('Order not found.');
+                            } else {
+                                alert(errorData.message || 'Download failed. Please try again.');
+                            }
+                        } catch (parseError) {
+                            console.error('Error parsing response:', parseError);
+                            alert(`Download failed (${response.status}). Please try again.`);
+                        }
+                        return;
                     }
+                    blob = await response.blob();
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // Track PDF download
+                if (window.trackActivity) {
+                    window.trackActivity('pdf_downloaded', {
+                        orderId: orderId,
+                        fileName: `voter-slips-${orderId}.pdf`
+                    });
                 }
             } catch (error) {
                 console.error('Download error:', error);
@@ -1256,11 +1338,14 @@ s0.parentNode.insertBefore(s1,s0);
         (async function initializeDashboard() {
             console.log('🚀 Initializing dashboard - loading data first...');
             
-            // Load user data and stats in parallel (both needed for UI)
+            // Load election module setting and user data first (stats + orders depend on module)
             await Promise.all([
-                loadUserData(),
-                loadStats()
+                loadElectionModule(),
+                loadUserData()
             ]);
+            
+            // Now load stats and orders (these depend on primaryModule being set)
+            await loadStats();
             
             console.log('✅ User data and stats loaded');
             

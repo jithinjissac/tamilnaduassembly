@@ -241,15 +241,41 @@
         <div class="error-message" id="errorMessage"></div>
 
         <div class="tabs">
-            <div class="tab active" data-category="pdf">PDF Generation</div>
+            <div class="tab active" data-category="general">General</div>
+            <div class="tab" data-category="pdf">PDF Generation</div>
             <div class="tab" data-category="slip">Slip Design</div>
             <div class="tab" data-category="email">Email & Notifications</div>
             <div class="tab" data-category="security">Security & Rate Limiting</div>
             <div class="tab" data-category="analytics">Analytics & Monitoring</div>
         </div>
 
+        <!-- General Settings Panel -->
+        <div class="settings-panel active" id="general-panel">
+            <div class="setting-group">
+                <h3>Election Module</h3>
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                    Choose which election module users see as the primary dashboard. This controls the default action buttons and navigation for all users.
+                </p>
+                <div class="setting-item">
+                    <label>
+                        Primary Election Module
+                        <small>Controls which module users see on their dashboard</small>
+                    </label>
+                    <select id="general-primaryElectionModule">
+                        <option value="local-body">Local Body Election (തദ്ദേശ തിരഞ്ഞെടുപ്പ്)</option>
+                        <option value="assembly">Assembly Election (നിയമസഭാ തിരഞ്ഞെടുപ്പ്)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings('general')">Save General Settings</button>
+                <button class="btn btn-secondary" onclick="resetSettings('general')">Reset to Defaults</button>
+            </div>
+        </div>
+
         <!-- PDF Settings Panel -->
-        <div class="settings-panel active" id="pdf-panel">
+        <div class="settings-panel" id="pdf-panel">
             <div class="setting-group">
                 <h3>Preview Settings</h3>
                 <div class="setting-item">
@@ -789,7 +815,7 @@
 
     <script>
         const API_BASE = '/api/settings';
-        let currentCategory = 'pdf';
+        let currentCategory = 'general';
 
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -968,7 +994,7 @@
         }
 
         // Load initial settings
-        loadSettings('pdf');
+        loadSettings('general');
     </script>
 </body>
 </html>

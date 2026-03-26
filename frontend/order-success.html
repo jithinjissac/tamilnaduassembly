@@ -536,7 +536,10 @@ s0.parentNode.insertBefore(s1,s0);
                 const currentUserId = profileData.user._id;
                 const isAdmin = profileData.user.role === 'admin';
 
-                const orderResponse = await fetch(`/api/orders/${orderId}`, {
+                const orderEndpoint = orderId.startsWith('ASM-') 
+                    ? `/api/assembly/orders/${orderId}` 
+                    : `/api/orders/${orderId}`;
+                const orderResponse = await fetch(orderEndpoint, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -967,7 +970,8 @@ Please assist me.`;
                 console.log('Token present:', !!token);
                 
                 // Add cache-busting to ensure fresh data after payment
-                const response = await fetch(`/api/orders/${orderId}?_t=${Date.now()}`, {
+                const orderApiPath = orderId.startsWith('ASM-') ? `/api/assembly/orders/${orderId}` : `/api/orders/${orderId}`;
+                const response = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -1007,7 +1011,7 @@ Please assist me.`;
                     if (verified) {
                         // Reload order data to get updated status
                         console.log('✅ Payment verified, reloading order data...');
-                        const reloadResponse = await fetch(`/api/orders/${orderId}?_t=${Date.now()}`, {
+                        const reloadResponse = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
                             headers: {
                                 'Authorization': `Bearer ${token}`,
                                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -1025,8 +1029,20 @@ Please assist me.`;
                 // Display order details
                 displayOrderDetails(orderData);
 
-                // Start checking PDF generation status
-                checkPDFStatus();
+                // For ASM orders, PDF is already generated - just enable download
+                if (orderId.startsWith('ASM-')) {
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (orderData.pdfPath && orderData.pdfGenerated) {
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    } else {
+                        downloadBtn.disabled = true;
+                        downloadBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> PDF Not Available';
+                    }
+                } else {
+                    // Start checking PDF generation status (local body only)
+                    checkPDFStatus();
+                }
 
             } catch (error) {
                 console.error('Error loading order:', error);
@@ -1203,12 +1219,23 @@ Please assist me.`;
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
 
-                const response = await fetch(`/api/slips/download/${orderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    signal: controller.signal
-                });
+                let response;
+                if (orderId.startsWith('ASM-')) {
+                    // Assembly order: download pre-generated PDF directly
+                    response = await fetch(`/api/assembly/orders/${orderId}/download`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        signal: controller.signal
+                    });
+                } else {
+                    response = await fetch(`/api/slips/download/${orderId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        signal: controller.signal
+                    });
+                }
 
                 clearTimeout(timeoutId);
 
@@ -1265,15 +1292,12 @@ Please assist me.`;
                 const downloadBtn = document.getElementById('downloadBtn');
                 
                 if (error.name === 'AbortError') {
-                    showMessage('error', 'Download Timeout', 'Download is taking too long. Attempting to regenerate PDF...');
-                    // Try to regenerate PDF
-                    await regeneratePDF();
+                    showMessage('error', 'Download Timeout', 'Download is taking too long. Please try again.');
                 } else {
-                    showMessage('error', 'Download Failed', 'Attempting to regenerate PDF...');
-                    // Try to regenerate PDF on any download failure
-                    await regeneratePDF();
+                    showMessage('error', 'Download Failed', error.message || 'Please try again or contact support.');
                 }
                 
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Try Again';
                 downloadBtn.disabled = false;
             } finally {
                 document.getElementById('downloadLoading').classList.remove('show');
@@ -1432,29 +1456,27 @@ Please assist me.`;
                 return;
             }
 
-            // Get order data from URL params if available (passed from payment success)
-            const urlOrderData = urlParams.get('orderData');
-            console.log('URL order data present:', !!urlOrderData);
-            
-            if (urlOrderData) {
+            // Read lightweight order snapshot from session storage, if present.
+            const cacheKey = `order-success:${orderId}`;
+            const cachedOrderData = sessionStorage.getItem(cacheKey);
+            console.log('Session cached order data present:', !!cachedOrderData);
+
+            if (cachedOrderData) {
                 try {
-                    // Decode and parse order data from URL
-                    const decodedData = JSON.parse(decodeURIComponent(urlOrderData));
-                    orderData = decodedData;
-                    console.log('Parsed order data from URL:', orderData);
-                    // Display immediately for faster perceived performance
+                    orderData = JSON.parse(cachedOrderData);
+                    console.log('Parsed cached order data from sessionStorage:', orderData);
                     displayOrderDetails(orderData);
                 } catch (e) {
-                    console.error('Failed to parse URL order data:', e);
-                    // Fall back to loading from API
-                    console.log('Falling back to API load...');
-                    loadOrderDetails();
+                    console.error('Failed to parse cached order data:', e);
+                } finally {
+                    // One-time cache; always remove to avoid stale UI on refresh.
+                    sessionStorage.removeItem(cacheKey);
                 }
-            } else {
-                // Load order details from API
-                console.log('Loading order details from API...');
-                loadOrderDetails();
             }
+
+            // Always refresh from API to ensure authoritative payment/order state.
+            console.log('Loading order details from API...');
+            loadOrderDetails();
         })();
 
         // Auto-trigger confetti effect (optional)

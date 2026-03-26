@@ -974,18 +974,25 @@ s0.parentNode.insertBefore(s1,s0);
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
+        const previewMode = urlParams.get('mode');
+        const assemblyPreviewId = urlParams.get('previewId');
+        // Assembly order: either legacy mode=assembly or orderId starts with ASM-
+        const isAssemblyPreview = previewMode === 'assembly' || (orderId && orderId.startsWith('ASM-'));
+        const isAssemblyOrder = orderId && orderId.startsWith('ASM-');
         const token = localStorage.getItem('token');
         let orderData = null;
         let razorpayKeyId = '';
         let isAdmin = false;
+        let assemblyPreviewData = null;
         
         // Station pagination state
         let pollingStations = [];
         let currentStationIndex = 0;
         let currentStationPdfUrl = null;
 
-        if (!token) {
+        if (!token && !(isAssemblyPreview && !isAssemblyOrder)) {
             // Save the intended destination with query params before redirecting to login
+            // Assembly orders (ASM-) need auth; legacy assembly preview (mode=assembly&previewId) does not
             sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
             window.location.href = 'login.html';
         }
@@ -1154,7 +1161,9 @@ s0.parentNode.insertBefore(s1,s0);
         }
 
         // Call checkUserRole before loading order
-        checkUserRole();
+        if ((!isAssemblyPreview || isAssemblyOrder) && token) {
+            checkUserRole();
+        }
 
         // Function to show messages on page
         function showMessage(type, title, text, redirectUrl = null, delay = 3000) {
@@ -1221,8 +1230,413 @@ s0.parentNode.insertBefore(s1,s0);
             }
         }
 
-        if (!orderId) {
+        if (!orderId && !(isAssemblyPreview && !isAssemblyOrder)) {
             showMessage('error', 'Order ID Not Found', 'Redirecting back to dashboard...', 'dashboard.html', 3000);
+        }
+
+        async function initializeAssemblyPreviewPage() {
+            try {
+                // NEW: Order-based flow (ASM- orderId) — same lifecycle as local body
+                if (isAssemblyOrder) {
+                    return await initializeAssemblyOrderPage();
+                }
+
+                // LEGACY: Preview-only flow (mode=assembly&previewId) for backward compat
+                if (assemblyPreviewId) {
+                    const previewResponse = await fetch(`/api/assembly/preview/${encodeURIComponent(assemblyPreviewId)}`);
+                    const previewResult = await previewResponse.json().catch(() => ({}));
+
+                    if (!previewResponse.ok || !previewResult.data) {
+                        throw new Error(previewResult.message || 'Preview data not found or expired');
+                    }
+
+                    assemblyPreviewData = previewResult.data;
+                } else {
+                    // Backward compatibility fallback for old links/flows
+                    const payload = sessionStorage.getItem('assemblyPreviewData');
+                    if (!payload) {
+                        showMessage('error', 'Preview Data Missing', 'Please extract assembly data again.', 'assembly-slips.html', 3000);
+                        return;
+                    }
+                    assemblyPreviewData = JSON.parse(payload);
+                }
+
+                const voters = Array.isArray(assemblyPreviewData.voters) ? assemblyPreviewData.voters : [];
+                const candidate = assemblyPreviewData.candidate || { symbol: '', symbolName: '' };
+                const extracted = assemblyPreviewData.extractedData || {};
+                const selectedParts = Array.isArray(assemblyPreviewData.selectedParts) ? assemblyPreviewData.selectedParts : [];
+
+                // Keep the same preview.html layout but map assembly fields into existing slots
+                document.querySelector('.page-title').textContent = 'Preview & Payment';
+                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter slips before download';
+
+                const toggleBlock = document.querySelector('input[name="previewSlipsPerPage"]');
+                if (toggleBlock) {
+                    const block = toggleBlock.closest('div[style*="background: #f8f9fa"]');
+                    if (block) block.style.display = 'none';
+                }
+
+                const stationPagination = document.getElementById('stationPagination');
+                if (stationPagination) stationPagination.style.display = 'none';
+
+                document.getElementById('displayOrderId').textContent = assemblyPreviewData.orderId || '-';
+                document.getElementById('displayPartyName').textContent = candidate.symbolName || (candidate.symbol ? 'Selected Symbol' : 'No Symbol');
+                document.getElementById('displayDistrict').textContent = extracted.district || '-';
+                document.getElementById('displayLocalBody').textContent = extracted.constituency || '-';
+                document.getElementById('displayWard').textContent = `${selectedParts.length} selected part(s)`;
+                document.getElementById('displayPollingStation').textContent = selectedParts[0]?.partName || '-';
+
+                const totalVoters = voters.length;
+                const pricePerVoter = 0.5;
+                const totalAmount = totalVoters * pricePerVoter;
+                document.getElementById('totalVoters').textContent = totalVoters;
+                document.getElementById('pricePerVoter').textContent = `₹${pricePerVoter.toFixed(2)}`;
+                document.getElementById('totalAmount').textContent = `₹${totalAmount.toFixed(2)}`;
+                document.getElementById('payBtnText').textContent = `Pay ₹${totalAmount.toFixed(2)} & Download`;
+                document.getElementById('paymentBtn').disabled = false;
+
+                const previewContainer = document.getElementById('previewContainer');
+                previewContainer.style.display = 'block';
+                previewContainer.style.alignItems = 'stretch';
+                previewContainer.style.justifyContent = 'flex-start';
+                previewContainer.style.padding = '0';
+                previewContainer.style.background = 'transparent';
+                previewContainer.innerHTML = `
+                    <div class="loading-preview">
+                        <div class="spinner"></div>
+                        <p>Generating assembly preview PDF...</p>
+                    </div>
+                `;
+
+                const previewResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        previewId: assemblyPreviewId,
+                        previewOnly: true
+                    })
+                });
+
+                if (!previewResponse.ok) {
+                    const errorData = await previewResponse.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to generate assembly preview PDF');
+                }
+
+                const previewData = await previewResponse.json();
+                if (!previewData.success || !previewData.pdfUrl) {
+                    throw new Error(previewData.message || 'Failed to generate assembly preview PDF');
+                }
+
+                const pdfResponse = await fetch(previewData.pdfUrl);
+                if (!pdfResponse.ok) {
+                    throw new Error('Failed to load assembly preview PDF');
+                }
+
+                const pdfBlob = await pdfResponse.blob();
+                const pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                window.currentPdfBlobUrl = pdfBlobUrl;
+                await displayPDF(pdfBlobUrl, previewContainer);
+
+                const previewNote = document.getElementById('previewNote');
+                if (previewNote) {
+                    previewNote.innerHTML = `<strong>Note:</strong> This is a preview PDF for your assembly slips. Download the complete PDF after payment.`;
+                }
+            } catch (error) {
+                console.error('Assembly preview initialization failed:', error);
+                showMessage('error', 'Preview Error', 'Could not load assembly preview data.', 'assembly-slips.html', 3000);
+            }
+        }
+
+        // NEW: Assembly order-based flow (mirrors local body loadOrderAndPreview)
+        async function initializeAssemblyOrderPage() {
+            try {
+                console.log('🚀 Loading assembly order (order-based flow)...');
+                
+                const [profileResponse, orderResponse] = await Promise.all([
+                    fetch('/api/auth/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`/api/assembly/orders/${orderId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                // Check authentication
+                if (!profileResponse.ok) {
+                    throw new Error('Authentication failed');
+                }
+
+                const profileData = await profileResponse.json();
+                const currentUserId = profileData.user._id;
+                isAdmin = profileData.user.role === 'admin';
+
+                // Check order fetch
+                if (!orderResponse.ok) {
+                    const errorData = await orderResponse.json().catch(() => ({}));
+                    if (orderResponse.status === 404 && !isAdmin) {
+                        throw new Error('UNAUTHORIZED');
+                    }
+                    throw new Error(errorData.message || `Failed to load order (${orderResponse.status})`);
+                }
+
+                const result = await orderResponse.json();
+                orderData = result.order || result;
+
+                // Verify ownership (allow admin access)
+                if (String(orderData.userId) !== String(currentUserId) && !isAdmin) {
+                    throw new Error('UNAUTHORIZED');
+                }
+
+                console.log('✅ Assembly order loaded:', orderData.orderId);
+
+                // Map assembly fields to UI
+                document.querySelector('.page-title').textContent = 'Preview & Payment';
+                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter slips before download';
+
+                // Hide slips per page toggle (assembly uses fixed format)
+                const toggleBlock = document.querySelector('input[name="previewSlipsPerPage"]');
+                if (toggleBlock) {
+                    const block = toggleBlock.closest('div[style*="background: #f8f9fa"]');
+                    if (block) block.style.display = 'none';
+                }
+
+                // Hide station pagination (assembly doesn't use stations)
+                const stationPagination = document.getElementById('stationPagination');
+                if (stationPagination) stationPagination.style.display = 'none';
+
+                // Display order info
+                document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
+                document.getElementById('displayPartyName').textContent = orderData.customization?.partyName || orderData.customization?.partyLogo || orderData.candidate?.symbolName || '-';
+                document.getElementById('displayDistrict').textContent = orderData.district || '-';
+                document.getElementById('displayLocalBody').textContent = orderData.constituency || '-';
+                const partCount = orderData.selectedParts?.length || 0;
+                document.getElementById('displayWard').textContent = partCount > 0 ? `${partCount} selected part(s)` : '-';
+                document.getElementById('displayPollingStation').textContent = orderData.selectedParts?.[0]?.partName || '-';
+
+                // Display pricing
+                const voterCount = orderData.totalVoters || 0;
+                const amount = orderData.amount || 0;
+                const pricePerVoter = orderData.pricePerVoter !== undefined ? orderData.pricePerVoter : 0.50;
+
+                document.getElementById('totalVoters').textContent = voterCount;
+                document.getElementById('pricePerVoter').textContent = pricePerVoter === 0 ? 'FREE' : `₹${pricePerVoter.toFixed(2)}`;
+                document.getElementById('totalAmount').textContent = `₹${amount.toFixed(2)}`;
+
+                // Update floating button
+                const floatAmount = document.getElementById('floatAmount');
+                const floatVoters = document.getElementById('floatVoters');
+                const floatBtnText = document.getElementById('floatBtnText');
+                if (floatAmount) floatAmount.textContent = amount === 0 ? 'FREE' : `₹${amount.toFixed(2)}`;
+                if (floatVoters) floatVoters.textContent = voterCount;
+                if (floatBtnText) floatBtnText.textContent = pricePerVoter === 0 ? 'Complete & Download' : 'Complete Payment';
+
+                // Price breakdown
+                if (voterCount > 0) {
+                    document.getElementById('priceBreakdown').style.display = 'block';
+                    document.getElementById('breakdownText').textContent = pricePerVoter === 0
+                        ? `${voterCount} voters × FREE = ₹0.00`
+                        : `${voterCount} voters × ₹${pricePerVoter.toFixed(2)} = ₹${amount.toFixed(2)}`;
+                }
+
+                // Check if FREE order
+                if (pricePerVoter === 0 && orderData.paymentStatus !== 'completed') {
+                    document.querySelector('.payment-title').innerHTML = 'Free Order <i class="fas fa-gift"></i>';
+                    document.querySelector('.preview-note').innerHTML =
+                        '<strong><i class="fas fa-info-circle"></i> Free Order:</strong> This order is free. Click below to complete and download.';
+
+                    const paymentBtn = document.getElementById('paymentBtn');
+                    paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete & Download';
+                    paymentBtn.style.background = 'var(--kerala-green)';
+                    paymentBtn.onclick = completeOrderAsAdmin;
+                    paymentBtn.disabled = false;
+
+                    const floatBtn = document.getElementById('floatPaymentBtn');
+                    if (floatBtn) {
+                        floatBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete & Download';
+                        floatBtn.style.background = 'var(--kerala-green)';
+                        floatBtn.onclick = function() { scrollToPayment(); setTimeout(completeOrderAsAdmin, 500); };
+                        floatBtn.disabled = false;
+                    }
+
+                    document.querySelector('.secure-badge').style.display = 'none';
+                    const paymentIcons = document.querySelector('.payment-icons');
+                    if (paymentIcons) paymentIcons.style.display = 'none';
+                }
+
+                // Check if already paid — show download instead of preview
+                if (orderData.paymentStatus === 'completed') {
+                    document.querySelector('.payment-title').innerHTML = 'Payment Completed <i class="fas fa-check-circle"></i>';
+                    document.getElementById('paymentBtn').style.display = 'none';
+                    document.querySelector('.secure-badge').style.display = 'none';
+                    document.querySelector('.preview-note').innerHTML =
+                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter slips.';
+
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn btn-payment';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
+                    downloadBtn.style.background = 'var(--kerala-green)';
+                    downloadBtn.onclick = downloadFullPDF;
+                    document.getElementById('paymentBtn').parentNode.insertBefore(downloadBtn, document.getElementById('paymentBtn'));
+
+                    if (orderData.paidAt) {
+                        const paidDate = new Date(orderData.paidAt);
+                        const paymentInfo = document.createElement('div');
+                        paymentInfo.className = 'price-breakdown';
+                        paymentInfo.style.display = 'block';
+                        paymentInfo.style.marginTop = '1rem';
+                        paymentInfo.innerHTML = `
+                            <p><strong>Payment Date:</strong> ${paidDate.toLocaleDateString('en-IN')}</p>
+                            ${orderData.razorpayPaymentId ? `<p><strong>Payment ID:</strong> ${orderData.razorpayPaymentId}</p>` : ''}
+                        `;
+                        document.querySelector('.payment-card').appendChild(paymentInfo);
+                    }
+
+                    document.getElementById('previewContainer').innerHTML = `
+                        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
+                            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Order Completed!</h3>
+                            <p style="margin: 0; opacity: 0.9;">Your assembly voter slips are ready for download.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Admin bypass
+                if (isAdmin) {
+                    document.querySelector('.payment-title').innerHTML = 'Admin Access <i class="fas fa-user-shield"></i>';
+                    document.querySelector('.preview-note').innerHTML =
+                        '<strong><i class="fas fa-info-circle"></i> Admin Mode:</strong> You can complete this order without payment.';
+
+                    const paymentBtn = document.getElementById('paymentBtn');
+                    paymentBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Without Payment';
+                    paymentBtn.style.background = 'var(--kerala-green)';
+                    paymentBtn.onclick = completeOrderAsAdmin;
+                    paymentBtn.disabled = false;
+
+                    const floatBtn = document.getElementById('floatPaymentBtn');
+                    if (floatBtn) {
+                        floatBtn.innerHTML = '<i class="fas fa-user-shield"></i> Admin: Complete Order';
+                        floatBtn.style.background = 'var(--kerala-green)';
+                        floatBtn.onclick = function() { scrollToPayment(); setTimeout(completeOrderAsAdmin, 500); };
+                        floatBtn.disabled = false;
+                    }
+
+                    document.querySelector('.secure-badge').style.display = 'none';
+                }
+
+                // Generate preview PDF using previewId from order, or use stored PDF
+                const previewId = orderData.previewId;
+                const storedPdfPath = orderData.pdfPath;
+
+                const previewContainer = document.getElementById('previewContainer');
+                previewContainer.style.display = 'block';
+                previewContainer.style.alignItems = 'stretch';
+                previewContainer.style.justifyContent = 'flex-start';
+                previewContainer.style.padding = '0';
+                previewContainer.style.background = 'transparent';
+                previewContainer.innerHTML = `
+                    <div class="loading-preview">
+                        <div class="spinner"></div>
+                        <p>Loading assembly preview PDF...</p>
+                    </div>
+                `;
+
+                let pdfBlobUrl = null;
+
+                // Try stored PDF first (always available), then fall back to preview session
+                if (storedPdfPath) {
+                    try {
+                        const pdfResponse = await fetch(storedPdfPath);
+                        if (pdfResponse.ok) {
+                            const pdfBlob = await pdfResponse.blob();
+                            pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                        }
+                    } catch (e) {
+                        console.warn('Failed to load stored PDF, trying preview session...', e);
+                    }
+                }
+
+                if (!pdfBlobUrl && previewId) {
+                    const previewResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            previewId: previewId,
+                            previewOnly: true
+                        })
+                    });
+
+                    if (!previewResponse.ok) {
+                        const errorData = await previewResponse.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'Failed to generate assembly preview PDF');
+                    }
+
+                    const previewData = await previewResponse.json();
+                    if (!previewData.success || !previewData.pdfUrl) {
+                        throw new Error(previewData.message || 'Failed to generate assembly preview PDF');
+                    }
+
+                    const pdfResponse = await fetch(previewData.pdfUrl);
+                    if (!pdfResponse.ok) {
+                        throw new Error('Failed to load assembly preview PDF');
+                    }
+
+                    const pdfBlob = await pdfResponse.blob();
+                    pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                }
+
+                if (!pdfBlobUrl) {
+                    throw new Error('No preview available. PDF will be available after payment on the order success page.');
+                }
+
+                window.currentPdfBlobUrl = pdfBlobUrl;
+                await displayPDF(pdfBlobUrl, previewContainer);
+
+                const previewNote = document.getElementById('previewNote');
+                if (previewNote) {
+                    previewNote.innerHTML = `<strong>Note:</strong> This is a preview PDF for your assembly slips. Download the complete PDF after payment.`;
+                }
+
+                // Enable payment button for regular users
+                if (!isAdmin && pricePerVoter > 0) {
+                    document.getElementById('paymentBtn').disabled = false;
+                    document.getElementById('payBtnText').textContent = amount > 0 ? `Pay ₹${amount.toFixed(2)}` : 'Pay Now';
+                    const floatBtn = document.getElementById('floatPaymentBtn');
+                    if (floatBtn) {
+                        floatBtn.disabled = false;
+                        floatBtn.onclick = scrollToPayment;
+                    }
+                }
+
+                handleMobilePaymentFloat();
+
+            } catch (error) {
+                console.error('Assembly order initialization failed:', error);
+                
+                if (error.message === 'UNAUTHORIZED') {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem;`;
+                    overlay.innerHTML = `
+                        <div style="background: #138808; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 3px solid white;">
+                            <i class="fas fa-lock" style="font-size: 4rem; color: white; margin-bottom: 1rem;"></i>
+                            <h2 style="color: white; margin-bottom: 1rem;">Access Denied</h2>
+                            <p style="color: white; margin-bottom: 2rem;">You are not authorized to access this page.</p>
+                            <button onclick="window.location.href='/dashboard.html'" style="background: white; color: #FF9933; padding: 1rem 2rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-arrow-left"></i> Go to Dashboard
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                    return;
+                }
+                
+                showMessage('error', 'Preview Error', error.message || 'Could not load assembly order.', 'assembly-slips.html', 3000);
+            }
         }
 
         // Group voters by polling station
@@ -1484,6 +1898,11 @@ s0.parentNode.insertBefore(s1,s0);
         // This ensures order data is fetched immediately when page loads
         (async function initializePreviewPage() {
             console.log('🚀 Initializing preview page - loading order data first...');
+            if (isAssemblyPreview) {
+                await initializeAssemblyPreviewPage();
+                console.log('✅ Assembly preview loaded');
+                return;
+            }
             await loadOrderAndPreview();
             console.log('✅ Order data loaded and preview ready');
         })();
@@ -1491,6 +1910,15 @@ s0.parentNode.insertBefore(s1,s0);
         // Helper function to display PDF with mobile-friendly fallback
         async function displayPDF(pdfBlobUrl, container) {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (isAssemblyPreview && typeof pdfjsLib !== 'undefined') {
+                try {
+                    await renderPDFWithPDFJS(pdfBlobUrl, container);
+                    return;
+                } catch (error) {
+                    console.error('Assembly PDF.js rendering failed:', error);
+                }
+            }
             
             if (isMobile && typeof pdfjsLib !== 'undefined') {
                 // Mobile with PDF.js support - render using canvas
@@ -1506,11 +1934,71 @@ s0.parentNode.insertBefore(s1,s0);
                 displayPDFWithIframe(pdfBlobUrl, container);
             }
         }
+
+        function renderAssemblyPreviewPaymentCard(container) {
+            if (!isAssemblyPreview) {
+                return;
+            }
+
+            const existingCard = document.getElementById('assemblyPreviewPaymentCard');
+            if (existingCard) {
+                existingCard.remove();
+            }
+
+            const totalVotersText = document.getElementById('totalVoters')?.textContent || '-';
+            const pricePerVoterText = document.getElementById('pricePerVoter')?.textContent || '₹0.50';
+            const totalAmountText = document.getElementById('totalAmount')?.textContent || '₹0.00';
+            const payLabel = document.getElementById('payBtnText')?.textContent || 'Pay Now';
+
+            const paymentCard = document.createElement('div');
+            paymentCard.id = 'assemblyPreviewPaymentCard';
+            paymentCard.style.cssText = 'margin-top: 1rem; padding: 1.25rem; background: #fffaf0; border: 2px solid #f6ad55; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);';
+            paymentCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                        <h3 style="margin:0 0 0.75rem 0; font-size:1.1rem; color:#9c4221;">Preview Payment Summary</h3>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:0.65rem;">
+                            <div style="background:#fff; border:1px solid #fbd38d; border-radius:8px; padding:0.8rem;">
+                                <div style="font-size:0.8rem; color:#744210; margin-bottom:0.25rem;">Total Voters</div>
+                                <div style="font-size:1rem; font-weight:700; color:#2d3748;">${totalVotersText}</div>
+                            </div>
+                            <div style="background:#fff; border:1px solid #fbd38d; border-radius:8px; padding:0.8rem;">
+                                <div style="font-size:0.8rem; color:#744210; margin-bottom:0.25rem;">Price per Voter</div>
+                                <div style="font-size:1rem; font-weight:700; color:#2d3748;">${pricePerVoterText}</div>
+                            </div>
+                            <div style="background:#fff; border:1px solid #fbd38d; border-radius:8px; padding:0.8rem;">
+                                <div style="font-size:0.8rem; color:#744210; margin-bottom:0.25rem;">Total Amount</div>
+                                <div style="font-size:1.1rem; font-weight:800; color:#c05621;">${totalAmountText}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <button type="button" onclick="scrollToPayment()" style="background:#c05621; color:#fff; border:none; border-radius:8px; padding:0.95rem 1.4rem; font-size:1rem; font-weight:700; cursor:pointer; white-space:nowrap; box-shadow: 0 6px 14px rgba(192,86,33,0.25);">
+                            <i class="fas fa-credit-card" style="margin-right:0.5rem;"></i>${payLabel}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const buttonsDiv = container.nextElementSibling?.classList.contains('pdf-action-buttons')
+                ? container.nextElementSibling
+                : null;
+
+            if (buttonsDiv && buttonsDiv.parentNode) {
+                buttonsDiv.parentNode.insertBefore(paymentCard, buttonsDiv.nextSibling);
+                return;
+            }
+
+            container.parentNode.insertBefore(paymentCard, container.nextSibling);
+        }
         
         // Display PDF using iframe (works on most desktop browsers)
         function displayPDFWithIframe(pdfBlobUrl, container) {
             // Check if order is completed
             const isOrderCompleted = orderData && orderData.paymentStatus === 'completed';
+            const previewDownloadName = isAssemblyPreview
+                ? `assembly-preview-${assemblyPreviewId || Date.now()}.pdf`
+                : `preview-${orderData.orderId}.pdf`;
             
             container.innerHTML = `
                 <iframe 
@@ -1557,19 +2045,23 @@ s0.parentNode.insertBefore(s1,s0);
                         <a href="${pdfBlobUrl}" target="_blank" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
                             <i class="fas fa-external-link-alt"></i> Open in New Tab
                         </a>
-                        <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
-                            <i class="fas fa-download"></i> Download Preview
+                        <a href="${pdfBlobUrl}" download="${previewDownloadName}" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+                            <i class="fas fa-download"></i> Download Preview PDF
                         </a>
                     </div>
                 `;
             }
             
             container.parentNode.insertBefore(buttonsDiv, container.nextSibling);
+            renderAssemblyPreviewPaymentCard(container);
         }
         
         // Render PDF using PDF.js (better mobile support)
         async function renderPDFWithPDFJS(pdfBlobUrl, container) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const previewDownloadName = isAssemblyPreview
+                ? `assembly-preview-${assemblyPreviewId || Date.now()}.pdf`
+                : `preview-${orderData.orderId}.pdf`;
             
             container.innerHTML = `
                 <div style="border: 2px solid #667eea; border-radius: 8px; overflow: hidden; background: #f8f9fa;">
@@ -1622,8 +2114,8 @@ s0.parentNode.insertBefore(s1,s0);
                         <button onclick="downloadFullPDF()" class="btn btn-payment" style="display: inline-block; font-size: 1.1rem; padding: 1rem 2rem;">
                             <i class="fas fa-download"></i> Download Full PDF
                         </button>
-                        <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
-                            <i class="fas fa-download"></i> Download Preview
+                        <a href="${pdfBlobUrl}" download="${previewDownloadName}" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
+                            <i class="fas fa-download"></i> Download Preview PDF
                         </a>
                     </div>
                 `;
@@ -1634,7 +2126,7 @@ s0.parentNode.insertBefore(s1,s0);
                         <i class="fas fa-download"></i> Download Options
                     </p>
                     <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-                        <a href="${pdfBlobUrl}" download="preview-${orderData.orderId}.pdf" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+                        <a href="${pdfBlobUrl}" download="${previewDownloadName}" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
                             <i class="fas fa-download"></i> Download Preview PDF
                         </a>
                     </div>
@@ -1642,6 +2134,7 @@ s0.parentNode.insertBefore(s1,s0);
             }
             
             container.parentNode.insertBefore(buttonsDiv, container.nextSibling);
+            renderAssemblyPreviewPaymentCard(container);
         }
         
         // Render specific page with high quality
@@ -2156,10 +2649,15 @@ s0.parentNode.insertBefore(s1,s0);
             try {
                 showMessage('info', 'Processing...', 'Marking order as completed...');
                 
-                // Use different endpoints based on user role
-                const endpoint = isAdmin 
-                    ? `/api/admin/orders/${orderData.orderId}/complete`
-                    : `/api/orders/${orderData.orderId}/complete`;
+                // Use different endpoints based on user role and order type
+                let endpoint;
+                if (isAssemblyOrder) {
+                    endpoint = `/api/assembly/orders/${orderData.orderId}/complete`;
+                } else if (isAdmin) {
+                    endpoint = `/api/admin/orders/${orderData.orderId}/complete`;
+                } else {
+                    endpoint = `/api/orders/${orderData.orderId}/complete`;
+                }
                 
                 // Mark order as completed
                 const markResponse = await fetch(endpoint, {
@@ -2180,16 +2678,42 @@ s0.parentNode.insertBefore(s1,s0);
                 // Wait a moment for PDF generation to complete
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
-                // Download the PDF
-                const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                // Download the PDF — assembly orders generate via a different endpoint
+                let blob;
+                if (isAssemblyOrder) {
+                    const previewId = orderData.previewId;
+                    const response = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ previewId: previewId })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to generate assembly PDF');
+                    }
+                    
+                    const data = await response.json();
+                    if (data.success && data.downloadUrl) {
+                        const pdfRes = await fetch(data.downloadUrl);
+                        if (!pdfRes.ok) throw new Error('Failed to download PDF');
+                        blob = await pdfRes.blob();
+                    } else {
+                        throw new Error('Failed to generate assembly PDF');
+                    }
+                } else {
+                    const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
 
-                if (!response.ok) {
-                    throw new Error('Failed to download PDF');
+                    if (!response.ok) {
+                        throw new Error('Failed to download PDF');
+                    }
+                    blob = await response.blob();
                 }
 
-                const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -2212,6 +2736,41 @@ s0.parentNode.insertBefore(s1,s0);
 
         async function initiatePayment() {
             try {
+                // Legacy assembly preview-only flow (no order, direct download)
+                if (isAssemblyPreview && !isAssemblyOrder) {
+                    document.getElementById('paymentBtn').disabled = true;
+                    document.getElementById('payBtnText').textContent = 'Generating PDF...';
+
+                    if (!assemblyPreviewData || !Array.isArray(assemblyPreviewData.voters) || assemblyPreviewData.voters.length === 0) {
+                        throw new Error('Assembly preview data missing. Please extract again.');
+                    }
+
+                    const response = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            previewId: assemblyPreviewId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'Failed to generate assembly PDF');
+                    }
+
+                    const data = await response.json();
+                    if (data.success && data.downloadUrl) {
+                        window.location.href = data.downloadUrl;
+                        return;
+                    }
+
+                    throw new Error(data.message || 'Failed to generate assembly PDF');
+                }
+
+                // Order-based payment flow (both local body and assembly orders)
                 document.getElementById('paymentBtn').disabled = true;
                 document.getElementById('payBtnText').textContent = 'Preparing payment...';
 
@@ -2254,7 +2813,7 @@ s0.parentNode.insertBefore(s1,s0);
                 if (window.trackError) {
                     window.trackError(error, {
                         context: 'payment_initiation',
-                        orderId: orderData.orderId
+                        orderId: orderData?.orderId || null
                     });
                 }
                 
@@ -2479,17 +3038,25 @@ s0.parentNode.insertBefore(s1,s0);
                     const updatedOrderData = data.order || orderData;
                     const essentialData = {
                         orderId: updatedOrderData.orderId || updatedOrderData._id,
-                        customization: updatedOrderData.customization,
+                        customization: {
+                            partyName: updatedOrderData.customization?.partyName || '',
+                            partyNameMalayalam: updatedOrderData.customization?.partyNameMalayalam || ''
+                        },
                         totalVoters: updatedOrderData.totalVoters || updatedOrderData.voterCount,
                         amount: updatedOrderData.amount,
                         paymentStatus: 'completed',
                         razorpayPaymentId: updatedOrderData.razorpayPaymentId,
                         paidAt: updatedOrderData.paidAt || new Date().toISOString()
                     };
-                    
-                    // Encode order data in URL for instant display (avoid API call)
-                    const encodedData = encodeURIComponent(JSON.stringify(essentialData));
-                    window.location.href = `order-success.html?orderId=${essentialData.orderId}&orderData=${encodedData}`;
+
+                    // Store light order snapshot in session storage and keep URL short.
+                    try {
+                        sessionStorage.setItem(`order-success:${essentialData.orderId}`, JSON.stringify(essentialData));
+                    } catch (storageError) {
+                        console.warn('Could not write order-success cache to sessionStorage:', storageError);
+                    }
+
+                    window.location.href = `order-success.html?orderId=${encodeURIComponent(essentialData.orderId)}`;
                 } else {
                     throw new Error(data.message || 'Payment verification failed');
                 }
@@ -2653,22 +3220,50 @@ s0.parentNode.insertBefore(s1,s0);
 
                 showMessage('info', 'Preparing Download', 'Your PDF is being prepared...');
 
-                const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                let blob;
+                if (isAssemblyOrder) {
+                    // Assembly orders: generate full PDF via assembly endpoint
+                    const response = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ previewId: orderData.previewId })
+                    });
 
-                if (!response.ok) {
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Download failed');
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'Failed to generate assembly PDF');
                     }
-                    throw new Error('Download failed');
+
+                    const data = await response.json();
+                    if (data.success && data.downloadUrl) {
+                        const pdfRes = await fetch(data.downloadUrl);
+                        if (!pdfRes.ok) throw new Error('Failed to download PDF');
+                        blob = await pdfRes.blob();
+                    } else {
+                        throw new Error('Failed to generate assembly PDF');
+                    }
+                } else {
+                    const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Download failed');
+                        }
+                        throw new Error('Download failed');
+                    }
+
+                    blob = await response.blob();
                 }
 
-                const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;

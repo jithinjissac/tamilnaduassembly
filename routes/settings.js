@@ -19,6 +19,12 @@ router.get('/popup', optionalAuth, async (req, res, next) => {
     return getSettings(req, res, next);
 });
 
+// Public endpoint for election module setting (needed for dashboard/login)
+router.get('/election-module', optionalAuth, async (req, res, next) => {
+    req.params.category = 'general';
+    return getSettings(req, res, next);
+});
+
 // PUT endpoint for popup (requires auth)
 router.put('/popup', adminAuth, async (req, res, next) => {
     req.params.category = 'popup';

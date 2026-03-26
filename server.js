@@ -12,6 +12,7 @@ import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
 import manualSlipRoutes from './controllers/manualSlipController.js';
+import dropdownRoutesNew from './routes/dropdown.js';
 
 console.log('✅ Controller imports loaded');
 
@@ -26,6 +27,7 @@ import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
 import slipRoutes from './routes/slips.js';
 import systemRoutes from './routes/system.js';
+import assemblyRoutes from './routes/assembly.js';
 
 console.log('✅ Route imports loaded');
 
@@ -60,8 +62,10 @@ setTimeout(async () => {
     
     // Check Playwright
     try {
-      const playwrightVersion = execSync('npx playwright --version', { encoding: 'utf8', timeout: 1000 }).trim();
-      console.log(`  ✅ Playwright: ${playwrightVersion}`);
+      const { createRequire } = await import('module');
+      const require = createRequire(import.meta.url);
+      const playwrightPkg = require('playwright/package.json');
+      console.log(`  ✅ Playwright: v${playwrightPkg.version}`);
     } catch (e) {
       console.log('  ⚠️ Playwright: Not installed or not in PATH');
     }
@@ -329,6 +333,7 @@ app.get('/razorpay-verification.html', (req, res) => {
 });
 
 // API Routes - Existing voter extraction
+app.use('/api/dropdown', dropdownRoutesNew);
 app.use('/api', dropdownRoutes);
 app.use('/api', voterRoutes);
 app.use('/api', captchaRoutes);
@@ -337,6 +342,12 @@ app.use('/api/manual-slip', manualSlipRoutes);
 // Playwright Stations Route (Malayalam polling stations)
 import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
 app.use('/api', playwrightStationsRoutes);
+
+// Serve voter slips directory
+app.use('/voter-slips', express.static(path.join(__dirname, 'voter-slips')));
+
+// Assembly Election Routes (ECI Portal)
+app.use('/api/assembly', assemblyRoutes);
 
 // Root route
 app.get('/', (req, res) => {

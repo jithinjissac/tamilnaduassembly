@@ -119,7 +119,8 @@
 
         .tabs {
             display: flex;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 2rem;
             border-bottom: 2px solid #e5e7eb;
         }
@@ -719,6 +720,7 @@
             <button class="tab" onclick="switchTab('media-manager')"><i class="fas fa-folder-open"></i> Media Manager</button>
             <button class="tab" onclick="switchTab('profile-settings')"><i class="fas fa-user-cog"></i> Profile Settings</button>
             <button class="tab" onclick="switchTab('developer-settings')"><i class="fas fa-code"></i> Developer</button>
+            <button class="tab" onclick="window.location.href='admin-settings.html'"><i class="fas fa-cogs"></i> System Settings</button>
         </div>
 
         <!-- Analytics Tab -->

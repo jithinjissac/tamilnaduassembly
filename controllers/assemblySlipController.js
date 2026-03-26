@@ -1,0 +1,343 @@
+import { logger } from '../utils/logger.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { chromium } from 'playwright';
+import { PDFDocument } from 'pdf-lib';
+import { getPreviewPayloadById } from './assemblyVoterController_v2.js';
+import AssemblyOrder from '../models/AssemblyOrder.js';
+import { optimizePdfLossless } from '../utils/pdfOptimizer.js';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Pre-load local Malayalam font as base64 once at startup — eliminates all
+// Google Fonts network requests during headless PDF rendering.
+const _fontPath = path.join(__dirname, '../assets/fonts/NotoSansMalayalam-Regular.ttf');
+const MALAYALAM_FONT_B64 = fs.existsSync(_fontPath)
+    ? fs.readFileSync(_fontPath).toString('base64')
+    : null;
+
+/**
+ * Generate assembly voter slips with candidate
+ */
+
+export const generateSlipsWithCandidates = async (req, res) => {
+    try {
+        const { previewId, previewOnly = false } = req.body || {};
+
+        let { voters, candidate, metadata } = req.body || {};
+
+        // Assembly preview flow sends previewId; resolve payload from server store.
+        if ((!Array.isArray(voters) || voters.length === 0) && previewId) {
+            const previewPayload = getPreviewPayloadById(previewId);
+            if (!previewPayload) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Preview data not found or expired. Please extract again.'
+                });
+            }
+
+            voters = Array.isArray(previewPayload.voters) ? previewPayload.voters : [];
+            candidate = previewPayload.candidate || candidate;
+
+            const extracted = previewPayload.extractedData || {};
+            const selectedParts = Array.isArray(previewPayload.selectedParts) ? previewPayload.selectedParts : [];
+            const singlePartLabel = selectedParts.length === 1
+                ? `${selectedParts[0].partNumber || ''}${selectedParts[0].partName ? ` - ${selectedParts[0].partName}` : ''}`.trim()
+                : '';
+
+            metadata = {
+                ...(metadata || {}),
+                constituency: extracted.constituency || metadata?.constituency,
+                district: extracted.district || metadata?.district,
+                pollingStationInfo: metadata?.pollingStationInfo || singlePartLabel
+            };
+        }
+
+        if (!voters || !Array.isArray(voters) || voters.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No voter data found'
+            });
+        }
+
+        const normalizedCandidate = {
+            symbol: '',
+            symbolName: '',
+            ...(candidate || {})
+        };
+
+        // Null-safe metadata extraction
+        const constituency = (metadata?.constituency || 'Assembly').toString().replace(/\s+/g, '');
+        const district = (metadata?.district || '').toString();
+        const totalVoters = metadata?.totalVoters || voters.length;
+
+        logger.info(`Generating slips for ${voters.length} voters — constituency: ${constituency}`);
+
+        const outputDir = path.join(path.dirname(__dirname), 'voter-slips');
+        if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
+        const timestamp = Date.now();
+        const baseName = `assembly-slips-${constituency}-${timestamp}`;
+        const pdfFileName = `${baseName}.pdf`;
+        const pdfFullPath = path.join(outputDir, pdfFileName);
+
+        const metaForHTML = {
+            constituency: metadata?.constituency || 'Assembly',
+            district,
+            pollingStationInfo: metadata?.pollingStationInfo || '',
+            previewOnly,
+            totalVoters,
+            totalAmount: totalVoters * 0.5,
+            previewLimit: 10
+        };
+
+        const renderVoters = previewOnly ? voters.slice(0, metaForHTML.previewLimit) : voters;
+
+        // ── Parallel chunked PDF generation ──────────────────────────────────
+        // Each voter carries a large base64 image. To avoid CDP message-size
+        // limits we write chunks to temp files and load via file://.
+        // Chunks are processed 3 at a time using a single browser to avoid
+        // the overhead of repeated browser launches.
+        const VOTERS_PER_CHUNK = 120;  // ~24 A4 pages per chunk
+        const PARALLEL = 3;            // concurrent pages inside one browser
+        const tmpDir = path.join(outputDir, '_tmp');
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+        // Split voters into ordered chunks
+        const chunks = [];
+        for (let s = 0; s < renderVoters.length; s += VOTERS_PER_CHUNK) {
+            chunks.push({ idx: chunks.length, voters: renderVoters.slice(s, s + VOTERS_PER_CHUNK) });
+        }
+
+        const chunkPdfs = new Array(chunks.length); // preserve page order
+
+        const browser = await chromium.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+            timeout: 300000
+        });
+        try {
+            // Process PARALLEL chunks simultaneously
+            for (let b = 0; b < chunks.length; b += PARALLEL) {
+                const batch = chunks.slice(b, b + PARALLEL);
+                await Promise.all(batch.map(async ({ idx, voters: cv }) => {
+                    const chunkHtml = generateSlipsHTML(cv, normalizedCandidate, metaForHTML);
+                    const tmpFile = path.join(tmpDir, `c-${timestamp}-${idx}.html`);
+                    fs.writeFileSync(tmpFile, chunkHtml, 'utf8');
+                    const page = await browser.newPage();
+                    try {
+                        await page.goto(`file:///${tmpFile.replace(/\\/g, '/')}`, {
+                            waitUntil: 'domcontentloaded', timeout: 180000
+                        });
+                        chunkPdfs[idx] = await page.pdf({
+                            printBackground: true,
+                            preferCSSPageSize: true,
+                            margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' }
+                        });
+                        logger.info(`  chunk ${idx + 1}/${chunks.length} done`);
+                    } finally {
+                        await page.close();
+                        try { fs.unlinkSync(tmpFile); } catch (_) {}
+                    }
+                }));
+            }
+        } finally {
+            await browser.close();
+            try { fs.rmdirSync(tmpDir); } catch (_) {}
+        }
+
+        // Merge all chunk PDFs in order
+        const mergedPdf = await PDFDocument.create();
+        for (const pdfBytes of chunkPdfs) {
+            const doc = await PDFDocument.load(pdfBytes);
+            const pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
+            pages.forEach(p => mergedPdf.addPage(p));
+        }
+        const pdfBuffer = await mergedPdf.save();
+        const optimizedPdfBuffer = await optimizePdfLossless(pdfBuffer, `assembly-slips:${baseName}`);
+        fs.writeFileSync(pdfFullPath, optimizedPdfBuffer);
+
+        logger.info(`✅ Assembly slips PDF saved: ${pdfFullPath}`);
+
+        // Update order in DB with the generated PDF path (if this was from a preview session)
+        if (previewId && !previewOnly) {
+            try {
+                const updated = await AssemblyOrder.findOneAndUpdate(
+                    { previewId },
+                    { pdfPath: `/voter-slips/${pdfFileName}`, pdfGenerated: true, pdfGeneratedAt: new Date() },
+                    { new: true }
+                );
+                if (updated) {
+                    logger.info(`✅ Updated order ${updated.orderId} pdfPath → /voter-slips/${pdfFileName}`);
+                }
+            } catch (dbErr) {
+                logger.warn(`⚠️ Could not update order pdfPath: ${dbErr.message}`);
+            }
+        }
+
+        res.json({
+            success: true,
+            message: 'Slips generated successfully',
+            downloadUrl: `/voter-slips/${pdfFileName}`,
+            htmlUrl: `/voter-slips/${pdfFileName}`,
+            pdfUrl: `/voter-slips/${pdfFileName}`,
+            fileName: pdfFileName,
+            pdfFileName,
+            totalSlips: renderVoters.length,
+            candidate: normalizedCandidate.symbolName || ''
+        });
+
+    } catch (error) {
+        logger.error('Error generating slips with candidates:', error);
+        logger.error('Stack:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate slips',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Generate HTML for assembly slips with single candidate
+ */
+function generateSlipsHTML(voters, candidate, metadata) {
+    const constituency = metadata?.constituency || 'Assembly';
+    const district = metadata?.district || '';
+    const pollingStationInfo = metadata?.pollingStationInfo || '';
+    const previewOnly = Boolean(metadata?.previewOnly);
+    const totalVoters = metadata?.totalVoters || voters.length;
+    const totalAmount = Number(metadata?.totalAmount || totalVoters * 0.5);
+    const slipsPerPage = 5;
+    const slipHeight = '52mm';
+    const slipGap = '4mm';
+
+    // Always render slips without candidate symbol/name information.
+
+    const pages = [];
+    for (let i = 0; i < voters.length; i += slipsPerPage) {
+        pages.push(voters.slice(i, i + slipsPerPage));
+    }
+
+    const totalRendered = voters.length;
+    const pagesHTML = pages.map((pageVoters, pageIndex) => {
+        const slips = pageVoters.map((voter, idx) => {
+            const absoluteIndex = pageIndex * slipsPerPage + idx;
+            const isLastSlipInPreview = previewOnly && absoluteIndex === totalRendered - 1;
+            const serialNo = voter.serialNo || voter.sl_no || idx + 1;
+            const snippetSrc = voter.snippetBase64 || '';
+            const fallbackInfo = [voter.name, voter.epicNo ? `EPIC: ${voter.epicNo}` : '', voter.age ? `Age: ${voter.age}` : '', voter.gender ? `Gender: ${voter.gender}` : '']
+                .filter(Boolean)
+                .join(' | ');
+
+            const pollingStation = voter.pollingStation || voter.partName || pollingStationInfo || '-';
+            if (isLastSlipInPreview) {
+                return `
+            <div class="voter-slip preview-payment-slip">
+                <div style="width: 100%; height: 100%; display: grid; grid-template-columns: 35% 65%; gap: 3mm; padding: 3mm; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 3px solid #c05621; border-radius: 2mm;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-right: 2px solid #e2e8f0; padding-right: 2mm;">
+                        <div style="width: 18mm; height: 18mm; background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2mm;">
+                            <span style="font-size: 22pt;">🔒</span>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); color: white; padding: 2mm 3mm; border-radius: 2mm; font-size: 11pt; font-weight: 800; margin-bottom: 2mm; width: 100%;">
+                            ₹${totalAmount.toFixed(2)}
+                        </div>
+                        <div style="background: #FFF3CD; border: 1px solid #FFC107; border-radius: 2mm; padding: 1.5mm; width: 100%;">
+                            <div style="font-size: 7pt; font-weight: 600; color: #856404;">
+                                ⚠️ Preview Only
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; padding-left: 2mm;">
+                        <div style="font-size: 14pt; font-weight: 800; color: #E53E3E; margin-bottom: 2mm; line-height: 1.1;">
+                            Complete Payment to Access Full PDF
+                        </div>
+                        <div style="font-size: 10pt; font-weight: 600; color: #1a202c; margin-bottom: 1mm;">
+                            Complete PDF Contains:
+                        </div>
+                        <div style="font-size: 16pt; font-weight: 800; color: #c05621; margin-bottom: 2mm;">
+                            ${totalVoters} Voter Slips
+                        </div>
+                        <div style="font-size: 8pt; color: #4a5568; margin-bottom: 2mm; line-height: 1.3;">
+                            This preview shows only first 2 pages. Complete payment now for instant download of all voter slips.
+                        </div>
+                        <div style="font-size: 7pt; color: #718096; line-height: 1.4;">
+                            ✓ Instant Download<br>
+                            ✓ All ${totalVoters} Slips<br>
+                            ✓ Secure Payment
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            }
+
+            return `
+            <div class="voter-slip">
+                <div class="slip-left">
+                    <div class="slip-left-content">
+                        <div class="serial-label">ക്രമ നമ്പർ</div>
+                        <div class="serial-value">${serialNo}</div>
+                    </div>
+                </div>
+                <div class="slip-right">
+                    <div class="voter-image-container">
+                        ${snippetSrc
+                            ? `<img src="${snippetSrc}" alt="Voter ${serialNo}" class="voter-image">`
+                            : `<div class="snippet-fallback">${fallbackInfo || 'No snippet available'}</div>`
+                        }
+                    </div>
+                    <div class="polling-station-footer">പോളിംഗ് സ്റ്റേഷൻ: ${pollingStation !== '-' ? pollingStation : ''}</div>
+                </div>
+            </div>`;
+        }).join('\n');
+
+        return `<div class="page">${slips}</div>`;
+    }).join('\n');
+
+    return `<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <title>Assembly Voter Slips - ${constituency}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
+
+        .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; align-items: center; page-break-after: always; }
+        .page:last-child { page-break-after: auto; }
+
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 1.2px solid #000; display: grid; grid-template-columns: 32mm 1fr; gap: 0; padding: 1.5mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
+        .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2mm; height: 0; border-bottom: 2px dashed #999; }
+        .voter-slip:last-child { margin-bottom: 0; }
+        .voter-slip:last-child::after { display: none; }
+        .voter-slip > * { overflow: hidden; }
+
+        .slip-left { display: flex !important; width: 32mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
+        .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        .serial-label { font-size: 10pt; font-weight: 700; color: #000; margin-bottom: 0.8mm; text-align: center; line-height: 1.1; }
+        .serial-value { font-size: 16pt; font-weight: 800; color: #000; text-align: center; line-height: 1; }
+
+        .slip-right { flex: 1; margin-left: 0; padding: 1mm 2mm; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+        .voter-image-container { flex: 1; overflow: hidden; display: flex; align-items: flex-start; justify-content: flex-start; min-height: 0; }
+        .voter-image { width: auto; height: 100%; max-width: 100%; object-fit: contain; display: block; filter: contrast(1.2); }
+        .snippet-fallback { font-size: 9pt; line-height: 1.3; color: #333; }
+
+        .polling-station-footer { font-size: 9.5pt; font-weight: 700; color: #000; border-top: 1.2px solid #000; padding-top: 1mm; margin-top: 1mm; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+${pagesHTML}
+</body>
+</html>`;
+}

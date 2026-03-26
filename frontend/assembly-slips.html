@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assembly Election Voter Slips | EasySlip Kerala</title>
+    <meta name="description" content="Create professional voter slips for Kerala Assembly Elections. All 140 constituencies. Preview slips and generate PDF.">
+    
+    <!-- Kerala Colors & Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="symbol-picker.js"></script>
+    
+    <style>
+        :root {
+            --kerala-green: #006D3B;
+            --kerala-gold: #FFB81C;
+            --kerala-red: #E03A3E;
+            --kerala-cream: #FFF8DC;
+            --kerala-white: #FFFFFF;
+            --kerala-dark: #1a1a1a;
+            --kerala-gradient: linear-gradient(135deg, #006D3B 0%, #004d2a 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: #f5f5f2;
+            color: #333;
+        }
+
+        header {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img.app-logo { height: 80px; width: auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--kerala-green);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-title-wrap {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--kerala-green);
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+
+        .page-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+            position: relative;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            height: 4px;
+            background: var(--kerala-gradient);
+            z-index: 1;
+            transition: width 0.3s;
+            width: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #718096;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            border-color: var(--kerala-green);
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            border-color: var(--kerala-gold);
+            background: var(--kerala-gold);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .step.active .step-label {
+            color: var(--kerala-green);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .form-subtitle {
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group{
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--kerala-dark);
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            box-shadow: 0 0 0 4px rgba(0, 109, 59, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--kerala-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--kerala-green) 0%, #005830 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 109, 59, 0.6);
+        }
+
+        .btn-secondary { background: #e2e8f0; color: #2d3748; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .symbol-selection-area {
+            border: 3px dashed var(--kerala-gold);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symbol-selection-area::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--kerala-green), var(--kerala-gold), var(--kerala-red));
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+
+        .symbol-preview {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 3px solid #48bb78;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
+        }
+
+        #selectSymbolBtn {
+            background: var(--kerala-gradient) !important;
+            border: none !important;
+            padding: 1.5rem 3rem !important;
+            font-size: 1.3rem !important;
+            font-weight: 700 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4), 0 0 0 0 rgba(0, 109, 59, 0.5) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            animation: pulse 2s ease-in-out infinite !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin: 0 auto;
+        }
+
+        #selectSymbolBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -200%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        #selectSymbolBtn::after {
+            content: '⚡ CLICK HERE FIRST ⚡';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--kerala-red);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(224, 58, 62, 0.4);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        #selectSymbolBtn:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(0, 109, 59, 0.5), 0 0 0 4px rgba(255, 184, 28, 0.3) !important;
+            animation: none !important;
+        }
+
+        #selectSymbolBtn:active {
+            transform: translateY(-1px) !important;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .preview-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-title {
+            font-size: 1.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .preview-badge {
+            background: var(--kerala-green);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .preview-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-info p {
+            margin: 0.25rem 0;
+            color: #2d3748;
+        }
+
+        .preview-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            min-height: 600px;
+            display: block;
+            padding: 1rem;
+            background: #fff;
+        }
+
+        .loading-preview {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .preview-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .payment-section {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .payment-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--kerala-gold);
+        }
+
+        .payment-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--kerala-green);
+            font-weight: 700;
+        }
+
+        .order-summary {
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--kerala-green);
+        }
+
+        .summary-label {
+            color: #718096;
+        }
+
+        .summary-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .btn-payment {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .btn-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+        }
+
+        .btn-payment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .payment-icon {
+            font-size: 1.5rem;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            color: var(--kerala-green);
+            font-size: 0.875rem;
+        }
+
+        /* Step 3 preview uses the same slip anatomy as generated assembly slips */
+        .preview-slip {
+            width: auto;
+            height: 31mm;
+            border: 1.2px solid #000;
+            display: flex;
+            padding: 4px;
+            position: relative;
+            margin-bottom: 6px;
+            background: #fff;
+        }
+
+        .preview-slip::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -3px;
+            border-bottom: 1px dashed #999;
+        }
+
+        .preview-slip:last-child::after {
+            display: none;
+        }
+
+        .preview-slip-left {
+            width: 32mm;
+            border-right: 1px dotted #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            margin-right: 5px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .preview-symbol-header {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .preview-symbol-image {
+            width: 18mm;
+            height: 18mm;
+            margin-bottom: 6px;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            padding: 2px;
+            background: #fff;
+        }
+
+        .preview-symbol-name {
+            font-size: 9.5pt;
+            font-weight: 700;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .preview-slip.symbol-free {
+            display: grid;
+            grid-template-columns: 28mm 160mm;
+            gap: 0;
+            width: auto;
+        }
+
+        .preview-slip.symbol-free .preview-slip-left {
+            width: 28mm;
+            border-right: 1px solid #000;
+            margin-right: 0;
+        }
+
+        .preview-serial-label {
+            font-size: 9pt;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .preview-serial-value {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .preview-slip-right {
+            width: 160mm;
+            flex-shrink: 0;
+            padding: 3px 5px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .preview-slip-header {
+            display: flex;
+            justify-content: flex-start;
+            gap: 8px;
+            font-size: 10pt;
+            font-weight: 700;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preview-snippet-area {
+            flex: 1;
+            padding: 1px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            min-height: 18mm;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .preview-voter-snippet {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: contrast(1.2) brightness(1.0);
+            display: block;
+        }
+
+        .preview-snippet-fallback {
+            font-size: 0.85rem;
+            color: #555;
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        .preview-candidate-footer {
+            font-size: 10pt;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .preview-payment-slip {
+            width: 100%;
+            border: none;
+            margin-top: 1rem;
+            background: transparent;
+        }
+
+        .alert {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid var(--kerala-green);
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 245, 242, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 16px;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading.show {
+            display: flex;
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            background: #f5f5f2;
+            padding: 2.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            max-width: 480px;
+            width: 90%;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 109, 59, 0.1);
+            border-top: 4px solid var(--kerala-green);
+            border-right: 4px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress tracker styles */
+        .progress-timer {
+            background: linear-gradient(135deg, #006d3b, #00894a);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--kerala-green), #00894a);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            width: 100%;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-box .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--kerala-green);
+            display: block;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .progress-steps {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active {
+            background: #e8f5e9;
+            color: var(--kerala-green);
+            font-weight: 600;
+        }
+
+        .progress-step.completed {
+            color: var(--kerala-green);
+        }
+
+        .progress-step .step-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            background: #e5e7eb;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        .progress-step.active .step-icon {
+            background: var(--kerala-green);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .progress-step.completed .step-icon {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 109, 59, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(0, 109, 59, 0); }
+        }
+
+        .part-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+            transition: all 0.2s;
+        }
+
+        .part-item:hover {
+            background: #f0f0f0;
+            border-color: var(--kerala-green);
+        }
+
+        .part-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+        }
+
+        .part-item label {
+            font-size: 0.95rem;
+            color: #333;
+            cursor: pointer;
+            flex: 1;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .container { padding: 0.5rem; }
+            .form-container { padding: 1.5rem 1rem; }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions { flex-direction: column; }
+            .progress-steps { font-size: 0.85rem; gap: 0.5rem; }
+            .step-circle { width: 40px; height: 40px; }
+            .content-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .payment-section { position: static; }
+            .preview-section, .payment-card { padding: 1rem; }
+
+            .logo img.app-logo { height: 56px; }
+            .btn-back { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="EasySlip Logo" class="app-logo" />
+            </div>
+            <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-title-wrap">
+            <h1 class="page-title"><i class="fas fa-landmark"></i> Assembly Election Voter Slips</h1>
+            <p class="page-subtitle">നിയമസഭാ തെരഞ്ഞെടുപ്പ് വോട്ടർ സ്ലിപ്പുകൾ</p>
+        </div>
+
+        <div class="form-container">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Customization</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Voter Data</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Preview & Payment</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Select Symbol & Candidate -->
+            <div class="form-section active" id="step1">
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
+                <p class="form-subtitle">Upload your symbol customization (optional)</p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Choose your election symbol first or continue without symbol.
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-image"></i> Election Symbol</label>
+                    <div id="symbolSelectionArea" class="symbol-selection-area">
+                        <div id="symbolPreview" class="symbol-preview" style="display: none; margin-bottom: 1rem;">
+                            <img id="selectedSymbolImage" src="" alt="Symbol" style="width: 100px; height: 100px; object-fit: contain; border: 3px solid var(--kerala-green); border-radius: 10px; background: white; padding: 8px; margin-bottom: 0.5rem;">
+                            <div id="selectedSymbolName" style="font-weight: 700; color: var(--kerala-dark); margin-bottom: 0.25rem;"></div>
+                            <div style="color: #48bb78; font-size: 0.9rem; margin-bottom: 0.75rem;"><i class="fas fa-check-circle"></i> Symbol Selected</div>
+                            <button type="button" class="btn btn-secondary" onclick="window.symbolPicker && window.symbolPicker.open()" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
+                                <i class="fas fa-sync-alt"></i> Change Symbol
+                            </button>
+                        </div>
+                        <button type="button" id="selectSymbolBtn" class="btn btn-primary" onclick="window.symbolPicker && window.symbolPicker.open()" style="display: block;">
+                            <i class="fas fa-hand-pointer"></i> SELECT YOUR SYMBOL
+                        </button>
+                        <div style="margin-top: 1.25rem;">
+                            <label style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; display: block;">Or upload custom image:</label>
+                            <input type="file" id="custom-symbol-upload" accept="image/*" style="width: auto; padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px;">
+                        </div>
+                        <div style="margin-top: 0.75rem;">
+                            <a href="#" id="continueWithoutSymbol" style="color: var(--kerala-green); font-size: 0.9rem;">Continue without symbol</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="next-to-step2" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Next: Extract Voters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Extract Voters -->
+            <div class="form-section" id="step2">
+                <h2 class="form-title"><i class="fas fa-users"></i> Create Voter Slip</h2>
+                <p class="form-subtitle">Select location and generate your customized voter slips</p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> Select your constituency and polling parts. Enter captcha to extract voter data from ECI portal.
+                </div>
+
+                <form id="extraction-form">
+                    <input type="hidden" id="state" value="S11">
+                    <input type="hidden" id="year" value="2026">
+                    <input type="hidden" id="rollType" value="SIR-FinalRoll">
+                    <input type="hidden" id="language" value="en">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> District *</label>
+                            <select id="district" required>
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-landmark"></i> Assembly Constituency *</label>
+                            <select id="constituency" required disabled>
+                                <option value="">Select District First</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-list"></i> Polling Parts</label>
+                        <button type="button" id="select-parts-btn" class="btn btn-primary" disabled>
+                            <i class="fas fa-check-square"></i> Select Polling Parts
+                        </button>
+                        <div id="selected-parts-info" style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;"></div>
+                    </div>
+
+                    <div class="form-group" id="captcha-section" style="display: none;">
+                        <label><i class="fas fa-shield-alt"></i> Captcha *</label>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="flex: 0 0 200px;">
+                                <img id="captcha-image" src="" alt="Captcha" style="width: 100%; border: 2px solid var(--kerala-green); border-radius: 8px;">
+                            </div>
+                            <div style="flex: 1;">
+                                <input type="text" id="captcha-text" placeholder="Enter captcha code" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            </div>
+                            <button type="button" id="refresh-captcha-btn" class="btn btn-secondary" style="white-space: nowrap;">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="back-to-step1" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" id="extract-btn" class="btn btn-success" disabled>
+                            <i class="fas fa-download"></i> Extract Voter Data
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loading" class="loading" tabindex="-1" role="alert" aria-live="polite">
+                    <div>
+                        <!-- Timer Badge -->
+                        <div class="progress-timer" id="progressTimer">
+                            <i class="fas fa-clock"></i>
+                            <span id="timeRemaining">Estimating time...</span>
+                        </div>
+
+                        <!-- Spinner -->
+                        <div class="spinner"></div>
+
+                        <!-- Main Status Text -->
+                        <div>
+                            <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
+                            <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.4;">Connecting to ECI portal</small>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressBarFill"></div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="progress-stats">
+                            <div class="stat-box">
+                                <span class="stat-value" id="statParts">0</span>
+                                <span class="stat-label">Parts Selected</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value" id="statVoters">0</span>
+                                <span class="stat-label">Voters Found</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value" id="statPdfSize">--</span>
+                                <span class="stat-label">PDF Size</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-value" id="statElapsed">0s</span>
+                                <span class="stat-label">Elapsed</span>
+                            </div>
+                        </div>
+
+                        <!-- Step Indicators -->
+                        <div class="progress-steps">
+                            <div class="progress-step active" id="pStep1">
+                                <span class="step-icon"><i class="fas fa-satellite-dish"></i></span>
+                                <span>Submitting form to ECI portal</span>
+                            </div>
+                            <div class="progress-step" id="pStep2">
+                                <span class="step-icon"><i class="fas fa-file-pdf"></i></span>
+                                <span>Downloading voter list PDF</span>
+                            </div>
+                            <div class="progress-step" id="pStep3">
+                                <span class="step-icon"><i class="fas fa-cogs"></i></span>
+                                <span>Parsing voter data from PDF</span>
+                            </div>
+                            <div class="progress-step" id="pStep4">
+                                <span class="step-icon"><i class="fas fa-shopping-cart"></i></span>
+                                <span>Creating your order</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Polling Parts Modal -->
+            <div id="parts-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+                <div style="background: white; border-radius: 15px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 3px solid var(--kerala-gold);">
+                        <h3 style="color: var(--kerala-green); margin: 0;"><i class="fas fa-list-check"></i> Select Polling Parts</h3>
+                        <button onclick="closePartsModal()" style="background: var(--kerala-red); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">×</button>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <button type="button" onclick="selectAllParts()" class="btn btn-primary" style="margin-right: 0.5rem;">
+                            <i class="fas fa-check-square"></i> Select All
+                        </button>
+                        <button type="button" onclick="deselectAllParts()" class="btn btn-secondary">
+                            <i class="fas fa-square"></i> Deselect All
+                        </button>
+                    </div>
+                    <div id="parts-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                    <div style="margin-top: 1.5rem; text-align: right;">
+                        <button type="button" onclick="confirmParts()" class="btn btn-success">
+                            <i class="fas fa-check"></i> Confirm Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Step 3: Preview & Download -->
+            <div class="form-section" id="step3">
+                <h2 class="form-title"><i class="fas fa-eye"></i> Preview & Payment</h2>
+                <p class="form-subtitle">Review snippets, complete payment preview flow, and download your final slips</p>
+
+                <div class="content-grid">
+                    <div class="preview-section">
+                        <div class="preview-header">
+                            <h2 class="preview-title">Preview (First 2 Pages)</h2>
+                            <span class="preview-badge">Free</span>
+                        </div>
+
+                        <div class="preview-info" id="orderInfo">
+                            <p><strong>Order ID:</strong> <span id="displayOrderId">-</span></p>
+                            <p><strong>Symbol:</strong> <span id="displayPartyName">-</span></p>
+                            <p><strong>District:</strong> <span id="displayDistrict">-</span></p>
+                            <p><strong>Constituency:</strong> <span id="displayConstituency">-</span></p>
+                            <p><strong>Selected Parts:</strong> <span id="displayParts">-</span></p>
+                        </div>
+
+                        <div id="previewContainer" class="preview-container">
+                            <div class="loading-preview">
+                                <div class="spinner"></div>
+                                <p>Generating preview...</p>
+                            </div>
+                        </div>
+
+                        <div class="preview-note" id="previewNote">
+                            <strong>Note:</strong> This is a preview of the first 2 pages only. Download the complete PDF after payment.
+                        </div>
+                    </div>
+
+                    <div class="payment-section" id="paymentSection">
+                        <div class="payment-card">
+                            <h3 class="payment-title">Order Summary</h3>
+
+                            <div class="order-summary">
+                                <div class="summary-row">
+                                    <span class="summary-label">Total Voters</span>
+                                    <span class="summary-value" id="totalVoters">-</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Price per Voter</span>
+                                    <span class="summary-value" id="pricePerVoter">₹0.50</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Total Amount</span>
+                                    <span class="summary-value" id="totalAmount">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-payment" id="paymentBtn" onclick="initiatePayment()" disabled>
+                                <span id="payBtnText">Pay Now</span>
+                            </button>
+
+                            <div class="secure-badge">
+                                <span><i class="fas fa-lock"></i></span>
+                                <span>Secure Payment</span>
+                            </div>
+
+                            <div class="payment-icons">
+                                <span class="payment-icon" title="UPI"><i class="fas fa-mobile-alt"></i></span>
+                                <span class="payment-icon" title="Cards"><i class="fas fa-credit-card"></i></span>
+                                <span class="payment-icon" title="Net Banking"><i class="fas fa-university"></i></span>
+                                <span class="payment-icon" title="Wallets"><i class="fas fa-wallet"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1rem;">
+                    <button type="button" id="back-to-step2" class="btn btn-secondary" style="max-width: 220px;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let state = {
+            currentStep: 1,
+            voterData: [],
+            candidate: null,
+            extractedData: null,
+            pollingParts: [],
+            selectedParts: [],
+            captchaId: null,
+            symbolFreeMode: false
+        };
+
+        // API Base
+        const API_BASE = '/api/assembly';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            initSymbolPickerIntegration();
+            await loadDistricts();
+            setupEventListeners();
+            updateProgressBar(1);
+        });
+
+        // ─── Symbol Picker Integration ──────────────────────────────────────
+        function initSymbolPickerIntegration() {
+            if (typeof initSymbolPicker !== 'function') return;
+
+            window.symbolPicker = initSymbolPicker((symbol) => {
+                // Symbol selected from picker
+                state.symbolFreeMode = false;
+                applySymbol(symbol.imageUrl || symbol.url || '', symbol.nameMalayalam || symbol.name || '');
+            });
+
+            // Custom file upload
+            document.getElementById('custom-symbol-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    state.symbolFreeMode = false;
+                    applySymbol(ev.target.result, file.name.replace(/\.[^.]+$/, ''));
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Continue without symbol
+            document.getElementById('continueWithoutSymbol').addEventListener('click', (e) => {
+                e.preventDefault();
+                state.symbolFreeMode = true;
+                state.candidate = buildCandidate(null, '');
+                document.getElementById('symbolPreview').style.display = 'none';
+                document.getElementById('selectSymbolBtn').style.display = 'block';
+            });
+        }
+
+        function applySymbol(src, name) {
+            document.getElementById('selectedSymbolImage').src = src;
+            document.getElementById('selectedSymbolName').textContent = name;
+            document.getElementById('symbolPreview').style.display = 'block';
+            document.getElementById('selectSymbolBtn').style.display = 'none';
+            state.candidate = buildCandidate(src, name);
+        }
+
+        function buildCandidate(symbolSrc, symbolName) {
+            return {
+                symbol: symbolSrc || '',
+                symbolName: symbolName || (state.candidate && state.candidate.symbolName) || ''
+            };
+        }
+
+        // ─── Districts & Constituencies ─────────────────────────────────────
+        async function loadDistricts() {
+            try {
+                const response = await fetch('/api/dropdown/districts?state=S11');
+                const data = await response.json();
+                const select = document.getElementById('district');
+                select.innerHTML = '<option value="">Select District</option>';
+                data.districts.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.value;
+                    opt.textContent = d.label;
+                    select.appendChild(opt);
+                });
+            } catch (error) {
+                console.error('Failed to load districts:', error);
+            }
+        }
+
+        async function loadConstituencies(districtCode) {
+            try {
+                const response = await fetch(`/api/dropdown/assembly-constituencies?state=S11&district=${districtCode}`);
+                const data = await response.json();
+                const select = document.getElementById('constituency');
+                select.innerHTML = '<option value="">Select Constituency</option>';
+                select.disabled = false;
+                data.constituencies.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.value;
+                    opt.textContent = c.label;
+                    select.appendChild(opt);
+                });
+            } catch (error) {
+                console.error('Failed to load constituencies:', error);
+            }
+        }
+
+        // ─── Polling Parts ──────────────────────────────────────────────────
+        async function loadPollingParts() {
+            const district = document.getElementById('district').value;
+            const constituency = document.getElementById('constituency').value;
+            if (!district || !constituency) { alert('Please select district and constituency first'); return; }
+            try {
+                const response = await fetch('/api/assembly/getPollingParts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'SIR-FinalRoll', district, constituency, language: 'en' })
+                });
+                const data = await response.json();
+                state.pollingParts = data.parts || [];
+                renderPartsModal();
+                openPartsModal();
+            } catch (error) {
+                alert('Failed to load polling parts: ' + error.message);
+            }
+        }
+
+        function renderPartsModal() {
+            const partsList = document.getElementById('parts-list');
+            if (!state.pollingParts || state.pollingParts.length === 0) {
+                partsList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No polling parts found.</p>';
+                return;
+            }
+            partsList.innerHTML = state.pollingParts.map(part => `
+                <div class="part-item">
+                    <input type="checkbox" id="part-${part.partNumber}" value="${part.partNumber}"
+                           data-part-name="${part.partName || 'Part ' + part.partNumber}">
+                    <label for="part-${part.partNumber}">Part ${part.partNumber} - ${part.partName || 'Part ' + part.partNumber}</label>
+                </div>
+            `).join('');
+        }
+
+        function openPartsModal() { document.getElementById('parts-modal').style.display = 'flex'; }
+        function closePartsModal() { document.getElementById('parts-modal').style.display = 'none'; }
+        function selectAllParts() { document.querySelectorAll('#parts-list input[type="checkbox"]').forEach(cb => cb.checked = true); }
+        function deselectAllParts() { document.querySelectorAll('#parts-list input[type="checkbox"]').forEach(cb => cb.checked = false); }
+
+        function confirmParts() {
+            const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) { alert('Please select at least one polling part'); return; }
+            state.selectedParts = Array.from(checkboxes).map(cb => ({ partNumber: cb.value, partName: cb.dataset.partName }));
+            document.getElementById('selected-parts-info').textContent = `${state.selectedParts.length} part(s) selected`;
+            closePartsModal();
+            loadCaptcha();
+        }
+
+        // ─── Captcha ────────────────────────────────────────────────────────
+        async function loadCaptcha() {
+            const district = document.getElementById('district').value;
+            const constituency = document.getElementById('constituency').value;
+            try {
+                const response = await fetch('/api/assembly/getCaptcha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'SIR-FinalRoll', district, constituency, language: 'en' })
+                });
+                const data = await response.json();
+                state.captchaId = data.captchaId;
+                document.getElementById('captcha-image').src = data.captchaUrl;
+                document.getElementById('captcha-section').style.display = 'block';
+                document.getElementById('captcha-text').value = '';
+                document.getElementById('extract-btn').disabled = true;
+                document.getElementById('captcha-text').focus();
+            } catch (error) {
+                alert('Failed to load captcha');
+            }
+        }
+
+        // ─── Event Listeners ────────────────────────────────────────────────
+        function setupEventListeners() {
+            // Step 1 → Step 2
+            document.getElementById('next-to-step2').addEventListener('click', () => {
+                if (!state.candidate) state.candidate = buildCandidate(null, '');
+                goToStep(2);
+            });
+
+            // Step 2: district → constituencies
+            document.getElementById('district').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    loadConstituencies(e.target.value);
+                    document.getElementById('select-parts-btn').disabled = true;
+                    document.getElementById('captcha-section').style.display = 'none';
+                    document.getElementById('extract-btn').disabled = true;
+                }
+            });
+
+            // Step 2: constituency → enable parts button
+            document.getElementById('constituency').addEventListener('change', (e) => {
+                document.getElementById('select-parts-btn').disabled = !e.target.value;
+                if (!e.target.value) {
+                    document.getElementById('captcha-section').style.display = 'none';
+                    document.getElementById('extract-btn').disabled = true;
+                }
+            });
+
+            document.getElementById('select-parts-btn').addEventListener('click', loadPollingParts);
+            document.getElementById('refresh-captcha-btn').addEventListener('click', loadCaptcha);
+            document.getElementById('captcha-text').addEventListener('input', (e) => {
+                document.getElementById('extract-btn').disabled = !e.target.value.trim();
+            });
+            document.getElementById('extract-btn').addEventListener('click', extractVoters);
+
+            // Navigation
+            document.getElementById('back-to-step1').addEventListener('click', () => goToStep(1));
+            document.getElementById('back-to-step2').addEventListener('click', () => goToStep(2));
+        }
+
+        // ─── Progress Tracker ─────────────────────────────────────────────
+        let progressInterval = null;
+        let progressPollInterval = null;
+        let progressStartTime = null;
+
+        function startProgressTracker(numParts, captchaId) {
+            progressStartTime = Date.now();
+            const estSecondsPerPart = 8;
+            const baseTime = 12;
+            const totalEstSec = baseTime + (numParts * estSecondsPerPart);
+
+            // Reset UI
+            document.getElementById('progressBarFill').style.width = '0%';
+            document.getElementById('statParts').textContent = `${numParts}`;
+            document.getElementById('statElapsed').textContent = '0s';
+            document.getElementById('statVoters').textContent = '0';
+            document.getElementById('statPdfSize').textContent = '--';
+            document.getElementById('loadingMainText').textContent = 'Requesting PDFs from ECI...';
+            document.getElementById('loadingSubText').textContent = 'Submitting captcha and generating download links';
+            setProgressStep(1);
+
+            // Timer interval (elapsed + estimated remaining)
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - progressStartTime) / 1000);
+                document.getElementById('statElapsed').textContent = formatTime(elapsed);
+
+                const remaining = Math.max(0, totalEstSec - elapsed);
+                if (remaining > 0) {
+                    document.getElementById('timeRemaining').textContent = `~${formatTime(remaining)} remaining`;
+                } else {
+                    document.getElementById('timeRemaining').textContent = 'Almost done...';
+                }
+            }, 500);
+
+            // Poll server for real-time progress
+            if (progressPollInterval) clearInterval(progressPollInterval);
+            progressPollInterval = setInterval(async () => {
+                try {
+                    const resp = await fetch(`${API_BASE}/extractionProgress/${encodeURIComponent(captchaId)}`);
+                    const result = await resp.json();
+                    if (result.status === 'ok' && result.progress) {
+                        applyServerProgress(result.progress);
+                    }
+                } catch (e) { /* ignore */ }
+            }, 700);
+        }
+
+        function applyServerProgress(p) {
+            // Update progress bar
+            if (p.percent) {
+                document.getElementById('progressBarFill').style.width = Math.min(p.percent, 95) + '%';
+            }
+            // Update stats
+            if (p.votersExtracted != null) {
+                document.getElementById('statVoters').textContent = p.votersExtracted.toLocaleString();
+            }
+            if (p.pdfSizeKB) {
+                document.getElementById('statPdfSize').textContent = p.pdfSizeKB >= 1024
+                    ? (p.pdfSizeKB / 1024).toFixed(1) + ' MB'
+                    : p.pdfSizeKB + ' KB';
+            }
+            // Update stage steps and text
+            if (p.stage === 'generating') {
+                setProgressStep(1);
+                document.getElementById('loadingMainText').textContent = 'Requesting PDFs from ECI...';
+                document.getElementById('loadingSubText').textContent = p.stageLabel || 'Submitting captcha';
+            } else if (p.stage === 'downloading') {
+                setProgressStep(2);
+                document.getElementById('loadingMainText').textContent = 'Downloading voter PDFs...';
+                document.getElementById('loadingSubText').textContent = p.stageLabel || `PDF ${p.pdfDownloaded || 0}/${p.pdfTotal || '?'}`;
+            } else if (p.stage === 'extracting') {
+                setProgressStep(3);
+                const liveCount = (p.votersExtracted || 0).toLocaleString();
+                document.getElementById('loadingMainText').textContent = `Extracting voter snippets... ${liveCount} voters found`;
+                document.getElementById('loadingSubText').textContent = p.stageLabel || `${p.votersExtracted || 0} voters found`;
+            } else if (p.stage === 'complete') {
+                setProgressStep(4);
+            }
+        }
+
+        function setProgressStep(activeStep) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('pStep' + i);
+                el.classList.remove('active', 'completed');
+                if (i < activeStep) el.classList.add('completed');
+                else if (i === activeStep) el.classList.add('active');
+            }
+        }
+
+        function stopProgressTracker(success, voterCount) {
+            if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
+            if (progressPollInterval) { clearInterval(progressPollInterval); progressPollInterval = null; }
+            const elapsed = progressStartTime ? Math.floor((Date.now() - progressStartTime) / 1000) : 0;
+            document.getElementById('statElapsed').textContent = formatTime(elapsed);
+
+            if (success) {
+                document.getElementById('progressBarFill').style.width = '100%';
+                document.getElementById('timeRemaining').textContent = 'Complete!';
+                document.getElementById('progressTimer').style.background = 'linear-gradient(135deg, #006d3b, #00894a)';
+                if (voterCount) {
+                    document.getElementById('statVoters').textContent = voterCount.toLocaleString();
+                }
+            } else {
+                document.getElementById('timeRemaining').textContent = 'Failed';
+                document.getElementById('progressTimer').style.background = '#dc3545';
+            }
+        }
+
+        function formatTime(sec) {
+            if (sec < 60) return sec + 's';
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return m + 'm ' + s + 's';
+        }
+
+        // ─── Extract Voters ─────────────────────────────────────────────────
+        async function extractVoters() {
+            const district = document.getElementById('district').value;
+            const constituency = document.getElementById('constituency').value;
+            const captchaText = document.getElementById('captcha-text').value.trim();
+
+            if (!district || !constituency) { alert('Please select district and constituency'); return; }
+            if (state.selectedParts.length === 0) { alert('Please select polling parts'); return; }
+            if (!captchaText) { alert('Please enter captcha text'); return; }
+            if (!state.captchaId) { alert('Captcha ID missing. Please refresh.'); return; }
+
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('extract-btn').disabled = true;
+            startProgressTracker(state.selectedParts.length, state.captchaId);
+
+            try {
+                const response = await fetch(`${API_BASE}/extractVoters`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stateCode: 'S11', district, constituency,
+                        year: '2026', rollType: 'SIR-FinalRoll', language: 'en',
+                        selectedParts: state.selectedParts,
+                        captcha: captchaText, captchaId: state.captchaId,
+                        useOCR: false,
+                        skipSlipGeneration: false,
+                        createPreviewSession: true,
+                        candidate: state.candidate || { symbol: '', symbolName: '' }
+                    })
+                });
+
+                const data = await response.json();
+                const isSuccess = data.success === true || data.status === 'success';
+
+                if (isSuccess) {
+                    // Update progress to parsing done
+                    setProgressStep(4);
+                    stopProgressTracker(true, data.data.totalVoters);
+                    document.getElementById('loadingMainText').innerHTML = `<i class="fas fa-check-circle" style="color: var(--kerala-green);"></i> Found ${data.data.totalVoters.toLocaleString()} voters!`;
+                    document.getElementById('loadingSubText').textContent = 'Creating your order...';
+
+                    state.extractedData = data.data;
+                    state.candidate = buildCandidate(
+                        state.candidate && state.candidate.symbol,
+                        state.candidate && state.candidate.symbolName
+                    );
+
+                    if (!data.data.previewId) {
+                        throw new Error('Failed to prepare preview data');
+                    }
+
+                    // Create assembly order in database (like local body flow)
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        alert('Please login to create an order');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    const districtSelect = document.getElementById('district');
+                    const constituencySelect = document.getElementById('constituency');
+
+                    const orderResponse = await fetch('/api/assembly/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            location: {
+                                state: 'Kerala',
+                                stateCode: 'S11',
+                                district: districtSelect.options[districtSelect.selectedIndex]?.text || district,
+                                districtCode: district,
+                                constituency: constituencySelect.options[constituencySelect.selectedIndex]?.text || constituency,
+                                constituencyCode: constituency,
+                                year: '2026',
+                                rollType: 'SIR-FinalRoll',
+                                language: 'en',
+                                selectedParts: state.selectedParts
+                            },
+                            voters: new Array(data.data.totalVoters), // Just pass length, images are in previewId
+                            candidate: state.candidate,
+                            previewId: data.data.previewId,
+                            slipFilePdf: data.data.slipFilePdf || null
+                        })
+                    });
+
+                    const orderData = await orderResponse.json();
+                    if (orderData.status !== 'success' || !orderData.order?.orderId) {
+                        throw new Error(orderData.message || 'Failed to create order');
+                    }
+
+                    // Show success, then redirect
+                    document.getElementById('loadingMainText').innerHTML = `<i class="fas fa-check-circle" style="color: var(--kerala-green);"></i> Order created!`;
+                    document.getElementById('loadingSubText').textContent = `${data.data.totalVoters.toLocaleString()} voters · Redirecting to preview...`;
+                    setProgressStep(5); // all done
+
+                    setTimeout(() => {
+                        window.location.href = `preview.html?orderId=${encodeURIComponent(orderData.order.orderId)}`;
+                    }, 1200);
+                } else {
+                    throw new Error(data.message || data.error || 'Extraction failed');
+                }
+            } catch (error) {
+                stopProgressTracker(false);
+                alert('❌ Extraction failed: ' + error.message);
+                loadCaptcha();
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('extract-btn').disabled = false;
+            }
+        }
+
+        // ─── Navigation ──────────────────────────────────────────────────────
+        function goToStep(step) {
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            document.querySelectorAll('.step').forEach(s => {
+                const n = parseInt(s.dataset.step);
+                s.classList.remove('active', 'completed');
+                if (n === step) s.classList.add('active');
+                else if (n < step) s.classList.add('completed');
+            });
+            state.currentStep = step;
+            updateProgressBar(step);
+            if (step === 3) generatePreview();
+        }
+
+        function updateProgressBar(step) {
+            const progress = ((step - 1) / 2) * 100;
+            const progressLine = document.getElementById('progressLine');
+            if (progressLine) progressLine.style.width = `${progress}%`;
+        }
+
+        // ─── Preview ─────────────────────────────────────────────────────────
+        function generatePreview() {
+            const container = document.getElementById('previewContainer');
+            const candidate = state.candidate || { symbol: '', symbolName: '' };
+
+            const previewSlips = state.voterData.slice(0, 5);
+
+            const orderId = `ASM-${Date.now()}`;
+            const district = (state.extractedData && state.extractedData.district) || '-';
+            const constituency = (state.extractedData && state.extractedData.constituency) || '-';
+            const symbolText = candidate.symbolName || (candidate.symbol ? 'Selected Symbol' : 'No Symbol');
+
+            document.getElementById('displayOrderId').textContent = orderId;
+            document.getElementById('displayPartyName').textContent = symbolText;
+            document.getElementById('displayDistrict').textContent = district;
+            document.getElementById('displayConstituency').textContent = constituency;
+            document.getElementById('displayParts').textContent = `${state.selectedParts.length}`;
+
+            const total = state.voterData.length;
+            const perVoter = 0.5;
+            const amount = (total * perVoter).toFixed(2);
+            document.getElementById('totalVoters').textContent = total;
+            document.getElementById('pricePerVoter').textContent = `₹${perVoter.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `₹${amount}`;
+
+            const paymentBtn = document.getElementById('paymentBtn');
+            const payBtnText = document.getElementById('payBtnText');
+            paymentBtn.disabled = false;
+            payBtnText.textContent = `Pay ₹${amount} & Download`;
+
+            const totalPreviewSlips = 10;
+            document.getElementById('previewNote').innerHTML =
+                `<strong>Note:</strong> This is a preview of the first ${totalPreviewSlips} slips only. Download the complete PDF after payment.`;
+
+            container.innerHTML = previewSlips.map((voter, index) => {
+                const serialNo = voter.serialNo || voter.sl_no || (index + 1);
+                const snippetSrc = voter.snippetBase64 || '';
+                const showSymbol = Boolean(candidate.symbol);
+                const symbolLabel = candidate.symbolName || 'ചിഹ്നം';
+                const pollingStation = voter.partName || voter.pollingStation || '-';
+
+                const leftSection = showSymbol
+                    ? `
+                    <div class="preview-slip-left">
+                        <div class="preview-symbol-header">നമ്മുടെ ചിഹ്നം</div>
+                        <img src="${candidate.symbol}" alt="Symbol" class="preview-symbol-image">
+                        <div class="preview-symbol-name">${symbolLabel}</div>
+                    </div>`
+                    : `
+                    <div class="preview-slip-left">
+                    </div>`;
+
+                return `
+                <div class="preview-slip${showSymbol ? '' : ' symbol-free'}">
+                    ${leftSection}
+                    <div class="preview-slip-right">
+                        ${showSymbol ? `<div class="preview-slip-header"></div>` : ''}
+                        <div class="preview-snippet-area">
+                            ${snippetSrc
+                                ? `<img src="${snippetSrc}" alt="Voter snippet ${serialNo}" class="preview-voter-snippet">`
+                                : `<div class="preview-snippet-fallback">No snippet available</div>`
+                            }
+                        </div>
+                        <div class="preview-candidate-footer">പോളിംഗ് സ്റ്റേഷൻ: ${pollingStation}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            if (state.voterData.length > 5) {
+                container.innerHTML += `<p style="text-align:center; color:#666; margin-top:1rem;">+ ${state.voterData.length - 5} more slips in full PDF</p>`;
+            }
+        }
+
+        function initiatePayment() {
+            // Assembly flow reuses the local-body payment section UI; actual action generates the full PDF.
+            downloadSlips();
+        }
+
+        // ─── Download ────────────────────────────────────────────────────────
+        async function downloadSlips() {
+            const candidate = state.candidate || { symbol: '', symbolName: '' };
+            const paymentBtn = document.getElementById('paymentBtn');
+            const payBtnText = document.getElementById('payBtnText');
+            try {
+                if (paymentBtn) paymentBtn.disabled = true;
+                if (payBtnText) payBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                const response = await fetch(`${API_BASE}/generateSlipsWithCandidates`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        voters: state.voterData,
+                        candidate,
+                        metadata: {
+                            district: state.extractedData && state.extractedData.district,
+                            constituency: state.extractedData && state.extractedData.constituency,
+                            totalVoters: state.voterData.length
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = data.downloadUrl;
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                alert('❌ Failed to generate slips: ' + error.message);
+            } finally {
+                if (paymentBtn) paymentBtn.disabled = false;
+                if (payBtnText) payBtnText.textContent = 'Pay Now';
+            }
+        }
+    </script>
+</body>
+</html>

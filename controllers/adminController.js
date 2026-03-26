@@ -1,8 +1,12 @@
 import User from '../models/User.js';
 import Symbol from '../models/Symbol.js';
 import Order from '../models/Order.js';
+import AssemblyOrder from '../models/AssemblyOrder.js';
+import Settings from '../models/Settings.js';
 import UserActivity from '../models/UserActivity.js';
 import UserSession from '../models/UserSession.js';
+import { getPreviewPayloadById } from './assemblyVoterController_v2.js';
+import { saveVoterSnippetSlipsToFile } from '../utils/imageSlipGenerator.js';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,6 +14,45 @@ import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+async function getPrimaryElectionModule() {
+    try {
+        const settingsMap = await Settings.getSettings('general');
+        const mode = settingsMap?.get
+            ? settingsMap.get('primaryElectionModule')
+            : settingsMap?.primaryElectionModule;
+        return mode === 'assembly' ? 'assembly' : 'local-body';
+    } catch (_) {
+        return 'local-body';
+    }
+}
+
+function normalizeAdminOrder(orderDoc, electionModule) {
+    const order = { ...orderDoc };
+
+    if (electionModule === 'assembly') {
+        return {
+            ...order,
+            voterCount: order.totalVoters || order.voters?.length || 0,
+            location: {
+                district: order.district || '-',
+                localBody: order.constituency || '-',
+                ward: order.selectedParts?.[0]?.partName || '-'
+            },
+            customization: {
+                ...(order.customization || {}),
+                symbolName: order.customization?.partyName || order.customization?.symbolText || '',
+                symbolNameMalayalam: order.customization?.partyNameMalayalam || order.customization?.symbolTextMalayalam || '',
+                symbolImage: order.customization?.partyLogo || ''
+            }
+        };
+    }
+
+    return {
+        ...order,
+        voterCount: order.totalVoters || order.voters?.length || 0
+    };
+}
 
 // Configure multer for symbol image uploads
 const storage = multer.diskStorage({
@@ -486,6 +529,9 @@ export const deleteSymbol = async (req, res) => {
 // Get all orders (admin only)
 export const getAllOrders = async (req, res) => {
     try {
+        const electionModule = await getPrimaryElectionModule();
+        const OrderModel = electionModule === 'assembly' ? AssemblyOrder : Order;
+
         const { 
             status, 
             search, 
@@ -528,9 +574,17 @@ export const getAllOrders = async (req, res) => {
         const limitNum = parseInt(limit);
         const skip = (pageNum - 1) * limitNum;
         
+        if (electionModule === 'assembly') {
+            query.isDeleted = { $ne: true };
+        }
+
+        const selectFields = electionModule === 'assembly'
+            ? 'orderId userId totalVoters amount paymentStatus createdAt pdfPath customization district constituency selectedParts status'
+            : 'orderId userId totalVoters amount paymentStatus createdAt pdfPath customization location status';
+
         // Get orders with pagination - OPTIMIZED
-        const orders = await Order.find(query)
-            .select('orderId userId totalVoters amount paymentStatus createdAt pdfPath customization location')
+        const orders = await OrderModel.find(query)
+            .select(selectFields)
             .populate('userId', 'name email phone')
             .sort(sortOptions)
             .skip(skip)
@@ -538,16 +592,14 @@ export const getAllOrders = async (req, res) => {
             .lean();  // 30-40% faster!
         
         // Get total count for pagination (run in parallel)
-        const totalCount = await Order.countDocuments(query);
+        const totalCount = await OrderModel.countDocuments(query);
         
-        // Add voterCount field for backward compatibility
-        const ordersWithCount = orders.map(order => ({
-            ...order,
-            voterCount: order.totalVoters || order.voters?.length || 0
-        }));
+        // Normalize to the existing admin UI shape.
+        const ordersWithCount = orders.map(order => normalizeAdminOrder(order, electionModule));
         
         res.json({
             status: 'success',
+            electionModule,
             count: ordersWithCount.length,
             total: totalCount,
             page: pageNum,
@@ -568,10 +620,23 @@ export const getAllOrders = async (req, res) => {
 export const getOrderDetails = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const electionModule = await getPrimaryElectionModule();
+
+        const primaryModel = electionModule === 'assembly' ? AssemblyOrder : Order;
+        const fallbackModel = electionModule === 'assembly' ? Order : AssemblyOrder;
         
-        const order = await Order.findById(orderId)
+        let order = await primaryModel.findById(orderId)
             .populate('userId', 'name email phone')
             .lean();
+        let resolvedModule = electionModule;
+
+        // Allow mixed data access by id even if mode changed recently.
+        if (!order) {
+            order = await fallbackModel.findById(orderId)
+                .populate('userId', 'name email phone')
+                .lean();
+            resolvedModule = electionModule === 'assembly' ? 'local-body' : 'assembly';
+        }
         
         if (!order) {
             return res.status(404).json({
@@ -580,11 +645,11 @@ export const getOrderDetails = async (req, res) => {
             });
         }
         
-        // Add voterCount field
-        order.voterCount = order.totalVoters || order.voters?.length || 0;
+        order = normalizeAdminOrder(order, resolvedModule);
         
         res.json({
             status: 'success',
+            electionModule: resolvedModule,
             order
         });
     } catch (error) {
@@ -850,6 +915,31 @@ export const createPendingOrderForUser = async (req, res) => {
 export const markOrderCompleted = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const electionModule = await getPrimaryElectionModule();
+
+        if (electionModule === 'assembly') {
+            const order = await AssemblyOrder.findOne({ orderId, isDeleted: { $ne: true } });
+            if (!order) {
+                return res.status(404).json({ status: 'error', message: 'Order not found' });
+            }
+
+            order.paymentStatus = 'completed';
+            order.paidAt = new Date();
+            order.paymentMethod = 'admin_bypass';
+            order.status = 'completed';
+            await order.save();
+
+            return res.json({
+                status: 'success',
+                electionModule,
+                message: 'Order marked as completed. PDF can now be generated.',
+                order: {
+                    orderId: order.orderId,
+                    paymentStatus: order.paymentStatus,
+                    paidAt: order.paidAt
+                }
+            });
+        }
         
         const order = await Order.findOne({ orderId });
         
@@ -891,6 +981,52 @@ export const markOrderCompleted = async (req, res) => {
 export const downloadOrderPDF = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const electionModule = await getPrimaryElectionModule();
+
+        if (electionModule === 'assembly') {
+            const order = await AssemblyOrder.findOne({ orderId, isDeleted: { $ne: true } });
+            if (!order) {
+                return res.status(404).json({ status: 'error', message: 'Order not found' });
+            }
+
+            if (order.paymentStatus !== 'completed') {
+                return res.status(403).json({ status: 'error', message: 'Payment not completed' });
+            }
+
+            if (!order.pdfPath && order.previewId) {
+                const previewPayload = getPreviewPayloadById(order.previewId);
+                if (previewPayload && Array.isArray(previewPayload.voters) && previewPayload.voters.length > 0) {
+                    const slipFileInfo = await saveVoterSnippetSlipsToFile(previewPayload.voters, {
+                        constituency: order.constituency || 'Assembly',
+                        district: order.district || '',
+                        stateCode: order.stateCode || '',
+                        candidate: previewPayload.candidate || null,
+                        symbolImage: previewPayload.candidate?.symbol || previewPayload.candidate?.symbolImage || '',
+                        symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
+                    });
+
+                    order.pdfPath = `/voter-slips/${slipFileInfo.pdfFileName}`;
+                    order.pdfGenerated = true;
+                    order.pdfGeneratedAt = new Date();
+                    await order.save();
+                }
+            }
+
+            if (!order.pdfPath) {
+                return res.status(404).json({ status: 'error', message: 'PDF not available for this assembly order' });
+            }
+
+            const pdfFullPath = path.join(__dirname, '..', order.pdfPath);
+            if (!fs.existsSync(pdfFullPath)) {
+                return res.status(404).json({ status: 'error', message: 'PDF file not found on server' });
+            }
+
+            const pdfBuffer = fs.readFileSync(pdfFullPath);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=voter-slips-${orderId}.pdf`);
+            res.setHeader('Content-Length', pdfBuffer.length);
+            return res.send(pdfBuffer);
+        }
         
         const order = await Order.findOne({ orderId });
         
@@ -988,6 +1124,45 @@ export const downloadOrderPDF = async (req, res) => {
 export const regenerateOrderPDF = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const electionModule = await getPrimaryElectionModule();
+
+        if (electionModule === 'assembly') {
+            const order = await AssemblyOrder.findOne({ orderId, isDeleted: { $ne: true } });
+            if (!order) {
+                return res.status(404).json({ status: 'error', message: 'Order not found' });
+            }
+
+            if (!order.previewId) {
+                return res.status(404).json({ status: 'error', message: 'Preview session missing. Please re-extract.' });
+            }
+
+            const previewPayload = getPreviewPayloadById(order.previewId);
+            if (!previewPayload || !Array.isArray(previewPayload.voters) || previewPayload.voters.length === 0) {
+                return res.status(404).json({ status: 'error', message: 'Preview session expired. Please re-extract.' });
+            }
+
+            const slipFileInfo = await saveVoterSnippetSlipsToFile(previewPayload.voters, {
+                constituency: order.constituency || 'Assembly',
+                district: order.district || '',
+                stateCode: order.stateCode || '',
+                candidate: previewPayload.candidate || null,
+                symbolImage: previewPayload.candidate?.symbol || previewPayload.candidate?.symbolImage || '',
+                symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
+            });
+
+            order.pdfPath = `/voter-slips/${slipFileInfo.pdfFileName}`;
+            order.pdfGenerated = true;
+            order.pdfGeneratedAt = new Date();
+            await order.save();
+
+            return res.json({
+                status: 'success',
+                electionModule,
+                message: 'Assembly PDF regenerated successfully',
+                filename: slipFileInfo.pdfFileName,
+                size: 'Generated'
+            });
+        }
         
         console.log(`🔄 ADMIN REGENERATE PDF: Starting for order ${orderId}`);
         
@@ -1080,6 +1255,14 @@ export const regenerateOrderPDF = async (req, res) => {
 // Get analytics data
 export const getAnalytics = async (req, res) => {
     try {
+        const electionModule = await getPrimaryElectionModule();
+        const OrderModel = electionModule === 'assembly' ? AssemblyOrder : Order;
+        const orderMatch = electionModule === 'assembly' ? { isDeleted: { $ne: true } } : {};
+
+        const recentSelect = electionModule === 'assembly'
+            ? 'orderId totalVoters amount paymentStatus createdAt district constituency'
+            : 'orderId totalVoters amount paymentStatus createdAt location';
+
         // Run ALL queries in parallel for 5-8x faster response!
         const [
             totalUsers,
@@ -1094,29 +1277,30 @@ export const getAnalytics = async (req, res) => {
         ] = await Promise.all([
             User.countDocuments({ role: 'user' }),
             User.countDocuments({ role: 'user', isActive: true }),
-            Order.countDocuments(),
-            Order.countDocuments({ paymentStatus: 'completed' }),
+            OrderModel.countDocuments(orderMatch),
+            OrderModel.countDocuments({ ...orderMatch, paymentStatus: 'completed' }),
             Symbol.countDocuments(),
             Symbol.countDocuments({ isActive: true }),
             
             // Revenue calculation using aggregation (much faster!)
-            Order.aggregate([
-                { $match: { paymentStatus: 'completed' } },
+            OrderModel.aggregate([
+                { $match: { ...orderMatch, paymentStatus: 'completed' } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
             ]),
             
             // Recent orders
-            Order.find()
+            OrderModel.find(orderMatch)
                 .sort({ createdAt: -1 })
                 .limit(10)
                 .populate('userId', 'name email')
-                .select('orderId totalVoters amount paymentStatus createdAt')
+                .select(recentSelect)
                 .lean(),
             
             // Orders by month (last 6 months)
-            Order.aggregate([
+            OrderModel.aggregate([
                 { 
                     $match: { 
+                        ...orderMatch,
                         createdAt: { 
                             $gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) 
                         } 
@@ -1137,9 +1321,11 @@ export const getAnalytics = async (req, res) => {
         ]);
 
         const totalRevenue = revenueResult[0]?.total || 0;
+        const normalizedRecentOrders = recentOrders.map(order => normalizeAdminOrder(order, electionModule));
 
         res.json({
             status: 'success',
+            electionModule,
             analytics: {
                 users: {
                     total: totalUsers,
@@ -1160,7 +1346,7 @@ export const getAnalytics = async (req, res) => {
                     total: totalRevenue,
                     currency: 'INR'
                 },
-                recentOrders,
+                recentOrders: normalizedRecentOrders,
                 ordersByMonth
             }
         });
@@ -1178,8 +1364,14 @@ export const getAnalytics = async (req, res) => {
 export const deleteOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
+        const electionModule = await getPrimaryElectionModule();
+        const OrderModel = electionModule === 'assembly' ? AssemblyOrder : Order;
 
-        const order = await Order.findByIdAndDelete(orderId);
+        let order = await OrderModel.findByIdAndDelete(orderId);
+        if (!order) {
+            const fallbackModel = electionModule === 'assembly' ? Order : AssemblyOrder;
+            order = await fallbackModel.findByIdAndDelete(orderId);
+        }
 
         if (!order) {
             return res.status(404).json({
@@ -1209,6 +1401,8 @@ export const deleteOrder = async (req, res) => {
 export const deleteOrders = async (req, res) => {
     try {
         const { orderIds } = req.body;
+        const electionModule = await getPrimaryElectionModule();
+        const OrderModel = electionModule === 'assembly' ? AssemblyOrder : Order;
 
         if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
             return res.status(400).json({
@@ -1217,15 +1411,19 @@ export const deleteOrders = async (req, res) => {
             });
         }
 
-        // Delete all specified orders
-        const result = await Order.deleteMany({ _id: { $in: orderIds } });
+        // Delete all specified orders for active module, then fallback model for mixed data.
+        const resultPrimary = await OrderModel.deleteMany({ _id: { $in: orderIds } });
+        const fallbackModel = electionModule === 'assembly' ? Order : AssemblyOrder;
+        const resultFallback = await fallbackModel.deleteMany({ _id: { $in: orderIds } });
+        const deletedTotal = (resultPrimary.deletedCount || 0) + (resultFallback.deletedCount || 0);
 
-        console.log(`✅ Deleted ${result.deletedCount} orders`);
+        console.log(`✅ Deleted ${deletedTotal} orders`);
 
         res.json({
             status: 'success',
-            message: `Successfully deleted ${result.deletedCount} order(s)`,
-            deletedCount: result.deletedCount,
+            electionModule,
+            message: `Successfully deleted ${deletedTotal} order(s)`,
+            deletedCount: deletedTotal,
             requestedCount: orderIds.length
         });
     } catch (error) {
@@ -1705,6 +1903,8 @@ function formatDuration(seconds) {
 export const getUserReports = async (req, res) => {
     try {
         const { startDate, endDate, sortBy = 'revenue', order = 'desc' } = req.query;
+        const electionModule = await getPrimaryElectionModule();
+        const OrderModel = electionModule === 'assembly' ? AssemblyOrder : Order;
 
         // Build date filter
         let dateFilter = {};
@@ -1714,9 +1914,13 @@ export const getUserReports = async (req, res) => {
             if (endDate) dateFilter.createdAt.$lte = new Date(endDate);
         }
 
+        const reportMatch = electionModule === 'assembly'
+            ? { paymentStatus: 'completed', isDeleted: { $ne: true }, ...dateFilter }
+            : { paymentStatus: 'completed', ...dateFilter };
+
         // Aggregate user-wise statistics
-        const userStats = await Order.aggregate([
-            { $match: { paymentStatus: 'completed', ...dateFilter } },
+        const userStats = await OrderModel.aggregate([
+            { $match: reportMatch },
             {
                 $group: {
                     _id: '$userId',
@@ -1804,6 +2008,7 @@ export const getUserReports = async (req, res) => {
 
         res.json({
             status: 'success',
+            electionModule,
             data: {
                 users: userStats,
                 summary,
@@ -1829,6 +2034,77 @@ export const getUserReports = async (req, res) => {
 export const getDistrictReport = async (req, res) => {
     try {
         const { startDate, endDate, sortBy = 'totalRevenue', order = 'desc' } = req.query;
+        const electionModule = await getPrimaryElectionModule();
+
+        if (electionModule === 'assembly') {
+            const dateFilter = {};
+            if (startDate || endDate) {
+                dateFilter.createdAt = {};
+                if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999);
+                    dateFilter.createdAt.$lte = end;
+                }
+            }
+
+            const districtStats = await AssemblyOrder.aggregate([
+                {
+                    $match: {
+                        paymentStatus: 'completed',
+                        isDeleted: { $ne: true },
+                        ...dateFilter
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$district',
+                        totalOrders: { $sum: 1 },
+                        totalRevenue: { $sum: '$amount' },
+                        totalVoterSlips: { $sum: '$totalVoters' },
+                        constituencies: { $addToSet: '$constituency' }
+                    }
+                },
+                {
+                    $project: {
+                        district: '$_id',
+                        totalOrders: 1,
+                        totalRevenue: { $round: ['$totalRevenue', 2] },
+                        totalVoterSlips: 1,
+                        totalLocalBodies: { $size: '$constituencies' },
+                        totalWards: { $literal: 0 },
+                        avgRevenuePerOrder: { $round: [{ $divide: ['$totalRevenue', '$totalOrders'] }, 2] },
+                        avgSlipsPerOrder: { $round: [{ $divide: ['$totalVoterSlips', '$totalOrders'] }, 0] }
+                    }
+                },
+                { $sort: { [sortBy]: order === 'desc' ? -1 : 1 } }
+            ]);
+
+            const summary = {
+                totalDistricts: districtStats.length,
+                totalRevenue: districtStats.reduce((sum, d) => sum + d.totalRevenue, 0),
+                totalOrders: districtStats.reduce((sum, d) => sum + d.totalOrders, 0),
+                totalVoterSlips: districtStats.reduce((sum, d) => sum + d.totalVoterSlips, 0),
+                totalWards: 0,
+                totalLocalBodies: districtStats.reduce((sum, d) => sum + d.totalLocalBodies, 0)
+            };
+            summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+
+            return res.json({
+                status: 'success',
+                electionModule,
+                data: {
+                    districts: districtStats,
+                    summary,
+                    filters: {
+                        startDate: startDate || null,
+                        endDate: endDate || null,
+                        sortBy,
+                        order
+                    }
+                }
+            });
+        }
 
         // District name mapping (Malayalam to English)
         const districtMapping = {
@@ -1999,6 +2275,90 @@ export const getDistrictReport = async (req, res) => {
 export const getSymbolReport = async (req, res) => {
     try {
         const { startDate, endDate, sortBy = 'usageCount', order = 'desc' } = req.query;
+        const electionModule = await getPrimaryElectionModule();
+
+        if (electionModule === 'assembly') {
+            const dateFilter = {};
+            if (startDate || endDate) {
+                dateFilter.createdAt = {};
+                if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999);
+                    dateFilter.createdAt.$lte = end;
+                }
+            }
+
+            const symbolStats = await AssemblyOrder.aggregate([
+                {
+                    $match: {
+                        paymentStatus: 'completed',
+                        isDeleted: { $ne: true },
+                        ...dateFilter
+                    }
+                },
+                {
+                    $addFields: {
+                        symbolKey: {
+                            $ifNull: ['$customization.partyName', 'No Symbol']
+                        },
+                        symbolImage: {
+                            $ifNull: ['$customization.partyLogo', '']
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$symbolKey',
+                        usageCount: { $sum: 1 },
+                        totalRevenue: { $sum: '$amount' },
+                        totalVoterSlips: { $sum: '$totalVoters' },
+                        districts: { $addToSet: '$district' },
+                        constituencies: { $addToSet: '$constituency' },
+                        symbolImage: { $first: '$symbolImage' }
+                    }
+                },
+                {
+                    $project: {
+                        symbolId: '$_id',
+                        symbolName: '$_id',
+                        symbolMalayalamName: '',
+                        symbolImage: 1,
+                        usageCount: 1,
+                        totalRevenue: { $round: ['$totalRevenue', 2] },
+                        totalVoterSlips: 1,
+                        districtsCount: { $size: '$districts' },
+                        localBodiesCount: { $size: '$constituencies' },
+                        avgRevenuePerOrder: { $round: [{ $divide: ['$totalRevenue', '$usageCount'] }, 2] },
+                        avgSlipsPerOrder: { $round: [{ $divide: ['$totalVoterSlips', '$usageCount'] }, 0] }
+                    }
+                },
+                { $sort: { [sortBy]: order === 'desc' ? -1 : 1 } }
+            ]);
+
+            const summary = {
+                totalSymbolsUsed: symbolStats.length,
+                totalRevenue: symbolStats.reduce((sum, s) => sum + s.totalRevenue, 0),
+                totalOrders: symbolStats.reduce((sum, s) => sum + s.usageCount, 0),
+                totalVoterSlips: symbolStats.reduce((sum, s) => sum + s.totalVoterSlips, 0)
+            };
+            summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+
+            return res.json({
+                status: 'success',
+                electionModule,
+                data: {
+                    symbols: symbolStats,
+                    summary,
+                    filters: {
+                        startDate: startDate || null,
+                        endDate: endDate || null,
+                        sortBy,
+                        order
+                    }
+                }
+            });
+        }
 
         // Build date filter
         const dateFilter = {};

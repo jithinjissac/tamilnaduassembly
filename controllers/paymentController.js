@@ -4,6 +4,7 @@ import { initializeCashfree, getCashfree } from '../config/cashfree.js';
 import { initializePayUMoney, getPayUMoney, generatePaymentHash, verifyPaymentHash } from '../config/payumoney.js';
 import { Cashfree } from 'cashfree-pg';
 import Order from '../models/Order.js';
+import AssemblyOrder from '../models/AssemblyOrder.js';
 import User from '../models/User.js';
 import Settings from '../models/Settings.js';
 import { sendPaymentSuccessEmail, sendPDFReadyEmail } from '../utils/emailService.js';
@@ -17,6 +18,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const logger = createLogger('Payment');
+
+// Helper: find order from either Order or AssemblyOrder based on orderId prefix
+async function findOrderByIdAndUser(orderId, userId) {
+    if (orderId.startsWith('ASM-')) {
+        return await AssemblyOrder.findOne({ orderId, userId });
+    }
+    return await Order.findOne({ orderId, userId });
+}
+
+// Helper: find order from either model (no user filter, for webhooks)
+async function findOrderById(orderId) {
+    if (orderId.startsWith('ASM-')) {
+        return await AssemblyOrder.findOne({ orderId });
+    }
+    return await Order.findOne({ orderId });
+}
 
 // Get active payment gateway settings
 async function getPaymentSettings() {
@@ -35,6 +52,20 @@ async function getPaymentSettings() {
             }
         }
         
+        // Merge .env fallbacks for empty DB credentials
+        if (settings.razorpay) {
+            if (!settings.razorpay.keyId) settings.razorpay.keyId = process.env.RAZORPAY_KEY_ID || '';
+            if (!settings.razorpay.keySecret) settings.razorpay.keySecret = process.env.RAZORPAY_KEY_SECRET || '';
+        }
+        if (settings.cashfree) {
+            if (!settings.cashfree.appId) settings.cashfree.appId = process.env.CASHFREE_APP_ID || '';
+            if (!settings.cashfree.secretKey) settings.cashfree.secretKey = process.env.CASHFREE_SECRET_KEY || '';
+        }
+        if (settings.payumoney) {
+            if (!settings.payumoney.merchantKey) settings.payumoney.merchantKey = process.env.PAYUMONEY_MERCHANT_KEY || '';
+            if (!settings.payumoney.merchantSalt) settings.payumoney.merchantSalt = process.env.PAYUMONEY_MERCHANT_SALT || '';
+        }
+
         logger.debug('Payment settings loaded');
         return settings;
     } catch (error) {
@@ -75,7 +106,7 @@ export const createPaymentOrder = async (req, res) => {
         logger.debug('Active gateway:', activeGateway);
 
         // Find order
-        const order = await Order.findOne({ orderId, userId });
+        const order = await findOrderByIdAndUser(orderId, userId);
 
         if (!order) {
             return res.status(404).json({ 
@@ -333,7 +364,7 @@ export const createRazorpayOrder = async (req, res) => {
         const userId = req.userId;
 
         // Find order
-        const order = await Order.findOne({ orderId, userId });
+        const order = await findOrderByIdAndUser(orderId, userId);
 
         if (!order) {
             return res.status(404).json({ 
@@ -398,7 +429,7 @@ export const verifyPayment = async (req, res) => {
         const userId = req.userId;
 
         // Find order
-        const order = await Order.findOne({ orderId, userId });
+        const order = await findOrderByIdAndUser(orderId, userId);
 
         if (!order) {
             return res.status(404).json({ 
@@ -510,7 +541,7 @@ export const webhook = async (req, res) => {
             // Payment successful
             const orderId = payload.notes.orderId;
             
-            const order = await Order.findOne({ orderId });
+            const order = await findOrderById(orderId);
             if (order && order.paymentStatus !== 'completed') {
                 order.paymentStatus = 'completed';
                 order.razorpayPaymentId = payload.id;
@@ -539,7 +570,7 @@ export const webhook = async (req, res) => {
             // Payment failed
             const orderId = payload.notes.orderId;
             
-            const order = await Order.findOne({ orderId });
+            const order = await findOrderById(orderId);
             if (order) {
                 order.paymentStatus = 'failed';
                 await order.save();
@@ -580,11 +611,12 @@ export const cashfreeWebhook = async (req, res) => {
         logger.debug(`Cashfree webhook: order_id=${cashfreeOrderId}, status=${orderStatus}`);
 
         // Try to find order by Cashfree order ID first, then by our order ID
-        let order = await Order.findOne({ cashfreeOrderId: cashfreeOrderId });
+        let order = await Order.findOne({ cashfreeOrderId: cashfreeOrderId })
+            || await AssemblyOrder.findOne({ cashfreeOrderId: cashfreeOrderId });
         
         if (!order) {
             // Fallback: try using cashfreeOrderId as our orderId (legacy)
-            order = await Order.findOne({ orderId: cashfreeOrderId });
+            order = await findOrderById(cashfreeOrderId);
         }
         
         if (!order) {
@@ -646,7 +678,7 @@ export const verifyCashfreePayment = async (req, res) => {
         const userId = req.userId;
 
         // Find order
-        const order = await Order.findOne({ orderId, userId });
+        const order = await findOrderByIdAndUser(orderId, userId);
 
         if (!order) {
             return res.status(404).json({ 
@@ -802,7 +834,7 @@ export const handlePayUMoneySuccess = async (req, res) => {
         }
 
         // Find order
-        const order = await Order.findOne({ orderId });
+        const order = await findOrderById(orderId);
 
         if (!order) {
             logger.error('Order not found:', orderId);
@@ -871,7 +903,7 @@ export const handlePayUMoneyFailure = async (req, res) => {
 
         if (orderId) {
             // Update order status
-            const order = await Order.findOne({ orderId });
+            const order = await findOrderById(orderId);
             if (order) {
                 order.paymentStatus = 'failed';
                 await order.save();
@@ -908,12 +940,16 @@ export const verifyPaymentStatus = async (req, res) => {
         // Find order by orderId or razorpayPaymentId
         // Admins can check any order, regular users only their own
         let order;
-        if (identifier.startsWith('ORD-')) {
+        if (identifier.startsWith('ASM-')) {
+            order = await AssemblyOrder.findOne(isAdmin ? { orderId: identifier } : { orderId: identifier, userId });
+        } else if (identifier.startsWith('ORD-')) {
             order = await Order.findOne(isAdmin ? { orderId: identifier } : { orderId: identifier, userId });
         } else if (identifier.startsWith('pay_')) {
-            order = await Order.findOne(isAdmin ? { razorpayPaymentId: identifier } : { razorpayPaymentId: identifier, userId });
+            order = await Order.findOne(isAdmin ? { razorpayPaymentId: identifier } : { razorpayPaymentId: identifier, userId })
+                || await AssemblyOrder.findOne(isAdmin ? { razorpayPaymentId: identifier } : { razorpayPaymentId: identifier, userId });
         } else if (identifier.startsWith('order_')) {
-            order = await Order.findOne(isAdmin ? { razorpayOrderId: identifier } : { razorpayOrderId: identifier, userId });
+            order = await Order.findOne(isAdmin ? { razorpayOrderId: identifier } : { razorpayOrderId: identifier, userId })
+                || await AssemblyOrder.findOne(isAdmin ? { razorpayOrderId: identifier } : { razorpayOrderId: identifier, userId });
         } else {
             // Try both orderId and payment ID
             const baseQuery = {
@@ -926,7 +962,7 @@ export const verifyPaymentStatus = async (req, res) => {
             if (!isAdmin) {
                 baseQuery.userId = userId;
             }
-            order = await Order.findOne(baseQuery);
+            order = await Order.findOne(baseQuery) || await AssemblyOrder.findOne(baseQuery);
         }
 
         if (!order) {

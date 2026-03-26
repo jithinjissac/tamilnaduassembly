@@ -5,7 +5,7 @@ const settingsSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        enum: ['email', 'slip', 'payment', 'popup', 'secError']
+        enum: ['email', 'slip', 'payment', 'popup', 'secError', 'general']
     },
     settings: {
         type: Map,
@@ -232,22 +232,37 @@ Login to https://easyslip.in to download your PDF.`
     secError: {
         title: 'SEC Website Unavailable',
         message: 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.'
+    },
+    general: {
+        primaryElectionModule: 'local-body' // 'local-body' or 'assembly'
     }
 };
 
 // Static method to get settings by category
 settingsSchema.statics.getSettings = async function(category) {
-    let settings = await this.findOne({ category });
+    const defaults = defaultSettings[category] || {};
+
+    // If DB is not connected, immediately fall back to defaults.
+    if (mongoose.connection.readyState !== 1) {
+        return new Map(Object.entries(defaults));
+    }
+
+    let settings;
+    try {
+        settings = await this.findOne({ category }).maxTimeMS(1500);
+    } catch (error) {
+        // On transient DB timeout/errors, serve defaults to keep app functional.
+        return new Map(Object.entries(defaults));
+    }
     
     if (!settings) {
         // Create default settings if not exists
         settings = await this.create({
             category,
-            settings: defaultSettings[category] || {}
+            settings: defaults
         });
     } else {
         // Merge with defaults to add any new fields
-        const defaults = defaultSettings[category] || {};
         const currentSettings = settings.settings instanceof Map 
             ? Object.fromEntries(settings.settings) 
             : settings.settings;

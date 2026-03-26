@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Kerala Assembly Election Voter Slip Generator | EasySlip - Professional Election Slips for All 140 Constituencies</title>
+    <meta name="title" content="Kerala Assembly Election Voter Slip Generator | EasySlip">
+    <meta name="description" content="Generate professional voter slips for Kerala Assembly Elections. All 140 constituencies covered. Traditional Malayalam design. ₹0.50/voter. Instant PDF download.">
+    <meta name="keywords" content="Kerala Assembly election, voter slip, നിയമസഭാ തെരഞ്ഞെടുപ്പ്, assembly constituency, voter list Kerala, election slip generator, MLA election Kerala">
+    <meta name="author" content="EasySlip - Kerala Election Voter Slip Generator">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Kerala Color Palette */
+            --kerala-green: #006D3B;
+            --kerala-gold: #FFB81C;
+            --kerala-red: #E03A3E;
+            --kerala-cream: #FFF8DC;
+            --kerala-white: #FFFFFF;
+            --kerala-dark: #1A1A1A;
+            
+            /* Gradients */
+            --kerala-gradient: linear-gradient(135deg, #006D3B 0%, #00A550 100%);
+            --kathakali-gradient: linear-gradient(135deg, #E03A3E 0%, #FFB81C 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', sans-serif;
+            line-height: 1.7;
+            color: var(--kerala-dark);
+            overflow-x: hidden;
+            background: var(--kerala-cream);
+        }
+
+        /* Header with Kerala Traditional Pattern */
+        header {
+            background: var(--kerala-gradient);
+            color: var(--kerala-white);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 109, 59, 0.3);
+            border-bottom: 4px solid var(--kerala-gold);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container img.app-logo {
+            height: 80px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        }
+
+        .animated-logo { 
+            animation: logoFloat 6s ease-in-out infinite, logoFade 1.2s ease-in-out 1; 
+        }
+        
+        @keyframes logoFloat { 
+            0%,100% { transform: translateY(0);} 
+            50% { transform: translateY(-6px);} 
+        }
+        
+        @keyframes logoFade { 
+            0% { opacity:0; transform:scale(0.9);} 
+            100% { opacity:1; transform:scale(1);} 
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-main {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            opacity: 0.95;
+            letter-spacing: 3px;
+            font-weight: 400;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0, 109, 59, 0.15);
+            margin-bottom: 2rem;
+            border: 3px solid var(--kerala-gold);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--kerala-gold);
+        }
+
+        .card-header h2 {
+            font-size: 2rem;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .card-header-ml {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            font-size: 1.2rem;
+            color: var(--kerala-gold);
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--kerala-dark);
+            font-size: 1rem;
+        }
+
+        .form-group label i {
+            color: var(--kerala-green);
+            margin-right: 0.5rem;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--kerala-green);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 109, 59, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .captcha-container {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .captcha-img {
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .captcha-img img {
+            width: 100%;
+            border: 3px solid var(--kerala-green);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .captcha-input {
+            flex: 2;
+        }
+
+        .btn {
+            padding: 0.875rem 2.5rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--kerala-gold) 0%, #d4a017 100%);
+            color: var(--kerala-dark);
+            box-shadow: 0 4px 15px rgba(255, 184, 28, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #d4a017 0%, var(--kerala-gold) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(255, 184, 28, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #28a745 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(40, 167, 69, 0.6);
+        }
+
+        .btn:disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 109, 59, 0.2);
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--kerala-green);
+            border-right: 5px solid var(--kerala-gold);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Polling Parts Modal */
+        .parts-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            overflow: auto;
+            animation: fadeIn 0.3s;
+        }
+
+        .parts-modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            border-radius: 20px;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 109, 59, 0.3);
+            border: 3px solid var(--kerala-gold);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .parts-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 3px solid var(--kerala-gold);
+            background: linear-gradient(135deg, var(--kerala-green), #005830);
+            color: white;
+            border-radius: 17px 17px 0 0;
+        }
+
+        .parts-modal-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .parts-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parts-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .parts-modal-body {
+            padding: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .parts-selection-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .btn-select-all, .btn-deselect-all {
+            padding: 0.6rem 1.25rem;
+            border: 2px solid var(--kerala-green);
+            background: white;
+            color: var(--kerala-green);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-select-all:hover {
+            background: var(--kerala-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 109, 59, 0.3);
+        }
+
+        .btn-deselect-all {
+            border-color: var(--kerala-red);
+            color: var(--kerala-red);
+        }
+
+        .btn-deselect-all:hover {
+            background: var(--kerala-red);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(224, 58, 62, 0.3);
+        }
+
+        .parts-count {
+            margin-left: auto;
+            font-weight: 700;
+            color: var(--kerala-green);
+            padding: 0.5rem 1rem;
+            background: rgba(0, 109, 59, 0.1);
+            border-radius: 20px;
+        }
+
+        .parts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .part-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .part-item:hover {
+            background: rgba(0, 109, 59, 0.05);
+            border-color: var(--kerala-green);
+            transform: translateX(5px);
+        }
+
+        .part-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--kerala-green);
+        }
+
+        .part-item label {
+            cursor: pointer;
+            flex: 1;
+            margin: 0;
+            font-weight: 500;
+            color: var(--kerala-dark);
+        }
+
+        .part-item.selected {
+            background: rgba(0, 109, 59, 0.1);
+            border-color: var(--kerala-green);
+            box-shadow: 0 2px 8px rgba(0, 109, 59, 0.2);
+        }
+
+        .parts-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            border-top: 3px solid var(--kerala-gold);
+            background: #f8f9fa;
+            border-radius: 0 0 17px 17px;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--kerala-green), #005830);
+            color: white;
+            padding: 1.75rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 109, 59, 0.3);
+            transition: all 0.3s;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 109, 59, 0.4);
+        }
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card p {
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        table th,
+        table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            background: linear-gradient(135deg, var(--kerala-green), #005830);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        table tr:hover {
+            background: rgba(0, 109, 59, 0.05);
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .alert {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            border-width: 2px;
+            border-style: solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: var(--kerala-green);
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: var(--kerala-red);
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: var(--kerala-gold);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-male {
+            background: linear-gradient(135deg, #4da6ff, #0066cc);
+            color: white;
+            box-shadow: 0 2px 5px rgba(77, 166, 255, 0.3);
+        }
+
+        .badge-female {
+            background: linear-gradient(135deg, #ff6b9d, #c9184a);
+            color: white;
+            box-shadow: 0 2px 5px rgba(255, 107, 157, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .logo-main {
+                font-size: 1.5rem;
+            }
+
+            .logo-sub {
+                font-size: 0.65rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .card-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .captcha-container {
+                flex-direction: column;
+            }
+
+            .captcha-img {
+                max-width: 100%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card h3 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .parts-modal-content {
+                margin: 10% 1rem;
+                max-width: 100%;
+            }
+
+            .parts-selection-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-select-all,
+            .btn-deselect-all {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .stat-card {
+                padding: 1.25rem;
+            }
+
+            .stat-card h3 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-content">
+                <h1 class="logo-main">🌴 EasySlip Kerala</h1>
+                <p class="logo-sub">Assembly Election Edition</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-vote-yea"></i> Kerala Assembly Voter Data Extraction</h2>
+                <p class="card-header-ml">കേരള നിയമസഭാ വോട്ടർ ഡാറ്റ എക്സ്ട്രാക്ഷൻ</p>
+                <p>Extract voter slips from Election Commission of India Portal | All 140 Constituencies</p>
+            </div>
+            
+            <div id="alert-container"></div>
+
+            <form id="extraction-form">
+                <!-- Hidden fields with fixed values -->
+                <input type="hidden" id="state" value="S11">
+                <input type="hidden" id="year" value="2026">
+                <input type="hidden" id="rollType" value="SIR-FinalRoll">
+                <input type="hidden" id="language" value="en">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="district"><i class="fas fa-map-marked-alt"></i> District <span style="color: var(--kerala-red);">*</span></label>
+                        <select id="district" required>
+                            <option value="">Loading districts...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="constituency"><i class="fas fa-landmark"></i> Assembly Constituency <span style="color: var(--kerala-red);">*</span></label>
+                        <select id="constituency" required disabled>
+                            <option value="">Select District First</option>
+                        </select>
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Note: On ECI portal, this is an autocomplete field. Type to search.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-shield-alt"></i> Captcha <span style="color: var(--kerala-red);">*</span></label>
+                    <div class="captcha-container">
+                        <div class="captcha-img">
+                            <div id="captcha-placeholder" style="text-align: center; padding: 2.5rem; background: #f0f0f0; border-radius: 10px;">
+                                <i class="fas fa-image" style="font-size: 2.5rem; color: #ccc;"></i>
+                                <p style="margin-top: 1rem; color: #999; font-weight: 500;">Fill all fields to load captcha</p>
+                            </div>
+                            <img id="captcha-image" style="display: none;" alt="Captcha">
+                        </div>
+                        <div class="captcha-input">
+                            <input type="text" id="captcha" placeholder="Enter captcha code" required disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" id="load-captcha-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-sync-alt"></i> Load Captcha
+                    </button>
+                    <button type="button" id="extract-btn" class="btn btn-success" disabled>
+                        <i class="fas fa-download"></i> Select Parts & Extract
+                    </button>
+                </div>
+
+                <div style="margin-top: 1.25rem; padding: 1.25rem; background: rgba(0, 109, 59, 0.08); border-left: 4px solid var(--kerala-green); border-radius: 8px;">
+                    <small>
+                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> After loading captcha, you can select specific polling station parts to download.
+                        Click "Select Parts & Extract" to choose which parts you want.
+                    </small>
+                </div>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p id="loading-message">Processing...</p>
+            </div>
+        </div>
+
+        <!-- Polling Parts Selection Modal -->
+        <div id="parts-modal" class="parts-modal" style="display: none;">
+            <div class="parts-modal-content">
+                <div class="parts-modal-header">
+                    <h3><i class="fas fa-list-check"></i> Select Polling Station Parts</h3>
+                    <button type="button" class="parts-modal-close" onclick="closePartsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="parts-modal-body">
+                    <div class="parts-selection-controls">
+                        <button type="button" class="btn-select-all" onclick="selectAllParts()">
+                            <i class="fas fa-check-square"></i> Select All
+                        </button>
+                        <button type="button" class="btn-deselect-all" onclick="deselectAllParts()">
+                            <i class="fas fa-square"></i> Deselect All
+                        </button>
+                        <span id="parts-count" class="parts-count">0 selected</span>
+                    </div>
+                    <div id="parts-list" class="parts-list">
+                        <!-- Parts will be populated here -->
+                    </div>
+                </div>
+                <div class="parts-modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closePartsModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="proceedWithExtraction()">
+                        <i class="fas fa-download"></i> Extract Selected Parts
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-section" class="results-section card">
+            <h2 style="margin-bottom: 20px;"><i class="fas fa-users"></i> Voter Data</h2>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="total-voters">0</h3>
+                    <p>Total Voters</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="male-voters">0</h3>
+                    <p>Male Voters</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="female-voters">0</h3>
+                    <p>Female Voters</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="voters-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>EPIC No</th>
+                            <th>Relative</th>
+                            <th>House No</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                        </tr>
+                    </thead>
+                    <tbody id="voters-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button id="export-json-btn" class="btn btn-primary">
+                    <i class="fas fa-file-code"></i> Export JSON
+                </button>
+                <button id="export-csv-btn" class="btn btn-primary">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button id="create-slips-btn" class="btn btn-success">
+                    <i class="fas fa-id-card"></i> Create Voter Slips
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/assembly';
+        let sessionId = null;
+        let voterData = null;
+        let pollingParts = [];
+
+        // Load states on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize with fixed values - no need to load states/years/rollTypes/languages
+            // State: Kerala (S11), Year: 2026, Roll Type: SIR-FinalRoll, Language: Malayalam
+            await loadDistricts('S11');
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            const districtSelect = document.getElementById('district');
+            const constituencySelect = document.getElementById('constituency');
+            const loadCaptchaBtn = document.getElementById('load-captcha-btn');
+
+            // District change - load constituencies for selected district
+            districtSelect.addEventListener('change', async (e) => {
+                if (e.target.value) {
+                    await loadConstituencies(e.target.value);
+                    constituencySelect.disabled = false;
+                }
+            });
+
+            // Constituency change - trigger captcha auto-load
+            constituencySelect.addEventListener('change', async (e) => {
+                if (e.target.value) {
+                    checkFormCompletion();
+                }
+            });
+
+            loadCaptchaBtn.addEventListener('click', loadCaptcha);
+            
+            // Show parts modal when extract button is clicked
+            document.getElementById('extract-btn').addEventListener('click', showPartsModal);
+
+            document.getElementById('export-json-btn').addEventListener('click', exportJSON);
+            document.getElementById('export-csv-btn').addEventListener('click', exportCSV);
+            document.getElementById('create-slips-btn').addEventListener('click', createSlips);
+        }
+
+        // Year is fixed to 2026 - no need to load
+
+        // Roll type is fixed to SIR-FinalRoll - no need to load
+
+        async function loadDistricts(stateCode) {
+            try {
+                const response = await fetch(`${API_BASE}/getDistricts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode })
+                });
+                const data = await response.json();
+                
+                const districtSelect = document.getElementById('district');
+                districtSelect.innerHTML = '<option value="">Select District</option>';
+                
+                data.districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.value;
+                    option.textContent = district.text;
+                    districtSelect.appendChild(option);
+                });
+
+                districtSelect.disabled = false;
+            } catch (error) {
+                showAlert('Error loading districts: ' + error.message, 'error');
+            }
+        }
+
+        async function loadConstituencies(district) {
+            try {
+                const constituencySelect = document.getElementById('constituency');
+                constituencySelect.innerHTML = '<option value="">Loading from ECI...</option>';
+                constituencySelect.disabled = true;
+                
+                // Use fixed values: stateCode=S11, year=2026, rollType=SIR-FinalRoll
+                const response = await fetch(`${API_BASE}/getConstituencies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode: 'S11', district, year: '2026', rollType: 'SIR-FinalRoll' })
+                });
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    throw new Error(data.message);
+                }
+                
+                constituencySelect.innerHTML = '<option value="">Select Constituency</option>';
+                
+                data.constituencies.forEach(ac => {
+                    const option = document.createElement('option');
+                    option.value = ac.value;
+                    option.textContent = ac.text;
+                    constituencySelect.appendChild(option);
+                });
+                
+                constituencySelect.disabled = false;
+            } catch (error) {
+                document.getElementById('constituency').innerHTML = '<option value="">Error loading</option>';
+                showAlert('Error loading constituencies: ' + error.message, 'error');
+            }
+        }
+
+        function checkFormCompletion() {
+            const state = document.getElementById('state').value;
+            const year = document.getElementById('year').value;
+            const rollType = document.getElementById('rollType').value;
+            const district = document.getElementById('district').value;
+            const constituency = document.getElementById('constituency').value;
+            const language = document.getElementById('language').value;
+
+            if (state && year && rollType && district && constituency && language) {
+                document.getElementById('load-captcha-btn').disabled = false;
+                // Auto-load captcha when all fields are selected
+                loadCaptcha();
+            }
+        }
+
+        let isLoadingCaptcha = false;
+
+        async function loadCaptcha() {
+            // Prevent duplicate calls
+            if (isLoadingCaptcha) {
+                return;
+            }
+            
+            isLoadingCaptcha = true;
+            
+            const constituencySelect = document.getElementById('constituency');
+            const selectedOption = constituencySelect.options[constituencySelect.selectedIndex];
+            const constituencyText = selectedOption ? selectedOption.textContent : '';
+            
+            // Extract AC number only (e.g., "AC 124" -> "124")
+            const constituencyMatch = constituencyText.match(/\d+/);
+            const constituencyNumber = constituencyMatch ? constituencyMatch[0] : constituencyText;
+
+            const formData = {
+                stateCode: document.getElementById('state').value,
+                year: document.getElementById('year').value,
+                rollType: document.getElementById('rollType').value,
+                district: document.getElementById('district').value,
+                constituency: constituencyNumber, // Use AC number
+                language: document.getElementById('language').value
+            };
+
+            showLoading('Loading captcha...');
+
+            try {
+                const response = await fetch(`${API_BASE}/getCaptcha`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    sessionId = data.sessionId;
+                    pollingParts = data.pollingParts || [];
+                    const captchaImg = document.getElementById('captcha-image');
+                    captchaImg.src = data.captchaUrl;
+                    captchaImg.style.display = 'block';
+                    document.getElementById('captcha-placeholder').style.display = 'none';
+                    document.getElementById('captcha').disabled = false;
+                    document.getElementById('extract-btn').disabled = false;
+                    showAlert(`Captcha loaded! Found ${pollingParts.length} polling station parts.`, 'success');
+                } else {
+                    showAlert('Failed to load captcha: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error loading captcha: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                isLoadingCaptcha = false;
+            }
+        }
+
+        // Show modal with polling parts
+        function showPartsModal() {
+            if (!sessionId) {
+                showAlert('Please load captcha first', 'error');
+                return;
+            }
+
+            // If no parts found, proceed with "Select All" mode
+            if (!pollingParts || pollingParts.length === 0) {
+                showAlert('No individual polling parts detected. Will use "Select All" mode.', 'warning');
+                setTimeout(() => {
+                    proceedWithExtractionSelectAll();
+                }, 1000);
+                return;
+            }
+
+            const partsList = document.getElementById('parts-list');
+            partsList.innerHTML = '';
+
+            pollingParts.forEach((part, index) => {
+                const div = document.createElement('div');
+                div.className = 'part-item selected';
+                
+                // Format: "Part 1 - Polling Station Name"
+                const partLabel = `Part ${part.partNumber} - ${part.partName}`;
+                
+                div.innerHTML = `
+                    <input type="checkbox" id="part-${index}" value="${index}" checked>
+                    <label for="part-${index}">${partLabel}</label>
+                `;
+                
+                // Toggle selection on click
+                div.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = div.querySelector('input');
+                        checkbox.checked = !checkbox.checked;
+                        updatePartCount();
+                        div.classList.toggle('selected', checkbox.checked);
+                    } else {
+                        updatePartCount();
+                        div.classList.toggle('selected', e.target.checked);
+                    }
+                });
+
+                partsList.appendChild(div);
+            });
+
+            updatePartCount();
+            document.getElementById('parts-modal').style.display = 'block';
+        }
+
+        function closePartsModal() {
+            document.getElementById('parts-modal').style.display = 'none';
+        }
+
+        function selectAllParts() {
+            const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                cb.closest('.part-item').classList.add('selected');
+            });
+            updatePartCount();
+        }
+
+        function deselectAllParts() {
+            const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.closest('.part-item').classList.remove('selected');
+            });
+            updatePartCount();
+        }
+
+        function updatePartCount() {
+            const checked = document.querySelectorAll('#parts-list input[type="checkbox"]:checked').length;
+            document.getElementById('parts-count').textContent = `${checked} selected`;
+        }
+
+        async function proceedWithExtraction() {
+            const captcha = document.getElementById('captcha').value;
+            if (!captcha) {
+                showAlert('Please enter the captcha code', 'error');
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]:checked');
+            const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+            if (selectedIndices.length === 0) {
+                showAlert('Please select at least one polling station part', 'error');
+                return;
+            }
+
+            // Map indices to actual part objects with all required data
+            const selectedParts = selectedIndices.map(index => pollingParts[index]);
+
+            closePartsModal();
+            await extractVoters(selectedParts);
+        }
+
+        // Proceed with Select All mode when no parts are found
+        async function proceedWithExtractionSelectAll() {
+            const captcha = document.getElementById('captcha').value;
+            if (!captcha) {
+                showAlert('Please enter the captcha code', 'error');
+                return;
+            }
+
+            await extractVoters(null); // null means selectAll=true
+        }
+
+        async function extractVoters(selectedParts = null) {
+            if (!sessionId) {
+                showAlert('Please load captcha first', 'error');
+                return;
+            }
+
+            const captcha = document.getElementById('captcha').value;
+            if (!captcha) {
+                showAlert('Please enter the captcha code', 'error');
+                return;
+            }
+
+            // If selectedParts is null, use all parts; otherwise use selected parts
+            const partsToExtract = selectedParts === null ? pollingParts : selectedParts;
+            const selectAll = selectedParts === null;
+            
+            const constituencySelect = document.getElementById('constituency');
+            const selectedOption = constituencySelect.options[constituencySelect.selectedIndex];
+            const constituencyText = selectedOption ? selectedOption.textContent : '';
+            const constituencyMatch = constituencyText.match(/\d+/);
+            const constituencyNumber = constituencyMatch ? constituencyMatch[0] : constituencyText;
+            
+            const formData = {
+                stateCode: document.getElementById('state').value,
+                year: document.getElementById('year').value,
+                rollType: document.getElementById('rollType').value,
+                district: document.getElementById('district').value,
+                constituency: constituencyNumber,
+                language: document.getElementById('language').value,
+                captcha: captcha,
+                captchaId: sessionId,
+                selectAll: selectAll,
+                selectedParts: partsToExtract
+            };
+
+            showLoading(`Downloading and parsing PDF... This may take 1-2 minutes.`);
+
+            try {
+                const response = await fetch(`${API_BASE}/extractVoters`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    voterData = data.data;
+                    displayResults(data.data);
+                    
+                    // Show success message with PDF link
+                    if (data.data.pdfUrls && data.data.pdfUrls.length > 0) {
+                        const pdfUrl = data.data.pdfUrls[0];
+                        console.log('PDF available at:', pdfUrl);
+                        
+                        let successMessage = `Successfully extracted ${data.data.totalVoters} voters! ` +
+                            `<a href="${pdfUrl}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">📄 View Original PDF</a>`;
+                        
+                        // Add slip viewer link if available
+                        if (data.data.slipFile) {
+                            successMessage += ` | <a href="${data.data.slipFile}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">🎫 View Voter Slips</a>`;
+                        }
+                        
+                        showAlert(successMessage, 'success');
+                        
+                        // Auto-open slips in new tab after 1 second
+                        if (data.data.slipFile) {
+                            setTimeout(() => {
+                                window.open(data.data.slipFile, '_blank');
+                            }, 1000);
+                        } else {
+                            // If no slips, open PDF
+                            setTimeout(() => {
+                                window.open(pdfUrl, '_blank');
+                            }, 1000);
+                        }
+                    } else {
+                        showAlert(`Successfully extracted ${data.data.totalVoters} voters!`, 'success');
+                    }
+                } else {
+                    showAlert('Failed to extract voters: ' + data.message, 'error');
+                    if (data.hint) {
+                        showAlert(data.hint, 'error');
+                    }
+                }
+            } catch (error) {
+                showAlert('Error extracting voters: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('total-voters').textContent = data.totalVoters;
+            
+            const maleCount = data.voters.filter(v => v.gender === 'M').length;
+            const femaleCount = data.voters.filter(v => v.gender === 'F').length;
+            
+            document.getElementById('male-voters').textContent = maleCount;
+            document.getElementById('female-voters').textContent = femaleCount;
+
+            const tbody = document.getElementById('voters-tbody');
+            tbody.innerHTML = '';
+
+            data.voters.forEach(voter => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${voter.serialNo || '-'}</td>
+                    <td>${voter.name}</td>
+                    <td>${voter.epicNo || '-'}</td>
+                    <td>${voter.relationType ? voter.relationType + ': ' : ''}${voter.relativeName || '-'}</td>
+                    <td>${voter.houseNo || '-'}</td>
+                    <td>${voter.age || '-'}</td>
+                    <td>
+                        <span class="badge badge-${voter.gender === 'M' ? 'male' : 'female'}">
+                            ${voter.gender === 'M' ? 'Male' : voter.gender === 'F' ? 'Female' : 'Other'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('results-section').classList.add('active');
+        }
+
+        function exportJSON() {
+            const dataStr = JSON.stringify(voterData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `assembly-voters-${voterData.constituency}-${Date.now()}.json`;
+            link.click();
+        }
+
+        function exportCSV() {
+            const headers = ['S.No', 'Name', 'EPIC No', 'Relative Type', 'Relative Name', 'House No', 'Age', 'Gender'];
+            const rows = voterData.voters.map(v => [
+                v.serialNo || '',
+                v.name || '',
+                v.epicNo || '',
+                v.relationType || '',
+                v.relativeName || '',
+                v.houseNo || '',
+                v.age || '',
+                v.gender || ''
+            ]);
+
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `assembly-voters-${voterData.constituency}-${Date.now()}.csv`;
+            link.click();
+        }
+
+        function createSlips() {
+            showAlert('Voter slip creation for Assembly elections will be available soon!', 'success');
+            // TODO: Integrate with existing slip creation system
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            // Longer timeout for success messages (usually have important links)
+            const timeout = type === 'success' ? 10000 : 5000;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, timeout);
+        }
+
+        function showLoading(message) {
+            document.getElementById('loading-message').textContent = message;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('extract-btn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('extract-btn').disabled = false;
+        }
+    </script>
+</body>
+</html>

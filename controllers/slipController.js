@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 import Order from '../models/Order.js';
 import fs from 'fs';
 import path from 'path';
@@ -34,13 +34,13 @@ export const getBrowser = async () => {
     if (!browserInstance || !browserInstance.isConnected()) {
         // Create a promise for this launch to queue subsequent requests
         browserLaunchPromise = (async () => {
-            console.log('🚀 Launching new Puppeteer browser instance with performance optimizations...');
+            console.log('🚀 Launching new Playwright browser instance with performance optimizations...');
             
             // Retry with exponential backoff
             let lastError;
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    const browser = await puppeteer.launch({
+                    const browser = await chromium.launch({
                         headless: true,
                         args: [
                             // Memory and stability
@@ -1457,10 +1457,10 @@ export const viewPreview = async (req, res) => {
     }
 };
 
-// Test Puppeteer with actual slip HTML (no logo)
+// Test Playwright with actual slip HTML (no logo)
 export const testPuppeteer = async (req, res) => {
     try {
-        console.log('Testing Puppeteer with slip HTML...');
+        console.log('Testing Playwright with slip HTML...');
         const testHtml = `
 <!DOCTYPE html>
 <html>
@@ -1510,7 +1510,7 @@ export const testPuppeteer = async (req, res) => {
         res.setHeader('Content-Length', pdf.length);
         res.send(pdf);
     } catch (error) {
-        console.error('Puppeteer test error:', error);
+        console.error('Playwright test error:', error);
         res.status(500).json({ error: error.message, stack: error.stack });
     }
 };

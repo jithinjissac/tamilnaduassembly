@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import util from 'util';
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
+import { optimizePdfLossless } from './pdfOptimizer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,7 +43,6 @@ export const createFreshBrowser = async () => {
                 const launchOptions = {
                     headless: true,
                     timeout: 180000,        // 3 minutes browser launch
-                    protocolTimeout: 300000, // 5 minutes protocol timeout (increased for large images)
                     dumpio: false
                 };
 
@@ -71,17 +71,15 @@ export const createFreshBrowser = async () => {
                         '--disable-setuid-sandbox',
                         '--disable-dev-shm-usage'
                     ];
-                    launchOptions.executablePath = puppeteer.executablePath(); // Use bundled Chromium
                 }
                 // Attempt 3: Bare minimum (most compatible)
                 else {
                     console.log('⚠️ Using bare minimum launch arguments...');
                     launchOptions.args = ['--no-sandbox'];
-                    launchOptions.executablePath = puppeteer.executablePath();
                     launchOptions.timeout = 60000; // Shorter timeout
                 }
 
-                const browser = await puppeteer.launch(launchOptions);
+                const browser = await chromium.launch(launchOptions);
                 console.log('✅ Fresh browser instance created successfully');
                 return browser;
                 
@@ -160,8 +158,6 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         // Always use a fresh browser for early/background generation
         const browser = await createFreshBrowser();
         const page = await browser.newPage();
-        await page.setBypassCSP(true);
-        await page.setJavaScriptEnabled(false);
         
         console.log('📝 Setting page content for session PDF...');
         await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 240000 }); // 4 minutes
@@ -170,8 +166,7 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         const pdf = await page.pdf({ 
             format: 'A4', 
             printBackground: true, 
-            margin: { top: 0, bottom: 0, left: 0, right: 0 },
-            timeout: 300000 // 5 minutes
+            margin: { top: 0, bottom: 0, left: 0, right: 0 }
         });
         await page.close();
         await browser.close();
@@ -180,7 +175,8 @@ export const generatePDFBackgroundWithSessionId = async (order, sessionId) => {
         if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
         const filename = `${sessionId}.pdf`;
         const filePath = path.join(tempDir, filename);
-        fs.writeFileSync(filePath, pdf);
+        const optimizedPdf = await optimizePdfLossless(pdf, `session:${sessionId}`);
+        fs.writeFileSync(filePath, optimizedPdf);
         tempPDFCache.set(sessionId, { orderId: sessionId, tempPath: filePath, createdAt: new Date() });
         schedulePDFDeletion(sessionId, filePath, 60 * 60 * 1000);
         console.log('Saved temp background PDF for session', sessionId);
@@ -216,8 +212,6 @@ export const generatePDFBackground = async (order, orderId) => {
                 console.log(`🔄 Background PDF attempt ${attempt}/${maxAttempts} for ${orderId} (${order.totalVoters} voters)`);
                 browser = await createFreshBrowser();
                 page = await browser.newPage();
-                await page.setBypassCSP(true);
-                await page.setJavaScriptEnabled(false);
                 
                 // Set content with extended timeout for large images
                 console.log('📝 Setting page content...');
@@ -228,8 +222,7 @@ export const generatePDFBackground = async (order, orderId) => {
                 pdf = await page.pdf({ 
                     format: 'A4', 
                     printBackground: true, 
-                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                    timeout: 300000 // 5 minutes for large PDFs with embedded images
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 }
                 });
                 
                 // Close page first and wait for cleanup
@@ -287,7 +280,8 @@ export const generatePDFBackground = async (order, orderId) => {
         const permanentPdfDir = path.join(__dirname, '..', 'public', 'permanent-pdfs');
         if (!fs.existsSync(permanentPdfDir)) fs.mkdirSync(permanentPdfDir, { recursive: true });
         const filePath = path.join(permanentPdfDir, `${orderId}.pdf`);
-        fs.writeFileSync(filePath, pdf);
+        const optimizedPdf = await optimizePdfLossless(pdf, `order:${orderId}`);
+        fs.writeFileSync(filePath, optimizedPdf);
         
         // Upload to Google Drive and get shareable link
         let googleDriveLink = null;
@@ -311,7 +305,7 @@ export const generatePDFBackground = async (order, orderId) => {
         registerPDFJob(orderId, { 
             status: 'ready', 
             path: filePath, 
-            size: pdf.length, 
+            size: optimizedPdf.length, 
             createdAt: new Date(), 
             progress: 100,
             googleDriveLink: googleDriveLink 
