@@ -151,6 +151,7 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         pollingStationInfo = '',
         symbolImage = '',
         symbolName = '',
+        symbolNameMalayalam = '',
         candidate = null
     } = metadata;
 
@@ -167,6 +168,13 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         candidate?.symbolName ||
         candidate?.name ||
         candidate?.partyName ||
+        '';
+    const rawSymbolNameMalayalam =
+        symbolNameMalayalam ||
+        candidate?.symbolNameMalayalam ||
+        candidate?.partyNameMalayalam ||
+        candidate?.nameMalayalam ||
+        rawSymbolName ||
         '';
     const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
     const showSymbol = Boolean(resolvedSymbolImage);
@@ -193,8 +201,9 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
                 <div class="slip-left">
                     <div class="slip-left-content">
                         ${showSymbol
-                            ? `<div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
-                        ${rawSymbolName ? `<div class="symbol-name">${rawSymbolName}</div>` : ''}`
+                            ? `<div class="symbol-header">നമ്മുടെ ചിഹ്നം</div>
+                        <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
+                        ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
                             : `<div class="serial-label">ക്രമ നമ്പർ</div>
                         <div class="serial-value">${serialNo}</div>`}
                     </div>
@@ -298,6 +307,15 @@ ${slipsHTML}
             color: #000; 
             text-align: center; 
             line-height: 1; 
+        }
+
+        .symbol-header {
+            font-size: 7.5pt;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 0.8mm;
+            white-space: nowrap;
         }
 
         .symbol-image-wrap {

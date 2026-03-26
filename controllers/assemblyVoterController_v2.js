@@ -381,6 +381,7 @@ export const extractVoters = async (req, res) => {
                     candidate,
                     symbolImage: candidate?.symbol || candidate?.symbolImage || '',
                     symbolName: candidate?.symbolName || candidate?.name || '',
+                    symbolNameMalayalam: candidate?.symbolNameMalayalam || candidate?.partyNameMalayalam || candidate?.nameMalayalam || candidate?.symbolName || candidate?.name || '',
                     pollingStationInfo: selectedParts.length === 1
                         ? `${selectedParts[0].partNumber || ''}${selectedParts[0].partName ? ` - ${selectedParts[0].partName}` : ''}`.trim()
                         : ''

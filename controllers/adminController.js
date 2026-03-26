@@ -1002,7 +1002,8 @@ export const downloadOrderPDF = async (req, res) => {
                         stateCode: order.stateCode || '',
                         candidate: previewPayload.candidate || null,
                         symbolImage: previewPayload.candidate?.symbol || previewPayload.candidate?.symbolImage || '',
-                        symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
+                        symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || '',
+                        symbolNameMalayalam: previewPayload.candidate?.symbolNameMalayalam || previewPayload.candidate?.partyNameMalayalam || previewPayload.candidate?.nameMalayalam || previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
                     });
 
                     order.pdfPath = `/voter-slips/${slipFileInfo.pdfFileName}`;
@@ -1147,7 +1148,8 @@ export const regenerateOrderPDF = async (req, res) => {
                 stateCode: order.stateCode || '',
                 candidate: previewPayload.candidate || null,
                 symbolImage: previewPayload.candidate?.symbol || previewPayload.candidate?.symbolImage || '',
-                symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
+                symbolName: previewPayload.candidate?.symbolName || previewPayload.candidate?.name || '',
+                symbolNameMalayalam: previewPayload.candidate?.symbolNameMalayalam || previewPayload.candidate?.partyNameMalayalam || previewPayload.candidate?.nameMalayalam || previewPayload.candidate?.symbolName || previewPayload.candidate?.name || ''
             });
 
             order.pdfPath = `/voter-slips/${slipFileInfo.pdfFileName}`;
