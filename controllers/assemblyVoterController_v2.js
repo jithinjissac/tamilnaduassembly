@@ -146,15 +146,6 @@ export const getCaptcha = async (req, res) => {
  * Extract voters using Direct ECI API
  */
 export const extractVoters = async (req, res) => {
-            // Captcha validation: check captchaId exists and is not expired
-            const captchaEntry = captchaStore.get(captchaId);
-            logger.info(`Captcha validation: receivedId=${captchaId}, receivedValue=${captcha}`);
-            if (!captchaEntry) {
-                logger.warn(`Captcha validation failed: captchaId not found or expired. receivedId=${captchaId}`);
-                return res.status(400).json({ status: 'error', message: 'Invalid captcha', error: 'Captcha mismatch or expired' });
-            }
-            // Remove captchaId after use
-            captchaStore.delete(captchaId);
     try {
         const {
             stateCode,
@@ -178,6 +169,16 @@ export const extractVoters = async (req, res) => {
                 message: 'All fields including captcha and captcha ID are required'
             });
         }
+
+        // Captcha validation: check captchaId exists and is not expired
+        const captchaEntry = captchaStore.get(captchaId);
+        logger.info(`Captcha validation: receivedId=${captchaId}, receivedValue=${captcha}`);
+        if (!captchaEntry) {
+            logger.warn(`Captcha validation failed: captchaId not found or expired. receivedId=${captchaId}`);
+            return res.status(400).json({ status: 'error', message: 'Invalid captcha', error: 'Captcha mismatch or expired' });
+        }
+        // Remove captchaId after use
+        captchaStore.delete(captchaId);
 
         if (!selectedParts || selectedParts.length === 0) {
             return res.status(400).json({
