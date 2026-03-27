@@ -1048,16 +1048,16 @@
 
                     <div class="form-group" id="captcha-section" style="display: none;">
                         <label><i class="fas fa-shield-alt"></i> Captcha *</label>
-                        <div style="display: flex; gap: 1rem; align-items: center;">
-                            <div style="flex: 0 0 200px;">
-                                <img id="captcha-image" src="" alt="Captcha" style="width: 100%; border: 2px solid var(--kerala-green); border-radius: 8px;">
+                        <div style="display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap;">
+                            <div style="flex: 1 1 140px; min-width: 140px;">
+                                <img id="captcha-image" src="" alt="Captcha" style="width: 100%; height: 100%; object-fit: contain; border: 2px solid var(--kerala-green); border-radius: 8px; background: white; min-height: 48px;">
                             </div>
-                            <div style="flex: 1;">
-                                <input type="text" id="captcha-text" placeholder="Enter captcha code" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <div style="flex: 2 1 200px; display: flex; gap: 0.5rem;">
+                                <input type="text" id="captcha-text" placeholder="Enter captcha code" style="flex: 1; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; min-width: 120px;">
+                                <button type="button" id="refresh-captcha-btn" class="btn btn-secondary" style="white-space: nowrap; padding: 0.75rem 1rem;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                             </div>
-                            <button type="button" id="refresh-captcha-btn" class="btn btn-secondary" style="white-space: nowrap;">
-                                <i class="fas fa-sync-alt"></i> Refresh
-                            </button>
                         </div>
                     </div>
 
@@ -1137,24 +1137,32 @@
             </div>
 
             <!-- Polling Parts Modal -->
-            <div id="parts-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-                <div style="background: white; border-radius: 15px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 3px solid var(--kerala-gold);">
-                        <h3 style="color: var(--kerala-green); margin: 0;"><i class="fas fa-list-check"></i> Select Polling Parts</h3>
-                        <button onclick="closePartsModal()" style="background: var(--kerala-red); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">×</button>
+            <div id="parts-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+                <div style="background: white; border-radius: 15px; max-width: 600px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                    
+                    <!-- Modal Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 1.5rem 1rem; border-bottom: 3px solid var(--kerala-gold); background: #f8fafc;">
+                        <h3 style="color: var(--kerala-green); margin: 0; font-size: 1.2rem;"><i class="fas fa-list-check"></i> Select Polling Parts</h3>
+                        <button onclick="closePartsModal()" style="background: var(--kerala-red); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">&times;</button>
                     </div>
-                    <div style="margin-bottom: 1rem;">
-                        <button type="button" onclick="selectAllParts()" class="btn btn-primary" style="margin-right: 0.5rem;">
+
+                    <!-- Modal Controls -->
+                    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; background: white; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button type="button" onclick="selectAllParts()" class="btn btn-primary" style="flex: 1; min-width: 120px; padding: 0.5rem;">
                             <i class="fas fa-check-square"></i> Select All
                         </button>
-                        <button type="button" onclick="deselectAllParts()" class="btn btn-secondary">
+                        <button type="button" onclick="deselectAllParts()" class="btn btn-secondary" style="flex: 1; min-width: 120px; padding: 0.5rem;">
                             <i class="fas fa-square"></i> Deselect All
                         </button>
                     </div>
-                    <div id="parts-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
-                    <div style="margin-top: 1.5rem; text-align: right;">
-                        <button type="button" onclick="confirmParts()" class="btn btn-success">
-                            <i class="fas fa-check"></i> Confirm Selection
+
+                    <!-- Modal Body (Scrollable) -->
+                    <div id="parts-list" style="flex-grow: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; background: #fafafa;"></div>
+
+                    <!-- Modal Footer (Sticky) -->
+                    <div style="padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; background: white; text-align: right; box-shadow: 0 -4px 10px rgba(0,0,0,0.02);">
+                        <button type="button" onclick="confirmParts()" class="btn btn-success" style="width: 100%; padding: 0.75rem; font-size: 1.1rem; font-weight: 600;">
+                            <i class="fas fa-check-circle"></i> Confirm Selection
                         </button>
                     </div>
                 </div>
