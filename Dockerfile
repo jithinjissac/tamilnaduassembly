@@ -2,7 +2,8 @@
 
 FROM node:20-bullseye-slim
 
-# Install only essential Playwright dependencies and Malayalam fonts
+
+# Install essential Playwright dependencies, Malayalam fonts, Python, and Python dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Core Chromium dependencies (minimal set)
     libnss3 \
@@ -26,9 +27,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-core \
     fonts-liberation \
     fontconfig \
+    # Python and pip
+    python3 \
+    python3-pip \
+    # For pdf2image dependency
+    poppler-utils \
     && fc-cache -fv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install Python dependencies for extractor
+RUN pip3 install --no-cache-dir pdf2image opencv-python-headless Pillow
 
 # Create app directory
 WORKDIR /app
