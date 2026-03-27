@@ -256,7 +256,11 @@ async function tryPythonBoxExtractor(pdfPath, startPage, endPage, outputDir, dpi
         '--png-compression', String(pngCompression)
     ];
 
-    let result = await runCommand('python', baseArgs);
+    let result = await runCommand('python3', baseArgs);
+    if (result.code !== 0) {
+        logger.warn(`python3 command failed: ${result.stderr}`);
+        result = await runCommand('python', baseArgs);
+    }
     if (result.code !== 0) {
         logger.warn(`python command failed: ${result.stderr}`);
         result = await runCommand('py', baseArgs);

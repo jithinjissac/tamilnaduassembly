@@ -1,0 +1,7 @@
+[providers]
+node = true
+python = true
+
+[phases.setup]
+nixPkgs = ["...", "libglib2.0-0", "libgl1-mesa-glx"]
+aptPkgs = ["...", "libglib2.0-0", "libgl1-mesa-glx"]
