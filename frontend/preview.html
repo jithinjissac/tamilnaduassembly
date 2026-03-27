@@ -1559,35 +1559,50 @@ s0.parentNode.insertBefore(s1,s0);
                 }
 
                 if (!pdfBlobUrl && previewId) {
-                    const previewResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            previewId: previewId,
-                            previewOnly: true
-                        })
-                    });
+                    // Add timeout to prevent infinite spinner on mobile network drop
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
-                    if (!previewResponse.ok) {
-                        const errorData = await previewResponse.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'Failed to generate assembly preview PDF');
+                    try {
+                        const previewResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                previewId: previewId,
+                                previewOnly: true
+                            }),
+                            signal: controller.signal
+                        });
+
+                        clearTimeout(timeoutId);
+
+                        if (!previewResponse.ok) {
+                            const errorData = await previewResponse.json().catch(() => ({}));
+                            throw new Error(errorData.message || 'Failed to generate assembly preview PDF');
+                        }
+
+                        const previewData = await previewResponse.json();
+                        if (!previewData.success || !previewData.pdfUrl) {
+                            throw new Error(previewData.message || 'Failed to generate assembly preview PDF');
+                        }
+
+                        const pdfResponse = await fetch(previewData.pdfUrl);
+                        if (!pdfResponse.ok) {
+                            throw new Error('Failed to load assembly preview PDF');
+                        }
+
+                        const pdfBlob = await pdfResponse.blob();
+                        pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                    } catch (fetchErr) {
+                        clearTimeout(timeoutId);
+                        if (fetchErr.name === 'AbortError') {
+                            throw new Error('Preview generation timed out. Please try again or refresh the page.');
+                        }
+                        throw fetchErr;
                     }
-
-                    const previewData = await previewResponse.json();
-                    if (!previewData.success || !previewData.pdfUrl) {
-                        throw new Error(previewData.message || 'Failed to generate assembly preview PDF');
-                    }
-
-                    const pdfResponse = await fetch(previewData.pdfUrl);
-                    if (!pdfResponse.ok) {
-                        throw new Error('Failed to load assembly preview PDF');
-                    }
-
-                    const pdfBlob = await pdfResponse.blob();
-                    pdfBlobUrl = URL.createObjectURL(pdfBlob);
                 }
 
                 if (!pdfBlobUrl) {
@@ -1712,18 +1727,32 @@ s0.parentNode.insertBefore(s1,s0);
                 // Generate preview for this specific station
                 const slipsPerPage = orderData.customization?.slipsPerPage || 5;
                 
-                const previewResponse = await fetch('/api/slips/preview', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        orderId: orderData.orderId || orderData._id,
-                        pollingStationValue: station.value,
-                        slipsPerPage: slipsPerPage
-                    })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+                
+                let previewResponse;
+                try {
+                    previewResponse = await fetch('/api/slips/preview', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            orderId: orderData.orderId || orderData._id,
+                            pollingStationValue: station.value,
+                            slipsPerPage: slipsPerPage
+                        }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                } catch (fetchErr) {
+                    clearTimeout(timeoutId);
+                    if (fetchErr.name === 'AbortError') {
+                        throw new Error('Station preview generation timed out. Please try again.');
+                    }
+                    throw fetchErr;
+                }
 
                 if (previewResponse.ok) {
                     const data = await previewResponse.json();
@@ -1917,6 +1946,10 @@ s0.parentNode.insertBefore(s1,s0);
                     return;
                 } catch (error) {
                     console.error('Assembly PDF.js rendering failed:', error);
+                    if (isMobile) {
+                        showPDFDownloadOnly(pdfBlobUrl, container);
+                        return;
+                    }
                 }
             }
             
@@ -1926,9 +1959,12 @@ s0.parentNode.insertBefore(s1,s0);
                     await renderPDFWithPDFJS(pdfBlobUrl, container);
                 } catch (error) {
                     console.error('PDF.js rendering failed:', error);
-                    // Fallback to iframe
-                    displayPDFWithIframe(pdfBlobUrl, container);
+                    // Mobile browsers struggle with PDF iframe, show download fallback
+                    showPDFDownloadOnly(pdfBlobUrl, container);
                 }
+            } else if (isMobile) {
+                // Mobile with no PDF.js
+                showPDFDownloadOnly(pdfBlobUrl, container);
             } else {
                 // Desktop or no PDF.js - use iframe
                 displayPDFWithIframe(pdfBlobUrl, container);
@@ -2515,14 +2551,28 @@ s0.parentNode.insertBefore(s1,s0);
                 }
 
                 // Single station or no station grouping - original preview logic
-                const previewResponse = await fetch('/api/slips/preview', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId: orderData.orderId || orderData._id })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+                let previewResponse;
+                try {
+                    previewResponse = await fetch('/api/slips/preview', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderData.orderId || orderData._id }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                } catch (fetchErr) {
+                    clearTimeout(timeoutId);
+                    if (fetchErr.name === 'AbortError') {
+                        throw new Error('Preview generation timed out. Please try again or refresh the page.');
+                    }
+                    throw fetchErr;
+                }
 
                 if (previewResponse.ok) {
                     const data = await previewResponse.json();
