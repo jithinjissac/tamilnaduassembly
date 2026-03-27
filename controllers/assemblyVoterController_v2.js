@@ -4,6 +4,9 @@
  */
 
 import { logger } from '../utils/logger.js';
+// In-memory captcha store for validation
+const captchaStore = new Map();
+const CAPTCHA_TTL_MS = 5 * 60 * 1000; // 5 minutes
 import crypto from 'crypto';
 import {
     generateCaptcha,
@@ -94,7 +97,16 @@ export const getCaptcha = async (req, res) => {
         logger.info(`Assembly: Found ${pollingParts.length} polling parts`);
 
         // Step 2: Generate captcha using direct API
+
+        // Generate captcha using direct API
         const { captchaImage, captchaId } = await generateCaptcha();
+
+        // Store captchaId with timestamp (no value to validate, just for expiry tracking)
+        captchaStore.set(captchaId, { createdAt: Date.now() });
+        // Clean up expired captchas
+        for (const [id, entry] of captchaStore) {
+            if (Date.now() - entry.createdAt > CAPTCHA_TTL_MS) captchaStore.delete(id);
+        }
 
         // Step 3: Save captcha image temporarily (must be in public/captcha-cache for Express static serving)
         const captchaDir = path.join(__dirname, '../public/captcha-cache');
@@ -134,6 +146,15 @@ export const getCaptcha = async (req, res) => {
  * Extract voters using Direct ECI API
  */
 export const extractVoters = async (req, res) => {
+            // Captcha validation: check captchaId exists and is not expired
+            const captchaEntry = captchaStore.get(captchaId);
+            logger.info(`Captcha validation: receivedId=${captchaId}, receivedValue=${captcha}`);
+            if (!captchaEntry) {
+                logger.warn(`Captcha validation failed: captchaId not found or expired. receivedId=${captchaId}`);
+                return res.status(400).json({ status: 'error', message: 'Invalid captcha', error: 'Captcha mismatch or expired' });
+            }
+            // Remove captchaId after use
+            captchaStore.delete(captchaId);
     try {
         const {
             stateCode,
