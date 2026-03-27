@@ -1417,7 +1417,7 @@
                 });
                 const data = await response.json();
                 state.captchaId = data.captchaId;
-                document.getElementById('captcha-image').src = data.captchaUrl;
+                document.getElementById('captcha-image').src = data.captchaUrl + '?ts=' + Date.now();
                 document.getElementById('captcha-section').style.display = 'block';
                 document.getElementById('captcha-text').value = '';
                 document.getElementById('extract-btn').disabled = true;
