@@ -256,51 +256,64 @@ export const extractVoters = async (req, res) => {
             const pdfFileName = `voter-list-${constituency}-${Date.now()}-${i + 1}.pdf`;
             const pdfPath = path.join(pdfDir, pdfFileName);
 
-            logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} from ${pdfUrl}...`);
+            let pdfDownloaded = false;
+            let downloadAttempts = 0;
+            const maxAttempts = 3;
 
-            try {
-                const response = await axios.get(pdfUrl, {
-                    responseType: 'arraybuffer',
-                    timeout: 60000, // 60 second timeout
-                    headers: {
-                        'Accept': '*/*',
-                        'Accept-Language': 'en-US,en;q=0.9',
-                        'Referer': 'https://voters.eci.gov.in/download-eroll?stateCode=S11',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
-                        'sec-ch-ua': '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
-                        'sec-ch-ua-mobile': '?0',
-                        'sec-ch-ua-platform': '"Windows"',
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'same-origin'
+            while (!pdfDownloaded && downloadAttempts < maxAttempts) {
+                downloadAttempts++;
+                try {
+                    logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts}) from ${pdfUrl}...`);
+
+                    const response = await axios.get(pdfUrl, {
+                        responseType: 'arraybuffer',
+                        timeout: 60000, // 60 second timeout
+                        headers: {
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                            'Accept-Encoding': 'gzip, deflate, br',
+                            'Referer': 'https://voters.eci.gov.in/',
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                            'Connection': 'keep-alive',
+                            'Upgrade-Insecure-Requests': '1',
+                            'sec-fetch-dest': 'document',
+                            'sec-fetch-mode': 'navigate',
+                            'sec-fetch-site': 'none',
+                            'sec-fetch-user': '?1'
+                        }
+                    });
+
+                    fs.writeFileSync(pdfPath, response.data);
+                    
+                    const stats = fs.statSync(pdfPath);
+                    logger.info(`Assembly: PDF ${i + 1} downloaded successfully - ${(stats.size / 1024).toFixed(2)} KB`);
+                    logger.info(`Assembly: PDF saved to: ${pdfPath}`);
+
+                    if (stats.size === 0) {
+                        logger.warn(`Assembly: PDF ${i + 1} is empty, skipping...`);
+                        break;
                     }
-                });
 
-                fs.writeFileSync(pdfPath, response.data);
-                
-                const stats = fs.statSync(pdfPath);
-                logger.info(`Assembly: PDF ${i + 1} downloaded successfully - ${(stats.size / 1024).toFixed(2)} KB`);
-                logger.info(`Assembly: PDF saved to: ${pdfPath}`);
+                    downloadedPDFs.push(pdfPath);
 
-                if (stats.size === 0) {
-                    logger.warn(`Assembly: PDF ${i + 1} is empty, skipping...`);
-                    continue;
+                    updateProgress(progressId, {
+                        pdfDownloaded: downloadedPDFs.length,
+                        pdfSizeKB: Math.round(stats.size / 1024),
+                        stageLabel: `Downloaded PDF ${downloadedPDFs.length}/${pdfResult.pdfUrls.length} (${(stats.size / 1024).toFixed(0)} KB)`,
+                        percent: 15 + Math.round((downloadedPDFs.length / pdfResult.pdfUrls.length) * 25)
+                    });
+                    
+                    pdfDownloaded = true;
+                    // Log the file path for debugging/preview
+                    logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
+                } catch (downloadError) {
+                    logger.error(`Assembly: Failed to download PDF ${i + 1} on attempt ${downloadAttempts}:`, downloadError.message);
+                    if (downloadAttempts < maxAttempts) {
+                        const delayMs = downloadAttempts * 2500; // 2.5s, 5s delay
+                        logger.info(`Assembly: Waiting ${delayMs}ms before retrying...`);
+                        await new Promise(res => setTimeout(res, delayMs));
+                    }
                 }
-
-                downloadedPDFs.push(pdfPath);
-
-                updateProgress(progressId, {
-                    pdfDownloaded: downloadedPDFs.length,
-                    pdfSizeKB: Math.round(stats.size / 1024),
-                    stageLabel: `Downloaded PDF ${downloadedPDFs.length}/${pdfResult.pdfUrls.length} (${(stats.size / 1024).toFixed(0)} KB)`,
-                    percent: 15 + Math.round((downloadedPDFs.length / pdfResult.pdfUrls.length) * 25)
-                });
-                
-                // Log the file path for debugging/preview
-                logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
-            } catch (downloadError) {
-                logger.error(`Assembly: Failed to download PDF ${i + 1}:`, downloadError.message);
-                // Continue with other PDFs
             }
         }
 
