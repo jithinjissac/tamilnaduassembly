@@ -1684,9 +1684,9 @@
                         selectedParts: state.selectedParts,
                         captcha: captchaText, captchaId: state.captchaId,
                         useOCR: false,
-                        // Do not generate full PDF at extraction time.
-                        // Preview page will request previewOnly PDF (2 pages).
-                        skipSlipGeneration: true,
+                        // Always generate the full PDF at extraction time because otherwise the
+                        // base64 images are lost and the final order download will only have 10 voters
+                        skipSlipGeneration: false,
                         createPreviewSession: true,
                         candidate: state.candidate || { symbol: '', symbolName: '' }
                     })
