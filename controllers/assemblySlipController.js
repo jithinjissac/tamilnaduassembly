@@ -362,7 +362,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
         .voter-image { width: auto; height: 100%; max-width: 100%; object-fit: contain; display: block; filter: contrast(1.2); }
         .snippet-fallback { font-size: 9pt; line-height: 1.3; color: #333; }
 
-        .polling-station-footer { font-size: 9.5pt; font-weight: 700; color: #000; border-top: 1.2px solid #000; padding-top: 1mm; margin-top: 1mm; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+        .polling-station-footer { font-size: 9.5pt; font-weight: 700; color: #000; border-top: 1.2px solid #000; padding-top: 1mm; margin-top: 1mm; line-height: 1.3; white-space: normal; overflow-wrap: anywhere; word-break: break-word; flex-shrink: 0; }
 
         @media print {
             @page { size: A4 portrait; margin: 0; }

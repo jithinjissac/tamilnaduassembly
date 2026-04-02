@@ -387,9 +387,9 @@ ${slipsHTML}
             text-align: center;
             line-height: 1.1;
             width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         .slip-right {
@@ -430,9 +430,9 @@ ${slipsHTML}
             padding-top: 1mm;
             margin-top: 1mm;
             flex-shrink: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             line-height: 1.2;
         }
 
