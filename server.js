@@ -344,8 +344,14 @@ app.use('/api/manual-slip', manualSlipRoutes);
 import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
 app.use('/api', playwrightStationsRoutes);
 
-// Serve voter slips directory
-app.use('/voter-slips', express.static(path.join(__dirname, 'voter-slips')));
+// Serve voter slips directory (prefer persistent mounted storage when available)
+const voterSlipsDir = fs.existsSync(mountedBucketPath)
+  ? path.join(mountedBucketPath, 'voter-slips')
+  : path.join(__dirname, 'voter-slips');
+if (!fs.existsSync(voterSlipsDir)) {
+  fs.mkdirSync(voterSlipsDir, { recursive: true });
+}
+app.use('/voter-slips', express.static(voterSlipsDir));
 
 // Assembly Election Routes (ECI Portal)
 app.use('/api/assembly', assemblyRoutes);

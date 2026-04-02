@@ -53,6 +53,14 @@ function ensureDir(dirPath) {
     }
 }
 
+function resolveVoterSlipsDir() {
+    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+    if (fs.existsSync(mountedBucketPath)) {
+        return path.join(mountedBucketPath, 'voter-slips');
+    }
+    return path.join(path.dirname(__dirname), 'voter-slips');
+}
+
 async function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -402,7 +410,7 @@ async function processBulkJob(jobId) {
     const heapLimitMB = Math.floor(heapStats.heap_size_limit / (1024 * 1024));
     logger.info(`📊 Heap limit: ${heapLimitMB} MB, Calculated concurrency: ${BULK_CONCURRENCY}`);
 
-    const voterSlipDir = path.join(path.dirname(__dirname), 'voter-slips');
+    const voterSlipDir = resolveVoterSlipsDir();
     const pdfDownloadDir = path.join(path.dirname(__dirname), 'pdf-downloads');
     ensureDir(voterSlipDir);
     ensureDir(pdfDownloadDir);
@@ -651,7 +659,7 @@ export const downloadBulkAssemblyZip = async (req, res) => {
             });
         }
 
-        const zipPath = path.join(path.dirname(__dirname), 'voter-slips', job.zipFileName);
+        const zipPath = path.join(resolveVoterSlipsDir(), job.zipFileName);
         if (!fs.existsSync(zipPath)) {
             return res.status(404).json({
                 status: 'error',
