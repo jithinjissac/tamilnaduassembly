@@ -9,6 +9,29 @@ import { logger } from './logger.js';
 
 const BASE_URL = 'https://gateway-voters.eci.gov.in';
 
+const DEFAULT_ROLL_TYPE_REF_ID = 'S11-2026-FIR-2';
+
+function normalizeRollTypeRefId(rollType, stateCode, year) {
+    if (typeof rollType === 'string' && /^S\d+-\d{4}-[A-Z]+-\d+$/i.test(rollType)) {
+        return rollType;
+    }
+
+    if (rollType === 'SIR-FinalRoll' || rollType === 'FinalRoll') {
+        return `${stateCode}-${year}-FIR-2`;
+    }
+
+    if (rollType === 'SupplementRoll') {
+        return `${stateCode}-${year}-SUP-1`;
+    }
+
+    return rollType || DEFAULT_ROLL_TYPE_REF_ID;
+}
+
+function extractRevisionNo(rollTypeRefId, fallback = 2) {
+    const match = String(rollTypeRefId || '').match(/-(\d+)$/);
+    return match ? Number(match[1]) : fallback;
+}
+
 // Common headers required by ECI API (verified from working curl command)
 const getHeaders = () => ({
     'Accept': '*/*',
@@ -74,10 +97,10 @@ export const getRollTypes = async (stateCode, year) => {
         
         if (response.data && response.data.status === 'Success') {
             const rollTypes = response.data.payload.map(item => ({
-                code: item.id,  // e.g., "S11-2026-FIR"
+                code: item.id || item.rollTypeRefId,
                 name: item.displayName || item.id,  // Use displayName (e.g., "SIR FinalRoll - 2026")
                 rollType: item.rollType,  // FinalRoll/DraftRoll
-                rollTypeRefId: item.rollTypeRefId,  // SIR-FinalRoll/SIR-DraftRoll
+                rollTypeRefId: item.rollTypeRefId,  // e.g. S11-2026-FIR-2
                 stateCd: item.stateCd,
                 year: item.year,
                 revisionNo: item.revisionNo
@@ -140,13 +163,15 @@ export const getACLanguages = async (stateCode, districtCode, acNumber, rollType
 export const getPollingPartsList = async (stateCode, districtCode, acNumber, rollType, year) => {
     try {
         logger.info(`📋 Fetching polling parts for AC ${acNumber}...`);
+        const rollTypeRefId = normalizeRollTypeRefId(rollType, stateCode, year);
+        const revisionNo = extractRevisionNo(rollTypeRefId);
         
         const requestBody = {
             stateCd: stateCode,
             acNumber: parseInt(acNumber),
-            rollTypeRefId: rollType,
+            rollTypeRefId,
             pdfGenType: 'EROLLGEN',
-            revisionNo: 1,
+            revisionNo,
             year: parseInt(year)
         };
         
@@ -204,15 +229,7 @@ export const generatePublishedPDFs = async (payload) => {
         logger.info(`   Captcha ID: ${captchaId}, Captcha Text: ${captcha}`);
         logger.info(`   Part Numbers: ${partNumbers.join(', ')}`);
         
-        // ✅ CORRECT FORMAT based on actual ECI API curl
-        // publishedRollId format: "S11-2026-FIR" (State-Year-RollType)
-        const rollTypeMap = {
-            'SIR-FinalRoll': 'FIR',
-            'FinalRoll': 'FIR',
-            'SupplementRoll': 'SUP'
-        };
-        const rollTypeSuffix = rollTypeMap[rollType] || 'FIR';
-        const publishedRollId = `${stateCode}-${year}-${rollTypeSuffix}`;
+        const publishedRollId = normalizeRollTypeRefId(rollType, stateCode, year);
         
         // Language code mapping - For Kerala (S11), use MAL
         // ECI accepts specific language codes per state

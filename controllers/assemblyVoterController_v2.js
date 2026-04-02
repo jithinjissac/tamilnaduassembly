@@ -421,7 +421,7 @@ export const extractVoters = async (req, res) => {
                         ? `${selectedParts[0].partNumber || ''}${selectedParts[0].partName ? ` - ${selectedParts[0].partName}` : ''}`.trim()
                         : ''
                 });
-                logger.info(`Assembly: Voter slips generated: ${slipFileInfo.htmlFileName} and ${slipFileInfo.pdfFileName}`);
+                logger.info(`Assembly: Voter slips generated: ${slipFileInfo.htmlFileName || 'no-html'} and ${slipFileInfo.pdfFileName || 'no-pdf'}`);
             } catch (slipError) {
                 logger.error('Assembly: Failed to generate slips:', slipError.message);
                 // Continue even if slip generation fails
@@ -479,8 +479,8 @@ export const extractVoters = async (req, res) => {
                 voterImages: allVoterSnippets.length,
                 pdfUrls: pdfResult.pdfUrls,
                 downloadedPdfPaths: downloadedPDFs,
-                slipFile: slipFileInfo ? `/voter-slips/${slipFileInfo.fileName}` : null,
-                slipFileHtml: slipFileInfo ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
+                slipFile: slipFileInfo?.fileName ? `/voter-slips/${slipFileInfo.fileName}` : null,
+                slipFileHtml: slipFileInfo?.htmlFileName ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
                 slipFilePdf: slipFileInfo?.pdfFileName ? `/voter-slips/${slipFileInfo.pdfFileName}` : null,
                 selectedParts: selectedParts.length,
                 constituency,

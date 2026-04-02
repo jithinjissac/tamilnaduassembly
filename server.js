@@ -34,6 +34,7 @@ console.log('✅ Route imports loaded');
 import { closeBrowser } from './controllers/slipController.js';
 import { cleanupExpiredPDFs } from './utils/pdfGenerator.js';
 import { startPaymentStatusCron } from './utils/paymentStatusCron.js';
+import { resumePendingBulkAssemblyJobs } from './controllers/adminBulkAssemblyController.js';
 
 console.log('✅ Service imports loaded');
 
@@ -479,6 +480,10 @@ const server = app.listen(PORT, '0.0.0.0', () => {
       // Start payment status cron job
       logger.info('Starting payment status verification cron job...');
       startPaymentStatusCron();
+
+      // Resume unfinished admin bulk assembly background jobs after restarts
+      logger.info('Resuming pending bulk assembly jobs...');
+      await resumePendingBulkAssemblyJobs();
       
       // Periodic cleanup every 10 minutes
       setInterval(() => {

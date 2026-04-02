@@ -34,6 +34,12 @@ import {
     getRecentActivity,
     updateAdminPassword
 } from '../controllers/adminController.js';
+import {
+    createBulkAssemblyJob,
+    listBulkAssemblyJobs,
+    getBulkAssemblyJob,
+    downloadBulkAssemblyZip
+} from '../controllers/adminBulkAssemblyController.js';
 import auth from '../middleware/auth.js';
 import { isAdmin } from '../middleware/adminAuth.js';
 
@@ -69,6 +75,12 @@ router.patch('/orders/:orderId/transfer', transferOrderToUser);
 router.get('/orders/:orderId/download', downloadOrderPDF);
 router.post('/orders/:orderId/regenerate-pdf', regenerateOrderPDF);
 router.delete('/orders/:orderId', deleteOrder);
+
+// Bulk Assembly Slips (background)
+router.post('/assembly-bulk/jobs', createBulkAssemblyJob);
+router.get('/assembly-bulk/jobs', listBulkAssemblyJobs);
+router.get('/assembly-bulk/jobs/:jobId', getBulkAssemblyJob);
+router.get('/assembly-bulk/jobs/:jobId/download', downloadBulkAssemblyZip);
 
 // Analytics & Reports
 router.get('/analytics', getAnalytics);

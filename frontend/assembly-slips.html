@@ -569,7 +569,7 @@
         }
 
         .preview-slip-left {
-            width: 32mm;
+            width: 38mm;
             border-right: 1px dotted #000;
             display: flex;
             flex-direction: column;
@@ -582,7 +582,7 @@
         }
 
         .preview-symbol-header {
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             font-weight: 700;
             margin-bottom: 2px;
         }
@@ -598,7 +598,7 @@
         }
 
         .preview-symbol-name {
-            font-size: 9.5pt;
+            font-size: 11pt;
             font-weight: 700;
             line-height: 1.2;
             word-break: break-word;
@@ -1019,7 +1019,7 @@
                 <form id="extraction-form">
                     <input type="hidden" id="state" value="S11">
                     <input type="hidden" id="year" value="2026">
-                    <input type="hidden" id="rollType" value="SIR-FinalRoll">
+                    <input type="hidden" id="rollType" value="S11-2026-FIR-2">
                     <input type="hidden" id="language" value="en">
 
                     <div class="form-row">
@@ -1365,7 +1365,7 @@
                 const response = await fetch('/api/assembly/getPollingParts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'SIR-FinalRoll', district, constituency, language: 'en' })
+                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'S11-2026-FIR-2', district, constituency, language: 'en' })
                 });
                 const data = await response.json();
                 state.pollingParts = data.parts || [];
@@ -1413,7 +1413,7 @@
                 const response = await fetch('/api/assembly/getCaptcha', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'SIR-FinalRoll', district, constituency, language: 'en' })
+                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'S11-2026-FIR-2', district, constituency, language: 'en' })
                 });
                 const data = await response.json();
                 state.captchaId = data.captchaId;
@@ -1603,7 +1603,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         stateCode: 'S11', district, constituency,
-                        year: '2026', rollType: 'SIR-FinalRoll', language: 'en',
+                        year: '2026', rollType: 'S11-2026-FIR-2', language: 'en',
                         selectedParts: state.selectedParts,
                         captcha: captchaText, captchaId: state.captchaId,
                         useOCR: false,
@@ -1659,7 +1659,7 @@
                                 constituency: constituencySelect.options[constituencySelect.selectedIndex]?.text || constituency,
                                 constituencyCode: constituency,
                                 year: '2026',
-                                rollType: 'SIR-FinalRoll',
+                                rollType: 'S11-2026-FIR-2',
                                 language: 'en',
                                 selectedParts: state.selectedParts
                             },

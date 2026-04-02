@@ -11,6 +11,7 @@
     
     <!-- Indic Transliteration Library -->
     <script src="https://cdn.jsdelivr.net/npm/indic-transliteration@2.3.39/build/indicTransliterate.min.js"></script>
+    <script src="symbol-picker.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -86,6 +87,37 @@
 
         .btn-primary:hover {
             background: #5568d3;
+        }
+
+        .bulk-symbol-selection-area {
+            border: 2px dashed #f59e0b;
+            border-radius: 14px;
+            padding: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff9eb 0%, #fffdf7 100%);
+        }
+
+        .bulk-symbol-preview {
+            padding: 1rem;
+            background: #fff;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+        }
+
+        .bulk-select-symbol-btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: #fff;
+            padding: 0.95rem 1.4rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(21, 128, 61, 0.22);
+        }
+
+        .bulk-select-symbol-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 26px rgba(21, 128, 61, 0.28);
         }
 
         .btn-success {
@@ -708,6 +740,7 @@
             <button class="tab" onclick="switchTab('users')"><i class="fas fa-users"></i> Users</button>
             <button class="tab" onclick="window.location.href='admin-user-tracking.html'"><i class="fas fa-chart-line"></i> User Activity</button>
             <button class="tab" onclick="switchTab('orders')"><i class="fas fa-shopping-cart"></i> Orders</button>
+            <button class="tab" onclick="switchTab('bulk-assembly')"><i class="fas fa-layer-group"></i> Bulk Assembly</button>
             <button class="tab" onclick="switchTab('reports')"><i class="fas fa-chart-bar"></i> Reports</button>
             <button class="tab" onclick="switchTab('resources')"><i class="fas fa-server"></i> Resources</button>
             <button class="tab" onclick="switchTab('symbols')"><i class="fas fa-flag"></i> Symbols</button>
@@ -981,6 +1014,130 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Assembly Tab -->
+        <div id="bulk-assembly-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Bulk Assembly Slip Tool</h2>
+                    <button class="btn btn-primary" onclick="loadBulkAssemblyJobs()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                    <input id="bulkStateCode" value="S11" type="hidden">
+                    <input id="bulkYear" value="2026" type="hidden">
+                    <input id="bulkRollType" value="S11-2026-FIR-2" type="hidden">
+                    <input id="bulkLanguage" value="en" type="hidden">
+
+                    <div>
+                        <label style="display:block; font-weight:600; margin-bottom:0.35rem;">District</label>
+                        <select id="bulkDistrictCode" style="width:100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display:block; font-weight:600; margin-bottom:0.35rem;">Constituency</label>
+                        <select id="bulkConstituencyCode" disabled style="width:100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="">Select Constituency</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex; align-items:flex-end;">
+                        <button class="btn btn-secondary" id="bulkLoadPartsBtn" onclick="loadBulkPollingParts()" disabled style="width:100%;">
+                            <i class="fas fa-list"></i> Load Polling Parts
+                        </button>
+                    </div>
+
+                    <div style="grid-column: 1 / -1;">
+                        <label style="display:block; font-weight:600; margin-bottom:0.35rem;">Election Symbol</label>
+                        <div id="bulkSymbolSelectionArea" class="bulk-symbol-selection-area">
+                            <div id="bulkSymbolPreview" class="bulk-symbol-preview" style="display:none; margin-bottom: 1rem;">
+                                <img id="bulkSelectedSymbolImage" src="" alt="Symbol" style="width:100px; height:100px; object-fit:contain; border:3px solid #16a34a; border-radius:10px; background:#fff; padding:8px; margin-bottom:0.5rem;">
+                                <div id="bulkSelectedSymbolName" style="font-weight:700; color:#1f2937; margin-bottom:0.25rem;"></div>
+                                <div id="bulkSelectedSymbolNameMalayalam" style="color:#10b981; font-size:0.92rem; margin-bottom:0.75rem;"></div>
+                                <button type="button" class="btn btn-secondary" onclick="openBulkSymbolPicker()" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
+                                    <i class="fas fa-sync-alt"></i> Change Symbol
+                                </button>
+                            </div>
+                            <button type="button" id="bulkSelectSymbolBtn" class="btn bulk-select-symbol-btn" onclick="openBulkSymbolPicker()" style="display:block; margin:0 auto;">
+                                <i class="fas fa-hand-pointer"></i> SELECT YOUR SYMBOL
+                            </button>
+                            <div style="margin-top: 1rem;">
+                                <label style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; display: block;">Or upload custom image:</label>
+                                <input type="file" id="bulk-custom-symbol-upload" accept="image/*" style="width:auto; padding:0.5rem; border:1px solid #ccc; border-radius:8px;">
+                            </div>
+                            <div style="margin-top: 0.75rem;">
+                                <a href="#" id="bulkContinueWithoutSymbol" style="color:#15803d; font-size:0.9rem;">Continue without symbol</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="border:1px solid #e5e7eb; border-radius:8px; padding:1rem; margin-bottom:1rem; background:#fafafa;">
+                    <div style="display:flex; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:center;">
+                        <div style="font-weight:600;">Polling Parts</div>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                            <span id="bulkSelectedPartsInfo" style="font-size:0.9rem; color:#666;">0 part(s) selected</span>
+                            <button class="btn btn-small btn-secondary" type="button" onclick="selectAllBulkParts()">Select All</button>
+                            <button class="btn btn-small btn-secondary" type="button" onclick="clearAllBulkParts()">Clear</button>
+                        </div>
+                    </div>
+                    <div id="bulkPartsList" style="max-height:260px; overflow:auto; display:grid; gap:0.4rem;">
+                        <div style="color:#666;">Load constituency polling parts first.</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="startBulkAssemblyJob()"><i class="fas fa-play"></i> Start Bulk Job</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent Bulk Jobs</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Job</th>
+                                <th>Constituency</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkJobsTable">
+                            <tr><td colspan="6" class="empty-state"><p>No bulk jobs yet</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" id="bulkJobDetailsCard" style="display: none;">
+                <div class="card-header">
+                    <h2 id="bulkJobTitle">Bulk Job Details</h2>
+                    <button id="bulkZipDownloadBtn" class="btn btn-primary" style="display:none;" onclick="downloadBulkZip()"><i class="fas fa-file-archive"></i> Download ZIP</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Part No</th>
+                                <th>Part Name</th>
+                                <th>Status</th>
+                                <th>Voters</th>
+                                <th>File</th>
+                                <th>Error</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkJobPartsTable">
+                            <tr><td colspan="6" class="empty-state"><p>Select a job to view per-part status</p></td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -2709,6 +2866,461 @@ Login to https://easyslip.in to download your PDF.</textarea>
         const API_BASE = '/api/admin';
         let token = localStorage.getItem('token');
         let currentTab = 'analytics'; // Track current active tab
+        let currentBulkJobId = null;
+        let bulkJobPollTimer = null;
+        const bulkAssemblyState = {
+            pollingParts: [],
+            selectedParts: [],
+            districtLabel: '',
+            constituencyLabel: '',
+            symbolFreeMode: true,
+            candidate: {
+                symbol: '',
+                symbolName: '',
+                symbolNameMalayalam: ''
+            }
+        };
+
+        function stopBulkJobPolling() {
+            if (bulkJobPollTimer) {
+                clearInterval(bulkJobPollTimer);
+                bulkJobPollTimer = null;
+            }
+        }
+
+        function renderBulkStatusBadge(status) {
+            const colorMap = {
+                queued: '#6b7280',
+                running: '#2563eb',
+                completed: '#10b981',
+                partial: '#f59e0b',
+                failed: '#ef4444',
+                pending: '#6b7280',
+                processing: '#2563eb'
+            };
+            const color = colorMap[status] || '#6b7280';
+            return `<span style="display:inline-block;padding:0.2rem 0.5rem;border-radius:999px;background:${color};color:white;font-size:0.78rem;text-transform:uppercase;">${status || '-'}</span>`;
+        }
+
+        function buildBulkCandidate(symbolSrc, symbolName, symbolNameMalayalam = '') {
+            return {
+                symbol: symbolSrc || '',
+                symbolName: symbolName || '',
+                symbolNameMalayalam: symbolNameMalayalam || symbolName || ''
+            };
+        }
+
+        function applyBulkSymbol(src, name, nameMalayalam = '') {
+            document.getElementById('bulkSelectedSymbolImage').src = src;
+            document.getElementById('bulkSelectedSymbolName').textContent = name || '';
+            document.getElementById('bulkSelectedSymbolNameMalayalam').textContent = nameMalayalam || '';
+            document.getElementById('bulkSymbolPreview').style.display = 'block';
+            document.getElementById('bulkSelectSymbolBtn').style.display = 'none';
+            bulkAssemblyState.symbolFreeMode = false;
+            bulkAssemblyState.candidate = buildBulkCandidate(src, name, nameMalayalam);
+        }
+
+        function clearBulkSymbolSelection() {
+            document.getElementById('bulkSelectedSymbolImage').src = '';
+            document.getElementById('bulkSelectedSymbolName').textContent = '';
+            document.getElementById('bulkSelectedSymbolNameMalayalam').textContent = '';
+            document.getElementById('bulkSymbolPreview').style.display = 'none';
+            document.getElementById('bulkSelectSymbolBtn').style.display = 'block';
+            bulkAssemblyState.symbolFreeMode = true;
+            bulkAssemblyState.candidate = buildBulkCandidate('', '', '');
+        }
+
+        function openBulkSymbolPicker() {
+            if (window.symbolPicker) {
+                window.symbolPicker.open();
+            }
+        }
+
+        function initBulkSymbolPickerIntegration() {
+            if (typeof initSymbolPicker !== 'function') return;
+
+            window.symbolPicker = initSymbolPicker((symbol) => {
+                applyBulkSymbol(
+                    symbol.imageUrl || symbol.url || '',
+                    symbol.name || '',
+                    symbol.nameMalayalam || symbol.name || ''
+                );
+            });
+
+            const uploadInput = document.getElementById('bulk-custom-symbol-upload');
+            const continueWithoutSymbol = document.getElementById('bulkContinueWithoutSymbol');
+
+            if (uploadInput) {
+                uploadInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const fileName = file.name.replace(/\.[^.]+$/, '');
+                        applyBulkSymbol(ev.target.result, fileName, fileName);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            if (continueWithoutSymbol) {
+                continueWithoutSymbol.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    clearBulkSymbolSelection();
+                });
+            }
+        }
+
+        async function loadBulkDistricts() {
+            try {
+                const response = await fetch('/api/dropdown/districts?state=S11');
+                const data = await response.json();
+                const select = document.getElementById('bulkDistrictCode');
+                if (!select) return;
+                select.innerHTML = '<option value="">Select District</option>';
+                (data.districts || []).forEach(district => {
+                    const opt = document.createElement('option');
+                    opt.value = district.value;
+                    opt.textContent = district.label;
+                    select.appendChild(opt);
+                });
+            } catch (error) {
+                console.error('Failed to load bulk districts:', error);
+                showError('Failed to load districts');
+            }
+        }
+
+        async function loadBulkConstituencies(districtCode) {
+            const select = document.getElementById('bulkConstituencyCode');
+            if (!select) return;
+            try {
+                const response = await fetch(`/api/dropdown/assembly-constituencies?state=S11&district=${encodeURIComponent(districtCode)}`);
+                const data = await response.json();
+                select.innerHTML = '<option value="">Select Constituency</option>';
+                select.disabled = false;
+                (data.constituencies || []).forEach(constituency => {
+                    const opt = document.createElement('option');
+                    opt.value = constituency.value;
+                    opt.textContent = constituency.label;
+                    select.appendChild(opt);
+                });
+            } catch (error) {
+                console.error('Failed to load bulk constituencies:', error);
+                showError('Failed to load constituencies');
+            }
+        }
+
+        function updateBulkSelectedPartsInfo() {
+            const info = document.getElementById('bulkSelectedPartsInfo');
+            if (info) {
+                info.textContent = `${bulkAssemblyState.selectedParts.length} part(s) selected`;
+            }
+        }
+
+        function renderBulkPartsList() {
+            const container = document.getElementById('bulkPartsList');
+            if (!container) return;
+
+            if (!bulkAssemblyState.pollingParts.length) {
+                container.innerHTML = '<div style="color:#666;">No polling parts found.</div>';
+                updateBulkSelectedPartsInfo();
+                return;
+            }
+
+            const selectedNumbers = new Set(bulkAssemblyState.selectedParts.map(part => String(part.partNumber)));
+            container.innerHTML = bulkAssemblyState.pollingParts.map(part => {
+                const checked = selectedNumbers.has(String(part.partNumber)) ? 'checked' : '';
+                const name = part.partName || `Part ${part.partNumber}`;
+                return `
+                    <label style="display:flex; gap:0.6rem; align-items:flex-start; padding:0.55rem 0.65rem; border:1px solid #e5e7eb; border-radius:6px; background:white; cursor:pointer;">
+                        <input type="checkbox" value="${part.partNumber}" data-part-name="${String(name).replace(/"/g, '&quot;')}" ${checked} onchange="toggleBulkPartSelection(this)">
+                        <span><strong>Part ${part.partNumber}</strong> - ${name}</span>
+                    </label>`;
+            }).join('');
+            updateBulkSelectedPartsInfo();
+        }
+
+        function toggleBulkPartSelection(checkbox) {
+            const partNumber = String(checkbox.value);
+            const partName = checkbox.dataset.partName || '';
+            if (checkbox.checked) {
+                if (!bulkAssemblyState.selectedParts.some(part => String(part.partNumber) === partNumber)) {
+                    bulkAssemblyState.selectedParts.push({ partNumber: Number(partNumber), partName });
+                }
+            } else {
+                bulkAssemblyState.selectedParts = bulkAssemblyState.selectedParts.filter(part => String(part.partNumber) !== partNumber);
+            }
+            updateBulkSelectedPartsInfo();
+        }
+
+        function selectAllBulkParts() {
+            bulkAssemblyState.selectedParts = bulkAssemblyState.pollingParts.map(part => ({
+                partNumber: Number(part.partNumber),
+                partName: part.partName || `Part ${part.partNumber}`
+            }));
+            renderBulkPartsList();
+        }
+
+        function clearAllBulkParts() {
+            bulkAssemblyState.selectedParts = [];
+            renderBulkPartsList();
+        }
+
+        async function loadBulkPollingParts() {
+            const district = document.getElementById('bulkDistrictCode').value;
+            const constituency = document.getElementById('bulkConstituencyCode').value;
+            if (!district || !constituency) {
+                showError('Select district and constituency first');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/assembly/getPollingParts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stateCode: 'S11',
+                        year: '2026',
+                        rollType: 'S11-2026-FIR-2',
+                        district,
+                        constituency,
+                        language: 'en'
+                    })
+                });
+                const data = await response.json();
+                bulkAssemblyState.pollingParts = data.parts || [];
+                bulkAssemblyState.selectedParts = [];
+                renderBulkPartsList();
+            } catch (error) {
+                console.error('Failed to load bulk polling parts:', error);
+                showError('Failed to load polling parts');
+            }
+        }
+
+        async function startBulkAssemblyJob() {
+            try {
+                if (!bulkAssemblyState.selectedParts.length) {
+                    showError('Select at least one polling part');
+                    return;
+                }
+
+                const districtSelect = document.getElementById('bulkDistrictCode');
+                const constituencySelect = document.getElementById('bulkConstituencyCode');
+                const districtCode = districtSelect.value.trim();
+                const constituencyCode = constituencySelect.value.trim();
+
+                if (!districtCode || !constituencyCode) {
+                    showError('Complete district, constituency and polling-part selection first');
+                    return;
+                }
+
+                const payload = {
+                    stateCode: 'S11',
+                    districtCode,
+                    constituencyCode,
+                    constituencyName: constituencySelect.options[constituencySelect.selectedIndex]?.text || constituencyCode,
+                    year: '2026',
+                    rollType: 'S11-2026-FIR-2',
+                    language: 'en',
+                    selectedParts: bulkAssemblyState.selectedParts,
+                    candidate: bulkAssemblyState.candidate
+                };
+
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Failed to start bulk job');
+                }
+
+                showSuccess(`Bulk job started: ${data.jobId}`);
+                await loadBulkAssemblyJobs();
+                if (data.id) {
+                    await loadBulkAssemblyJob(data.id, true);
+                }
+            } catch (error) {
+                showError(error.message || 'Failed to start bulk assembly job');
+            }
+        }
+
+        async function loadBulkAssemblyJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Failed to load bulk jobs');
+                }
+
+                const tbody = document.getElementById('bulkJobsTable');
+                const jobs = data.jobs || [];
+                if (!jobs.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No bulk jobs yet</p></td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = jobs.map(job => {
+                    const progress = `${job.completedParts || 0}/${job.totalParts || 0} (failed: ${job.failedParts || 0})`;
+                    const created = job.createdAt ? new Date(job.createdAt).toLocaleString() : '-';
+                    const zipBtn = job.zipFileUrl
+                        ? `<button class="btn btn-small btn-primary" onclick="downloadBulkZip('${job._id}')">ZIP</button>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td>${job.jobId}</td>
+                            <td>${job.constituencyName || '-'}</td>
+                            <td>${renderBulkStatusBadge(job.status)}</td>
+                            <td>${progress}</td>
+                            <td>${created}</td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="loadBulkAssemblyJob('${job._id}', true)">View</button>
+                                ${zipBtn}
+                            </td>
+                        </tr>`;
+                }).join('');
+            } catch (error) {
+                showError(error.message || 'Failed to load bulk jobs');
+            }
+        }
+
+        async function loadBulkAssemblyJob(jobId, enablePolling = false) {
+            try {
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs/${encodeURIComponent(jobId)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Failed to load bulk job details');
+                }
+
+                const job = data.job;
+                currentBulkJobId = job._id;
+                document.getElementById('bulkJobDetailsCard').style.display = 'block';
+                document.getElementById('bulkJobTitle').textContent = `${job.jobId} - ${job.constituencyName}`;
+
+                const zipBtn = document.getElementById('bulkZipDownloadBtn');
+                if (job.zipFileUrl) {
+                    zipBtn.style.display = 'inline-block';
+                    zipBtn.dataset.jobId = job._id;
+                } else {
+                    zipBtn.style.display = 'none';
+                    delete zipBtn.dataset.jobId;
+                }
+
+                const partsTbody = document.getElementById('bulkJobPartsTable');
+                const parts = job.parts || [];
+                if (!parts.length) {
+                    partsTbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No parts found</p></td></tr>';
+                } else {
+                    partsTbody.innerHTML = parts.map(part => {
+                        const fileLink = part.slipFileUrl
+                            ? `<a href="${part.slipFileUrl}" target="_blank">${part.slipFileName || 'PDF'}</a>`
+                            : '-';
+                        return `
+                            <tr>
+                                <td>${part.partNumber}</td>
+                                <td>${part.partName || '-'}</td>
+                                <td>${renderBulkStatusBadge(part.status)}</td>
+                                <td>${part.voterCount || 0}</td>
+                                <td>${fileLink}</td>
+                                <td style="max-width:260px; word-break:break-word;">${part.error || '-'}</td>
+                            </tr>`;
+                    }).join('');
+                }
+
+                if (enablePolling) {
+                    stopBulkJobPolling();
+                    if (job.status === 'queued' || job.status === 'running') {
+                        bulkJobPollTimer = setInterval(async () => {
+                            await loadBulkAssemblyJob(currentBulkJobId, false);
+                            await loadBulkAssemblyJobs();
+                        }, 5000);
+                    }
+                }
+            } catch (error) {
+                showError(error.message || 'Failed to load bulk job details');
+            }
+        }
+
+        async function downloadBulkZip(jobIdOverride = '') {
+            const zipBtn = document.getElementById('bulkZipDownloadBtn');
+            const jobId = jobIdOverride || zipBtn.dataset.jobId;
+            if (!jobId) return;
+            if (!jobIdOverride) {
+                zipBtn.disabled = true;
+                zipBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+            }
+            try {
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs/${jobId}/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || 'Download failed');
+                }
+                const disposition = response.headers.get('content-disposition') || '';
+                const match = disposition.match(/filename[^;=\n]*=["']?([^"';\n]+)/i);
+                const fileName = match ? match[1].trim() : `bulk-slips-${jobId}.zip`;
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                showError(error.message || 'Failed to download ZIP');
+            } finally {
+                if (!jobIdOverride) {
+                    zipBtn.disabled = false;
+                    zipBtn.innerHTML = '<i class="fas fa-file-archive"></i> Download ZIP';
+                }
+            }
+        }
+
+        function initializeBulkAssemblyForm() {
+            initBulkSymbolPickerIntegration();
+            loadBulkDistricts();
+
+            const districtSelect = document.getElementById('bulkDistrictCode');
+            const constituencySelect = document.getElementById('bulkConstituencyCode');
+            if (!districtSelect || !constituencySelect) return;
+
+            districtSelect.addEventListener('change', async (e) => {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                bulkAssemblyState.districtLabel = selectedOption ? selectedOption.text : '';
+                bulkAssemblyState.pollingParts = [];
+                bulkAssemblyState.selectedParts = [];
+                renderBulkPartsList();
+                constituencySelect.disabled = true;
+                constituencySelect.innerHTML = '<option value="">Select Constituency</option>';
+                document.getElementById('bulkLoadPartsBtn').disabled = true;
+
+                if (e.target.value) {
+                    await loadBulkConstituencies(e.target.value);
+                }
+            });
+
+            constituencySelect.addEventListener('change', (e) => {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                bulkAssemblyState.constituencyLabel = selectedOption ? selectedOption.text : '';
+                bulkAssemblyState.pollingParts = [];
+                bulkAssemblyState.selectedParts = [];
+                renderBulkPartsList();
+                document.getElementById('bulkLoadPartsBtn').disabled = !e.target.value;
+            });
+        }
 
         // Check admin authentication on load
         async function checkAuth() {
@@ -4308,6 +4920,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
             if (currentTab === 'resources') {
                 stopResourcesAutoRefresh();
             }
+            if (currentTab === 'bulk-assembly') {
+                stopBulkJobPolling();
+            }
             
             // Update tab buttons
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -4334,6 +4949,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 startResourcesAutoRefresh();
             } else if (tabName === 'symbols') {
                 loadSymbols();
+            } else if (tabName === 'bulk-assembly') {
+                loadBulkAssemblyJobs();
             } else if (tabName === 'media-manager') {
                 loadPDFList();
             } else if (tabName === 'sec-error') {
@@ -6718,6 +7335,9 @@ Login to https://easyslip.in to download your PDF.</textarea>
             
             // Check auth first (blocking - required for all data)
             await checkAuth();
+
+            // Initialize bulk assembly admin form
+            initializeBulkAssemblyForm();
             
             // Initialize developer settings
             initDeveloperSettings();

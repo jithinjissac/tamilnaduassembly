@@ -516,9 +516,6 @@
             transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(0, 109, 59, 0.4);
         }
-            border-radius: 10px;
-            text-align: center;
-        }
 
         .stat-card h3 {
             font-size: 2.5rem;
@@ -749,7 +746,7 @@
                 <!-- Hidden fields with fixed values -->
                 <input type="hidden" id="state" value="S11">
                 <input type="hidden" id="year" value="2026">
-                <input type="hidden" id="rollType" value="SIR-FinalRoll">
+                <input type="hidden" id="rollType" value="S11-2026-FIR-2">
                 <input type="hidden" id="language" value="en">
 
                 <div class="form-row">
@@ -904,7 +901,7 @@
         // Load states on page load
         document.addEventListener('DOMContentLoaded', async () => {
             // Initialize with fixed values - no need to load states/years/rollTypes/languages
-            // State: Kerala (S11), Year: 2026, Roll Type: SIR-FinalRoll, Language: Malayalam
+            // State: Kerala (S11), Year: 2026, Roll Type: S11-2026-FIR-2, Language: Malayalam
             await loadDistricts('S11');
             setupEventListeners();
         });
@@ -941,7 +938,7 @@
 
         // Year is fixed to 2026 - no need to load
 
-        // Roll type is fixed to SIR-FinalRoll - no need to load
+        // Roll type is fixed to S11-2026-FIR-2 - no need to load
 
         async function loadDistricts(stateCode) {
             try {
@@ -974,11 +971,11 @@
                 constituencySelect.innerHTML = '<option value="">Loading from ECI...</option>';
                 constituencySelect.disabled = true;
                 
-                // Use fixed values: stateCode=S11, year=2026, rollType=SIR-FinalRoll
+                // Use fixed values: stateCode=S11, year=2026, rollType=S11-2026-FIR-2
                 const response = await fetch(`${API_BASE}/getConstituencies`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', district, year: '2026', rollType: 'SIR-FinalRoll' })
+                    body: JSON.stringify({ stateCode: 'S11', district, year: '2026', rollType: 'S11-2026-FIR-2' })
                 });
                 const data = await response.json();
                 

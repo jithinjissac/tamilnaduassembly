@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) {
     try {
         const { constituency = 'Assembly', district = '', stateCode = '' } = metadata;
+        const VOTERS_PER_CHUNK = 100;  // ~20 A4 pages per chunk (5 slips/page)
+        const PARALLEL = 3;
+        const KEEP_FULL_HTML_MAX_VOTERS = 100;
         
         // Create output directory
         const outputDir = path.join(path.dirname(__dirname), 'voter-slips');
@@ -34,20 +37,23 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
         const pdfFileName = `${baseName}.pdf`;
         const htmlFullPath = path.join(outputDir, htmlFileName);
         const pdfFullPath = path.join(outputDir, pdfFileName);
-        
-        // Generate print HTML (keep full HTML for reference/printing)
-        const html = generateImageSlipsHTML(voterSnippets, metadata);
+        let htmlArtifactSaved = false;
 
-        // Save HTML artifact
-        fs.writeFileSync(htmlFullPath, html, 'utf8');
-        logger.info(`✅ Image-based voter slips HTML saved to: ${htmlFullPath}`);
+        // Only keep a full HTML artifact for smaller jobs. Large jobs can blow up
+        // memory/string limits because every voter carries a big base64 image.
+        if (voterSnippets.length <= KEEP_FULL_HTML_MAX_VOTERS) {
+            const html = generateImageSlipsHTML(voterSnippets, metadata);
+            fs.writeFileSync(htmlFullPath, html, 'utf8');
+            htmlArtifactSaved = true;
+            logger.info(`✅ Image-based voter slips HTML saved to: ${htmlFullPath}`);
+        } else {
+            logger.info(`ℹ️ Skipping full HTML artifact for ${voterSnippets.length} voters; using chunked PDF generation only`);
+        }
 
         // ── Chunked PDF generation ───────────────────────────────────────
         // Each voter carries a large base64 image. To avoid memory/protocol
         // limits, we split voters into chunks, render each chunk to a temp
         // HTML file, convert to PDF via file:// URL, then merge with pdf-lib.
-        const VOTERS_PER_CHUNK = 100;  // ~20 A4 pages per chunk (5 slips/page)
-        const PARALLEL = 3;
         const tmpDir = path.join(outputDir, '_tmp');
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
@@ -115,21 +121,24 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
             logger.info(`✅ Image-based voter slips PDF saved to: ${pdfFullPath} (${chunks.length} chunks merged)`);
 
             // Delete the large HTML file to save disk space now that PDF is ready
-            try {
-                fs.unlinkSync(htmlFullPath);
-                logger.info(`🗑️ Deleted HTML file to save space: ${htmlFileName}`);
-            } catch (delErr) {
-                logger.warn(`⚠️ Could not delete HTML file: ${delErr.message}`);
+            if (htmlArtifactSaved) {
+                try {
+                    fs.unlinkSync(htmlFullPath);
+                    logger.info(`🗑️ Deleted HTML file to save space: ${htmlFileName}`);
+                    htmlArtifactSaved = false;
+                } catch (delErr) {
+                    logger.warn(`⚠️ Could not delete HTML file: ${delErr.message}`);
+                }
             }
         } catch (pdfErr) {
             logger.error(`❌ PDF generation failed (HTML still available): ${pdfErr.message}`);
         }
 
         return {
-            fileName: htmlFileName,
-            fullPath: htmlFullPath,
-            htmlFileName,
-            htmlFullPath,
+            fileName: htmlArtifactSaved ? htmlFileName : (pdfGenerated ? pdfFileName : null),
+            fullPath: htmlArtifactSaved ? htmlFullPath : (pdfGenerated ? pdfFullPath : null),
+            htmlFileName: htmlArtifactSaved ? htmlFileName : null,
+            htmlFullPath: htmlArtifactSaved ? htmlFullPath : null,
             pdfFileName: pdfGenerated ? pdfFileName : null,
             pdfFullPath: pdfGenerated ? pdfFullPath : null,
             totalSlips: voterSnippets.length
@@ -201,7 +210,7 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
                 <div class="slip-left">
                     <div class="slip-left-content">
                         ${showSymbol
-                            ? `<div class="symbol-header">നമ്മുടെ ചിഹ്നം</div>
+                            ? `<div class="symbol-header">നമ്മുടെ<br>ചിഹ്നം</div>
                         <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
                         ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
                             : `<div class="serial-label">ക്രമ നമ്പർ</div>
@@ -255,7 +264,7 @@ ${slipsHTML}
             height: ${slipHeight}; 
             border: 1.2px solid #000; 
             display: grid; 
-            grid-template-columns: 32mm 1fr; 
+            grid-template-columns: 38mm 1fr; 
             gap: 0; 
             padding: 1.5mm; 
             position: relative; 
@@ -277,7 +286,7 @@ ${slipsHTML}
         
         .slip-left { 
             display: flex !important; 
-            width: 32mm; 
+            width: 38mm; 
             border-right: 1.2px solid #000; 
             background: #fff; 
             margin-right: 0; 
@@ -311,12 +320,13 @@ ${slipsHTML}
         }
 
         .symbol-header {
-            font-size: 7.5pt;
+            font-size: 8.5pt;
             font-weight: 700;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.2;
             margin-bottom: 0.2mm;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: keep-all;
         }
 
         .symbol-image-wrap {
@@ -338,8 +348,8 @@ ${slipsHTML}
         }
 
         .symbol-name {
-            margin-top: 0;
-            font-size: 8.5pt;
+            margin-top: 1.5mm;
+            font-size: 10pt;
             font-weight: 700;
             text-align: center;
             line-height: 1.1;
