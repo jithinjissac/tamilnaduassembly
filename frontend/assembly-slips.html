@@ -1660,8 +1660,12 @@
 
         // ─── Extract Voters ─────────────────────────────────────────────────
         async function extractVoters() {
-            const district = document.getElementById('district').value;
-            const constituency = document.getElementById('constituency').value;
+            const districtEl = document.getElementById('district');
+            const constituencyEl = document.getElementById('constituency');
+            const district = districtEl.value;
+            const constituency = constituencyEl.value;
+            const districtLabel = districtEl.options[districtEl.selectedIndex]?.text || district;
+            const constituencyLabel = constituencyEl.options[constituencyEl.selectedIndex]?.text || constituency;
             const captchaText = document.getElementById('captcha-text').value.trim();
 
             if (!district || !constituency) { alert('Please select district and constituency'); return; }
@@ -1679,7 +1683,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        stateCode: 'S11', district, constituency,
+                        stateCode: 'S11', district, constituency, districtLabel, constituencyLabel,
                         year: '2026', rollType: 'S11-2026-FIR-2', language: 'en',
                         selectedParts: state.selectedParts,
                         captcha: captchaText, captchaId: state.captchaId,

@@ -213,7 +213,9 @@ export const extractVoters = async (req, res) => {
             selectedParts = [], // Array of part objects: [{partId, partNumber, partName}]
             skipSlipGeneration = false, // Optional: Skip slip generation, return just voter data
             createPreviewSession: shouldCreatePreviewSession = false,
-            candidate = { symbol: '', symbolName: '' }
+            candidate = { symbol: '', symbolName: '' },
+            districtLabel = '',
+            constituencyLabel = '',
         } = req.body;
 
         // Validate required fields
@@ -465,6 +467,8 @@ export const extractVoters = async (req, res) => {
                 slipFileInfo = await saveVoterSnippetSlipsToFile(allVoterSnippets, {
                     constituency,
                     district,
+                    districtLabel,
+                    constituencyLabel,
                     stateCode,
                     year,
                     candidate,
@@ -523,6 +527,8 @@ export const extractVoters = async (req, res) => {
                 previewSlipFileInfo = await saveVoterSnippetSlipsToFile(previewVoters, {
                     constituency,
                     district,
+                    districtLabel,
+                    constituencyLabel,
                     stateCode,
                     year,
                     candidate,

@@ -3252,29 +3252,19 @@ s0.parentNode.insertBefore(s1,s0);
 
                 let blob;
                 if (isAssemblyOrder) {
-                    // Assembly orders: generate full PDF via assembly endpoint
-                    const response = await fetch('/api/assembly/generateSlipsWithCandidates', {
-                        method: 'POST',
+                    // Assembly orders: download the pre-generated full PDF directly
+                    const response = await fetch(`/api/assembly/orders/${orderData.orderId}/download`, {
                         headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ previewId: orderData.previewId })
+                            'Authorization': `Bearer ${token}`
+                        }
                     });
 
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'Failed to generate assembly PDF');
+                        throw new Error(errorData.message || 'Failed to download assembly PDF');
                     }
 
-                    const data = await response.json();
-                    if (data.success && data.downloadUrl) {
-                        const pdfRes = await fetch(data.downloadUrl);
-                        if (!pdfRes.ok) throw new Error('Failed to download PDF');
-                        blob = await pdfRes.blob();
-                    } else {
-                        throw new Error('Failed to generate assembly PDF');
-                    }
+                    blob = await response.blob();
                 } else {
                     const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
                         headers: {

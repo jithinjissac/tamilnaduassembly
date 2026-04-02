@@ -182,6 +182,8 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
     const {
         constituency = 'Assembly',
         district = '',
+        districtLabel = '',
+        constituencyLabel = '',
         pollingStationInfo = '',
         symbolImage = '',
         symbolName = '',
@@ -219,8 +221,8 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         const stripped = raw.replace(/^\d+\s*[-:.)]?\s*/, '').trim();
         return stripped || raw;
     };
-    const districtDisplay = toDisplayName(district);
-    const constituencyDisplay = toDisplayName(constituency);
+    const districtDisplay = districtLabel ? districtLabel : toDisplayName(district);
+    const constituencyDisplay = constituencyLabel ? toDisplayName(constituencyLabel) : toDisplayName(constituency);
       // Use 5 slips per page for portrait A4 print layout
     const slipsPerPage = 5;
     
