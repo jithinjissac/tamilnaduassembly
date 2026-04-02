@@ -289,6 +289,7 @@ ${slipsHTML}
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
+            gap: 0.3mm;
             width: 100%; 
         }
         
@@ -314,13 +315,13 @@ ${slipsHTML}
             font-weight: 700;
             text-align: center;
             line-height: 1.1;
-            margin-bottom: 0.8mm;
+            margin-bottom: 0.2mm;
             white-space: nowrap;
         }
 
         .symbol-image-wrap {
             width: 100%;
-            height: 100%;
+            height: 18mm;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -329,7 +330,7 @@ ${slipsHTML}
 
         .symbol-image {
             max-width: 95%;
-            max-height: 95%;
+            max-height: 17.5mm;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -337,7 +338,7 @@ ${slipsHTML}
         }
 
         .symbol-name {
-            margin-top: 1mm;
+            margin-top: 0;
             font-size: 8.5pt;
             font-weight: 700;
             text-align: center;
