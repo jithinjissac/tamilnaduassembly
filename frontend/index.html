@@ -798,7 +798,6 @@
 
         /* Responsive */
         @media (max-width: 992px) {
-
             .hero-grid,
             .split-section {
                 grid-template-columns: 1fr;
@@ -813,6 +812,11 @@
             .hero-price-tag {
                 margin-left: auto;
                 margin-right: auto;
+            }
+
+            /* Center the hero buttons on mobile */
+            .hero-content > div[style*="display: flex"] {
+                justify-content: center !important;
             }
 
             .split-content {
@@ -860,12 +864,110 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 0 1.25rem;
+            }
+
+            header {
+                padding: 0.75rem 0;
+            }
+
+            header .logo img {
+                height: 50px !important;
+            }
+
+            header .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
             .hero {
-                padding-top: 8rem;
+                padding-top: 7rem;
+                padding-bottom: 3rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.25rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Fix horizontal bleed from absolute positions */
+            .floating-card {
+                padding: 1.25rem;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .floating-card.delay-1 {
+                left: 10px; 
+                bottom: -20px;
+                width: auto;
             }
 
             .section {
-                padding: 4rem 0;
+                padding: 3rem 0;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .cta-banner {
+                padding: 2.5rem 1.5rem;
+                border-radius: 24px;
+            }
+            
+            .cta-banner h2 {
+                font-size: 1.75rem !important;
+            }
+            
+            .split-image img {
+                width: 100%;
+                height: auto;
+            }
+            
+            .split-image img[alt="Slip Back"] {
+                width: 75%;
+                top: 20px !important;
+                right: 0 !important;
+            }
+            
+            .comp-cell {
+                padding: 1.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header .nav-inner div[style*="display: flex"] {
+                gap: 0.5rem !important;
+            }
+            
+            header .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            header .btn-primary i {
+                display: none; /* Hide rocket icon to save space */
+            }
+
+            .modern-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-price-tag {
+                font-size: 1rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .hero-price-tag strong {
+                font-size: 1.125rem;
+            }
+
+            .hero-content .btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
             }
         }
     </style>
