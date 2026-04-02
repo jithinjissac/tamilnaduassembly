@@ -25,7 +25,8 @@ export const createOrder = async (req, res) => {
             voters,
             candidate,
             previewId,
-            slipFilePdf
+            slipFilePdf,
+            previewSlipFilePdf
         } = req.body;
 
         const userId = req.userId;
@@ -84,6 +85,7 @@ export const createOrder = async (req, res) => {
             paymentStatus: amount === 0 ? 'completed' : 'pending',
             status: amount === 0 ? 'completed' : 'payment_pending',
             paidAt: amount === 0 ? new Date() : null,
+            previewPdfPath: previewSlipFilePdf || slipFilePdf || null,
             pdfPath: slipFilePdf || null,
             pdfGenerated: !!slipFilePdf,
             pdfGeneratedAt: slipFilePdf ? new Date() : null

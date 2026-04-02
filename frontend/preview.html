@@ -1526,8 +1526,8 @@ s0.parentNode.insertBefore(s1,s0);
                     document.querySelector('.secure-badge').style.display = 'none';
                 }
 
-                // Generate preview PDF using previewId from order, or use stored PDF
-                const previewId = orderData.previewId;
+                // Load persisted preview PDF URL from DB (no preview regeneration).
+                const storedPreviewPdfPath = orderData.previewPdfPath;
                 const storedPdfPath = orderData.pdfPath;
 
                 const previewContainer = document.getElementById('previewContainer');
@@ -1545,57 +1545,21 @@ s0.parentNode.insertBefore(s1,s0);
 
                 let pdfBlobUrl = null;
 
-                // For pending assembly orders always prefer preview session PDF (2 pages
-                // with payment-summary last slip), even if a full PDF path exists.
-                if (previewId) {
-                    // Add timeout to prevent infinite spinner on mobile network drop
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
-
+                // 1) Prefer persisted preview PDF path saved in DB.
+                if (storedPreviewPdfPath) {
                     try {
-                        const previewResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            },
-                            body: JSON.stringify({
-                                previewId: previewId,
-                                previewOnly: true
-                            }),
-                            signal: controller.signal
-                        });
-
-                        clearTimeout(timeoutId);
-
-                        if (!previewResponse.ok) {
-                            const errorData = await previewResponse.json().catch(() => ({}));
-                            throw new Error(errorData.message || 'Failed to generate assembly preview PDF');
+                        const pdfResponse = await fetch(storedPreviewPdfPath);
+                        if (pdfResponse.ok) {
+                            const pdfBlob = await pdfResponse.blob();
+                            pdfBlobUrl = URL.createObjectURL(pdfBlob);
                         }
-
-                        const previewData = await previewResponse.json();
-                        if (!previewData.success || !previewData.pdfUrl) {
-                            throw new Error(previewData.message || 'Failed to generate assembly preview PDF');
-                        }
-
-                        const pdfResponse = await fetch(previewData.pdfUrl);
-                        if (!pdfResponse.ok) {
-                            throw new Error('Failed to load assembly preview PDF');
-                        }
-
-                        const pdfBlob = await pdfResponse.blob();
-                        pdfBlobUrl = URL.createObjectURL(pdfBlob);
-                    } catch (fetchErr) {
-                        clearTimeout(timeoutId);
-                        if (fetchErr.name === 'AbortError') {
-                            throw new Error('Preview generation timed out. Please try again or refresh the page.');
-                        }
-                        console.warn('Preview session PDF failed, trying stored PDF fallback...', fetchErr);
+                    } catch (e) {
+                        console.warn('Failed to load stored preview PDF path', e);
                     }
                 }
 
-                // Fallback for legacy orders where preview session is unavailable
-                if (!pdfBlobUrl && storedPdfPath) {
+                // 2) Fallback to full stored PDF path only for already-paid legacy orders.
+                if (!pdfBlobUrl && storedPdfPath && orderData.paymentStatus === 'completed') {
                     try {
                         const pdfResponse = await fetch(storedPdfPath);
                         if (pdfResponse.ok) {
@@ -1608,15 +1572,29 @@ s0.parentNode.insertBefore(s1,s0);
                 }
 
                 if (!pdfBlobUrl) {
-                    throw new Error('No preview available. PDF will be available after payment on the order success page.');
-                }
+                    console.warn('Assembly preview PDF unavailable for this order. Keeping page active with payment/details.');
+                    previewContainer.innerHTML = `
+                        <div style="text-align: center; padding: 2.5rem 1.5rem;">
+                            <i class="fas fa-file-pdf" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i>
+                            <h3 style="margin: 0 0 0.5rem 0; color: #2d3748;">Preview Not Available</h3>
+                            <p style="margin: 0; color: #64748b; line-height: 1.6;">
+                                This order is saved and active. You can still complete payment and download the full PDF after payment.
+                            </p>
+                        </div>
+                    `;
 
-                window.currentPdfBlobUrl = pdfBlobUrl;
-                await displayPDF(pdfBlobUrl, previewContainer);
+                    const previewNote = document.getElementById('previewNote');
+                    if (previewNote) {
+                        previewNote.innerHTML = `<strong>Note:</strong> Preview file is unavailable for this older order, but order details and payment are still active.`;
+                    }
+                } else {
+                    window.currentPdfBlobUrl = pdfBlobUrl;
+                    await displayPDF(pdfBlobUrl, previewContainer);
 
-                const previewNote = document.getElementById('previewNote');
-                if (previewNote) {
-                    previewNote.innerHTML = `<strong>Note:</strong> This is a preview PDF for your assembly slips. Download the complete PDF after payment.`;
+                    const previewNote = document.getElementById('previewNote');
+                    if (previewNote) {
+                        previewNote.innerHTML = `<strong>Note:</strong> This is a preview PDF for your assembly slips. Download the complete PDF after payment.`;
+                    }
                 }
 
                 // Enable payment button for regular users

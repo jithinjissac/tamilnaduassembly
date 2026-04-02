@@ -108,7 +108,7 @@ class SymbolPicker {
 
                     <div style="background: #f0fdf4; border-top: 1px solid #bbf7d0; border-bottom: 1px solid #bbf7d0; padding: 12px 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
                         <span style="color: #166534; font-size: 0.95rem; font-weight: 500;">Can't find your election symbol?</span>
-                        <a href="https://wa.me/917907638842?text=Hello,%20I%20can't%20find%20my%20election%20symbol%20in%20the%20list." target="_blank" style="background: #25D366; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(37,211,102,0.3); transition: transform 0.2s;">
+                        <a href="https://wa.me/447435111412?text=Hello,%20I%20can't%20find%20my%20election%20symbol%20in%20the%20list." target="_blank" style="background: #25D366; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(37,211,102,0.3); transition: transform 0.2s;">
                             <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i> Contact us on WhatsApp
                         </a>
                     </div>

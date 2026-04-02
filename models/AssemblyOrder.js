@@ -135,6 +135,8 @@ const AssemblyOrderSchema = new mongoose.Schema({
     payumoneyPaymentId: String,
     
     // PDF management
+    // Preview PDF path (first pages), stored for persistent preview serving.
+    previewPdfPath: String,
     pdfGenerated: {
         type: Boolean,
         default: false

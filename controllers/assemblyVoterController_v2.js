@@ -113,7 +113,8 @@ function createPreviewSession(payload) {
 function schedulePreviewCleanup(previewId) {
     setTimeout(() => {
         assemblyPreviewSessions.delete(previewId);
-        deletePersistedPreviewSession(previewId);
+        // Keep persisted preview files for order recovery on older orders.
+        // This only clears in-memory cache to control memory usage.
     }, PREVIEW_TTL_MS);
 }
 
@@ -496,11 +497,14 @@ export const extractVoters = async (req, res) => {
         }
 
         let previewSessionInfo = null;
+        let previewSlipFileInfo = null;
         if (shouldCreatePreviewSession) {
+            const previewVoters = allVoterSnippets.slice(0, 10);
+
             previewSessionInfo = createPreviewSession({
                 orderId: `ASM-${Date.now()}`,
                 // Preview needs only first 10 voters (2 pages at 5 slips/page).
-                voters: allVoterSnippets.slice(0, 10),
+                voters: previewVoters,
                 candidate,
                 extractedData: {
                     totalVoters: allVoterSnippets.length,
@@ -513,6 +517,26 @@ export const extractVoters = async (req, res) => {
                 selectedParts,
                 createdAt: Date.now()
             });
+
+            // Generate and persist preview PDF once, then serve via stored DB URL.
+            try {
+                previewSlipFileInfo = await saveVoterSnippetSlipsToFile(previewVoters, {
+                    constituency,
+                    district,
+                    stateCode,
+                    year,
+                    candidate,
+                    symbolImage: candidate?.symbol || candidate?.symbolImage || '',
+                    symbolName: candidate?.symbolName || candidate?.name || '',
+                    symbolNameMalayalam: candidate?.symbolNameMalayalam || candidate?.partyNameMalayalam || candidate?.nameMalayalam || candidate?.symbolName || candidate?.name || '',
+                    pollingStationInfo: selectedParts.length === 1
+                        ? `${selectedParts[0].partNumber || ''}${selectedParts[0].partName ? ` - ${selectedParts[0].partName}` : ''}`.trim()
+                        : ''
+                });
+                logger.info(`Assembly: Preview PDF generated: ${previewSlipFileInfo?.pdfFileName || 'none'}`);
+            } catch (previewSlipError) {
+                logger.warn(`Assembly: Preview PDF generation failed: ${previewSlipError.message}`);
+            }
         }
 
         // Send response
@@ -536,6 +560,7 @@ export const extractVoters = async (req, res) => {
                 slipFile: slipFileInfo?.fileName ? `/voter-slips/${slipFileInfo.fileName}` : null,
                 slipFileHtml: slipFileInfo?.htmlFileName ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
                 slipFilePdf: slipFileInfo?.pdfFileName ? `/voter-slips/${slipFileInfo.pdfFileName}` : null,
+                previewSlipFilePdf: previewSlipFileInfo?.pdfFileName ? `/voter-slips/${previewSlipFileInfo.pdfFileName}` : null,
                 selectedParts: selectedParts.length,
                 constituency,
                 district,
@@ -635,12 +660,7 @@ export const getPreviewData = (req, res) => {
         }
 
         if (Date.now() > entry.expiresAt) {
-            assemblyPreviewSessions.delete(previewId);
-            deletePersistedPreviewSession(previewId);
-            return res.status(410).json({
-                status: 'error',
-                message: 'Preview data expired. Please extract again.'
-            });
+            logger.info(`Assembly: Serving persisted preview ${previewId} after TTL for order preview recovery`);
         }
 
         return res.json({
@@ -679,9 +699,7 @@ export const getPreviewPayloadById = (previewId) => {
     }
 
     if (Date.now() > entry.expiresAt) {
-        assemblyPreviewSessions.delete(previewId);
-        deletePersistedPreviewSession(previewId);
-        return null;
+        logger.info(`Assembly: Using persisted preview payload ${previewId} after TTL`);
     }
 
     return entry.payload;
