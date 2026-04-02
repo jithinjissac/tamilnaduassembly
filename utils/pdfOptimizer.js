@@ -139,48 +139,147 @@ async function optimizeWithPdfLib(inputBytes) {
     });
 }
 
-async function optimizeWithApdf(fileUrl, contextLabel = 'pdf') {
-    const token = process.env.APDF_API_TOKEN || process.env.APDF_API_KEY || '';
-    if (!token || !fileUrl) {
+async function optimizeWithILovePdf(fileUrl, contextLabel = 'pdf') {
+    const baseUrl = (process.env.ILOVEPDF_API_BASE_URL || 'https://api.ilovepdf.com/v1').replace(/\/$/, '');
+    const publicKey = (process.env.ILOVEPDF_PUBLIC_KEY || '').trim();
+    const staticToken = (process.env.ILOVEPDF_TOKEN || '').trim();
+    const region = (process.env.ILOVEPDF_REGION || '').trim();
+    const compressionLevel = (process.env.ILOVEPDF_COMPRESSION_LEVEL || 'recommended').trim();
+    const allowedLevels = new Set(['extreme', 'recommended', 'low']);
+    const normalizedLevel = allowedLevels.has(compressionLevel) ? compressionLevel : 'recommended';
+
+    if ((!publicKey && !staticToken) || !fileUrl) {
         return null;
     }
 
-    const baseUrl = (process.env.APDF_API_BASE_URL || 'https://apdf.io/api').replace(/\/$/, '');
-    const endpoint = `${baseUrl}/pdf/file/compress`;
+    const fetchWithRetry = async (url, init, retries = 2, timeoutMs = 25000) => {
+        let lastErr = null;
+        for (let attempt = 1; attempt <= retries + 1; attempt += 1) {
+            const controller = new AbortController();
+            const t = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, {
+                    ...init,
+                    signal: controller.signal
+                });
+                clearTimeout(t);
+                return response;
+            } catch (err) {
+                clearTimeout(t);
+                lastErr = err;
+                if (attempt <= retries) {
+                    await new Promise((resolve) => setTimeout(resolve, 600 * attempt));
+                    continue;
+                }
+            }
+        }
+        throw lastErr;
+    };
 
     try {
-        const body = new URLSearchParams({ file: fileUrl });
-        const response = await fetch(endpoint, {
+        let token = staticToken;
+        if (!token) {
+            const authBody = new URLSearchParams({ public_key: publicKey });
+            const authResp = await fetchWithRetry(`${baseUrl}/auth`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: authBody
+            }, 2, 30000);
+            if (!authResp.ok) {
+                const text = await authResp.text().catch(() => '');
+                throw new Error(`iLovePDF auth failed with status ${authResp.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+            }
+            const authJson = await authResp.json();
+            token = authJson?.token || '';
+            if (!token) {
+                throw new Error('iLovePDF auth response missing token');
+            }
+        }
+
+        const startPath = region ? `/start/compress/${encodeURIComponent(region)}` : '/start/compress';
+        const startResp = await fetchWithRetry(`${baseUrl}${startPath}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json'
+            }
+        }, 2, 30000);
+        if (!startResp.ok) {
+            const text = await startResp.text().catch(() => '');
+            throw new Error(`iLovePDF start failed with status ${startResp.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+        }
+        const startJson = await startResp.json();
+        const server = startJson?.server;
+        const task = startJson?.task;
+        if (!server || !task) {
+            throw new Error('iLovePDF start response missing server/task');
+        }
+
+        const uploadBody = new URLSearchParams({
+            task,
+            cloud_file: fileUrl
+        });
+        const uploadResp = await fetchWithRetry(`https://${server}/v1/upload`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body
-        });
-
-        if (!response.ok) {
-            const text = await response.text().catch(() => '');
-            throw new Error(`aPDF compress failed with status ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+            body: uploadBody
+        }, 2, 30000);
+        if (!uploadResp.ok) {
+            const text = await uploadResp.text().catch(() => '');
+            throw new Error(`iLovePDF upload failed with status ${uploadResp.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+        }
+        const uploadJson = await uploadResp.json();
+        const serverFilename = uploadJson?.server_filename;
+        if (!serverFilename) {
+            throw new Error('iLovePDF upload response missing server_filename');
         }
 
-        const payload = await response.json();
-        const compressedUrl = payload?.file;
-        if (!compressedUrl) {
-            throw new Error('aPDF response missing compressed file URL');
+        const processPayload = {
+            task,
+            tool: 'compress',
+            files: [{
+                server_filename: serverFilename,
+                filename: 'input.pdf'
+            }],
+            compression_level: normalizedLevel
+        };
+        const processResp = await fetchWithRetry(`https://${server}/v1/process`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(processPayload)
+        }, 2, 120000);
+        if (!processResp.ok) {
+            const text = await processResp.text().catch(() => '');
+            throw new Error(`iLovePDF process failed with status ${processResp.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
         }
 
-        const fileResp = await fetch(compressedUrl, { method: 'GET' });
+        const fileResp = await fetchWithRetry(`https://${server}/v1/download/${task}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }, 2, 120000);
         if (!fileResp.ok) {
-            throw new Error(`failed to download compressed PDF (${fileResp.status})`);
+            throw new Error(`failed to download iLovePDF output (${fileResp.status})`);
         }
 
-        const buf = new Uint8Array(await fileResp.arrayBuffer());
-        logger.info(`✅ aPDF compression completed (${contextLabel})`);
+        const buf = toBytes(await fileResp.arrayBuffer());
+        logger.info(`✅ iLovePDF compression completed (${contextLabel})`);
         return buf;
     } catch (err) {
-        logger.warn(`⚠️ aPDF compression skipped (${contextLabel}): ${err.message}`);
+        const errDetails = err?.cause?.message || err?.code || err?.message || String(err);
+        logger.warn(`⚠️ iLovePDF compression skipped (${contextLabel}): ${errDetails}`);
         return null;
     }
 }
@@ -246,19 +345,19 @@ export async function optimizePdfLossless(pdfBytes, contextLabel = 'pdf', option
         }
     }
 
-    const apdfSourceUrl = options?.apdfSourceUrl || '';
-    if (apdfSourceUrl) {
-        const apdfCandidate = await optimizeWithApdf(apdfSourceUrl, contextLabel);
-        if (apdfCandidate && apdfCandidate.length < best.length) {
-            const savedBytes = best.length - apdfCandidate.length;
+    const remoteSourceUrl = options?.remoteSourceUrl || options?.apdfSourceUrl || '';
+    if (remoteSourceUrl) {
+        const remoteCandidate = await optimizeWithILovePdf(remoteSourceUrl, contextLabel);
+        if (remoteCandidate && remoteCandidate.length < best.length) {
+            const savedBytes = best.length - remoteCandidate.length;
             logger.info(
-                `✅ PDF optimized (${contextLabel}) via aPDF: ` +
-                `-${savedBytes} bytes (${pctSaved(best.length, apdfCandidate.length)}%) beyond local optimization`
+                `✅ PDF optimized (${contextLabel}) via iLovePDF: ` +
+                `-${savedBytes} bytes (${pctSaved(best.length, remoteCandidate.length)}%) beyond local optimization`
             );
-            return apdfCandidate;
+            return remoteCandidate;
         }
-        if (apdfCandidate) {
-            logger.info(`ℹ️ aPDF returned no additional reduction (${contextLabel})`);
+        if (remoteCandidate) {
+            logger.info(`ℹ️ iLovePDF returned no additional reduction (${contextLabel})`);
         }
     }
 
