@@ -240,6 +240,15 @@ function generateSlipsHTML(voters, candidate, metadata) {
     const slipHeight = '52mm';
     const slipGap = '4mm';
 
+    const toDisplayName = (value) => {
+        const raw = (value || '').toString().trim();
+        if (!raw) return '';
+        const stripped = raw.replace(/^\d+\s*[-:.)]?\s*/, '').trim();
+        return stripped || raw;
+    };
+    const districtDisplay = toDisplayName(district);
+    const constituencyDisplay = toDisplayName(constituency);
+
     // Always render slips without candidate symbol/name information.
 
     const pages = [];
@@ -262,34 +271,34 @@ function generateSlipsHTML(voters, candidate, metadata) {
             if (isLastSlipInPreview) {
                 return `
             <div class="voter-slip preview-payment-slip">
-                <div style="width: 100%; height: 100%; display: grid; grid-template-columns: 35% 65%; gap: 3mm; padding: 3mm; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 3px solid #c05621; border-radius: 2mm;">
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-right: 2px solid #e2e8f0; padding-right: 2mm;">
-                        <div style="width: 18mm; height: 18mm; background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 2mm;">
-                            <span style="font-size: 22pt;">🔒</span>
+                <div style="width: 100%; height: 100%; display: grid; grid-template-columns: 34% 66%; gap: 2mm; padding: 1.2mm; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #c05621; border-radius: 1.5mm; overflow: hidden;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-right: 1.5px solid #e2e8f0; padding-right: 1.5mm; min-width: 0;">
+                        <div style="width: 13mm; height: 13mm; background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1mm;">
+                            <span style="font-size: 13pt; line-height: 1;">🔒</span>
                         </div>
-                        <div style="background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); color: white; padding: 2mm 3mm; border-radius: 2mm; font-size: 11pt; font-weight: 800; margin-bottom: 2mm; width: 100%;">
+                        <div style="background: linear-gradient(135deg, #c05621 0%, #9c4221 100%); color: white; padding: 1mm 1.4mm; border-radius: 1.2mm; font-size: 9pt; font-weight: 800; margin-bottom: 1mm; width: 100%; line-height: 1.1;">
                             ₹${totalAmount.toFixed(2)}
                         </div>
-                        <div style="background: #FFF3CD; border: 1px solid #FFC107; border-radius: 2mm; padding: 1.5mm; width: 100%;">
-                            <div style="font-size: 7pt; font-weight: 600; color: #856404;">
+                        <div style="background: #FFF3CD; border: 1px solid #FFC107; border-radius: 1mm; padding: 0.8mm; width: 100%;">
+                            <div style="font-size: 6pt; font-weight: 700; color: #856404; line-height: 1.15;">
                                 ⚠️ Preview Only
                             </div>
                         </div>
                     </div>
-                    <div style="display: flex; flex-direction: column; justify-content: center; padding-left: 2mm;">
-                        <div style="font-size: 14pt; font-weight: 800; color: #E53E3E; margin-bottom: 2mm; line-height: 1.1;">
+                    <div style="display: flex; flex-direction: column; justify-content: center; padding-left: 1mm; min-width: 0; overflow: hidden;">
+                        <div style="font-size: 9.5pt; font-weight: 800; color: #E53E3E; margin-bottom: 0.8mm; line-height: 1.1;">
                             Complete Payment to Access Full PDF
                         </div>
-                        <div style="font-size: 10pt; font-weight: 600; color: #1a202c; margin-bottom: 1mm;">
+                        <div style="font-size: 7pt; font-weight: 700; color: #1a202c; margin-bottom: 0.5mm; line-height: 1.15;">
                             Complete PDF Contains:
                         </div>
-                        <div style="font-size: 16pt; font-weight: 800; color: #c05621; margin-bottom: 2mm;">
+                        <div style="font-size: 11pt; font-weight: 800; color: #c05621; margin-bottom: 0.8mm; line-height: 1.1;">
                             ${totalVoters} Voter Slips
                         </div>
-                        <div style="font-size: 8pt; color: #4a5568; margin-bottom: 2mm; line-height: 1.3;">
-                            This preview shows only first 2 pages. Complete payment now for instant download of all voter slips.
+                        <div style="font-size: 6.4pt; color: #4a5568; margin-bottom: 0.8mm; line-height: 1.22;">
+                            This preview shows only first 2 pages. Complete payment now for instant full download.
                         </div>
-                        <div style="font-size: 7pt; color: #718096; line-height: 1.4;">
+                        <div style="font-size: 6.2pt; color: #718096; line-height: 1.2;">
                             ✓ Instant Download<br>
                             ✓ All ${totalVoters} Slips<br>
                             ✓ Secure Payment
@@ -305,10 +314,10 @@ function generateSlipsHTML(voters, candidate, metadata) {
                     <div class="slip-left-content">
                         <div style="text-align:center; width:100%; line-height:1.2;">
                         <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ജില്ല</div>
-                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${district}</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${districtDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
                         <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">നിയോജകമണ്ഡലം</div>
-                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituency}</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituencyDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
                         <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ഭാഗം നമ്പർ</div>
                         <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
@@ -345,13 +354,13 @@ function generateSlipsHTML(voters, candidate, metadata) {
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; align-items: center; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
 
-        .voter-slip { width: 100%; height: ${slipHeight}; border: 1.2px solid #000; display: grid; grid-template-columns: 32mm 1fr; gap: 0; padding: 1.5mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 1.2px solid #000; display: grid; grid-template-columns: 38mm 1fr; gap: 0; padding: 1.5mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
         .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2mm; height: 0; border-bottom: 2px dashed #999; }
         .voter-slip:last-child { margin-bottom: 0; }
         .voter-slip:last-child::after { display: none; }
         .voter-slip > * { overflow: hidden; }
 
-        .slip-left { display: flex !important; width: 32mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
+        .slip-left { display: flex !important; width: 38mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
         .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         .serial-label { font-size: 10pt; font-weight: 700; color: #000; margin-bottom: 0.8mm; text-align: center; line-height: 1.1; }
         .serial-value { font-size: 16pt; font-weight: 800; color: #000; text-align: center; line-height: 1; }
