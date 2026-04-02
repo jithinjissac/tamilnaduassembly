@@ -1545,20 +1545,9 @@ s0.parentNode.insertBefore(s1,s0);
 
                 let pdfBlobUrl = null;
 
-                // Try stored PDF first (always available), then fall back to preview session
-                if (storedPdfPath) {
-                    try {
-                        const pdfResponse = await fetch(storedPdfPath);
-                        if (pdfResponse.ok) {
-                            const pdfBlob = await pdfResponse.blob();
-                            pdfBlobUrl = URL.createObjectURL(pdfBlob);
-                        }
-                    } catch (e) {
-                        console.warn('Failed to load stored PDF, trying preview session...', e);
-                    }
-                }
-
-                if (!pdfBlobUrl && previewId) {
+                // For pending assembly orders always prefer preview session PDF (2 pages
+                // with payment-summary last slip), even if a full PDF path exists.
+                if (previewId) {
                     // Add timeout to prevent infinite spinner on mobile network drop
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
@@ -1601,7 +1590,20 @@ s0.parentNode.insertBefore(s1,s0);
                         if (fetchErr.name === 'AbortError') {
                             throw new Error('Preview generation timed out. Please try again or refresh the page.');
                         }
-                        throw fetchErr;
+                        console.warn('Preview session PDF failed, trying stored PDF fallback...', fetchErr);
+                    }
+                }
+
+                // Fallback for legacy orders where preview session is unavailable
+                if (!pdfBlobUrl && storedPdfPath) {
+                    try {
+                        const pdfResponse = await fetch(storedPdfPath);
+                        if (pdfResponse.ok) {
+                            const pdfBlob = await pdfResponse.blob();
+                            pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                        }
+                    } catch (e) {
+                        console.warn('Failed to load stored PDF fallback', e);
                     }
                 }
 

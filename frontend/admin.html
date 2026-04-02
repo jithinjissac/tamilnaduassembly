@@ -2768,102 +2768,202 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
     <!-- Media Manager Tab -->
     <div id="media-manager-tab" class="tab-content">
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-folder-open"></i> PDF Media Manager</h2>
-                <div style="display: flex; gap: 1rem;">
-                    <button class="btn btn-primary" onclick="loadPDFList()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                    <button class="btn btn-danger" onclick="cleanupOrphanedPDFs()">
-                        <i class="fas fa-broom"></i> Clean Orphaned PDFs
-                    </button>
-                </div>
-            </div>
 
-            <div id="media-alert" class="alert" style="display: none;"></div>
+        <!-- Media Manager sub-navigation -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+            <button id="mm-tab-slips" class="btn btn-primary" onclick="mmSwitchTab('slips')" style="border-radius:8px;">
+                <i class="fas fa-file-pdf"></i> Voter Slip Files
+            </button>
+            <button id="mm-tab-orders" class="btn" onclick="mmSwitchTab('orders')" style="border-radius:8px; background:#e2e8f0; color:#374151;">
+                <i class="fas fa-folder"></i> Order PDFs
+            </button>
+        </div>
 
-            <!-- PDF Statistics -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px;">
-                    <h3 style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Total PDFs</h3>
-                    <div style="font-size: 2rem; font-weight: 700;" id="totalPDFs">0</div>
-                </div>
-                <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 1.5rem; border-radius: 10px;">
-                    <h3 style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Permanent</h3>
-                    <div style="font-size: 2rem; font-weight: 700;" id="permanentPDFs">0</div>
-                    <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 0.25rem;" id="permanentSize">0 MB</div>
-                </div>
-                <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 1.5rem; border-radius: 10px;">
-                    <h3 style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Preview (Temp)</h3>
-                    <div style="font-size: 2rem; font-weight: 700;" id="temporaryPDFs">0</div>
-                    <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 0.25rem;" id="temporarySize">0 MB</div>
-                </div>
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 1.5rem; border-radius: 10px;">
-                    <h3 style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Total Size</h3>
-                    <div style="font-size: 2rem; font-weight: 700;" id="totalSize">0 MB</div>
-                </div>
-                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 1.5rem; border-radius: 10px;">
-                    <h3 style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Orphaned</h3>
-                    <div style="font-size: 2rem; font-weight: 700;" id="orphanedPDFs">0</div>
-                </div>
-            </div>
+        <div id="media-alert" class="alert" style="display: none; margin-bottom:1rem;"></div>
 
-            <!-- Search and Filters -->
-            <div class="search-filter">
-                <div class="search-box">
-                    <input type="text" id="pdfSearch" placeholder="Search by Order ID..." oninput="filterPDFList()">
-                </div>
-                <div class="filter-select">
-                    <select id="pdfTypeFilter" onchange="filterPDFList()">
-                        <option value="all">All PDFs</option>
-                        <option value="permanent">Permanent Only</option>
-                        <option value="temporary">Preview Only</option>
-                        <option value="linked">Linked to Orders</option>
-                        <option value="orphaned">Orphaned</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- PDF List -->
-            <div class="table-wrapper">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 0.5rem;">
-                    <div>
-                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                            <input type="checkbox" id="selectAllPDFs" onchange="toggleSelectAll()" style="width: 18px; height: 18px; cursor: pointer;">
-                            <span style="font-weight: 500;">Select All</span>
-                        </label>
+        <!-- ======== VOTER SLIPS PANEL ======== -->
+        <div id="mm-panel-slips">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-file-pdf"></i> Voter Slip Files</h2>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="loadVoterSlips()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-warning" onclick="cleanupOrphanedVoterSlips()" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none;">
+                            <i class="fas fa-broom"></i> Clean Orphaned
+                        </button>
                     </div>
-                    <button class="btn btn-danger btn-small" id="deleteSelectedBtn" onclick="deleteSelectedPDFs()" style="display: none;">
-                        <i class="fas fa-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
-                    </button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">
-                                <input type="checkbox" disabled style="visibility: hidden;">
-                            </th>
-                            <th>Order ID</th>
-                            <th>File Name</th>
-                            <th>Type</th>
-                            <th>Size</th>
-                            <th>Created</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pdfListTable">
-                        <tr>
-                            <td colspan="8" class="empty-state">
-                                <div class="empty-state-icon">📁</div>
-                                <p>Loading PDF files...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <!-- Stats row -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:1.5rem;">
+                    <div style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Total Files</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="vs-total">0</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">PDFs</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="vs-pdfs">0</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#8b5cf6,#7c3aed); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">ZIP Archives</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="vs-zips">0</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#06b6d4,#0284c7); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">HTML Snippets</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="vs-htmls">0</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Total Size</div>
+                        <div style="font-size:1.4rem; font-weight:700;" id="vs-size">0 B</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Orphaned</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="vs-orphaned">0</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="search-filter" style="margin-bottom:1rem;">
+                    <div class="search-box">
+                        <input type="text" id="vs-search" placeholder="Search filename..." oninput="vsFilter()">
+                    </div>
+                    <div class="filter-select">
+                        <select id="vs-category" onchange="vsFilter()">
+                            <option value="all">All Types</option>
+                            <option value="pdf">PDFs</option>
+                            <option value="image-pdf">Image-based PDFs</option>
+                            <option value="assembly-pdf">Assembly Slip PDFs</option>
+                            <option value="zip">ZIP Archives</option>
+                            <option value="html">HTML Snippets</option>
+                        </select>
+                    </div>
+                    <div class="filter-select">
+                        <select id="vs-status" onchange="vsFilter()">
+                            <option value="all">All Status</option>
+                            <option value="linked">Linked</option>
+                            <option value="orphaned">Orphaned</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- File grid/list -->
+                <div class="table-wrapper">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; padding:0 0.5rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                            <input type="checkbox" id="vs-select-all" onchange="vsToggleAll()" style="width:18px; height:18px; cursor:pointer;">
+                            <span style="font-weight:500;">Select All</span>
+                        </label>
+                        <button class="btn btn-danger btn-small" id="vs-delete-selected-btn" onclick="vsDeleteSelected()" style="display:none;">
+                            <i class="fas fa-trash"></i> Delete Selected (<span id="vs-selected-count">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- Card grid view for PDFs/ZIPs/HTMLs -->
+                    <div id="vs-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem;"></div>
+                    <div id="vs-empty" style="display:none; text-align:center; padding:3rem; color:#9ca3af;">
+                        <div style="font-size:3rem; margin-bottom:1rem;">📂</div>
+                        <p>No files found</p>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- ======== ORDER PDFs PANEL ======== -->
+        <div id="mm-panel-orders" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-folder"></i> Order PDFs</h2>
+                    <div style="display:flex; gap:0.75rem;">
+                        <button class="btn btn-primary" onclick="loadPDFList()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-danger" onclick="cleanupOrphanedPDFs()">
+                            <i class="fas fa-broom"></i> Clean Orphaned
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:1.5rem;">
+                    <div style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Total PDFs</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="totalPDFs">0</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Permanent</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="permanentPDFs">0</div>
+                        <div style="font-size:0.75rem; opacity:0.9; margin-top:0.2rem;" id="permanentSize">0 B</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#8b5cf6,#7c3aed); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Preview (Temp)</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="temporaryPDFs">0</div>
+                        <div style="font-size:0.75rem; opacity:0.9; margin-top:0.2rem;" id="temporarySize">0 B</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Total Size</div>
+                        <div style="font-size:1.4rem; font-weight:700;" id="totalSize">0 B</div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; padding:1.25rem; border-radius:10px;">
+                        <div style="font-size:0.8rem; opacity:0.9;">Orphaned</div>
+                        <div style="font-size:1.8rem; font-weight:700;" id="orphanedPDFs">0</div>
+                    </div>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="search-filter">
+                    <div class="search-box">
+                        <input type="text" id="pdfSearch" placeholder="Search by Order ID..." oninput="filterPDFList()">
+                    </div>
+                    <div class="filter-select">
+                        <select id="pdfTypeFilter" onchange="filterPDFList()">
+                            <option value="all">All PDFs</option>
+                            <option value="permanent">Permanent Only</option>
+                            <option value="temporary">Preview Only</option>
+                            <option value="linked">Linked to Orders</option>
+                            <option value="orphaned">Orphaned</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- PDF List -->
+                <div class="table-wrapper">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; padding:0 0.5rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                            <input type="checkbox" id="selectAllPDFs" onchange="toggleSelectAll()" style="width:18px; height:18px; cursor:pointer;">
+                            <span style="font-weight:500;">Select All</span>
+                        </label>
+                        <button class="btn btn-danger btn-small" id="deleteSelectedBtn" onclick="deleteSelectedPDFs()" style="display:none;">
+                            <i class="fas fa-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px;"><input type="checkbox" disabled style="visibility:hidden;"></th>
+                                <th>Order ID</th>
+                                <th>File Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pdfListTable">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-state-icon">📁</div>
+                                    <p>Loading PDF files...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -5065,7 +5165,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
             } else if (tabName === 'bulk-assembly') {
                 loadBulkAssemblyJobs();
             } else if (tabName === 'media-manager') {
-                loadPDFList();
+                // Default to voter slips panel and load it
+                mmSwitchTab('slips');
             } else if (tabName === 'sec-error') {
                 loadSECErrorSettings();
             }
@@ -7089,7 +7190,200 @@ Login to https://easyslip.in to download your PDF.</textarea>
         });
 
         // ==================== MEDIA MANAGER FUNCTIONS ====================
-        
+
+        // ---- Sub-tab switching ----
+        function mmSwitchTab(tab) {
+            const tabs = ['slips', 'orders'];
+            tabs.forEach(t => {
+                document.getElementById(`mm-panel-${t}`).style.display = (t === tab) ? '' : 'none';
+                const btn = document.getElementById(`mm-tab-${t}`);
+                if (t === tab) {
+                    btn.style.background = '';
+                    btn.className = 'btn btn-primary';
+                } else {
+                    btn.className = 'btn';
+                    btn.style.background = '#e2e8f0';
+                    btn.style.color = '#374151';
+                }
+            });
+            if (tab === 'slips' && vsAllFiles.length === 0) loadVoterSlips();
+            if (tab === 'orders' && allPDFs.length === 0) loadPDFList();
+        }
+
+        // ==================== VOTER SLIPS PANEL ====================
+        let vsAllFiles = [];
+        let vsFilteredFiles = [];
+
+        async function loadVoterSlips() {
+            try {
+                document.getElementById('vs-grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:#9ca3af;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top:0.5rem;">Loading files...</p></div>`;
+                document.getElementById('vs-empty').style.display = 'none';
+
+                const res = await fetch(`${API_BASE}/media/voter-slips`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to load voter slips');
+                const data = await res.json();
+
+                vsAllFiles = data.files || [];
+                vsFilteredFiles = [...vsAllFiles];
+
+                // Update stats
+                document.getElementById('vs-total').textContent = data.stats.total || 0;
+                document.getElementById('vs-pdfs').textContent = data.stats.pdfs || 0;
+                document.getElementById('vs-zips').textContent = data.stats.zips || 0;
+                document.getElementById('vs-htmls').textContent = data.stats.htmls || 0;
+                document.getElementById('vs-size').textContent = mmFormatBytes(data.stats.totalSize || 0);
+                document.getElementById('vs-orphaned').textContent = data.stats.orphaned || 0;
+
+                vsRenderGrid();
+            } catch (err) {
+                console.error(err);
+                showMediaAlert('Failed to load voter slip files', 'error');
+                document.getElementById('vs-grid').innerHTML = '';
+                document.getElementById('vs-empty').style.display = '';
+            }
+        }
+
+        function vsFilter() {
+            const q = document.getElementById('vs-search').value.toLowerCase();
+            const cat = document.getElementById('vs-category').value;
+            const status = document.getElementById('vs-status').value;
+
+            vsFilteredFiles = vsAllFiles.filter(f => {
+                const matchQ = !q || f.fileName.toLowerCase().includes(q);
+                const matchCat = cat === 'all' || f.category === cat;
+                const matchStatus = status === 'all' || (status === 'linked' && f.linked) || (status === 'orphaned' && !f.linked);
+                return matchQ && matchCat && matchStatus;
+            });
+            vsRenderGrid();
+        }
+
+        function vsRenderGrid() {
+            const grid = document.getElementById('vs-grid');
+            const empty = document.getElementById('vs-empty');
+
+            if (vsFilteredFiles.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = '';
+                document.getElementById('vs-select-all').checked = false;
+                vsUpdateDeleteBtn();
+                return;
+            }
+            empty.style.display = 'none';
+
+            grid.innerHTML = vsFilteredFiles.map((f, idx) => {
+                const icon = f.category === 'zip' ? 'fa-file-archive' : f.category === 'html' ? 'fa-file-code' : 'fa-file-pdf';
+                const iconColor = f.category === 'zip' ? '#f59e0b' : f.category === 'html' ? '#06b6d4' : '#ef4444';
+                const catLabel = { 'pdf': 'PDF', 'image-pdf': 'Image PDF', 'assembly-pdf': 'Assembly PDF', 'zip': 'ZIP', 'html': 'HTML' }[f.category] || f.category.toUpperCase();
+                const catColor = { 'pdf': '#3b82f6', 'image-pdf': '#8b5cf6', 'assembly-pdf': '#667eea', 'zip': '#f59e0b', 'html': '#06b6d4' }[f.category] || '#6b7280';
+                const date = new Date(f.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+                const linkedBadge = f.linked
+                    ? `<span style="background:#d1fae5; color:#065f46; font-size:0.7rem; padding:2px 7px; border-radius:999px; font-weight:600;">Linked</span>`
+                    : `<span style="background:#fef3c7; color:#92400e; font-size:0.7rem; padding:2px 7px; border-radius:999px; font-weight:600;">Orphaned</span>`;
+
+                return `
+                <div style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; gap:0.6rem; box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <input type="checkbox" class="vs-checkbox" data-idx="${idx}" data-name="${encodeURIComponent(f.fileName)}" onchange="vsUpdateDeleteBtn()" style="width:16px; height:16px; flex-shrink:0; cursor:pointer;">
+                        <i class="fas ${icon}" style="font-size:1.6rem; color:${iconColor}; flex-shrink:0;"></i>
+                        <div style="min-width:0; flex:1;">
+                            <div style="font-size:0.8rem; font-weight:600; word-break:break-all; color:#111827; line-height:1.3;">${f.fileName}</div>
+                            <div style="font-size:0.72rem; color:#6b7280; margin-top:2px;">${date}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
+                        <span style="background:${catColor}; color:#fff; font-size:0.7rem; padding:2px 8px; border-radius:999px; font-weight:600;">${catLabel}</span>
+                        ${linkedBadge}
+                        <span style="margin-left:auto; font-size:0.78rem; color:#6b7280; font-weight:500;">${mmFormatBytes(f.size)}</span>
+                    </div>
+                    <div style="display:flex; gap:0.4rem; margin-top:0.25rem;">
+                        ${f.category !== 'html' ? `<a href="${f.url}" target="_blank" class="btn btn-primary btn-small" style="flex:1; text-align:center; text-decoration:none;"><i class="fas fa-eye"></i> View</a>` : ''}
+                        <a href="${f.url}" download="${f.fileName}" class="btn btn-primary btn-small" style="flex:1; text-align:center; text-decoration:none;"><i class="fas fa-download"></i> Download</a>
+                        <button class="btn btn-danger btn-small" onclick="vsDeleteFile('${encodeURIComponent(f.fileName)}')" style="flex-shrink:0;" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('vs-select-all').checked = false;
+            vsUpdateDeleteBtn();
+        }
+
+        function vsToggleAll() {
+            const checked = document.getElementById('vs-select-all').checked;
+            document.querySelectorAll('.vs-checkbox').forEach(cb => { cb.checked = checked; });
+            vsUpdateDeleteBtn();
+        }
+
+        function vsUpdateDeleteBtn() {
+            const checked = document.querySelectorAll('.vs-checkbox:checked');
+            const btn = document.getElementById('vs-delete-selected-btn');
+            const cnt = document.getElementById('vs-selected-count');
+            if (checked.length > 0) {
+                btn.style.display = '';
+                cnt.textContent = checked.length;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        async function vsDeleteFile(encodedName) {
+            const fileName = decodeURIComponent(encodedName);
+            if (!confirm(`Delete file?\n${fileName}\n\nThis cannot be undone.`)) return;
+            try {
+                const res = await fetch(`${API_BASE}/media/voter-slips/${encodedName}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Delete failed');
+                showMediaAlert(`Deleted: ${fileName}`, 'success');
+                await loadVoterSlips();
+            } catch (err) {
+                console.error(err);
+                showMediaAlert('Failed to delete file', 'error');
+            }
+        }
+
+        async function vsDeleteSelected() {
+            const checkboxes = document.querySelectorAll('.vs-checkbox:checked');
+            if (checkboxes.length === 0) { showMediaAlert('No files selected', 'error'); return; }
+            if (!confirm(`Delete ${checkboxes.length} selected file(s)?\n\nThis cannot be undone.`)) return;
+
+            const fileNames = [...checkboxes].map(cb => decodeURIComponent(cb.dataset.name));
+            try {
+                showMediaAlert(`Deleting ${fileNames.length} files...`, 'info');
+                const res = await fetch(`${API_BASE}/media/voter-slips/bulk-delete`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileNames })
+                });
+                const data = await res.json();
+                showMediaAlert(`Deleted ${data.deleted} file(s)${data.errors?.length ? `, ${data.errors.length} failed` : ''}`, data.errors?.length ? 'error' : 'success');
+                await loadVoterSlips();
+            } catch (err) {
+                console.error(err);
+                showMediaAlert('Bulk delete failed', 'error');
+            }
+        }
+
+        async function cleanupOrphanedVoterSlips() {
+            if (!confirm('Delete all orphaned voter slip files (not linked to any assembly order)?\n\nThis cannot be undone.')) return;
+            try {
+                const res = await fetch(`${API_BASE}/media/voter-slips/cleanup`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                showMediaAlert(data.message || 'Cleanup complete', 'success');
+                await loadVoterSlips();
+            } catch (err) {
+                console.error(err);
+                showMediaAlert('Cleanup failed', 'error');
+            }
+        }
+
+        // ==================== ORDER PDFs PANEL (existing) ====================
+
         let allPDFs = [];
         let filteredPDFs = [];
 
@@ -7108,10 +7402,10 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 // Update statistics
                 document.getElementById('totalPDFs').textContent = data.stats.total || 0;
                 document.getElementById('permanentPDFs').textContent = data.stats.permanent || 0;
-                document.getElementById('permanentSize').textContent = formatBytes(data.stats.permanentSize || 0);
+                document.getElementById('permanentSize').textContent = mmFormatBytes(data.stats.permanentSize || 0);
                 document.getElementById('temporaryPDFs').textContent = data.stats.temporary || 0;
-                document.getElementById('temporarySize').textContent = formatBytes(data.stats.temporarySize || 0);
-                document.getElementById('totalSize').textContent = formatBytes(data.stats.totalSize || 0);
+                document.getElementById('temporarySize').textContent = mmFormatBytes(data.stats.temporarySize || 0);
+                document.getElementById('totalSize').textContent = mmFormatBytes(data.stats.totalSize || 0);
                 document.getElementById('orphanedPDFs').textContent = data.stats.orphaned || 0;
 
                 // Display PDFs
@@ -7152,7 +7446,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             ${pdf.type === 'permanent' ? 'Permanent' : 'Preview'}
                         </span>
                     </td>
-                    <td>${formatBytes(pdf.size)}</td>
+                    <td>${mmFormatBytes(pdf.size)}</td>
                     <td>${new Date(pdf.createdAt).toLocaleString()}</td>
                     <td>
                         <span class="badge badge-${pdf.hasOrder ? 'success' : 'warning'}">
@@ -7351,7 +7645,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             }
         }
 
-        function formatBytes(bytes) {
+        function mmFormatBytes(bytes) {
             if (bytes === 0) return '0 B';
             const k = 1024;
             const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -7362,12 +7656,11 @@ Login to https://easyslip.in to download your PDF.</textarea>
         function showMediaAlert(message, type) {
             const alert = document.getElementById('media-alert');
             alert.textContent = message;
-            alert.className = `alert ${type === 'success' ? 'alert-success' : 'alert-error'}`;
+            alert.className = `alert ${type === 'success' ? 'alert-success' : type === 'info' ? '' : 'alert-error'}`;
             alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { alert.style.display = 'none'; }, 5000);
         }
+
 
         // ==================== DEVELOPER SETTINGS FUNCTIONS ====================
         
