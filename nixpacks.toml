@@ -5,3 +5,8 @@ python = true
 [phases.setup]
 nixPkgs = ["...", "libglib2.0-0", "libgl1-mesa-glx"]
 aptPkgs = ["...", "libglib2.0-0", "libgl1-mesa-glx"]
+
+[env]
+# Increase Node.js heap to 8GB for concurrent bulk PDF extraction
+# Each part (37-43 pages) ~600-1000MB; 5 concurrent = ~4-5GB used, 3GB buffer for OS/Chromium
+NODE_OPTIONS = "--max-old-space-size=8192"

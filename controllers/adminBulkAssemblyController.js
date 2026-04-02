@@ -15,6 +15,27 @@ const __dirname = path.dirname(__filename);
 
 const activeJobs = new Set();
 
+/**
+ * Calculate concurrency based on available memory.
+ * image-heavy PDF extraction is memory-intensive, requiring careful tuning.
+ */
+function calculateConcurrency() {
+    // Get max heap size in bytes
+    const heapLimitMB = Math.floor(require('v8').getHeapStatistics().heap_size_limit / (1024 * 1024));
+    
+    // Rule of thumb: each concurrent part needs ~600-1000MB under normal load during extraction
+    // With OOM margin (20%), safe concurrency = (heapLimitMB * 0.8) / 750
+    if (heapLimitMB <= 1024) return 1;      // <=1GB: sequential only
+    if (heapLimitMB <= 2048) return 2;      // 2GB: 2 concurrent (observed OOM at 5)
+    if (heapLimitMB <= 4096) return 3;      // 4GB: 3 concurrent
+    if (heapLimitMB >= 8192) return 5;      // 8GB+: 5 concurrent (Railway Pro default)
+    return Math.floor((heapLimitMB * 0.8) / 750);
+}
+
+// Concurrency config (dynamically tuned for available heap memory)
+// With nixpacks.toml NODE_OPTIONS=--max-old-space-size=8192, defaults to 5 concurrent parts
+const BULK_CONCURRENCY = calculateConcurrency();
+
 function sanitizeFileName(input) {
     return String(input || 'unknown')
         .trim()
@@ -173,11 +194,6 @@ async function ensureZipForCompletedJob(job, voterSlipDir) {
     job.zipFileUrl = `/voter-slips/${zipFileName}`;
 }
 
-// Max parts processed simultaneously. Each part spawns a Playwright Chromium
-// instance (~300-500 MB RAM). For Railway Pro (24 vCPU / 24 GB RAM) 5 is a
-// safe default; raise to 8 if you want to push harder.
-const BULK_CONCURRENCY = 5;
-
 /**
  * Run an array of async task factories with limited concurrency.
  * Returns results in the same order as tasks.
@@ -300,6 +316,11 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
 async function processBulkJob(jobId) {
     const job = await AdminBulkAssemblyJob.findById(jobId);
     if (!job) return;
+
+    // Log heap and concurrency info for diagnostics
+    const heapStats = require('v8').getHeapStatistics();
+    const heapLimitMB = Math.floor(heapStats.heap_size_limit / (1024 * 1024));
+    logger.info(`📊 Heap limit: ${heapLimitMB} MB, Calculated concurrency: ${BULK_CONCURRENCY}`);
 
     const voterSlipDir = path.join(path.dirname(__dirname), 'voter-slips');
     const pdfDownloadDir = path.join(path.dirname(__dirname), 'pdf-downloads');
