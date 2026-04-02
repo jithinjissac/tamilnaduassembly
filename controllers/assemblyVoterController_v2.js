@@ -28,6 +28,55 @@ const __dirname = path.dirname(__filename);
 const PREVIEW_TTL_MS = 30 * 60 * 1000;
 const assemblyPreviewSessions = new Map();
 
+function resolveVoterSlipsDir() {
+    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+    if (fs.existsSync(mountedBucketPath)) {
+        return path.join(mountedBucketPath, 'voter-slips');
+    }
+    return path.join(path.dirname(__dirname), 'voter-slips');
+}
+
+function resolvePreviewSessionsDir() {
+    const dir = path.join(resolveVoterSlipsDir(), '_preview-sessions');
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+    return dir;
+}
+
+function getPreviewSessionFilePath(previewId) {
+    return path.join(resolvePreviewSessionsDir(), `${previewId}.json`);
+}
+
+function persistPreviewSession(previewId, entry) {
+    try {
+        fs.writeFileSync(getPreviewSessionFilePath(previewId), JSON.stringify(entry), 'utf8');
+    } catch (error) {
+        logger.warn(`Assembly: Failed to persist preview session ${previewId}: ${error.message}`);
+    }
+}
+
+function readPersistedPreviewSession(previewId) {
+    try {
+        const filePath = getPreviewSessionFilePath(previewId);
+        if (!fs.existsSync(filePath)) return null;
+        const raw = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(raw);
+    } catch (error) {
+        logger.warn(`Assembly: Failed to read persisted preview session ${previewId}: ${error.message}`);
+        return null;
+    }
+}
+
+function deletePersistedPreviewSession(previewId) {
+    try {
+        const filePath = getPreviewSessionFilePath(previewId);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    } catch (error) {
+        logger.warn(`Assembly: Failed to delete persisted preview session ${previewId}: ${error.message}`);
+    }
+}
+
 // ─── Extraction Progress Tracking ────────────────────────────────────
 const extractionProgress = new Map();
 
@@ -48,11 +97,14 @@ function createPreviewSession(payload) {
     const previewId = `asm_${Date.now()}_${crypto.randomUUID()}`;
     const expiresAt = Date.now() + PREVIEW_TTL_MS;
 
-    assemblyPreviewSessions.set(previewId, {
+    const entry = {
         payload,
         createdAt: Date.now(),
         expiresAt
-    });
+    };
+
+    assemblyPreviewSessions.set(previewId, entry);
+    persistPreviewSession(previewId, entry);
     schedulePreviewCleanup(previewId);
 
     return { previewId, expiresAt };
@@ -61,6 +113,7 @@ function createPreviewSession(payload) {
 function schedulePreviewCleanup(previewId) {
     setTimeout(() => {
         assemblyPreviewSessions.delete(previewId);
+        deletePersistedPreviewSession(previewId);
     }, PREVIEW_TTL_MS);
 }
 
@@ -446,7 +499,8 @@ export const extractVoters = async (req, res) => {
         if (shouldCreatePreviewSession) {
             previewSessionInfo = createPreviewSession({
                 orderId: `ASM-${Date.now()}`,
-                voters: allVoterSnippets,
+                // Preview needs only first 10 voters (2 pages at 5 slips/page).
+                voters: allVoterSnippets.slice(0, 10),
                 candidate,
                 extractedData: {
                     totalVoters: allVoterSnippets.length,
@@ -565,7 +619,14 @@ export const getPreviewData = (req, res) => {
             });
         }
 
-        const entry = assemblyPreviewSessions.get(previewId);
+        let entry = assemblyPreviewSessions.get(previewId);
+        if (!entry) {
+            entry = readPersistedPreviewSession(previewId);
+            if (entry) {
+                assemblyPreviewSessions.set(previewId, entry);
+            }
+        }
+
         if (!entry) {
             return res.status(404).json({
                 status: 'error',
@@ -575,6 +636,7 @@ export const getPreviewData = (req, res) => {
 
         if (Date.now() > entry.expiresAt) {
             assemblyPreviewSessions.delete(previewId);
+            deletePersistedPreviewSession(previewId);
             return res.status(410).json({
                 status: 'error',
                 message: 'Preview data expired. Please extract again.'
@@ -604,13 +666,21 @@ export const getPreviewPayloadById = (previewId) => {
         return null;
     }
 
-    const entry = assemblyPreviewSessions.get(previewId);
+    let entry = assemblyPreviewSessions.get(previewId);
+    if (!entry) {
+        entry = readPersistedPreviewSession(previewId);
+        if (entry) {
+            assemblyPreviewSessions.set(previewId, entry);
+        }
+    }
+
     if (!entry) {
         return null;
     }
 
     if (Date.now() > entry.expiresAt) {
         assemblyPreviewSessions.delete(previewId);
+        deletePersistedPreviewSession(previewId);
         return null;
     }
 
