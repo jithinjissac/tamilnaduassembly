@@ -14,6 +14,20 @@ import { optimizePdfLossless } from './pdfOptimizer.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function resolveVoterSlipsDir() {
+    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+    if (fs.existsSync(mountedBucketPath)) {
+        return path.join(mountedBucketPath, 'voter-slips');
+    }
+    return path.join(path.dirname(__dirname), 'voter-slips');
+}
+
+function buildPublicVoterSlipUrl(fileName) {
+    const base = (process.env.PUBLIC_BASE_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '');
+    if (!base || !fileName) return '';
+    return `${base}/voter-slips/${encodeURIComponent(fileName)}`;
+}
+
 /**
  * Generate voter slips with embedded images
  */
@@ -25,7 +39,7 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
         const KEEP_FULL_HTML_MAX_VOTERS = 100;
         
         // Create output directory
-        const outputDir = path.join(path.dirname(__dirname), 'voter-slips');
+        const outputDir = resolveVoterSlipsDir();
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
@@ -115,8 +129,19 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
                 pages.forEach(p => mergedPdf.addPage(p));
             }
             const finalPdfBytes = await mergedPdf.save();
-            const optimizedPdfBytes = await optimizePdfLossless(finalPdfBytes, `image-slips:${baseName}`);
-            fs.writeFileSync(pdfFullPath, optimizedPdfBytes);
+            const localOptimizedPdfBytes = await optimizePdfLossless(finalPdfBytes, `image-slips:${baseName}`);
+            fs.writeFileSync(pdfFullPath, localOptimizedPdfBytes);
+
+            const apdfSourceUrl = buildPublicVoterSlipUrl(pdfFileName);
+            if (apdfSourceUrl) {
+                const apdfOptimizedPdfBytes = await optimizePdfLossless(localOptimizedPdfBytes, `image-slips:${baseName}:apdf`, {
+                    apdfSourceUrl,
+                    skipLocal: true
+                });
+                if (apdfOptimizedPdfBytes.length < localOptimizedPdfBytes.length) {
+                    fs.writeFileSync(pdfFullPath, apdfOptimizedPdfBytes);
+                }
+            }
             pdfGenerated = true;
             logger.info(`✅ Image-based voter slips PDF saved to: ${pdfFullPath} (${chunks.length} chunks merged)`);
 

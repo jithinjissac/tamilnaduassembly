@@ -139,63 +139,128 @@ async function optimizeWithPdfLib(inputBytes) {
     });
 }
 
+async function optimizeWithApdf(fileUrl, contextLabel = 'pdf') {
+    const token = process.env.APDF_API_TOKEN || process.env.APDF_API_KEY || '';
+    if (!token || !fileUrl) {
+        return null;
+    }
+
+    const baseUrl = (process.env.APDF_API_BASE_URL || 'https://apdf.io/api').replace(/\/$/, '');
+    const endpoint = `${baseUrl}/pdf/file/compress`;
+
+    try {
+        const body = new URLSearchParams({ file: fileUrl });
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body
+        });
+
+        if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(`aPDF compress failed with status ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+        }
+
+        const payload = await response.json();
+        const compressedUrl = payload?.file;
+        if (!compressedUrl) {
+            throw new Error('aPDF response missing compressed file URL');
+        }
+
+        const fileResp = await fetch(compressedUrl, { method: 'GET' });
+        if (!fileResp.ok) {
+            throw new Error(`failed to download compressed PDF (${fileResp.status})`);
+        }
+
+        const buf = new Uint8Array(await fileResp.arrayBuffer());
+        logger.info(`✅ aPDF compression completed (${contextLabel})`);
+        return buf;
+    } catch (err) {
+        logger.warn(`⚠️ aPDF compression skipped (${contextLabel}): ${err.message}`);
+        return null;
+    }
+}
+
 /**
  * Multi-strategy lossless PDF optimization.
  * Tries strong external optimizers first, then falls back to pdf-lib.
  */
-export async function optimizePdfLossless(pdfBytes, contextLabel = 'pdf') {
+export async function optimizePdfLossless(pdfBytes, contextLabel = 'pdf', options = {}) {
     const original = toBytes(pdfBytes);
     let best = original;
     let bestMethod = 'original';
+    const skipLocal = options?.skipLocal === true;
 
-    // Prefer qpdf as the primary lossless optimizer.
-    try {
-        const qpdfCandidate = await optimizeWithQpdf(original);
-        if (qpdfCandidate && qpdfCandidate.length < original.length) {
-            const qpdfBytes = toBytes(qpdfCandidate);
-            const savedBytes = original.length - qpdfBytes.length;
-            logger.info(
-                `✅ Lossless PDF optimized (${contextLabel}) via qpdf: ` +
-                `-${savedBytes} bytes (${pctSaved(original.length, qpdfBytes.length)}%)`
-            );
-            return qpdfBytes;
-        }
-
-        if (qpdfCandidate) {
-            logger.info(`ℹ️ qpdf ran but gave no size reduction (${contextLabel})`);
-        } else {
-            logger.info(`ℹ️ qpdf not available for this environment (${contextLabel}), trying fallback optimizers`);
-        }
-    } catch (err) {
-        logger.warn(`⚠️ qpdf optimization failed (${contextLabel}): ${err.message}`);
-    }
-
-    const strategies = [
-        { name: 'ghostscript-lossless', fn: optimizeWithGhostscriptLossless },
-        { name: 'pdf-lib', fn: optimizeWithPdfLib }
-    ];
-
-    for (const strategy of strategies) {
+    if (!skipLocal) {
+        // Prefer qpdf as the primary lossless optimizer.
         try {
-            const candidate = await strategy.fn(original);
-            if (candidate && candidate.length < best.length) {
-                best = toBytes(candidate);
-                bestMethod = strategy.name;
+            const qpdfCandidate = await optimizeWithQpdf(original);
+            if (qpdfCandidate && qpdfCandidate.length < original.length) {
+                const qpdfBytes = toBytes(qpdfCandidate);
+                const savedBytes = original.length - qpdfBytes.length;
+                logger.info(
+                    `✅ Lossless PDF optimized (${contextLabel}) via qpdf: ` +
+                    `-${savedBytes} bytes (${pctSaved(original.length, qpdfBytes.length)}%)`
+                );
+                return qpdfBytes;
+            }
+
+            if (qpdfCandidate) {
+                logger.info(`ℹ️ qpdf ran but gave no size reduction (${contextLabel})`);
+            } else {
+                logger.info(`ℹ️ qpdf not available for this environment (${contextLabel}), trying fallback optimizers`);
             }
         } catch (err) {
-            logger.warn(`⚠️ PDF optimizer ${strategy.name} skipped (${contextLabel}): ${err.message}`);
+            logger.warn(`⚠️ qpdf optimization failed (${contextLabel}): ${err.message}`);
+        }
+
+        const strategies = [
+            { name: 'ghostscript-lossless', fn: optimizeWithGhostscriptLossless },
+            { name: 'pdf-lib', fn: optimizeWithPdfLib }
+        ];
+
+        for (const strategy of strategies) {
+            try {
+                const candidate = await strategy.fn(original);
+                if (candidate && candidate.length < best.length) {
+                    best = toBytes(candidate);
+                    bestMethod = strategy.name;
+                }
+            } catch (err) {
+                logger.warn(`⚠️ PDF optimizer ${strategy.name} skipped (${contextLabel}): ${err.message}`);
+            }
+        }
+
+        if (best.length < original.length) {
+            const savedBytes = original.length - best.length;
+            logger.info(
+                `✅ Lossless PDF optimized (${contextLabel}) via ${bestMethod}: ` +
+                `-${savedBytes} bytes (${pctSaved(original.length, best.length)}%)`
+            );
+        } else {
+            logger.info(`ℹ️ Lossless optimization kept original (${contextLabel}): no smaller output`);
         }
     }
 
-    if (best.length < original.length) {
-        const savedBytes = original.length - best.length;
-        logger.info(
-            `✅ Lossless PDF optimized (${contextLabel}) via ${bestMethod}: ` +
-            `-${savedBytes} bytes (${pctSaved(original.length, best.length)}%)`
-        );
-        return best;
+    const apdfSourceUrl = options?.apdfSourceUrl || '';
+    if (apdfSourceUrl) {
+        const apdfCandidate = await optimizeWithApdf(apdfSourceUrl, contextLabel);
+        if (apdfCandidate && apdfCandidate.length < best.length) {
+            const savedBytes = best.length - apdfCandidate.length;
+            logger.info(
+                `✅ PDF optimized (${contextLabel}) via aPDF: ` +
+                `-${savedBytes} bytes (${pctSaved(best.length, apdfCandidate.length)}%) beyond local optimization`
+            );
+            return apdfCandidate;
+        }
+        if (apdfCandidate) {
+            logger.info(`ℹ️ aPDF returned no additional reduction (${contextLabel})`);
+        }
     }
 
-    logger.info(`ℹ️ Lossless optimization kept original (${contextLabel}): no smaller output`);
-    return original;
+    return best;
 }

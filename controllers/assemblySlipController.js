@@ -12,6 +12,20 @@ import { optimizePdfLossless } from '../utils/pdfOptimizer.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function resolveVoterSlipsDir() {
+    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+    if (fs.existsSync(mountedBucketPath)) {
+        return path.join(mountedBucketPath, 'voter-slips');
+    }
+    return path.join(path.dirname(__dirname), 'voter-slips');
+}
+
+function buildPublicVoterSlipUrl(fileName) {
+    const base = (process.env.PUBLIC_BASE_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '');
+    if (!base || !fileName) return '';
+    return `${base}/voter-slips/${encodeURIComponent(fileName)}`;
+}
+
 // Pre-load local Malayalam font as base64 once at startup — eliminates all
 // Google Fonts network requests during headless PDF rendering.
 const _fontPath = path.join(__dirname, '../assets/fonts/NotoSansMalayalam-Regular.ttf');
@@ -76,7 +90,7 @@ export const generateSlipsWithCandidates = async (req, res) => {
 
         logger.info(`Generating slips for ${voters.length} voters — constituency: ${constituency}`);
 
-        const outputDir = path.join(path.dirname(__dirname), 'voter-slips');
+        const outputDir = resolveVoterSlipsDir();
         if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
         const timestamp = Date.now();
@@ -157,8 +171,19 @@ export const generateSlipsWithCandidates = async (req, res) => {
             pages.forEach(p => mergedPdf.addPage(p));
         }
         const pdfBuffer = await mergedPdf.save();
-        const optimizedPdfBuffer = await optimizePdfLossless(pdfBuffer, `assembly-slips:${baseName}`);
-        fs.writeFileSync(pdfFullPath, optimizedPdfBuffer);
+        const localOptimizedPdfBuffer = await optimizePdfLossless(pdfBuffer, `assembly-slips:${baseName}`);
+        fs.writeFileSync(pdfFullPath, localOptimizedPdfBuffer);
+
+        const apdfSourceUrl = buildPublicVoterSlipUrl(pdfFileName);
+        if (apdfSourceUrl) {
+            const apdfOptimizedPdfBuffer = await optimizePdfLossless(localOptimizedPdfBuffer, `assembly-slips:${baseName}:apdf`, {
+                apdfSourceUrl,
+                skipLocal: true
+            });
+            if (apdfOptimizedPdfBuffer.length < localOptimizedPdfBuffer.length) {
+                fs.writeFileSync(pdfFullPath, apdfOptimizedPdfBuffer);
+            }
+        }
 
         logger.info(`✅ Assembly slips PDF saved: ${pdfFullPath}`);
 
