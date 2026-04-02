@@ -66,7 +66,8 @@ export const generateSlipsWithCandidates = async (req, res) => {
                 ...(metadata || {}),
                 constituency: extracted.constituency || metadata?.constituency,
                 district: extracted.district || metadata?.district,
-                pollingStationInfo: metadata?.pollingStationInfo || singlePartLabel
+                pollingStationInfo: metadata?.pollingStationInfo || singlePartLabel,
+                totalVoters: extracted.totalVoters || metadata?.totalVoters
             };
         }
 
@@ -226,6 +227,27 @@ export const generateSlipsWithCandidates = async (req, res) => {
     }
 };
 
+function resolveSymbolImageSrc(src) {
+    if (!src || typeof src !== 'string') return '';
+    const cleaned = src.trim();
+    if (cleaned.startsWith('data:image/') || cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
+    
+    if (cleaned.startsWith('/')) {
+        const localPath = path.join(path.dirname(__dirname), 'public', cleaned.replace(/^\//, ''));
+        if (fs.existsSync(localPath)) {
+            return `file:///${localPath.replace(/\\/g, '/')}`;
+        }
+        return `http://localhost:3000${cleaned}`;
+    }
+    
+    const relative = cleaned.replace(/^public\//i, '');
+    const relativeLocalPath = path.join(path.dirname(__dirname), 'public', relative);
+    if (fs.existsSync(relativeLocalPath)) {
+        return `file:///${relativeLocalPath.replace(/\\/g, '/')}`;
+    }
+    return `http://localhost:3000/${relative}`;
+}
+
 /**
  * Generate HTML for assembly slips with single candidate
  */
@@ -250,8 +272,9 @@ function generateSlipsHTML(voters, candidate, metadata) {
     const constituencyDisplay = toDisplayName(constituency);
 
       // Determine if a symbol should be displayed
-      const showSymbol = Boolean(candidate && candidate.symbol);
-      const resolvedSymbolImage = showSymbol ? candidate.symbol : '';
+      const rawSymbolImage = candidate?.symbol || '';
+      const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
+      const showSymbol = Boolean(resolvedSymbolImage);
       const rawSymbolNameMalayalam = candidate?.symbolNameMalayalam || candidate?.symbolName || '';
 
     const pages = [];
@@ -369,7 +392,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
         .voter-slip > * { overflow: hidden; }
 
         .slip-left { display: flex !important; width: 38mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
-        .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3mm; width: 100%; }
         
         .symbol-header { font-size: 8.5pt; font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 0.2mm; white-space: normal; word-break: keep-all; }
         .symbol-image-wrap { width: 100%; height: 18mm; display: flex; align-items: center; justify-content: center; }
