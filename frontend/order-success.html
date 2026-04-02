@@ -473,7 +473,7 @@ s0.parentNode.insertBefore(s1,s0);
         </div>
 
         <div style="margin-bottom: 2rem;">
-            <a href="create-slip.html" class="btn" style="width: 100%; display: block; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white;">
+            <a href="create-slip.html" id="createAnotherSlipLink" class="btn" style="width: 100%; display: block; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white;">
                 <i class="fas fa-plus-circle"></i> Create Another Slip
             </a>
         </div>
@@ -520,6 +520,9 @@ s0.parentNode.insertBefore(s1,s0);
 
         let orderData = null;
         let downloadInProgress = false;
+
+        // Apply order-type specific button visibility as early as possible.
+        applyOrderTypeUI();
 
         // Function to check authentication and order ownership
         async function verifyOrderAccess() {
@@ -894,7 +897,7 @@ Preview Link: ${previewUrl}
 Please assist me.`;
             
             const encodedMessage = encodeURIComponent(message);
-            whatsappLink.href = `https://wa.me/917907638842?text=${encodedMessage}`;
+            whatsappLink.href = `https://wa.me/447435111412?text=${encodedMessage}`;
         }
 
         // Verify Cashfree payment after redirect
