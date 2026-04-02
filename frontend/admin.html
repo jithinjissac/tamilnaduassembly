@@ -1120,7 +1120,11 @@
             <div class="card" id="bulkJobDetailsCard" style="display: none;">
                 <div class="card-header">
                     <h2 id="bulkJobTitle">Bulk Job Details</h2>
-                    <button id="bulkZipDownloadBtn" class="btn btn-primary" style="display:none;" onclick="downloadBulkZip()"><i class="fas fa-file-archive"></i> Download ZIP</button>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button id="bulkRetryFailedBtn" class="btn btn-warning" style="display:none;" onclick="retryFailedBulkParts()"><i class="fas fa-redo"></i> Retry Failed</button>
+                        <button id="bulkCancelJobBtn" class="btn btn-danger" style="display:none;" onclick="cancelBulkJob()"><i class="fas fa-stop-circle"></i> Cancel Job</button>
+                        <button id="bulkZipDownloadBtn" class="btn btn-primary" style="display:none;" onclick="downloadBulkZip()"><i class="fas fa-file-archive"></i> Download ZIP</button>
+                    </div>
                 </div>
                 <div class="table-wrapper">
                     <table>
@@ -2895,8 +2899,10 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 completed: '#10b981',
                 partial: '#f59e0b',
                 failed: '#ef4444',
+                canceled: '#374151',
                 pending: '#6b7280',
-                processing: '#2563eb'
+                processing: '#2563eb',
+                cancelled: '#374151'
             };
             const color = colorMap[status] || '#6b7280';
             return `<span style="display:inline-block;padding:0.2rem 0.5rem;border-radius:999px;background:${color};color:white;font-size:0.78rem;text-transform:uppercase;">${status || '-'}</span>`;
@@ -3173,6 +3179,14 @@ Login to https://easyslip.in to download your PDF.</textarea>
                     const zipBtn = job.zipFileUrl
                         ? `<button class="btn btn-small btn-primary" onclick="downloadBulkZip('${job._id}')">ZIP</button>`
                         : '';
+                    const canCancel = job.status === 'queued' || job.status === 'running';
+                    const cancelBtn = canCancel
+                        ? `<button class="btn btn-small btn-danger" onclick="cancelBulkJob('${job._id}')">Cancel</button>`
+                        : '';
+                    const canRetryFailed = Number(job.failedParts || 0) > 0 && job.status !== 'queued' && job.status !== 'running';
+                    const retryBtn = canRetryFailed
+                        ? `<button class="btn btn-small btn-warning" onclick="retryFailedBulkParts('${job._id}')">Retry Failed</button>`
+                        : '';
 
                     return `
                         <tr>
@@ -3183,6 +3197,8 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             <td>${created}</td>
                             <td>
                                 <button class="btn btn-small btn-secondary" onclick="loadBulkAssemblyJob('${job._id}', true)">View</button>
+                                ${cancelBtn}
+                                ${retryBtn}
                                 ${zipBtn}
                             </td>
                         </tr>`;
@@ -3214,6 +3230,24 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 } else {
                     zipBtn.style.display = 'none';
                     delete zipBtn.dataset.jobId;
+                }
+
+                const cancelBtn = document.getElementById('bulkCancelJobBtn');
+                if (job.status === 'queued' || job.status === 'running') {
+                    cancelBtn.style.display = 'inline-block';
+                    cancelBtn.dataset.jobId = job._id;
+                } else {
+                    cancelBtn.style.display = 'none';
+                    delete cancelBtn.dataset.jobId;
+                }
+
+                const retryBtn = document.getElementById('bulkRetryFailedBtn');
+                if ((job.failedParts || 0) > 0 && job.status !== 'queued' && job.status !== 'running') {
+                    retryBtn.style.display = 'inline-block';
+                    retryBtn.dataset.jobId = job._id;
+                } else {
+                    retryBtn.style.display = 'none';
+                    delete retryBtn.dataset.jobId;
                 }
 
                 const partsTbody = document.getElementById('bulkJobPartsTable');
@@ -3248,6 +3282,85 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 }
             } catch (error) {
                 showError(error.message || 'Failed to load bulk job details');
+            }
+        }
+
+        async function cancelBulkJob(jobIdOverride = '') {
+            const cancelBtn = document.getElementById('bulkCancelJobBtn');
+            const jobId = jobIdOverride || cancelBtn.dataset.jobId;
+            if (!jobId) return;
+
+            const ok = window.confirm('Cancel this bulk job? Running parts may finish, but remaining parts will be stopped.');
+            if (!ok) return;
+
+            const detailsButtonMode = !jobIdOverride;
+            if (detailsButtonMode) {
+                cancelBtn.disabled = true;
+                cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Canceling...';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs/${encodeURIComponent(jobId)}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Failed to cancel bulk job');
+                }
+
+                showSuccess(data.message || 'Bulk job cancellation requested');
+                stopBulkJobPolling();
+                await loadBulkAssemblyJobs();
+                if (currentBulkJobId && (currentBulkJobId === jobId || !jobIdOverride)) {
+                    await loadBulkAssemblyJob(currentBulkJobId, true);
+                }
+            } catch (error) {
+                showError(error.message || 'Failed to cancel bulk job');
+            } finally {
+                if (detailsButtonMode) {
+                    cancelBtn.disabled = false;
+                    cancelBtn.innerHTML = '<i class="fas fa-stop-circle"></i> Cancel Job';
+                }
+            }
+        }
+
+        async function retryFailedBulkParts(jobIdOverride = '') {
+            const retryBtn = document.getElementById('bulkRetryFailedBtn');
+            const jobId = jobIdOverride || retryBtn.dataset.jobId;
+            if (!jobId) return;
+
+            const ok = window.confirm('Retry only failed parts for this bulk job?');
+            if (!ok) return;
+
+            const detailsButtonMode = !jobIdOverride;
+            if (detailsButtonMode) {
+                retryBtn.disabled = true;
+                retryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Retrying...';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/assembly-bulk/jobs/${encodeURIComponent(jobId)}/retry-failed`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Failed to retry failed parts');
+                }
+
+                showSuccess(data.message || 'Retry started for failed parts');
+                await loadBulkAssemblyJobs();
+                if (currentBulkJobId && (currentBulkJobId === jobId || !jobIdOverride)) {
+                    await loadBulkAssemblyJob(currentBulkJobId, true);
+                }
+            } catch (error) {
+                showError(error.message || 'Failed to retry failed parts');
+            } finally {
+                if (detailsButtonMode) {
+                    retryBtn.disabled = false;
+                    retryBtn.innerHTML = '<i class="fas fa-redo"></i> Retry Failed';
+                }
             }
         }
 

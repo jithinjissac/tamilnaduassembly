@@ -11,7 +11,7 @@ const BulkPartSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'processing', 'completed', 'failed'],
+        enum: ['pending', 'processing', 'completed', 'failed', 'canceled'],
         default: 'pending'
     },
     voterCount: {
@@ -41,8 +41,13 @@ const AdminBulkAssemblyJobSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['queued', 'running', 'completed', 'partial', 'failed'],
+        enum: ['queued', 'running', 'completed', 'partial', 'failed', 'canceled'],
         default: 'queued',
+        index: true
+    },
+    cancelRequested: {
+        type: Boolean,
+        default: false,
         index: true
     },
     stateCode: { type: String, required: true },

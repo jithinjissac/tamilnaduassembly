@@ -13,6 +13,7 @@ import { saveVoterSnippetSlipsToFile } from '../utils/imageSlipGenerator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const JOB_CANCELED_ERROR = '__BULK_JOB_CANCELED__';
 
 const activeJobs = new Set();
 
@@ -54,6 +55,39 @@ function ensureDir(dirPath) {
 
 async function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function isJobCancellationRequested(jobId) {
+    const job = await AdminBulkAssemblyJob.findById(jobId)
+        .select('cancelRequested status')
+        .lean();
+    if (!job) return false;
+    return job.cancelRequested === true || job.status === 'canceled';
+}
+
+async function markRemainingPartsCanceled(jobId, reason = 'Canceled by admin') {
+    const job = await AdminBulkAssemblyJob.findById(jobId);
+    if (!job) return;
+
+    let changed = false;
+    for (const part of job.parts) {
+        if (part.status === 'pending' || part.status === 'processing') {
+            part.status = 'canceled';
+            part.error = reason;
+            part.completedAt = new Date();
+            changed = true;
+        }
+    }
+
+    if (changed) {
+        job.markModified('parts');
+    }
+
+    job.status = 'canceled';
+    job.error = reason;
+    job.cancelRequested = true;
+    job.finishedAt = new Date();
+    await job.save();
 }
 
 /**
@@ -199,12 +233,15 @@ async function ensureZipForCompletedJob(job, voterSlipDir) {
  * Run an array of async task factories with limited concurrency.
  * Returns results in the same order as tasks.
  */
-async function runWithConcurrency(tasks, limit) {
+async function runWithConcurrency(tasks, limit, shouldStop = null) {
     const results = new Array(tasks.length);
     let nextIdx = 0;
 
     async function worker() {
         while (nextIdx < tasks.length) {
+            if (shouldStop && await shouldStop()) {
+                return;
+            }
             const i = nextIdx++;
             results[i] = await tasks[i]();
         }
@@ -234,6 +271,10 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
     const tempPdfPath = path.join(pdfDownloadDir,
         `bulk-${displayId}-${part.partNumber}-${Date.now()}.pdf`);
 
+    if (await isJobCancellationRequested(jobId)) {
+        return { status: 'canceled' };
+    }
+
     // Mark part as processing
     await AdminBulkAssemblyJob.updateOne(
         { _id: jobId, 'parts.partNumber': part.partNumber },
@@ -241,7 +282,15 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
     );
 
     try {
+        if (await isJobCancellationRequested(jobId)) {
+            throw new Error(JOB_CANCELED_ERROR);
+        }
+
         const resolvedPdfUrl = await downloadPdfFromCandidates(pdfUrlCandidates, tempPdfPath);
+
+        if (await isJobCancellationRequested(jobId)) {
+            throw new Error(JOB_CANCELED_ERROR);
+        }
 
         const snippets = await extractVoterSnippets(tempPdfPath, {
             startPage: 3,
@@ -255,6 +304,11 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
         }
 
         const pollingStationInfo = `${part.partNumber}${part.partName ? ` - ${part.partName}` : ''}`;
+
+        if (await isJobCancellationRequested(jobId)) {
+            throw new Error(JOB_CANCELED_ERROR);
+        }
+
         const slipInfo = await saveVoterSnippetSlipsToFile(snippets, {
             constituency: constituencyName,
             district: districtCode,
@@ -270,6 +324,10 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
 
         if (!slipInfo?.pdfFullPath || !fs.existsSync(slipInfo.pdfFullPath)) {
             throw new Error('Slip PDF was not generated');
+        }
+
+        if (await isJobCancellationRequested(jobId)) {
+            throw new Error(JOB_CANCELED_ERROR);
         }
 
         const safeConstituency = sanitizeFileName(constituencyName);
@@ -296,6 +354,22 @@ async function processOnePart(jobId, jobMeta, part, voterSlipDir, pdfDownloadDir
         logger.info(`✅ Bulk part ${part.partNumber} done — ${snippets.length} voters`);
         return { status: 'completed', fullPath: finalPdfFullPath, fileName: finalPdfFileName };
     } catch (error) {
+        const canceled = error?.message === JOB_CANCELED_ERROR || await isJobCancellationRequested(jobId);
+        if (canceled) {
+            await AdminBulkAssemblyJob.updateOne(
+                { _id: jobId, 'parts.partNumber': part.partNumber },
+                {
+                    $set: {
+                        'parts.$.status': 'canceled',
+                        'parts.$.error': 'Canceled by admin',
+                        'parts.$.completedAt': new Date()
+                    }
+                }
+            );
+            logger.info(`⏹️ Bulk part ${part.partNumber} canceled`);
+            return { status: 'canceled' };
+        }
+
         await AdminBulkAssemblyJob.updateOne(
             { _id: jobId, 'parts.partNumber': part.partNumber },
             {
@@ -318,6 +392,11 @@ async function processBulkJob(jobId) {
     const job = await AdminBulkAssemblyJob.findById(jobId);
     if (!job) return;
 
+    if (job.cancelRequested || job.status === 'canceled') {
+        await markRemainingPartsCanceled(jobId);
+        return;
+    }
+
     // Log heap and concurrency info for diagnostics
     const heapStats = v8.getHeapStatistics();
     const heapLimitMB = Math.floor(heapStats.heap_size_limit / (1024 * 1024));
@@ -333,7 +412,7 @@ async function processBulkJob(jobId) {
     await job.save();
 
     try {
-        const remainingParts = job.parts.filter((part) => part.status !== 'completed');
+        const remainingParts = job.parts.filter((part) => part.status !== 'completed' && part.status !== 'canceled');
 
         if (!remainingParts.length) {
             await ensureZipForCompletedJob(job, voterSlipDir);
@@ -362,11 +441,22 @@ async function processBulkJob(jobId) {
         );
 
         logger.info(`🚀 Processing ${tasks.length} parts with concurrency ${BULK_CONCURRENCY}`);
-        await runWithConcurrency(tasks, BULK_CONCURRENCY);
+        await runWithConcurrency(tasks, BULK_CONCURRENCY, async () => isJobCancellationRequested(jobId));
 
         // Reload fresh doc — concurrent $inc writes are now all flushed
         const freshJob = await AdminBulkAssemblyJob.findById(jobId);
         if (!freshJob) return;
+
+        if (freshJob.cancelRequested || freshJob.status === 'canceled') {
+            await markRemainingPartsCanceled(jobId);
+            const canceledJob = await AdminBulkAssemblyJob.findById(jobId);
+            if (canceledJob) {
+                await ensureZipForCompletedJob(canceledJob, voterSlipDir);
+                await canceledJob.save();
+            }
+            logger.info(`⏹️ Bulk job ${jobId} canceled`);
+            return;
+        }
 
         await ensureZipForCompletedJob(freshJob, voterSlipDir);
 
@@ -465,7 +555,8 @@ export const createBulkAssemblyJob = async (req, res) => {
 
 export const resumePendingBulkAssemblyJobs = async () => {
     const resumableJobs = await AdminBulkAssemblyJob.find({
-        status: { $in: ['queued', 'running'] }
+        status: { $in: ['queued', 'running'] },
+        cancelRequested: { $ne: true }
     });
 
     if (!resumableJobs.length) {
@@ -485,6 +576,7 @@ export const resumePendingBulkAssemblyJobs = async () => {
 
         job.status = 'queued';
         job.error = '';
+        job.cancelRequested = false;
         if (changed) {
             job.markModified('parts');
         }
@@ -572,6 +664,142 @@ export const downloadBulkAssemblyZip = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to download ZIP',
+            error: error.message
+        });
+    }
+};
+
+export const cancelBulkAssemblyJob = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const query = mongoose.Types.ObjectId.isValid(jobId)
+            ? { $or: [{ _id: jobId }, { jobId }] }
+            : { jobId };
+        const job = await AdminBulkAssemblyJob.findOne(query);
+
+        if (!job) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Bulk job not found'
+            });
+        }
+
+        if (job.status === 'canceled') {
+            return res.json({
+                status: 'success',
+                message: 'Bulk job already canceled',
+                jobId: job.jobId,
+                id: job._id
+            });
+        }
+
+        if (['completed', 'partial', 'failed'].includes(job.status)) {
+            return res.status(409).json({
+                status: 'error',
+                message: `Cannot cancel job in ${job.status} state`
+            });
+        }
+
+        job.cancelRequested = true;
+        job.error = 'Canceled by admin';
+
+        if (job.status === 'queued') {
+            for (const part of job.parts) {
+                if (part.status === 'pending' || part.status === 'processing') {
+                    part.status = 'canceled';
+                    part.error = 'Canceled by admin';
+                    part.completedAt = new Date();
+                }
+            }
+            job.markModified('parts');
+            job.status = 'canceled';
+            job.finishedAt = new Date();
+        }
+
+        await job.save();
+
+        return res.json({
+            status: 'success',
+            message: job.status === 'canceled' ? 'Bulk job canceled' : 'Bulk job cancellation requested',
+            jobId: job.jobId,
+            id: job._id
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to cancel bulk job',
+            error: error.message
+        });
+    }
+};
+
+export const retryFailedBulkAssemblyParts = async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const query = mongoose.Types.ObjectId.isValid(jobId)
+            ? { $or: [{ _id: jobId }, { jobId }] }
+            : { jobId };
+        const job = await AdminBulkAssemblyJob.findOne(query);
+
+        if (!job) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Bulk job not found'
+            });
+        }
+
+        if (job.status === 'queued' || job.status === 'running') {
+            return res.status(409).json({
+                status: 'error',
+                message: `Cannot retry while job is ${job.status}`
+            });
+        }
+
+        let retriedCount = 0;
+        for (const part of job.parts) {
+            if (part.status === 'failed') {
+                part.status = 'pending';
+                part.error = '';
+                part.startedAt = undefined;
+                part.completedAt = undefined;
+                part.voterCount = 0;
+                part.slipFileName = '';
+                part.slipFileUrl = '';
+                retriedCount += 1;
+            }
+        }
+
+        if (!retriedCount) {
+            return res.status(409).json({
+                status: 'error',
+                message: 'No failed parts available to retry'
+            });
+        }
+
+        job.markModified('parts');
+        job.failedParts = 0;
+        job.completedParts = job.parts.filter((part) => part.status === 'completed').length;
+        job.status = 'queued';
+        job.error = '';
+        job.cancelRequested = false;
+        job.finishedAt = undefined;
+        job.zipFileName = '';
+        job.zipFileUrl = '';
+        await job.save();
+
+        launchBackgroundJob(job._id.toString());
+
+        return res.json({
+            status: 'success',
+            message: `Retry started for ${retriedCount} failed part(s)`,
+            jobId: job.jobId,
+            id: job._id,
+            retriedCount
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to retry failed bulk parts',
             error: error.message
         });
     }

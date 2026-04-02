@@ -15,6 +15,46 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function getSymbolsUploadConfig() {
+    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+    const customDir = process.env.SYMBOLS_UPLOAD_DIR;
+
+    if (customDir) {
+        return {
+            dir: customDir,
+            urlPrefix: '/symbols'
+        };
+    }
+
+    if (fs.existsSync(mountedBucketPath)) {
+        return {
+            dir: path.join(mountedBucketPath, 'symbols'),
+            urlPrefix: '/slipsdata/symbols'
+        };
+    }
+
+    return {
+        dir: path.join(__dirname, '..', 'public', 'symbols'),
+        urlPrefix: '/symbols'
+    };
+}
+
+function getSymbolAbsolutePathFromUrl(imageUrl) {
+    if (!imageUrl) return null;
+
+    if (imageUrl.startsWith('/slipsdata/')) {
+        const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+        const relative = imageUrl.replace('/slipsdata/', '');
+        return path.join(mountedBucketPath, relative);
+    }
+
+    if (imageUrl.startsWith('/symbols/')) {
+        return path.join(__dirname, '..', 'public', imageUrl);
+    }
+
+    return null;
+}
+
 async function getPrimaryElectionModule() {
     try {
         const settingsMap = await Settings.getSettings('general');
@@ -57,7 +97,7 @@ function normalizeAdminOrder(orderDoc, electionModule) {
 // Configure multer for symbol image uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, '..', 'public', 'symbols');
+        const { dir: uploadDir } = getSymbolsUploadConfig();
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -199,7 +239,15 @@ export const uploadSymbol = async (req, res) => {
             });
         }
 
-        const imageUrl = `/symbols/${req.file.filename}`;
+        if (!name || !String(name).trim()) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Symbol name is required'
+            });
+        }
+
+        const { urlPrefix } = getSymbolsUploadConfig();
+        const imageUrl = `${urlPrefix}/${req.file.filename}`;
 
         const symbol = new Symbol({
             name,
@@ -253,12 +301,13 @@ export const updateSymbol = async (req, res) => {
         // If new image is uploaded, update imageUrl and delete old image
         if (req.file) {
             // Delete old image file
-            const oldImagePath = path.join(__dirname, '..', 'public', symbol.imageUrl);
-            if (fs.existsSync(oldImagePath)) {
+            const oldImagePath = getSymbolAbsolutePathFromUrl(symbol.imageUrl);
+            if (oldImagePath && fs.existsSync(oldImagePath)) {
                 fs.unlinkSync(oldImagePath);
             }
-            
-            symbol.imageUrl = `/symbols/${req.file.filename}`;
+
+            const { urlPrefix } = getSymbolsUploadConfig();
+            symbol.imageUrl = `${urlPrefix}/${req.file.filename}`;
         }
 
         await symbol.save();

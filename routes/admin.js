@@ -38,6 +38,8 @@ import {
     createBulkAssemblyJob,
     listBulkAssemblyJobs,
     getBulkAssemblyJob,
+    cancelBulkAssemblyJob,
+    retryFailedBulkAssemblyParts,
     downloadBulkAssemblyZip
 } from '../controllers/adminBulkAssemblyController.js';
 import auth from '../middleware/auth.js';
@@ -80,6 +82,8 @@ router.delete('/orders/:orderId', deleteOrder);
 router.post('/assembly-bulk/jobs', createBulkAssemblyJob);
 router.get('/assembly-bulk/jobs', listBulkAssemblyJobs);
 router.get('/assembly-bulk/jobs/:jobId', getBulkAssemblyJob);
+router.post('/assembly-bulk/jobs/:jobId/cancel', cancelBulkAssemblyJob);
+router.post('/assembly-bulk/jobs/:jobId/retry-failed', retryFailedBulkAssemblyParts);
 router.get('/assembly-bulk/jobs/:jobId/download', downloadBulkAssemblyZip);
 
 // Analytics & Reports
