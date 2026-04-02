@@ -212,6 +212,15 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         '';
     const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
     const showSymbol = Boolean(resolvedSymbolImage);
+
+    const toDisplayName = (value) => {
+        const raw = (value || '').toString().trim();
+        if (!raw) return '';
+        const stripped = raw.replace(/^\d+\s*[-:.)]?\s*/, '').trim();
+        return stripped || raw;
+    };
+    const districtDisplay = toDisplayName(district);
+    const constituencyDisplay = toDisplayName(constituency);
       // Use 5 slips per page for portrait A4 print layout
     const slipsPerPage = 5;
     
@@ -240,10 +249,10 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
                         ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
                             : `<div style="text-align:center; width:100%; line-height:1.2;">
                         <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">ജില്ല</div>
-                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${district}</div>
+                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${districtDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 1mm;"></div>
                         <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">നിയോജകമണ്ഡലം</div>
-                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${constituency}</div>
+                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${constituencyDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 1mm;"></div>
                         <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">ഭാഗം നമ്പർ</div>
                         <div style="font-size:10pt; font-weight:800;">${voter.partNumber || ''}</div>

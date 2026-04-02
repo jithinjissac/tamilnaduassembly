@@ -339,10 +339,11 @@ export const forgotPassword = [
             const user = await User.findOne({ email });
 
             if (!user) {
-                // Don't reveal if user exists for security
+                // Email not registered
                 return res.json({
                     status: 'success',
-                    message: 'If an account with that email exists, a password reset link has been sent.'
+                    emailNotFound: true,
+                    message: 'This email is not registered. Please create an account first.'
                 });
             }
 
