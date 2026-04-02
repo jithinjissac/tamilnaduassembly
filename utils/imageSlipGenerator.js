@@ -134,9 +134,11 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
 
             const apdfSourceUrl = buildPublicVoterSlipUrl(pdfFileName);
             if (apdfSourceUrl) {
+                // Use 'low' compression on iLovePDF to preserve voter snippet image quality
                 const apdfOptimizedPdfBytes = await optimizePdfLossless(localOptimizedPdfBytes, `image-slips:${baseName}:apdf`, {
                     apdfSourceUrl,
-                    skipLocal: true
+                    skipLocal: true,
+                    ilovepdfCompressionLevel: 'low'
                 });
                 if (apdfOptimizedPdfBytes.length < localOptimizedPdfBytes.length) {
                     fs.writeFileSync(pdfFullPath, apdfOptimizedPdfBytes);

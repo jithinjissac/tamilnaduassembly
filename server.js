@@ -463,6 +463,10 @@ app.use((err, req, res, next) => {
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
+  // Increase timeouts for long-running extraction requests (ECI portal can be slow)
+  server.timeout = 600000;           // 10 minutes: socket inactivity timeout
+  server.keepAliveTimeout = 620000;  // slightly above timeout
+  server.headersTimeout = 630000;    // must be > keepAliveTimeout
   console.log(`✅ Server listening on 0.0.0.0:${PORT}`);
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Log level: ${process.env.LOG_LEVEL || 'info'}`);

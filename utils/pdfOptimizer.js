@@ -139,12 +139,12 @@ async function optimizeWithPdfLib(inputBytes) {
     });
 }
 
-async function optimizeWithILovePdf(fileUrl, contextLabel = 'pdf') {
+async function optimizeWithILovePdf(fileUrl, contextLabel = 'pdf', compressionLevelOverride = null) {
     const baseUrl = (process.env.ILOVEPDF_API_BASE_URL || 'https://api.ilovepdf.com/v1').replace(/\/$/, '');
     const publicKey = (process.env.ILOVEPDF_PUBLIC_KEY || '').trim();
     const staticToken = (process.env.ILOVEPDF_TOKEN || '').trim();
     const region = (process.env.ILOVEPDF_REGION || '').trim();
-    const compressionLevel = (process.env.ILOVEPDF_COMPRESSION_LEVEL || 'recommended').trim();
+    const compressionLevel = (compressionLevelOverride || process.env.ILOVEPDF_COMPRESSION_LEVEL || 'recommended').trim();
     const allowedLevels = new Set(['extreme', 'recommended', 'low']);
     const normalizedLevel = allowedLevels.has(compressionLevel) ? compressionLevel : 'recommended';
 
@@ -347,7 +347,7 @@ export async function optimizePdfLossless(pdfBytes, contextLabel = 'pdf', option
 
     const remoteSourceUrl = options?.remoteSourceUrl || options?.apdfSourceUrl || '';
     if (remoteSourceUrl) {
-        const remoteCandidate = await optimizeWithILovePdf(remoteSourceUrl, contextLabel);
+        const remoteCandidate = await optimizeWithILovePdf(remoteSourceUrl, contextLabel, options?.ilovepdfCompressionLevel || null);
         if (remoteCandidate && remoteCandidate.length < best.length) {
             const savedBytes = best.length - remoteCandidate.length;
             logger.info(

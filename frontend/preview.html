@@ -3087,6 +3087,10 @@ s0.parentNode.insertBefore(s1,s0);
                     }
 
                     window.location.href = `order-success.html?orderId=${encodeURIComponent(essentialData.orderId)}`;
+                } else if (response.status === 400 && data.message && data.message.toLowerCase().includes('already verified')) {
+                    // Webhook already completed this order — redirect directly to order-success
+                    console.log('✅ Razorpay already verified (webhook beat us), redirecting...');
+                    window.location.href = `order-success.html?orderId=${encodeURIComponent(orderData.orderId || orderData._id)}`;
                 } else {
                     throw new Error(data.message || 'Payment verification failed');
                 }
