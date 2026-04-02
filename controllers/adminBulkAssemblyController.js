@@ -3,6 +3,7 @@ import path from 'path';
 import axios from 'axios';
 import archiver from 'archiver';
 import mongoose from 'mongoose';
+import v8 from 'v8';
 import { fileURLToPath } from 'url';
 
 import AdminBulkAssemblyJob from '../models/AdminBulkAssemblyJob.js';
@@ -21,7 +22,7 @@ const activeJobs = new Set();
  */
 function calculateConcurrency() {
     // Get max heap size in bytes
-    const heapLimitMB = Math.floor(require('v8').getHeapStatistics().heap_size_limit / (1024 * 1024));
+    const heapLimitMB = Math.floor(v8.getHeapStatistics().heap_size_limit / (1024 * 1024));
     
     // Rule of thumb: each concurrent part needs ~600-1000MB under normal load during extraction
     // With OOM margin (20%), safe concurrency = (heapLimitMB * 0.8) / 750
@@ -318,7 +319,7 @@ async function processBulkJob(jobId) {
     if (!job) return;
 
     // Log heap and concurrency info for diagnostics
-    const heapStats = require('v8').getHeapStatistics();
+    const heapStats = v8.getHeapStatistics();
     const heapLimitMB = Math.floor(heapStats.heap_size_limit / (1024 * 1024));
     logger.info(`📊 Heap limit: ${heapLimitMB} MB, Calculated concurrency: ${BULK_CONCURRENCY}`);
 
