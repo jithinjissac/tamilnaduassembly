@@ -249,7 +249,10 @@ function generateSlipsHTML(voters, candidate, metadata) {
     const districtDisplay = toDisplayName(district);
     const constituencyDisplay = toDisplayName(constituency);
 
-    // Always render slips without candidate symbol/name information.
+      // Determine if a symbol should be displayed
+      const showSymbol = Boolean(candidate && candidate.symbol);
+      const resolvedSymbolImage = showSymbol ? candidate.symbol : '';
+      const rawSymbolNameMalayalam = candidate?.symbolNameMalayalam || candidate?.symbolName || '';
 
     const pages = [];
     for (let i = 0; i < voters.length; i += slipsPerPage) {
@@ -312,7 +315,11 @@ function generateSlipsHTML(voters, candidate, metadata) {
             <div class="voter-slip">
                 <div class="slip-left">
                     <div class="slip-left-content">
-                        <div style="text-align:center; width:100%; line-height:1.2;">
+                        ${showSymbol 
+                            ? `<div class="symbol-header">നമ്മുടെ<br>ചിഹ്നം</div>
+                               <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
+                               ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
+                            : `<div style="text-align:center; width:100%; line-height:1.2;">
                         <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ജില്ല</div>
                         <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${districtDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
@@ -321,7 +328,8 @@ function generateSlipsHTML(voters, candidate, metadata) {
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
                         <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ഭാഗം നമ്പർ</div>
                         <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
-                        </div>
+                        </div>`
+                        }
                     </div>
                 </div>
                 <div class="slip-right">
@@ -362,6 +370,12 @@ function generateSlipsHTML(voters, candidate, metadata) {
 
         .slip-left { display: flex !important; width: 38mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
         .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        
+        .symbol-header { font-size: 8.5pt; font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 0.2mm; white-space: normal; word-break: keep-all; }
+        .symbol-image-wrap { width: 100%; height: 18mm; display: flex; align-items: center; justify-content: center; }
+        .symbol-image { max-width: 95%; max-height: 17.5mm; width: auto; height: auto; object-fit: contain; display: block; }
+        .symbol-name { margin-top: 1.5mm; font-size: 10pt; font-weight: 700; text-align: center; line-height: 1.1; width: 100%; }
+
         .serial-label { font-size: 10pt; font-weight: 700; color: #000; margin-bottom: 0.8mm; text-align: center; line-height: 1.1; }
         .serial-value { font-size: 16pt; font-weight: 800; color: #000; text-align: center; line-height: 1; }
 
