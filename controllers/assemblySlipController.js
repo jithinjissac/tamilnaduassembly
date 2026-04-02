@@ -303,8 +303,16 @@ function generateSlipsHTML(voters, candidate, metadata) {
             <div class="voter-slip">
                 <div class="slip-left">
                     <div class="slip-left-content">
-                        <div class="serial-label">ക്രമ നമ്പർ</div>
-                        <div class="serial-value">${serialNo}</div>
+                        <div style="text-align:center; width:100%; line-height:1.2;">
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ജില്ല</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${district}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">നിയോജകമണ്ഡലം</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituency}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ഭാഗം നമ്പർ</div>
+                        <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="slip-right">

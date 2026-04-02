@@ -990,11 +990,7 @@
                         <button type="button" id="selectSymbolBtn" class="btn btn-primary" onclick="window.symbolPicker && window.symbolPicker.open()" style="display: block;">
                             <i class="fas fa-hand-pointer"></i> SELECT YOUR SYMBOL
                         </button>
-                        <div style="margin-top: 1.25rem;">
-                            <label style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; display: block;">Or upload custom image:</label>
-                            <input type="file" id="custom-symbol-upload" accept="image/*" style="width: auto; padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px;">
-                        </div>
-                        <div style="margin-top: 0.75rem;">
+                            <div style="margin-top: 0.75rem;">
                             <a href="#" id="continueWithoutSymbol" style="color: var(--kerala-green); font-size: 0.9rem;">Continue without symbol</a>
                         </div>
                     </div>
@@ -1263,6 +1259,7 @@
         };
 
         // API Base
+        const MAX_SELECTED_PARTS = 2;
         const API_BASE = '/api/assembly';
 
         // Initialize
@@ -1284,17 +1281,6 @@
             });
 
             // Custom file upload
-            document.getElementById('custom-symbol-upload').addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    state.symbolFreeMode = false;
-                    applySymbol(ev.target.result, file.name.replace(/\.[^.]+$/, ''));
-                };
-                reader.readAsDataURL(file);
-            });
-
             // Continue without symbol
             document.getElementById('continueWithoutSymbol').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1389,16 +1375,33 @@
                     <label for="part-${part.partNumber}">Part ${part.partNumber} - ${part.partName || 'Part ' + part.partNumber}</label>
                 </div>
             `).join('');
+
+            partsList.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const selected = partsList.querySelectorAll('input[type="checkbox"]:checked');
+                    if (selected.length > MAX_SELECTED_PARTS) {
+                        cb.checked = false;
+                        alert(`You can select maximum ${MAX_SELECTED_PARTS} parts at a time`);
+                    }
+                });
+            });
         }
 
         function openPartsModal() { document.getElementById('parts-modal').style.display = 'flex'; }
         function closePartsModal() { document.getElementById('parts-modal').style.display = 'none'; }
-        function selectAllParts() { document.querySelectorAll('#parts-list input[type="checkbox"]').forEach(cb => cb.checked = true); }
+        function selectAllParts() {
+            const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]');
+            checkboxes.forEach((cb, index) => {
+                cb.checked = index < MAX_SELECTED_PARTS;
+            });
+            alert(`Selected first ${Math.min(MAX_SELECTED_PARTS, checkboxes.length)} parts (maximum ${MAX_SELECTED_PARTS})`);
+        }
         function deselectAllParts() { document.querySelectorAll('#parts-list input[type="checkbox"]').forEach(cb => cb.checked = false); }
 
         function confirmParts() {
             const checkboxes = document.querySelectorAll('#parts-list input[type="checkbox"]:checked');
             if (checkboxes.length === 0) { alert('Please select at least one polling part'); return; }
+            if (checkboxes.length > MAX_SELECTED_PARTS) { alert(`You can select maximum ${MAX_SELECTED_PARTS} parts at a time`); return; }
             state.selectedParts = Array.from(checkboxes).map(cb => ({ partNumber: cb.value, partName: cb.dataset.partName }));
             document.getElementById('selected-parts-info').textContent = `${state.selectedParts.length} part(s) selected`;
             closePartsModal();

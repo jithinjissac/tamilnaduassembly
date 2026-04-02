@@ -238,8 +238,16 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
                             ? `<div class="symbol-header">നമ്മുടെ<br>ചിഹ്നം</div>
                         <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
                         ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
-                            : `<div class="serial-label">ക്രമ നമ്പർ</div>
-                        <div class="serial-value">${serialNo}</div>`}
+                            : `<div style="text-align:center; width:100%; line-height:1.2;">
+                        <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">ജില്ല</div>
+                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${district}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 1mm;"></div>
+                        <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">നിയോജകമണ്ഡലം</div>
+                        <div style="font-size:6.5pt; font-weight:600; color:#1e3a5f; margin-bottom:1mm; word-break:break-word;">${constituency}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 1mm;"></div>
+                        <div style="font-weight:700; font-size:7.5pt; margin-bottom:0.5mm;">ഭാഗം നമ്പർ</div>
+                        <div style="font-size:10pt; font-weight:800;">${voter.partNumber || ''}</div>
+                        </div>`}
                     </div>
                 </div>
                 <div class="slip-right">
