@@ -1,4 +1,4 @@
-# robots.txt for easyslip.in - Kerala Voter Slip Generator
+# robots.txt for easyslip.in - Kerala Voter Information Slip Generator
 User-agent: *
 Allow: /
 Allow: /index.html

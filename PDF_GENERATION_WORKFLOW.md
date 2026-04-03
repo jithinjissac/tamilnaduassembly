@@ -418,4 +418,4 @@ Database:
 - On-demand PDF generation (fallback)
 - Auto-cleanup of temporary files
 - Payment verification before download
-- Multi-station voter slip generation
+- Multi-station voter information slip generation

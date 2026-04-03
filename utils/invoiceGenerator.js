@@ -134,7 +134,7 @@ export async function generateInvoice(order, user) {
             
             doc.fontSize(12)
                .font('Helvetica')
-               .text('Kerala Local Body Election Voter Slip Generator', 50, 85)
+               .text('Kerala Local Body Election Voter Information Slip Generator', 50, 85)
                .text('EasySlip.in', 50, 100)
                .text('support@easyslip.in', 50, 115);
 
@@ -229,7 +229,7 @@ export async function generateInvoice(order, user) {
             );
 
             // Build comprehensive description with location details (sanitized)
-            let description = 'Voter Slip Generation\n';
+            let description = 'Voter Information Slip Generation\n';
             const descParts = [];
             
             if (order.location) {
@@ -338,7 +338,7 @@ export async function generateInvoice(order, user) {
             const footerY = doc.page.height - 100;
             doc.fontSize(9)
                .fillColor('#666666')
-               .text('Thank you for using Kerala Local Body Election Voter Slip Generator!', 50, footerY, { align: 'center' })
+               .text('Thank you for using Kerala Local Body Election Voter Information Slip Generator!', 50, footerY, { align: 'center' })
                .text('This is a computer-generated invoice and does not require a signature.', 50, footerY + 15, { align: 'center' })
                .text('For support, contact: support@easyslip.in', 50, footerY + 30, { align: 'center' });
 

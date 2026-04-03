@@ -424,7 +424,7 @@
                     <select id="sortBy">
                         <option value="usageCount">Usage Count (High to Low)</option>
                         <option value="totalRevenue">Revenue</option>
-                        <option value="totalVoterSlips">Voter Slips</option>
+                        <option value="totalVoterSlips">Voter Information Slips</option>
                         <option value="districtsCount">Districts Coverage</option>
                         <option value="localBodiesCount">Local Bodies</option>
                     </select>
@@ -457,7 +457,7 @@
                             <th style="min-width: 250px;">Symbol</th>
                             <th class="sortable" data-sort="usageCount">Usage Count</th>
                             <th class="sortable" data-sort="totalRevenue">Total Revenue</th>
-                            <th class="sortable" data-sort="totalVoterSlips">Voter Slips</th>
+                            <th class="sortable" data-sort="totalVoterSlips">Voter Information Slips</th>
                             <th class="sortable" data-sort="districtsCount">Districts</th>
                             <th class="sortable" data-sort="localBodiesCount">Local Bodies</th>
                         </tr>
@@ -615,7 +615,7 @@
                 return;
             }
 
-            const headers = ['Symbol Name', 'Malayalam Name', 'Usage Count', 'Total Revenue', 'Total Voter Slips', 'Districts Count', 'Local Bodies Count'];
+            const headers = ['Symbol Name', 'Malayalam Name', 'Usage Count', 'Total Revenue', 'Total Voter Information Slips', 'Districts Count', 'Local Bodies Count'];
             const rows = currentData.data.symbols.map(s => [
                 s.symbolName || 'Unknown',
                 s.malayalamName || '',

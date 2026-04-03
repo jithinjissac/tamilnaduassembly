@@ -9,7 +9,7 @@ const API_BASE = 'http://localhost:3000/api';
 const testPopupSettings = {
     enabled: true,
     title: 'Test Popup - Kerala Elections',
-    content: '<div style="text-align: center;"><h3>Welcome to EasySlip!</h3><p>Generate professional voter slips for Kerala elections.</p><button style="background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer;">Get Started</button></div>',
+    content: '<div style="text-align: center;"><h3>Welcome to EasySlip!</h3><p>Generate professional voter information slips for Kerala elections.</p><button style="background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer;">Get Started</button></div>',
     showOnce: false,
     delay: 1000
 };

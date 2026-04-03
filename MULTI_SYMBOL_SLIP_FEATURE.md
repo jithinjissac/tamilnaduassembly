@@ -1,7 +1,7 @@
 # Multi-Symbol Slip Generator - Feature Summary
 
 ## Overview
-A private page for generating voter slips with **multiple symbols** for different local body types in Kerala.
+A private page for generating voter information slips with **multiple symbols** for different local body types in Kerala.
 
 ---
 
@@ -54,7 +54,7 @@ Built-in dropdown with 5 Kerala local body types:
    - Click "Add Symbol" (up to 3)
    - Select symbol from gallery
    - Choose local body type from dropdown
-5. **Generate slips**: Review and create multi-symbol voter slips
+5. **Generate slips**: Review and create multi-symbol voter information slips
 
 ---
 

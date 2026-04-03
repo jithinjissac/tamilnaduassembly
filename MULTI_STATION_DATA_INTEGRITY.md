@@ -26,7 +26,7 @@ Combined PDF:
 
 ### 2. Polling Station Names
 - **Per-voter metadata**: Each voter record includes which polling station they came from
-- **Displayed on slip**: The polling station name appears at the bottom of each voter slip
+- **Displayed on slip**: The polling station name appears at the bottom of each voter information slip
 - **Multi-station support**: PDF can contain voters from different stations with correct labels
 
 ### 3. Voter Data Fields

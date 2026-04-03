@@ -1,7 +1,7 @@
-# Assembly Voter Slip Format Update
+# Assembly Voter Information Slip Format Update
 
 ## Summary
-Updated the assembly voter slip generator to **exactly match** the existing local body election slip format used throughout the application.
+Updated the assembly voter information slip generator to **exactly match** the existing local body election slip format used throughout the application.
 
 ## Changes Made
 
@@ -71,7 +71,7 @@ All integration points were already in place:
 - Usage: Passes voters array with metadata (constituency, district, stateCode, year)
 
 ✅ **frontend/assembly.html** (lines 946-955):
-- Displays "🎫 View Voter Slips" link
+- Displays "🎫 View Voter Information Slips" link
 - Auto-opens slip file in new tab after extraction
 
 ✅ **server.js** (line 342):
@@ -184,4 +184,4 @@ The format exactly mirrors **controllers/slipController.js** (local body electio
 
 ## Result
 
-Assembly voter slips now use the **exact same format, styling, and layout** as the proven local body election slip system, ensuring consistency across all voter slip generation features in the application.
+Assembly voter information slips now use the **exact same format, styling, and layout** as the proven local body election slip system, ensuring consistency across all voter information slip generation features in the application.

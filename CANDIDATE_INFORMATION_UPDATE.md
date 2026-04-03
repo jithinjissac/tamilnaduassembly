@@ -15,7 +15,7 @@ Added clear informational sections in both English and Malayalam to inform users
 - **Design**: Clean info box with green border and light background
 
 ### **2. Index Page (index.html)** 
-- **Location**: New section after hero section, before sample voter slip section
+- **Location**: New section after hero section, before sample voter information slip section
 - **Content**: Comprehensive candidate information section
 - **Languages**: Bilingual (English/Malayalam) side-by-side layout
 - **Design**: Professional card with responsive grid layout
@@ -27,7 +27,7 @@ Added clear informational sections in both English and Malayalam to inform users
 ### **English Content:**
 - **Service Purpose**: Platform designed for election candidates
 - **Target Users**: Candidates contesting in Kerala elections
-- **Use Case**: Create professional voter slips for ward/constituency
+- **Use Case**: Create professional voter information slips for ward/constituency
 - **Perfect For**: 
   - Local Body Election Candidates
   - Assembly Election Candidates
@@ -112,4 +112,4 @@ The candidate service information has been:
 - ✅ Included in protected frontend generation
 - ✅ Ready for production deployment
 
-**Users will now clearly understand this service is specifically designed for election candidates to create voter slips for their constituencies.**
+**Users will now clearly understand this service is specifically designed for election candidates to create voter information slips for their constituencies.**

@@ -54,7 +54,7 @@ All user-facing emojis across the website have been successfully replaced with p
   - ✓ → `<i class="fas fa-check-circle"></i>` (Symbol Selected)
   
 - **Form Sections:**
-  - 🎫 → `<i class="fas fa-ticket-alt"></i>` (Create Voter Slip title × 2)
+  - 🎫 → `<i class="fas fa-ticket-alt"></i>` (Create Voter Information Slip title × 2)
   - ✓ → `<i class="fas fa-check"></i>` (Select All button)
   
 - **CSS Animation:**

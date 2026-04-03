@@ -133,7 +133,7 @@ A complete email settings management system for admins with template preview and
    Username: your-email@gmail.com
    Password: your-app-password
    From Email: noreply@yourapp.com
-   From Name: Kerala Voter Slips
+   From Name: Kerala Voter Information Slips
    ```
 
 2. Enable/disable templates as needed

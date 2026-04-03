@@ -77,7 +77,7 @@ Type: "bharathiya janatha party" → Output: "ഭാരതീയ ജനതാ �
 6. Complete the rest of the form and upload
 
 ### For Users:
-1. When creating voter slips, symbols will show both English and Malayalam names
+1. When creating voter information slips, symbols will show both English and Malayalam names
 2. Can search using either English or Malayalam text
 3. Malayalam names appear in green below English names
 

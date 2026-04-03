@@ -6,7 +6,7 @@ This guide explains how to set up Google Drive integration for automatic PDF upl
 
 ## 📋 Overview
 
-The system automatically uploads generated voter slip PDFs to Google Drive, providing:
+The system automatically uploads generated voter information slip PDFs to Google Drive, providing:
 - **Shareable links** for easy access from in-app browsers (Instagram, Facebook, etc.)
 - **Cloud backup** of all generated PDFs
 - **Alternative download method** when direct downloads fail
@@ -24,12 +24,12 @@ The system automatically uploads generated voter slip PDFs to Google Drive, prov
 4. Click **"+ CREATE CREDENTIALS"** → **"OAuth 2.0 Client ID"**
 5. If prompted, configure the OAuth consent screen:
    - User type: **"External"**
-   - App name: `Voter Slips App`
+   - App name: `Voter Information Slips App`
    - User support email: Your email
    - Developer contact: Your email
    - Click **"Save and Continue"** through all steps
 6. Application type: Select **"Desktop app"** or **"Web application"**
-7. Name: `Voter Slips Uploader`
+7. Name: `Voter Information Slips Uploader`
 8. Click **"Create"**
 9. **Download the JSON** or copy the **Client ID** and **Client Secret**
 
@@ -59,7 +59,7 @@ The script will output your configuration. Copy it!
 ### **Step 3: Create Google Drive Folder**
 
 1. Go to [Google Drive](https://drive.google.com)
-2. Create a folder: `Voter Slips`
+2. Create a folder: `Voter Information Slips`
 3. Open the folder and copy the **Folder ID** from the URL:
    ```
    https://drive.google.com/drive/folders/1abc123xyz456...
@@ -96,7 +96,7 @@ GOOGLE_DRIVE_FOLDER_ID=1abc123xyz456...
    ```
    ✅ Google Drive authentication successful
    ✅ Google Drive client initialized
-   ✅ Google Drive connection successful! Folder: "Voter Slips"
+   ✅ Google Drive connection successful! Folder: "Voter Information Slips"
    ✅ All tests passed! Google Drive is configured correctly.
    ```
    
@@ -117,7 +117,7 @@ GOOGLE_DRIVE_FOLDER_ID=1abc123xyz456...
    ✅ Google Drive client initialized
    ```
 
-4. Generate a voter slip PDF (create an order and complete payment)
+4. Generate a voter information slip PDF (create an order and complete payment)
 
 5. Check the logs for:
    ```
@@ -177,7 +177,7 @@ GOOGLE_DRIVE_FOLDER_ID=1abc123xyz456...
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 3. Uploaded to Google Drive                                 │
-│    → Folder: "Voter Slips"                                  │
+│    → Folder: "Voter Information Slips"                                  │
 │    → Filename: {orderId}-voter-slips.pdf                    │
 │    → Permission: Public (anyone with link can view)         │
 └─────────────────────────────────────────────────────────────┘

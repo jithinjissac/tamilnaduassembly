@@ -15,10 +15,10 @@ async function createFolder() {
 
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
-    console.log('📁 Creating "Voter Slips PDFs" folder in your Google Drive...\n');
+    console.log('📁 Creating "Voter Information Slips PDFs" folder in your Google Drive...\n');
 
     const fileMetadata = {
-      name: 'Voter Slips PDFs',
+      name: 'Voter Information Slips PDFs',
       mimeType: 'application/vnd.google-apps.folder'
     };
 

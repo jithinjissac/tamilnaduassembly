@@ -105,7 +105,7 @@ Check that emails were sent:
    - Payment ID included
 
 2. **PDF Ready Email**
-   - Subject: "Your Voter Slips are Ready"
+   - Subject: "Your Voter Information Slips are Ready"
    - Download link present
    - Order ID correct
 
@@ -254,7 +254,7 @@ const params = {
   key: 'TEST_KEY',
   txnid: 'ORD123_1234567890',
   amount: '10.00',
-  productinfo: 'Voter Slip Order - ORD123',
+  productinfo: 'Voter Information Slip Order - ORD123',
   firstname: 'John',
   email: 'john@example.com',
   udf1: 'ORD123',
@@ -283,7 +283,7 @@ console.log('Hash:', hash);
   "key": "TEST_KEY",
   "txnid": "ORD123_1234567890",
   "amount": "10.00",
-  "productinfo": "Voter Slip Order - ORD123",
+  "productinfo": "Voter Information Slip Order - ORD123",
   "firstname": "John",
   "email": "john@example.com",
   "mihpayid": "403993715529816697",

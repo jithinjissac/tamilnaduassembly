@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Kerala Voter Slip</title>
+    <title>Settings - Kerala Voter Information Slip</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
@@ -193,7 +193,7 @@
             max-height: 800px;
         }
 
-        /* Voter Slip Preview Styles */
+        /* Voter Information Slip Preview Styles */
         .voter-slip-preview {
             width: 100%;
             max-width: 450px;
@@ -586,7 +586,7 @@
                                 </div>
                                 <div class="setting-row" style="grid-template-columns: 1fr;">
                                     <label>Message:</label>
-                                    <textarea name="paymentSuccess.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Your payment of ₹{{amount}} has been received successfully. Your voter slips are ready for download!</textarea>
+                                    <textarea name="paymentSuccess.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Your payment of ₹{{amount}} has been received successfully. Your voter information slips are ready for download!</textarea>
                                 </div>
                             </div>
 
@@ -594,7 +594,7 @@
                                 <h3>PDF Ready Email</h3>
                                 <div class="setting-row" style="grid-template-columns: 1fr;">
                                     <label>Subject:</label>
-                                    <input type="text" name="pdfReady.subject" value="Your Voter Slips are Ready - {{orderId}}" style="width: 100%;">
+                                    <input type="text" name="pdfReady.subject" value="Your Voter Information Slips are Ready - {{orderId}}" style="width: 100%;">
                                 </div>
                                 <div class="setting-row" style="grid-template-columns: 1fr;">
                                     <label>Heading:</label>
@@ -602,7 +602,7 @@
                                 </div>
                                 <div class="setting-row" style="grid-template-columns: 1fr;">
                                     <label>Message:</label>
-                                    <textarea name="pdfReady.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Great news! Your voter slips PDF for {{orderId}} with {{voterCount}} voters is now ready for download.</textarea>
+                                    <textarea name="pdfReady.message" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">Great news! Your voter information slips PDF for {{orderId}} with {{voterCount}} voters is now ready for download.</textarea>
                                 </div>
                             </div>
 

@@ -478,11 +478,11 @@ async function runExtractionJob(body, progressId) {
 
         logger.info(`Assembly: Total voters extracted: ${allVoterSnippets.length}`);
 
-        // Generate voter slips with embedded images (unless skipped)
+        // Generate voter information slips with embedded images (unless skipped)
         let slipFileInfo = null;
         if (!skipSlipGeneration) {
             try {
-                logger.info('Assembly: Generating voter slips with images...');
+                logger.info('Assembly: Generating voter information slips with images...');
                 slipFileInfo = await saveVoterSnippetSlipsToFile(allVoterSnippets, {
                     constituency,
                     district,
@@ -498,7 +498,7 @@ async function runExtractionJob(body, progressId) {
                         ? `${selectedParts[0].partNumber || ''}${selectedParts[0].partName ? ` - ${selectedParts[0].partName}` : ''}`.trim()
                         : ''
                 });
-                logger.info(`Assembly: Voter slips generated: ${slipFileInfo.htmlFileName || 'no-html'} and ${slipFileInfo.pdfFileName || 'no-pdf'}`);
+                logger.info(`Assembly: voter information slips generated: ${slipFileInfo.htmlFileName || 'no-html'} and ${slipFileInfo.pdfFileName || 'no-pdf'}`);
             } catch (slipError) {
                 logger.error('Assembly: Failed to generate slips:', slipError.message);
                 // Continue even if slip generation fails

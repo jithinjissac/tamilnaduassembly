@@ -198,7 +198,7 @@ Get change history for settings (last 50 changes).
   smtpUser: '',
   smtpPassword: '',
   fromEmail: '',
-  fromName: 'Kerala Voter Slip',
+  fromName: 'Kerala Voter Information Slip',
   emailTemplates: {
     orderConfirmation: true,
     paymentSuccess: true,

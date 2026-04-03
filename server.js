@@ -325,7 +325,7 @@ app.get('/symbols/*', (req, res) => {
 // Serve lottie animations directory
 app.use('/lottie', express.static(path.join(__dirname, 'public', 'lottie')));
 
-// Serve voter slip examples
+// Serve voter information slip examples
 app.use('/voter-slip-examples', express.static(path.join(__dirname, 'voter-slip-examples')));
 
 // Serve Razorpay verification page
@@ -344,7 +344,7 @@ app.use('/api/manual-slip', manualSlipRoutes);
 import playwrightStationsRoutes from './controllers/playwrightStationsController.js';
 app.use('/api', playwrightStationsRoutes);
 
-// Serve voter slips directory (prefer persistent mounted storage when available)
+// Serve voter information slips directory (prefer persistent mounted storage when available)
 const voterSlipsDir = fs.existsSync(mountedBucketPath)
   ? path.join(mountedBucketPath, 'voter-slips')
   : path.join(__dirname, 'voter-slips');

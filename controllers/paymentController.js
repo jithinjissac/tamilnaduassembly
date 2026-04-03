@@ -310,7 +310,7 @@ async function createPayUMoneyOrderInternal(req, res, order, payumoneySettings) 
             key: payumoneySettings.merchantKey,
             txnid: txnid,
             amount: order.amount.toFixed(2),
-            productinfo: `Voter Slip Order - ${order.orderId}`,
+            productinfo: `Voter Information Slip Order - ${order.orderId}`,
             firstname: user.name.split(' ')[0] || user.name,
             email: user.email,
             phone: user.phone || '9999999999',

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Kerala SEC Voter Slips</title>
+    <title>Admin Dashboard - Kerala SEC Voter Information Slips</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
@@ -2132,7 +2132,7 @@ Your order has been confirmed successfully!
 • Symbol: {{symbolName}}
 • Total Voters: {{voterCount}}
 
-Your voter slips are being prepared and will be ready for download shortly.</textarea>
+Your voter information slips are being prepared and will be ready for download shortly.</textarea>
                                 </div>
                             </div>
                         </div>
@@ -2166,7 +2166,7 @@ Your payment has been received successfully!
 • Order ID: {{orderId}}
 • Ward: {{wardName}}
 
-Your voter slips PDF is being generated and will be ready for download shortly.</textarea>
+Your voter information slips PDF is being generated and will be ready for download shortly.</textarea>
                                 </div>
                             </div>
                         </div>
@@ -2183,7 +2183,7 @@ Your voter slips PDF is being generated and will be ready for download shortly.<
                             <div style="display: grid; gap: 1rem;">
                                 <div>
                                     <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Subject:</label>
-                                    <input type="text" name="pdfReady.subject" value="Your Voter Slips are Ready - {{wardName}} - {{orderId}}" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    <input type="text" name="pdfReady.subject" value="Your Voter Information Slips are Ready - {{wardName}} - {{orderId}}" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;">
                                 </div>
                                 <div>
                                     <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Heading:</label>
@@ -2193,7 +2193,7 @@ Your voter slips PDF is being generated and will be ready for download shortly.<
                                     <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Message:</label>
                                     <textarea name="pdfReady.message" rows="8" class="email-input" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;">നമസ്കാരം {{userName}},
 
-Great news! Your voter slips PDF is now ready for download.
+Great news! Your voter information slips PDF is now ready for download.
 
 <i class="fas fa-file-pdf"></i> PDF Details:
 • Order ID: {{orderId}}
@@ -2749,7 +2749,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
         <!-- Media Manager sub-navigation -->
         <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
             <button id="mm-tab-slips" class="btn btn-primary" onclick="mmSwitchTab('slips')" style="border-radius:8px;">
-                <i class="fas fa-file-pdf"></i> Voter Slip Files
+                <i class="fas fa-file-pdf"></i> Voter Information Slip Files
             </button>
             <button id="mm-tab-orders" class="btn" onclick="mmSwitchTab('orders')" style="border-radius:8px; background:#e2e8f0; color:#374151;">
                 <i class="fas fa-folder"></i> Order PDFs
@@ -2758,11 +2758,11 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
         <div id="media-alert" class="alert" style="display: none; margin-bottom:1rem;"></div>
 
-        <!-- ======== VOTER SLIPS PANEL ======== -->
+        <!-- ======== voter information slips PANEL ======== -->
         <div id="mm-panel-slips">
             <div class="card">
                 <div class="card-header">
-                    <h2><i class="fas fa-file-pdf"></i> Voter Slip Files</h2>
+                    <h2><i class="fas fa-file-pdf"></i> Voter Information Slip Files</h2>
                     <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
                         <button class="btn btn-primary" onclick="loadVoterSlips()">
                             <i class="fas fa-sync-alt"></i> Refresh
@@ -5142,7 +5142,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             } else if (tabName === 'bulk-assembly') {
                 loadBulkAssemblyJobs();
             } else if (tabName === 'media-manager') {
-                // Default to voter slips panel and load it
+                // Default to voter information slips panel and load it
                 mmSwitchTab('slips');
             } else if (tabName === 'sec-error') {
                 loadSECErrorSettings();
@@ -6263,7 +6263,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 
                 <!-- Footer -->
                 <div style="background: ${keralaCream}; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; font-family: 'Noto Sans Malayalam', Arial, sans-serif;">
-                    <p style="margin: 0 0 8px 0; font-weight: 600; color: ${keralaGreen};">EASYSLIP - Kerala Election Voter Slip Service</p>
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: ${keralaGreen};">EASYSLIP - Kerala Election Voter Information Slip Service</p>
                     <p style="margin: 0 0 8px 0;">🌐 <a href="https://easyslip.in" style="color: ${keralaGreen}; text-decoration: none;">https://easyslip.in</a></p>
                     <p style="margin: 0; color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
                 </div>
@@ -7187,7 +7187,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             if (tab === 'orders' && allPDFs.length === 0) loadPDFList();
         }
 
-        // ==================== VOTER SLIPS PANEL ====================
+        // ==================== voter information slips PANEL ====================
         let vsAllFiles = [];
         let vsFilteredFiles = [];
 
@@ -7199,7 +7199,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 const res = await fetch(`${API_BASE}/media/voter-slips`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Failed to load voter slips');
+                if (!res.ok) throw new Error('Failed to load voter information slips');
                 const data = await res.json();
 
                 vsAllFiles = data.files || [];
@@ -7216,7 +7216,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 vsRenderGrid();
             } catch (err) {
                 console.error(err);
-                showMediaAlert('Failed to load voter slip files', 'error');
+                showMediaAlert('Failed to load voter information slip files', 'error');
                 document.getElementById('vs-grid').innerHTML = '';
                 document.getElementById('vs-empty').style.display = '';
             }
@@ -7344,7 +7344,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
         }
 
         async function cleanupOrphanedVoterSlips() {
-            if (!confirm('Delete all orphaned voter slip files (not linked to any assembly order)?\n\nThis cannot be undone.')) return;
+            if (!confirm('Delete all orphaned voter information slip files (not linked to any assembly order)?\n\nThis cannot be undone.')) return;
             try {
                 const res = await fetch(`${API_BASE}/media/voter-slips/cleanup`, {
                     method: 'POST',

@@ -31,7 +31,7 @@ async function getRefreshToken() {
       console.log('This usually means you\'ve already authorized this app before.\n');
       console.log('To get a refresh token, you need to:');
       console.log('1. Go to: https://myaccount.google.com/permissions');
-      console.log('2. Remove "Voter Slips Uploader" app access');
+      console.log('2. Remove "Voter Information Slips Uploader" app access');
       console.log('3. Run the setup script again\n');
     }
     

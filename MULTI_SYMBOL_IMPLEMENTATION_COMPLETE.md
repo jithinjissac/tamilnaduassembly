@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Status: COMPLETE
 
-This document summarizes the complete implementation of multi-symbol voter slip generation, where different political party symbols can be assigned based on local body type (Grama Panchayat, Municipality, or Corporation).
+This document summarizes the complete implementation of multi-symbol voter information slip generation, where different political party symbols can be assigned based on local body type (Grama Panchayat, Municipality, or Corporation).
 
 ---
 
@@ -11,7 +11,7 @@ This document summarizes the complete implementation of multi-symbol voter slip 
 The multi-symbol feature allows users to:
 1. Select 2-3 different political symbols
 2. Assign each symbol to a specific local body type (G/M/C)
-3. Generate voter slips where each voter automatically gets the correct symbol based on their local body type
+3. Generate voter information slips where each voter automatically gets the correct symbol based on their local body type
 4. Preview and download PDFs with the correct symbols
 
 ---
@@ -258,7 +258,7 @@ const symbolImageStyle = isMultiSymbol && voterSymbolUrl
 
 ## 🎨 Symbol Display
 
-Each voter slip shows:
+Each voter information slip shows:
 - **Symbol Image**: 24mm × 24mm (5 slips) or 20mm × 20mm (6 slips)
 - **Symbol Name**: Malayalam name from database
 - **Symbol Header**: "നമ്മുടെ ചിഹ്നം" (Our Symbol)

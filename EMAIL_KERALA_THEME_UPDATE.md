@@ -47,7 +47,7 @@ Your order has been confirmed successfully!
 • Symbol: {{symbolName}}
 • Total Voters: {{voterCount}}
 
-Your voter slips are being prepared and will be ready for download shortly.
+Your voter information slips are being prepared and will be ready for download shortly.
 ```
 
 **Includes**:
@@ -82,7 +82,7 @@ Your payment has been received successfully!
 • Order ID: {{orderId}}
 • Ward: {{wardName}}
 
-Your voter slips PDF is being generated and will be ready for download shortly.
+Your voter information slips PDF is being generated and will be ready for download shortly.
 ```
 
 **Includes**:
@@ -95,9 +95,9 @@ Your voter slips PDF is being generated and will be ready for download shortly.
 
 **Subject**: 
 ```
-Your Voter Slips are Ready - {{wardName}} - {{orderId}}
+Your Voter Information Slips are Ready - {{wardName}} - {{orderId}}
 ```
-Example: `Your Voter Slips are Ready - 012 - കോട്ടയ്ക്കൽ - ORD-20251112-ABCD12`
+Example: `Your Voter Information Slips are Ready - 012 - കോട്ടയ്ക്കൽ - ORD-20251112-ABCD12`
 
 **Heading**: 
 ```
@@ -108,7 +108,7 @@ Your PDF is Ready for Download!
 ```
 നമസ്കാരം {{userName}},
 
-Great news! Your voter slips PDF is now ready for download.
+Great news! Your voter information slips PDF is now ready for download.
 
 📄 PDF Details:
 • Order ID: {{orderId}}

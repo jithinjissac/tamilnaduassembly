@@ -1,4 +1,4 @@
-/* Print-ready A4 voter slips - 5 per page */
+/* Print-ready A4 voter information slips - 5 per page */
 
 * {
     margin: 0;
@@ -70,7 +70,7 @@ body {
     gap: 8mm;
 }
 
-/* Single Voter Slip */
+/* Single Voter Information Slip */
 .voter-slip {
     width: 100%;
     height: 55mm;

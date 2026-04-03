@@ -44,7 +44,7 @@ You need to provide service account credentials.
 ```bash
 # In Google Cloud Console or Cloud Shell:
 gcloud iam service-accounts create voter-slip-app \
-    --display-name="Voter Slip Application"
+    --display-name="Voter Information Slip Application"
 
 # Grant storage access
 gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \

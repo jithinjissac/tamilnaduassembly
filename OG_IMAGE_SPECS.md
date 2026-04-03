@@ -6,7 +6,7 @@ Create an Open Graph image (1200x630px) with the following specifications:
 1. **Background**: Kerala gradient (green #006D3B to lighter green)
 2. **Kerala Tricolor Border**: Top - Green, Gold, Red stripes (8px each)
 3. **Main Heading**: "EasySlip.in" (Bold, 72px, White)
-4. **Subheading**: "Kerala Voter Slip Generator" (48px, Gold #FFB81C)
+4. **Subheading**: "Kerala Voter Information Slip Generator" (48px, Gold #FFB81C)
 5. **Features**: 
    - "All 14 Districts Covered" with Kerala map silhouette
    - "₹0.50 per Voter" badge

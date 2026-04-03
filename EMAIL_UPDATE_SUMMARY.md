@@ -113,11 +113,11 @@ Your order has been confirmed successfully!
 
 ### PDF Ready
 ```
-Subject: Your Voter Slips are Ready - 012 - കോട്ടയ്ക്കൽ - ORD-20251112-ABCD12
+Subject: Your Voter Information Slips are Ready - 012 - കോട്ടയ്ക്കൽ - ORD-20251112-ABCD12
 
 നമസ്കാരം രമേഷ് കുമാർ,
 
-Great news! Your voter slips PDF is now ready for download.
+Great news! Your voter information slips PDF is now ready for download.
 
 📄 PDF Details:
 • Order ID: ORD-20251112-ABCD12

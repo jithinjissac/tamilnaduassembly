@@ -267,7 +267,7 @@ if (voters > 1000) {
 ## 🎯 Quick Reference
 
 ### **System Does What?**
-- Generates PDF voter slips from data
+- Generates PDF voter information slips from data
 - Handles 1000+ voters reliably
 - Background PDF generation
 - Caching for instant downloads

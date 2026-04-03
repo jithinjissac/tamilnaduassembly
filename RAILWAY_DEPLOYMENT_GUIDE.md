@@ -35,7 +35,7 @@ SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 FROM_EMAIL=noreply@yourapp.com
-FROM_NAME=Kerala Voter Slips
+FROM_NAME=Kerala Voter Information Slips
 ```
 
 ---

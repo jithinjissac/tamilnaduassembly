@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Assembly Election module has been successfully integrated into your Kerala voter slip platform. This module extracts voter data from the **Election Commission of India (ECI)** portal instead of the Kerala SEC portal.
+The Assembly Election module has been successfully integrated into your Kerala voter information slip platform. This module extracts voter data from the **Election Commission of India (ECI)** portal instead of the Kerala SEC portal.
 
 ---
 
@@ -189,7 +189,7 @@ The `pdfParser.js` utility uses multiple strategies to extract voter data:
 
 ### Shared Components
 - ✅ Payment gateways (Razorpay, Cashfree, PayUMoney)
-- ✅ PDF generation engine (for voter slips)
+- ✅ PDF generation engine (for voter information slips)
 - ✅ Email notification system
 - ✅ Admin panel (can be extended)
 
@@ -351,4 +351,4 @@ This module is for legitimate political campaign purposes only. Ensure complianc
 ---
 
 **Module Status**: ✅ Core functionality complete
-**Next Priority**: Payment integration and voter slip generation
+**Next Priority**: Payment integration and voter information slip generation

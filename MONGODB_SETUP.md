@@ -268,7 +268,7 @@ net start MongoDB
    - Visit: http://localhost:3000
    - Register a new user
    - Login
-   - Create a voter slip
+   - Create a voter information slip
 
 ---
 

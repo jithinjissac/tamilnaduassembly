@@ -1,7 +1,7 @@
-# Voter Slip Generator Feature
+# Voter Information Slip Generator Feature
 
 ## Overview
-A print-ready voter slip generator that creates BJP party-branded slips with voter details. The system generates 5 slips per A4 page for efficient printing and distribution during election campaigns.
+A print-ready voter information slip generator that creates BJP party-branded slips with voter details. The system generates 5 slips per A4 page for efficient printing and distribution during election campaigns.
 
 ## Features
 - **Print-Ready Layout**: Optimized for A4 paper with 5 slips per page
@@ -25,7 +25,7 @@ A print-ready voter slip generator that creates BJP party-branded slips with vot
 4. View extracted voter list
 
 ### Step 2: Generate Slips
-1. Click the "🎫 Generate Voter Slips" button in the results section
+1. Click the "🎫 Generate Voter Information Slips" button in the results section
 2. System will automatically:
    - Store voter data in browser session
    - Store polling station information

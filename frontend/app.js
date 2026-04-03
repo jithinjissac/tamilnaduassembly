@@ -517,7 +517,7 @@ function exportToCsv() {
     URL.revokeObjectURL(url);
 }
 
-// Generate Voter Slips
+// Generate Voter Information Slips
 function generateSlips() {
     if (!voterData || !voterData.voters || voterData.voters.length === 0) {
         showError('No voter data available to generate slips');

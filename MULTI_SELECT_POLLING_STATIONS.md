@@ -21,7 +21,7 @@ This feature allows users to manually select specific polling stations within a 
    - Checked stations show green border and background
    - Selected count badge appears: "X station(s) selected"
    - Button text updates dynamically:
-     - No selection: "🎫 Create Voter Slip"
+     - No selection: "🎫 Create Voter Information Slip"
      - 1 station: "🎫 Extract 1 Station"
      - Multiple: "🎫 Extract X Stations"
 

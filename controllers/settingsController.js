@@ -236,11 +236,11 @@ export const testEmail = async (req, res) => {
         const { email } = req.body;
         const testResult = await sendEmail({
             to: email || req.user.email,
-            subject: 'Test Email - Kerala Voter Slip',
+            subject: 'Test Email - Kerala Voter Information Slip',
             html: `
                 <h2>✅ Email Configuration Successful!</h2>
                 <p>Your email settings are working correctly.</p>
-                <p>This is a test email sent from your Kerala Voter Slip application.</p>
+                <p>This is a test email sent from your Kerala Voter Information Slip application.</p>
                 <p>Sent at: ${new Date().toLocaleString()}</p>
             `
         });

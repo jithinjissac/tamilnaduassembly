@@ -318,8 +318,8 @@ export const listVoterSlips = async (req, res) => {
 
         res.json({ status: 'success', files, stats });
     } catch (error) {
-        console.error('Error listing voter slips:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to list voter slips', error: error.message });
+        console.error('Error listing voter information slips:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to list voter information slips', error: error.message });
     }
 };
 
@@ -342,10 +342,10 @@ export const deleteVoterSlip = async (req, res) => {
         const stats = fs.statSync(filePath);
         fs.unlinkSync(filePath);
 
-        console.log(`🗑️ Deleted voter slip file: ${fileName} (${formatBytes(stats.size)})`);
+        console.log(`🗑️ Deleted voter information slip file: ${fileName} (${formatBytes(stats.size)})`);
         res.json({ status: 'success', message: 'File deleted successfully', deletedFile: fileName, freedSpace: stats.size });
     } catch (error) {
-        console.error('Error deleting voter slip:', error);
+        console.error('Error deleting voter information slip:', error);
         res.status(500).json({ status: 'error', message: 'Failed to delete file', error: error.message });
     }
 };
@@ -386,7 +386,7 @@ export const deleteBulkVoterSlips = async (req, res) => {
 
         res.json({ status: 'success', deleted, freed, errors });
     } catch (error) {
-        console.error('Error bulk-deleting voter slips:', error);
+        console.error('Error bulk-deleting voter information slips:', error);
         res.status(500).json({ status: 'error', message: 'Failed to delete files', error: error.message });
     }
 };
@@ -422,14 +422,14 @@ export const cleanupOrphanedVoterSlips = async (req, res) => {
                     fs.unlinkSync(filePath);
                     deleted++;
                     freed += s.size;
-                    console.log(`🗑️ Cleaned up orphaned voter slip: ${entry.name}`);
+                    console.log(`🗑️ Cleaned up orphaned voter information slip: ${entry.name}`);
                 } catch (e) { /* skip */ }
             }
         }
 
         res.json({ status: 'success', message: `Cleanup complete: ${deleted} files deleted`, deleted, freed: formatBytes(freed) });
     } catch (error) {
-        console.error('Error cleaning up voter slips:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to cleanup voter slips', error: error.message });
+        console.error('Error cleaning up voter information slips:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to cleanup voter information slips', error: error.message });
     }
 };

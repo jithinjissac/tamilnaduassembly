@@ -24,7 +24,7 @@ router.delete('/pdfs/:orderId', deletePDF);
 // @access  Admin only
 router.post('/cleanup', cleanupOrphanedPDFs);
 
-// ---- Voter Slips (assembly, image-based) ----
+// ---- Voter Information Slips (assembly, image-based) ----
 
 // @route   GET /api/admin/media/voter-slips
 // @desc    List all files in voter-slips directory (PDFs, ZIPs, HTMLs)

@@ -1,7 +1,7 @@
-# Kerala Voter Slip Generator - Complete Deployment Guide
+# Kerala Voter Information Slip Generator - Complete Deployment Guide
 
 ## 🎯 Overview
-This is a complete SaaS platform for generating customized voter slips with payment integration, user authentication, and dashboard management.
+This is a complete SaaS platform for generating customized voter information slips with payment integration, user authentication, and dashboard management.
 
 ## 📋 Prerequisites
 
@@ -222,7 +222,7 @@ electionnew/
 - No payment required
 
 ### Full PDF (Paid)
-- All voter slips
+- All voter information slips
 - A4 format, 5 slips per page
 - Includes cutting guides
 - Generated on-demand (no file storage)
@@ -346,4 +346,4 @@ For issues:
 
 ---
 
-**Ready to launch your voter slip SaaS platform!** 🚀
+**Ready to launch your voter information slip SaaS platform!** 🚀

@@ -34,7 +34,7 @@ const MALAYALAM_FONT_B64 = fs.existsSync(_fontPath)
     : null;
 
 /**
- * Generate assembly voter slips with candidate
+ * Generate assembly voter information slips with candidate
  */
 
 export const generateSlipsWithCandidates = async (req, res) => {
@@ -319,7 +319,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
                             Complete PDF Contains:
                         </div>
                         <div style="font-size: 11pt; font-weight: 800; color: #c05621; margin-bottom: 0.8mm; line-height: 1.1;">
-                            ${totalVoters} Voter Slips
+                            ${totalVoters} Voter Information Slips
                         </div>
                         <div style="font-size: 6.4pt; color: #4a5568; margin-bottom: 0.8mm; line-height: 1.22;">
                             This preview shows only first 2 pages. Complete payment now for instant full download.
@@ -374,7 +374,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <title>Assembly Voter Slips - ${constituency}</title>
+    <title>Assembly Voter Information Slips - ${constituency}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">

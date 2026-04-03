@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview & Payment - EasySlip | Kerala Local Body Election Voter Slip Generator</title>
+    <title>Preview & Payment - EasySlip | Kerala Local Body Election Voter Information Slip Generator</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
@@ -813,7 +813,7 @@ s0.parentNode.insertBefore(s1,s0);
     <!-- Main Container -->
     <div class="container">
         <h1 class="page-title">Preview & Payment</h1>
-        <p class="page-subtitle">Preview your voter slips before payment</p>
+        <p class="page-subtitle">Preview your voter information slips before payment</p>
 
         <!-- Error/Warning Message Display -->
         <div id="messageBox" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; margin: 0; padding: 1.5rem 2rem; border-radius: 12px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: slideDown 0.3s ease;">
@@ -959,7 +959,7 @@ s0.parentNode.insertBefore(s1,s0);
 
                     <div class="features-list">
                         <h4>What You Get:</h4>
-                        <div class="feature-item"><i class="fas fa-check-circle"></i> Complete voter slips as PDF</div>
+                        <div class="feature-item"><i class="fas fa-check-circle"></i> Complete voter information slips as PDF</div>
                         <div class="feature-item" id="slipsPerPageFeature"><i class="fas fa-check-circle"></i> A4 print ready (<span id="featureSlipsCount">5</span> slips/page)</div>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Cutting guide lines</div>
                         <div class="feature-item"><i class="fas fa-check-circle"></i> Unlimited downloads</div>
@@ -1276,7 +1276,7 @@ s0.parentNode.insertBefore(s1,s0);
 
                 // Keep the same preview.html layout but map assembly fields into existing slots
                 document.querySelector('.page-title').textContent = 'Preview & Payment';
-                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter slips before download';
+                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter information slips before download';
 
                 const toggleBlock = document.querySelector('input[name="previewSlipsPerPage"]');
                 if (toggleBlock) {
@@ -1404,7 +1404,7 @@ s0.parentNode.insertBefore(s1,s0);
 
                 // Map assembly fields to UI
                 document.querySelector('.page-title').textContent = 'Preview & Payment';
-                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter slips before download';
+                document.querySelector('.page-subtitle').textContent = 'Preview your assembly voter information slips before download';
 
                 // Hide slips per page toggle (assembly uses fixed format)
                 const toggleBlock = document.querySelector('input[name="previewSlipsPerPage"]');
@@ -1485,7 +1485,7 @@ s0.parentNode.insertBefore(s1,s0);
                     document.getElementById('paymentBtn').style.display = 'none';
                     document.querySelector('.secure-badge').style.display = 'none';
                     document.querySelector('.preview-note').innerHTML =
-                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter slips.';
+                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter information slips.';
 
                     const downloadBtn = document.createElement('button');
                     downloadBtn.className = 'btn btn-payment';
@@ -1511,7 +1511,7 @@ s0.parentNode.insertBefore(s1,s0);
                         <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
                             <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
                             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Order Completed!</h3>
-                            <p style="margin: 0; opacity: 0.9;">Your assembly voter slips are ready for download.</p>
+                            <p style="margin: 0; opacity: 0.9;">Your assembly voter information slips are ready for download.</p>
                         </div>
                     `;
                     return;
@@ -2054,7 +2054,7 @@ s0.parentNode.insertBefore(s1,s0);
                 // For completed orders, show prominent download full PDF button
                 buttonsDiv.innerHTML = `
                     <p style="margin: 0 0 1rem 0; color: var(--kerala-green); font-size: 1rem; font-weight: 700;">
-                        <i class="fas fa-check-circle"></i> Order Completed - Download Your Complete Voter Slips
+                        <i class="fas fa-check-circle"></i> Order Completed - Download Your Complete Voter Information Slips
                     </p>
                     <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
                         <button onclick="downloadFullPDF()" class="btn btn-payment" style="display: inline-block; font-size: 1.1rem; padding: 1rem 2rem;">
@@ -2138,7 +2138,7 @@ s0.parentNode.insertBefore(s1,s0);
                 // For completed orders, show prominent download full PDF button
                 buttonsDiv.innerHTML = `
                     <p style="margin: 0 0 1rem 0; color: var(--kerala-green); font-size: 1rem; font-weight: 700;">
-                        <i class="fas fa-check-circle"></i> Order Completed - Download Your Complete Voter Slips
+                        <i class="fas fa-check-circle"></i> Order Completed - Download Your Complete Voter Information Slips
                     </p>
                     <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
                         <button onclick="downloadFullPDF()" class="btn btn-payment" style="display: inline-block; font-size: 1.1rem; padding: 1rem 2rem;">
@@ -2463,7 +2463,7 @@ s0.parentNode.insertBefore(s1,s0);
                     document.getElementById('paymentBtn').style.display = 'none';
                     document.querySelector('.secure-badge').style.display = 'none';
                     document.querySelector('.preview-note').innerHTML = 
-                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter slips.';
+                        '<strong><i class="fas fa-party-horn"></i> Payment Successful!</strong> You can now download the complete voter information slips.';
                     
                     // Add download button
                     const downloadBtn = document.createElement('button');
@@ -2492,7 +2492,7 @@ s0.parentNode.insertBefore(s1,s0);
                         <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
                             <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
                             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">Order Completed!</h3>
-                            <p style="margin: 0; opacity: 0.9;">Your voter slips are ready for download.</p>
+                            <p style="margin: 0; opacity: 0.9;">Your voter information slips are ready for download.</p>
                         </div>
                     `;
                     

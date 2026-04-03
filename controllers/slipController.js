@@ -574,7 +574,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voter Slips - ${order.orderId}</title>
+    <title>Voter Information Slips - ${order.orderId}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -739,12 +739,12 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                                 Complete PDF Contains:
                             </div>
                             <div style="font-size: 16pt; font-weight: 800; color: #006D3B; margin-bottom: 2mm;">
-                                ${order.voters.length} Voter Slips
+                                ${order.voters.length} Voter Information Slips
                             </div>
                             
                             <!-- Call to Action -->
                             <div style="font-size: 8pt; color: #4a5568; margin-bottom: 2mm; line-height: 1.3;">
-                                This preview shows only first 2 pages. Complete payment now for instant download of all voter slips.
+                                This preview shows only first 2 pages. Complete payment now for instant download of all voter information slips.
                             </div>
                             
                             <!-- Benefits -->
@@ -1476,7 +1476,7 @@ export const testPuppeteer = async (req, res) => {
 </head>
 <body>
     <div class="slip">
-        <h3>Test Voter Slip</h3>
+        <h3>Test Voter Information Slip</h3>
         <p><strong>Name:</strong> Test Voter</p>
         <p><strong>Guardian:</strong> Test Guardian</p>
         <p><strong>House:</strong> Test House</p>

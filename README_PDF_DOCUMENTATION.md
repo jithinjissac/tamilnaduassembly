@@ -297,7 +297,7 @@ FEATURE GUIDES:
 ## 🎯 Quick Facts About the System
 
 **What It Does:**
-- Generates PDF voter slips from extracted voter data
+- Generates PDF voter information slips from extracted voter data
 - Handles 1000+ voters per order
 - Generates PDFs in background without blocking
 - Caches PDFs for instant downloads

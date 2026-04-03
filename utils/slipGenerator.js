@@ -3,7 +3,7 @@ import path from 'path';
 import { logger } from './logger.js';
 
 /**
- * Generate HTML for assembly voter slips matching local body election format
+ * Generate HTML for assembly voter information slips matching local body election format
  * Uses 5 slips per page layout with Malayalam labels
  */
 export const generateVoterSlips = (voters, metadata = {}) => {
@@ -39,7 +39,7 @@ export const generateVoterSlips = (voters, metadata = {}) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assembly Voter Slips - ${constituency}</title>
+    <title>Assembly Voter Information Slips - ${constituency}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -287,7 +287,7 @@ export const generateVoterSlips = (voters, metadata = {}) => {
 };
 
 /**
- * Save voter slips HTML to file
+ * Save voter information slips HTML to file
  */
 export const saveVoterSlipsToFile = (voters, metadata, outputDir = 'voter-slips') => {
     try {
@@ -306,7 +306,7 @@ export const saveVoterSlipsToFile = (voters, metadata, outputDir = 'voter-slips'
         
         fs.writeFileSync(filepath, html, 'utf8');
         
-        logger.info(`✅ Voter slips saved to: ${filepath}`);
+        logger.info(`✅ voter information slips saved to: ${filepath}`);
         
         return {
             success: true,
@@ -315,7 +315,7 @@ export const saveVoterSlipsToFile = (voters, metadata, outputDir = 'voter-slips'
             totalSlips: voters.length
         };
     } catch (error) {
-        logger.error('Error saving voter slips:', error);
+        logger.error('Error saving voter information slips:', error);
         throw error;
     }
 };

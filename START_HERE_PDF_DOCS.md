@@ -138,7 +138,7 @@ Result: Issue fixed ✅
 
 ## ⚡ 30-Second Summary
 
-**What:** PDF generation system for voter slips
+**What:** PDF generation system for voter information slips
 
 **Problem:** Large PDFs (1181+ voters) crashed browser → 500 errors
 

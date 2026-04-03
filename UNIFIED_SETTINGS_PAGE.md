@@ -17,7 +17,7 @@ Created a modern, unified settings page (`settings.html`) that combines both **S
 ### 1. Tabbed Interface
 - **Clean navigation** similar to the admin dashboard
 - Two main tabs:
-  - **Slip Font Settings** - Configure font sizes for voter slips
+  - **Slip Font Settings** - Configure font sizes for voter information slips
   - **Email Settings** - Customize email templates
 
 ### 2. Live Preview Panel (Slip Settings)
@@ -114,7 +114,7 @@ Created a modern, unified settings page (`settings.html`) that combines both **S
 - **Placeholders**: {{orderId}}, {{amount}}
 
 #### 3. PDF Ready Email
-- **Subject**: "Your Voter Slips are Ready - {{orderId}}"
+- **Subject**: "Your Voter Information Slips are Ready - {{orderId}}"
 - **Heading**: "Your PDF is Ready!"
 - **Message**: Download notification
 - **Placeholders**: {{orderId}}, {{voterCount}}

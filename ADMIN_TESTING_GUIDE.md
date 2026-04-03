@@ -159,7 +159,7 @@ bcrypt.hash(password, 10).then(hash => console.log(hash));
 6. **Complete order creation:**
    - Select location (District, Local Body, Ward, Polling Station)
    - Load captcha and enter it
-   - Click "🎫 Create Voter Slip"
+   - Click "🎫 Create Voter Information Slip"
    - Verify order is created with symbol
 
 ---

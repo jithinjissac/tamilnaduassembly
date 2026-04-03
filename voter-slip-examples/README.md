@@ -1,10 +1,10 @@
-# Voter Slip Examples
+# Voter Information Slip Examples
 
-This folder contains example voter slip images used in the landing page to showcase the platform's output quality.
+This folder contains example voter information slip images used in the landing page to showcase the platform's output quality.
 
 ## Quick Setup Instructions
 
-**Save your voter slip screenshots as:**
+**Save your voter information slip screenshots as:**
 1. `bjp-example.png` - The BJP (Lotus symbol) slip you showed
 2. `inc-example.png` - The INC (Hand symbol) slip you showed  
 3. `cpim-example.png` - The LDF (Hand symbol) slip you showed

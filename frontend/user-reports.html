@@ -349,7 +349,7 @@
     <div class="container">
         <div class="page-header">
             <h1><i class="fas fa-users"></i> User-wise Reports</h1>
-            <p>View detailed statistics for revenue, orders, and voter slips per user</p>
+            <p>View detailed statistics for revenue, orders, and voter information slips per user</p>
         </div>
 
         <div class="filters-card">
@@ -367,7 +367,7 @@
                     <select id="sortBy">
                         <option value="revenue">Total Revenue</option>
                         <option value="orders">Total Orders</option>
-                        <option value="slips">Voter Slips</option>
+                        <option value="slips">Voter Information Slips</option>
                         <option value="avgOrder">Avg Order Value</option>
                         <option value="recent">Most Recent</option>
                     </select>
@@ -411,7 +411,7 @@
                     <div class="subvalue" id="avgOrdersPerUser">Avg: 0 per user</div>
                 </div>
                 <div class="summary-card">
-                    <h3>Total Voter Slips</h3>
+                    <h3>Total Voter Information Slips</h3>
                     <div class="value" id="totalSlips">0</div>
                     <div class="subvalue" id="avgSlipsPerUser">Avg: 0 per user</div>
                 </div>
@@ -438,7 +438,7 @@
                             <th>Status</th>
                             <th>Total Orders</th>
                             <th>Total Revenue</th>
-                            <th>Voter Slips</th>
+                            <th>Voter Information Slips</th>
                             <th>Avg Order</th>
                             <th>First Order</th>
                             <th>Last Order</th>
@@ -582,7 +582,7 @@
                 return;
             }
 
-            const headers = ['#', 'Name', 'Email', 'Phone', 'Status', 'Total Orders', 'Total Revenue', 'Voter Slips', 'Avg Order Value', 'First Order', 'Last Order'];
+            const headers = ['#', 'Name', 'Email', 'Phone', 'Status', 'Total Orders', 'Total Revenue', 'Voter Information Slips', 'Avg Order Value', 'First Order', 'Last Order'];
             
             const rows = reportData.map((user, index) => [
                 index + 1,

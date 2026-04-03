@@ -346,7 +346,7 @@
                 <div class="value">0</div>
             </div>
             <div class="summary-card slips">
-                <h3>Voter Slips</h3>
+                <h3>Voter Information Slips</h3>
                 <div class="value">0</div>
             </div>
             <div class="summary-card bodies">
@@ -492,7 +492,7 @@
                                 <th>Ward</th>
                                 <th>Orders</th>
                                 <th>Revenue</th>
-                                <th>Voter Slips</th>
+                                <th>Voter Information Slips</th>
                                 <th>Unique Users</th>
                             </tr>
                         </thead>
@@ -526,7 +526,7 @@
                 return;
             }
 
-            const headers = ['Local Body', 'Ward', 'Orders', 'Revenue', 'Voter Slips', 'Unique Users'];
+            const headers = ['Local Body', 'Ward', 'Orders', 'Revenue', 'Voter Information Slips', 'Unique Users'];
             let rows = [];
 
             currentData.data.localBodies.forEach(lb => {

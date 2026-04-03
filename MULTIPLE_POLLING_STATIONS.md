@@ -37,7 +37,7 @@ Extract voter data from ALL polling stations within a ward in one go, with manua
 - Disables polling station selector when checked
 
 ### Button Text Updates
-- **Normal mode**: "🎫 Create Voter Slip"
+- **Normal mode**: "🎫 Create Voter Information Slip"
 - **Bulk mode**: "🎫 Extract ALL 5 Stations" (dynamic count)
 
 ### Captcha Modal

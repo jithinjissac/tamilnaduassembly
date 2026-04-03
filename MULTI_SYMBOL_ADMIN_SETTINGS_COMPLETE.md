@@ -184,7 +184,7 @@ If database settings are missing:
 
 ### Performance
 - Settings loaded once per PDF generation
-- No additional database queries per voter slip
+- No additional database queries per voter information slip
 - Preview updates are client-side only (no server calls)
 
 ## Files Modified

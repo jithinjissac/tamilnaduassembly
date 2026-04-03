@@ -11,7 +11,7 @@ This system automates the extraction of voter list data from the Kerala SEC webs
 - **Session-Based Captcha Handling**: Persistent browser sessions with screenshot capture
 - **Data Parsing**: Converts HTML tables to structured JSON with section filtering
 - **Export Options**: Download results as JSON or CSV
-- **Voter Slip Generator**: Create print-ready voter slips (5 per A4 page) with party branding
+- **Voter Information Slip Generator**: Create print-ready voter information slips (5 per A4 page) with party branding
 - **RESTful API**: Clean API endpoints for integration
 - **Modern UI**: Responsive web interface with real-time feedback
 - **Malayalam Support**: Default Malayalam language with proper font rendering
@@ -68,13 +68,13 @@ The server will start on `http://localhost:3000`
 6. Wait for **Captcha** to load automatically and enter the code
 7. Click **Extract Voters**
 8. View results in the table
-9. **Export** as JSON or CSV, or **Generate Voter Slips** for printing
+9. **Export** as JSON or CSV, or **Generate Voter Information Slips** for printing
 
-### Using the Voter Slip Generator
+### Using the Voter Information Slip Generator
 
 After extracting voter data:
 
-1. Click **"🎫 Generate Voter Slips"** button in the results section
+1. Click **"🎫 Generate Voter Information Slips"** button in the results section
 2. Review the generated slips (5 per A4 page) with:
    - Party logo and branding
    - Voter details (name, SEC ID, address, guardian)
@@ -222,7 +222,7 @@ project/
 │   ├── index.html                 # Main extraction interface
 │   ├── styles.css                 # Main page styling
 │   ├── app.js                     # Frontend JavaScript
-│   ├── slips.html                 # Voter slip generator page
+│   ├── slips.html                 # voter information slip generator page
 │   ├── slips.css                  # Print-ready slip styling
 │   └── slips.js                   # Slip generation logic
 ├── public/
@@ -234,7 +234,7 @@ project/
 ├── API_EXAMPLES.md
 ├── QUICKSTART.md
 ├── SETUP_COMPLETE.md
-└── VOTER_SLIPS_GUIDE.md          # Voter slip feature documentation
+└── VOTER_SLIPS_GUIDE.md          # voter information slip feature documentation
 ```
 
 ## 🔧 Technology Stack

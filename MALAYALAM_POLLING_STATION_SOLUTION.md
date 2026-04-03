@@ -62,7 +62,7 @@ Although the dropdown APIs still return English, we enforce Malayalam at every p
 ```
 1. User selects District → Local Body → Ward → Polling Station(s)
    ↓
-2. User enters captcha and clicks "Create Voter Slip"
+2. User enters captcha and clicks "Create Voter Information Slip"
    ↓
 3. Frontend calls /api/submitWithCaptcha with:
    - view_voters_list[language] = M
@@ -104,7 +104,7 @@ Although the dropdown APIs still return English, we enforce Malayalam at every p
 1. Go to http://localhost:3000/create-slip.html
 2. Select District → Local Body → Ward → One Polling Station
 3. Load captcha and enter it
-4. Click "Create Voter Slip"
+4. Click "Create Voter Information Slip"
 5. **Check server console** for:
    ```
    [PARSER] Found polling station from label: 001 - മലയാളം പേര്

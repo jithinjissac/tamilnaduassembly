@@ -404,7 +404,7 @@ export const forgotPassword = [
                     </div>
                     <div class="kerala-border" style="height: 4px;"></div>
                     <div class="footer">
-                        <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                        <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Information Slip Service</p>
                         <p>🌐 <a href="https://easyslip.techiussolutions.in" style="color: #006D3B; text-decoration: none;">https://easyslip.techiussolutions.in</a></p>
                         <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
                     </div>

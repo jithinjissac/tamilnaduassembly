@@ -58,7 +58,7 @@ export const defaultSettings = {
         smtpUser: '',
         smtpPassword: '',
         fromEmail: '',
-        fromName: 'Kerala Voter Slip',
+        fromName: 'Kerala Voter Information Slip',
         emailTemplates: {
             orderConfirmation: true,
             paymentSuccess: true,
@@ -79,7 +79,7 @@ Your order has been confirmed successfully!
 • Symbol: {{symbolName}}
 • Total Voters: {{voterCount}}
 
-Your voter slips are being prepared and will be ready for download shortly.`
+Your voter information slips are being prepared and will be ready for download shortly.`
         },
         paymentSuccess: {
             subject: 'Payment Successful - {{wardName}} - {{orderId}}',
@@ -93,14 +93,14 @@ Your payment has been received successfully!
 • Order ID: {{orderId}}
 • Ward: {{wardName}}
 
-Your voter slips PDF is being generated and will be ready for download shortly.`
+Your voter information slips PDF is being generated and will be ready for download shortly.`
         },
         pdfReady: {
-            subject: 'Your Voter Slips are Ready - {{wardName}} - {{orderId}}',
+            subject: 'Your Voter Information Slips are Ready - {{wardName}} - {{orderId}}',
             heading: 'Your PDF is Ready for Download!',
             message: `നമസ്കാരം {{userName}},
 
-Great news! Your voter slips PDF is now ready for download.
+Great news! Your voter information slips PDF is now ready for download.
 
 📄 PDF Details:
 • Order ID: {{orderId}}

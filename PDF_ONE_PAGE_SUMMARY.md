@@ -2,7 +2,7 @@
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
-║                    KERALA SEC VOTER SLIP PDF SYSTEM                       ║
+║                    KERALA SEC voter information slip PDF SYSTEM                       ║
 ║                         Complete Workflow Map                             ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 

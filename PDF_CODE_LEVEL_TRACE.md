@@ -259,7 +259,7 @@ controllers/slipController.js → downloadSlip() [continued]
 │  ├─ const html = generateSlipHTML(order)
 │  ├─ Parameters: Full order (1181 voters)
 │  ├─ Returns: 150 MB HTML
-│  └─ Includes: All voter slips + cutting guides
+│  └─ Includes: All voter information slips + cutting guides
 │
 ├─ Line 824-826: Determine browser strategy
 │  ├─ Check: order.totalVoters (1181)

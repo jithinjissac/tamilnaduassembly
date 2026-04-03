@@ -250,7 +250,7 @@ Read these in order:
 - ✅ On-demand PDF generation (fallback)
 - ✅ Payment verification
 - ✅ Auto-cleanup of temp files
-- ✅ Multi-station voter slip generation
+- ✅ Multi-station voter information slip generation
 - ✅ Error handling and logging
 
 ### What's Tested

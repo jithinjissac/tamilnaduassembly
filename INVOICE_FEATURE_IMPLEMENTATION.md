@@ -13,7 +13,7 @@ Added professional PDF invoice generation for all paid orders. Users can downloa
 - **Purpose**: Generate professional PDF invoices using PDFKit
 - **Features**:
   - Kerala-themed header with gradient (#667eea)
-  - Company branding (Kerala Voter Slip Generator, EasySlip.in)
+  - Company branding (Kerala Voter Information Slip Generator, EasySlip.in)
   - Invoice number (same as Order ID)
   - Bill To section (user details)
   - Order details section
@@ -60,7 +60,7 @@ Added professional PDF invoice generation for all paid orders. Users can downloa
 ## 📋 Invoice Content
 
 ### Header Section
-- **Company Name**: Kerala Voter Slip Generator
+- **Company Name**: Kerala Voter Information Slip Generator
 - **Website**: EasySlip.in
 - **Email**: service@easyslip.in
 - **Invoice Number**: Order ID
@@ -79,7 +79,7 @@ Added professional PDF invoice generation for all paid orders. Users can downloa
 - Payment gateway used (Razorpay/Cashfree)
 
 ### Itemized Table
-- **Description**: Voter Slip Generation - [Symbol Name]
+- **Description**: Voter Information Slip Generation - [Symbol Name]
 - **Quantity**: Total voters
 - **Rate**: ₹0.50 per voter (or actual pricePerVoter)
 - **Amount**: Subtotal

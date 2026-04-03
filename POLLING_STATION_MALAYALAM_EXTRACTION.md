@@ -175,7 +175,7 @@ const pollingStation = order.location.pollingStationMalayalam ||
 This ensures:
 1. **Priority**: Malayalam name → English name → value
 2. **Fallback**: If Malayalam not available, use English or value
-3. **PDF Display**: Shows proper Malayalam text on voter slips
+3. **PDF Display**: Shows proper Malayalam text on voter information slips
 
 ## Testing
 

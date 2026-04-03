@@ -161,7 +161,7 @@ export async function sendOrderConfirmationEmail(user, order) {
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
             <div class="footer">
-                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Information Slip Service</p>
                 <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
                 <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
             </div>
@@ -249,7 +249,7 @@ export async function sendPaymentSuccessEmail(user, order) {
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
             <div class="footer">
-                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Information Slip Service</p>
                 <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
                 <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
             </div>
@@ -275,9 +275,9 @@ export async function sendPDFReadyEmail(user, order) {
     
     // Get template settings with defaults
     const template = settings.pdfReady || {
-        subject: 'Your Voter Slips are Ready - {{wardName}} - {{orderId}}',
+        subject: 'Your Voter Information Slips are Ready - {{wardName}} - {{orderId}}',
         heading: 'Your PDF is Ready for Download!',
-        message: 'Your voter slips PDF is ready.'
+        message: 'Your voter information slips PDF is ready.'
     };
     
     // Replace placeholders
@@ -336,7 +336,7 @@ export async function sendPDFReadyEmail(user, order) {
             </div>
             <div class="kerala-border" style="height: 4px;"></div>
             <div class="footer">
-                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Slip Service</p>
+                <p style="font-weight: 600; color: #006D3B;">EASYSLIP - Kerala Voter Information Slip Service</p>
                 <p>🌐 <a href="https://easyslip.in" style="color: #006D3B; text-decoration: none;">https://easyslip.in</a></p>
                 <p style="color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
             </div>

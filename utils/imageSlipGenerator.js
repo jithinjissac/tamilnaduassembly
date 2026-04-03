@@ -1,5 +1,5 @@
 /**
- * Image-based Voter Slip Generator
+ * Image-based Voter Information Slip Generator
  * Embeds voter snippet images directly in slips
  */
 
@@ -29,7 +29,7 @@ function buildPublicVoterSlipUrl(fileName) {
 }
 
 /**
- * Generate voter slips with embedded images
+ * Generate voter information slips with embedded images
  */
 export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) {
     try {
@@ -59,7 +59,7 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
             const html = generateImageSlipsHTML(voterSnippets, metadata);
             fs.writeFileSync(htmlFullPath, html, 'utf8');
             htmlArtifactSaved = true;
-            logger.info(`✅ Image-based voter slips HTML saved to: ${htmlFullPath}`);
+            logger.info(`✅ Image-based voter information slips HTML saved to: ${htmlFullPath}`);
         } else {
             logger.info(`ℹ️ Skipping full HTML artifact for ${voterSnippets.length} voters; using chunked PDF generation only`);
         }
@@ -145,7 +145,7 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
                 }
             }
             pdfGenerated = true;
-            logger.info(`✅ Image-based voter slips PDF saved to: ${pdfFullPath} (${chunks.length} chunks merged)`);
+            logger.info(`✅ Image-based voter information slips PDF saved to: ${pdfFullPath} (${chunks.length} chunks merged)`);
 
             // Delete the large HTML file to save disk space now that PDF is ready
             if (htmlArtifactSaved) {
@@ -283,7 +283,7 @@ ${slipsHTML}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assembly Voter Slips - ${constituency}</title>
+    <title>Assembly Voter Information Slips - ${constituency}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">

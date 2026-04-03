@@ -105,7 +105,7 @@ function generateOrderConfirmationHTML(user, order) {
                         </div>
                     </div>
                     
-                    <p>Please complete your payment to generate the voter slip PDF.</p>
+                    <p>Please complete your payment to generate the voter information slip PDF.</p>
                     
                     <center>
                         <a href="#" class="button">
@@ -114,7 +114,7 @@ function generateOrderConfirmationHTML(user, order) {
                     </center>
                     
                     <div class="footer">
-                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Information Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ function generatePaymentSuccessHTML(user, order) {
                 </div>
                 <div class="content">
                     <p>Hi <strong>${user.name}</strong>,</p>
-                    <p>Your payment has been received successfully! Your voter slip PDF is being generated.</p>
+                    <p>Your payment has been received successfully! Your voter information slip PDF is being generated.</p>
                     
                     <div class="order-details">
                         <h3 style="margin-top: 0;">Payment Details</h3>
@@ -182,7 +182,7 @@ function generatePaymentSuccessHTML(user, order) {
                     </center>
                     
                     <div class="footer">
-                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Information Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>
@@ -217,7 +217,7 @@ function generatePDFReadyHTML(user, order) {
                 </div>
                 <div class="content">
                     <p>Hi <strong>${user.name}</strong>,</p>
-                    <p>Great news! Your voter slip PDF has been generated and is ready for download.</p>
+                    <p>Great news! Your voter information slip PDF has been generated and is ready for download.</p>
                     
                     <div class="info-box">
                         <p style="margin: 5px 0;"><strong>Order ID:</strong> ${order.orderId}</p>
@@ -235,7 +235,7 @@ function generatePDFReadyHTML(user, order) {
                     </p>
                     
                     <div class="footer">
-                        <p><strong>Kerala Local Body Election Voter Slip Generator</strong></p>
+                        <p><strong>Kerala Local Body Election Voter Information Slip Generator</strong></p>
                         <p>This is an automated email. Please do not reply.</p>
                     </div>
                 </div>

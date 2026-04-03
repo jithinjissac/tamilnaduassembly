@@ -22,7 +22,7 @@
 ## 🚀 For Users
 
 ### Problem
-You're seeing error: **"Access denied. No token provided"** when trying to download your voter slips PDF
+You're seeing error: **"Access denied. No token provided"** when trying to download your voter information slips PDF
 
 ### Solution (3 Steps)
 1. **Logout** - Click the logout button in the top right

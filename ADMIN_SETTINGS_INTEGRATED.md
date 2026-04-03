@@ -133,13 +133,13 @@ All email templates support these dynamic placeholders:
 #### 2. Payment Success Email
 - **Default Subject**: "Payment Successful - {{orderId}}"
 - **Default Heading**: "Payment Successful!"
-- **Default Message**: "Your payment of ₹{{amount}} has been received successfully. Your voter slips are ready for download!"
+- **Default Message**: "Your payment of ₹{{amount}} has been received successfully. Your voter information slips are ready for download!"
 - **When Sent**: After payment is confirmed
 
 #### 3. PDF Ready Email
-- **Default Subject**: "Your Voter Slips are Ready - {{orderId}}"
+- **Default Subject**: "Your Voter Information Slips are Ready - {{orderId}}"
 - **Default Heading**: "Your PDF is Ready!"
-- **Default Message**: "Great news! Your voter slips PDF for {{orderId}} with {{voterCount}} voters is now ready for download."
+- **Default Message**: "Great news! Your voter information slips PDF for {{orderId}} with {{voterCount}} voters is now ready for download."
 - **When Sent**: After PDF generation completes
 
 ### Live Preview Features
@@ -298,9 +298,9 @@ const processedMessage = message
     "message": "Your payment of ₹{{amount}}..."
   },
   "pdfReady": {
-    "subject": "Your Voter Slips are Ready - {{orderId}}",
+    "subject": "Your Voter Information Slips are Ready - {{orderId}}",
     "heading": "Your PDF is Ready!",
-    "message": "Great news! Your voter slips..."
+    "message": "Great news! Your voter information slips..."
   }
 }
 ```

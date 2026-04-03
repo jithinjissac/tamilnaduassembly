@@ -15,7 +15,7 @@ console.log('📋 Step 1: Get OAuth2 Credentials\n');
 console.log('1. Go to: https://console.cloud.google.com/apis/credentials');
 console.log('2. Click "Create Credentials" → "OAuth 2.0 Client ID"');
 console.log('3. Application type: "Web application"');
-console.log('4. Name it: "Voter Slips Uploader"');
+console.log('4. Name it: "Voter Information Slips Uploader"');
 console.log('5. Authorized redirect URIs: Add "http://localhost:3000/oauth2callback"');
 console.log('6. Click "Create"\n');
 

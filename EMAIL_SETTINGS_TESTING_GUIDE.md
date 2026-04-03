@@ -26,7 +26,7 @@
    SMTP Username: your-email@gmail.com
    SMTP Password: your-app-password
    From Email: noreply@yourapp.com
-   From Name: Kerala Voter Slips
+   From Name: Kerala Voter Information Slips
    ```
 
 2. **Get Gmail App Password:**
@@ -219,7 +219,7 @@ curl -X PUT \
     "smtpUsername": "test@gmail.com",
     "smtpPassword": "app-password",
     "fromEmail": "noreply@app.com",
-    "fromName": "Kerala Voter Slips"
+    "fromName": "Kerala Voter Information Slips"
   }' \
   http://localhost:3000/api/settings/email
 ```
@@ -247,8 +247,8 @@ http://localhost:3000/api/settings/preview-template/pdfReady
 
 ### **Successful Test Email:**
 ```
-Subject: Test Email - Kerala Voter Slips
-From: Kerala Voter Slips <noreply@app.com>
+Subject: Test Email - Kerala Voter Information Slips
+From: Kerala Voter Information Slips <noreply@app.com>
 To: your@email.com
 
 Content: Order Confirmation email with sample data

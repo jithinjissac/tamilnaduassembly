@@ -1,7 +1,7 @@
-# Voter Slip SaaS Platform Architecture
+# Voter Information Slip SaaS Platform Architecture
 
 ## Overview
-A complete SaaS platform for generating customized voter slips with payment integration.
+A complete SaaS platform for generating customized voter information slips with payment integration.
 
 ## User Flow
 
@@ -291,7 +291,7 @@ async function generateSlipPDF(order) {
 
 ### Per User Calculation
 ```
-Cost per voter slip: ₹0.50
+Cost per voter information slip: ₹0.50
 Platform fee: Included
 Payment gateway fee: 2% (Razorpay)
 
