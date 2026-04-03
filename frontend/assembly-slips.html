@@ -1155,6 +1155,9 @@
                         <div>
                             <p id="loadingMainText" style="font-size: 1.3rem; font-weight: 700; margin: 0; color: #2d3748; letter-spacing: -0.3px;">Fetching voter data...</p>
                             <small id="loadingSubText" style="color: #666; display: block; margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.4;">Connecting to ECI portal</small>
+                            <small id="loadingStickyHint" style="color: #b45309; display: block; margin-top: 0.6rem; font-size: 0.9rem; line-height: 1.45; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 0.55rem 0.7rem;">
+                                <i class="fas fa-mobile-alt"></i> Please stay on this page and keep your mobile screen ON until extraction completes.
+                            </small>
                         </div>
 
                         <!-- Progress Bar -->
@@ -1546,6 +1549,30 @@
         let progressInterval = null;
         let progressPollInterval = null;
         let progressStartTime = null;
+        let wakeLockSentinel = null;
+
+        async function requestWakeLock() {
+            try {
+                if (!('wakeLock' in navigator)) return;
+                wakeLockSentinel = await navigator.wakeLock.request('screen');
+                wakeLockSentinel.addEventListener('release', () => {
+                    wakeLockSentinel = null;
+                });
+            } catch (err) {
+                console.warn('Wake lock not available:', err?.message || err);
+            }
+        }
+
+        async function releaseWakeLock() {
+            try {
+                if (wakeLockSentinel) {
+                    await wakeLockSentinel.release();
+                    wakeLockSentinel = null;
+                }
+            } catch (err) {
+                console.warn('Failed to release wake lock:', err?.message || err);
+            }
+        }
 
         function startProgressTracker(numParts, captchaId) {
             progressStartTime = Date.now();
@@ -1677,6 +1704,7 @@
             document.getElementById('loading').focus();
             document.getElementById('extract-btn').disabled = true;
             startProgressTracker(state.selectedParts.length, state.captchaId);
+            await requestWakeLock();
 
             try {
                 const response = await fetch(`${API_BASE}/extractVoters`, {
@@ -1778,6 +1806,7 @@
                     setProgressStep(5); // all done
 
                     setTimeout(() => {
+                        releaseWakeLock();
                         window.location.href = `preview.html?orderId=${encodeURIComponent(orderData.order.orderId)}`;
                     }, 1200);
                 } else {
@@ -1785,6 +1814,7 @@
                 }
             } catch (error) {
                 stopProgressTracker(false);
+                await releaseWakeLock();
                 alert('❌ Extraction failed: ' + error.message);
                 loadCaptcha();
                 document.getElementById('loading').classList.remove('show');
