@@ -772,6 +772,7 @@ export const getPreviewPayloadById = (previewId) => {
 export default {
     healthCheck,
     getCaptcha,
+    extractVotersAsync,
     extractVoters,
     storePreviewData,
     getPreviewData,
