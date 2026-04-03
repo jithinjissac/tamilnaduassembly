@@ -973,6 +973,13 @@ s0.parentNode.insertBefore(s1,s0);
                     ${filteredOrders.map(order => {
                         const locationLine1 = order.location?.wardName || order.location?.ward || order.constituency || '-';
                         const locationLine2 = order.location?.localBodyName || order.location?.localBody || order.district || '-';
+                        const selectedParts = Array.isArray(order.location?.selectedParts)
+                            ? order.location.selectedParts.filter(part => part && (part.partNumber || part.partName))
+                            : [];
+                        const firstPart = selectedParts[0] || null;
+                        const partDetailLine = firstPart
+                            ? `Part ${firstPart.partNumber || '-'}${firstPart.partName ? ` - ${firstPart.partName}` : ''}${selectedParts.length > 1 ? ` (+${selectedParts.length - 1} more)` : ''}`
+                            : '';
                         const voters = order.voterCount || order.totalVoters || 0;
                         const amount = order.amount || 0;
                         return `
@@ -992,6 +999,7 @@ s0.parentNode.insertBefore(s1,s0);
                                 <div class="order-location">
                                     <div class="order-location-name"><i class="fas fa-map-marker-alt"></i> ${locationLine1}</div>
                                     <div class="order-location-body">${locationLine2}</div>
+                                    ${partDetailLine ? `<div class="order-location-body" style="margin-top: 0.2rem; font-size: 0.88rem;"><i class="fas fa-list"></i> ${partDetailLine}</div>` : ''}
                                 </div>
                                 
                                 <div class="order-info-row">
@@ -1010,8 +1018,7 @@ s0.parentNode.insertBefore(s1,s0);
                                     <i class="fas fa-eye"></i> View
                                 </a>
                                 ${order.paymentStatus === 'completed' 
-                                    ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>
-                                       <button class="btn btn-download" onclick="downloadInvoice('${order.orderId}')" style="background: #10b981;"><i class="fas fa-file-invoice"></i> Invoice</button>`
+                                    ? `<button class="btn btn-download" onclick="downloadSlip('${order.orderId}')"><i class="fas fa-download"></i> PDF</button>`
                                     : `<button class="btn btn-download" style="background: var(--kerala-gold);" onclick="window.location.href='preview.html?orderId=${order.orderId}'"><i class="fas fa-credit-card"></i> Pay Now</button>
                                        <button class="btn btn-download" onclick="verifyPayment('${order.orderId}')" style="background: #8b5cf6;" title="Verify payment status from gateway"><i class="fas fa-check-circle"></i> Verify</button>`
                                 }
@@ -1033,60 +1040,6 @@ s0.parentNode.insertBefore(s1,s0);
                 displayOrders();
             });
         });
-
-        // Download invoice
-        async function downloadInvoice(orderId) {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    alert('Please login to download invoice');
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                const response = await fetch(`/api/orders/${orderId}/invoice`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status === 400) {
-                        alert('Invoice only available for completed payments');
-                    } else {
-                        alert(errorData.message || 'Failed to download invoice');
-                    }
-                    return;
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `invoice-${orderId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                
-                // Track invoice download
-                if (window.trackActivity) {
-                    window.trackActivity('invoice_downloaded', {
-                        orderId: orderId,
-                        fileName: `invoice-${orderId}.pdf`
-                    });
-                }
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-
-            } catch (error) {
-                console.error('Invoice download error:', error);
-                alert('Failed to download invoice. Please try again.');
-            }
-        }
 
         // Store current order ID for download modal
         let currentDownloadOrderId = null;
@@ -1193,27 +1146,10 @@ s0.parentNode.insertBefore(s1,s0);
                 const isAsm = orderId.startsWith('ASM-');
                 
                 if (isAsm) {
-                    // Assembly order: find previewId from the order, then generate PDF
-                    const orderResp = await fetch(`/api/assembly/orders/${orderId}`, {
+                    // Assembly order: download full paid PDF from order download endpoint
+                    const pdfResp = await fetch(`/api/assembly/orders/${orderId}/download`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
-                    if (!orderResp.ok) throw new Error('Failed to load order');
-                    const orderResult = await orderResp.json();
-                    const order = orderResult.order || orderResult;
-                    
-                    const genResp = await fetch('/api/assembly/generateSlipsWithCandidates', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ previewId: order.previewId })
-                    });
-                    if (!genResp.ok) throw new Error('Failed to generate assembly PDF');
-                    const genData = await genResp.json();
-                    if (!genData.success || !genData.downloadUrl) throw new Error('Failed to generate assembly PDF');
-                    
-                    const pdfResp = await fetch(genData.downloadUrl);
                     if (!pdfResp.ok) throw new Error('Failed to download PDF');
                     blob = await pdfResp.blob();
                 } else {

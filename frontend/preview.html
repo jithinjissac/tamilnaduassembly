@@ -864,7 +864,7 @@ s0.parentNode.insertBefore(s1,s0);
                     <p><strong>Order ID:</strong> <span id="displayOrderId">-</span></p>
                     <p><strong>Symbol:</strong> <span id="displayPartyName">-</span></p>
                     <p><strong>District:</strong> <span id="displayDistrict">-</span></p>
-                    <p><strong>Local Body:</strong> <span id="displayLocalBody">-</span></p>
+                    <p><strong id="localBodyLabel">Local Body:</strong> <span id="displayLocalBody">-</span></p>
                     <p><strong>Ward:</strong> <span id="displayWard">-</span></p>
                     <p id="pollingStationDisplay"><strong>Polling Station:</strong> <span id="displayPollingStation">-</span></p>
                 </div>
@@ -989,6 +989,14 @@ s0.parentNode.insertBefore(s1,s0);
         let pollingStations = [];
         let currentStationIndex = 0;
         let currentStationPdfUrl = null;
+
+        function formatPartDisplay(part) {
+            if (!part) return '-';
+            const partNo = part.partNumber ? String(part.partNumber).trim() : '';
+            const partName = part.partName ? String(part.partName).trim() : '';
+            if (partNo && partName) return `${partNo} - ${partName}`;
+            return partNo || partName || '-';
+        }
 
         if (!token && !(isAssemblyPreview && !isAssemblyOrder)) {
             // Save the intended destination with query params before redirecting to login
@@ -1279,12 +1287,15 @@ s0.parentNode.insertBefore(s1,s0);
                 const stationPagination = document.getElementById('stationPagination');
                 if (stationPagination) stationPagination.style.display = 'none';
 
+                const localBodyLabelEl = document.getElementById('localBodyLabel');
+                if (localBodyLabelEl) localBodyLabelEl.textContent = 'Constituency:';
+
                 document.getElementById('displayOrderId').textContent = assemblyPreviewData.orderId || '-';
                 document.getElementById('displayPartyName').textContent = candidate.symbolName || (candidate.symbol ? 'Selected Symbol' : 'No Symbol');
                 document.getElementById('displayDistrict').textContent = extracted.district || '-';
                 document.getElementById('displayLocalBody').textContent = extracted.constituency || '-';
                 document.getElementById('displayWard').textContent = `${selectedParts.length} selected part(s)`;
-                document.getElementById('displayPollingStation').textContent = selectedParts[0]?.partName || '-';
+                document.getElementById('displayPollingStation').textContent = formatPartDisplay(selectedParts[0]);
 
                 const totalVoters = voters.length;
                 const pricePerVoter = 0.5;
@@ -1406,6 +1417,9 @@ s0.parentNode.insertBefore(s1,s0);
                 const stationPagination = document.getElementById('stationPagination');
                 if (stationPagination) stationPagination.style.display = 'none';
 
+                const localBodyLabelEl = document.getElementById('localBodyLabel');
+                if (localBodyLabelEl) localBodyLabelEl.textContent = 'Constituency:';
+
                 // Display order info
                 document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
                 document.getElementById('displayPartyName').textContent = orderData.customization?.partyName || orderData.customization?.partyLogo || orderData.candidate?.symbolName || '-';
@@ -1413,7 +1427,7 @@ s0.parentNode.insertBefore(s1,s0);
                 document.getElementById('displayLocalBody').textContent = orderData.constituency || '-';
                 const partCount = orderData.selectedParts?.length || 0;
                 document.getElementById('displayWard').textContent = partCount > 0 ? `${partCount} selected part(s)` : '-';
-                document.getElementById('displayPollingStation').textContent = orderData.selectedParts?.[0]?.partName || '-';
+                document.getElementById('displayPollingStation').textContent = formatPartDisplay(orderData.selectedParts?.[0]);
 
                 // Display pricing
                 const voterCount = orderData.totalVoters || 0;

@@ -140,7 +140,13 @@ export const getUserOrders = async (req, res) => {
                 localBody: order.constituency,
                 localBodyName: order.constituency,
                 ward: order.constituencyCode,
-                wardName: order.constituency
+                wardName: order.constituency,
+                selectedParts: Array.isArray(order.selectedParts)
+                    ? order.selectedParts.map(part => ({
+                        partNumber: part?.partNumber || '',
+                        partName: part?.partName || ''
+                    }))
+                    : []
             },
             voterCount: order.totalVoters,
             amount: order.amount,

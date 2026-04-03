@@ -110,9 +110,10 @@ export const login = [
             });
 
             if (!user) {
+                const isEmailLogin = typeof emailOrPhone === 'string' && emailOrPhone.includes('@');
                 return res.status(401).json({ 
                     status: 'error',
-                    message: 'Invalid credentials' 
+                    message: isEmailLogin ? 'User not registered. Please register.' : 'Invalid credentials'
                 });
             }
 

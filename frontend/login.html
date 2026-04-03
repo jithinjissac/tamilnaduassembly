@@ -465,8 +465,10 @@
                         window.location.href = 'dashboard.html';
                     }
                 } else {
-                    // Show error message
-                    showError('generalError', data.message || 'Login failed. Please try again.');
+                    // Show user-friendly message for unregistered emails
+                    const serverMessage = data.message || 'Login failed. Please try again.';
+                    const isUnregistered = serverMessage.toLowerCase().includes('not registered');
+                    showError('generalError', isUnregistered ? 'User not registered. Please register.' : serverMessage);
                     document.getElementById('loginForm').style.display = 'block';
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('loginBtn').disabled = false;
