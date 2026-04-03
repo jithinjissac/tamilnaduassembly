@@ -247,10 +247,9 @@ def process_page(
 
     if len(boxes) < 6:
         print(
-            f"[INFO] Page {page_number}: contour detection found {len(boxes)} boxes - falling back to fixed-grid layout",
+            f"[INFO] Page {page_number}: contour detection found {len(boxes)} boxes - continuing without layout fallback",
             file=sys.stderr,
         )
-        boxes = filter_box_layout(grid_fallback(img), img.shape)
 
     saved = []
     skipped = 0
