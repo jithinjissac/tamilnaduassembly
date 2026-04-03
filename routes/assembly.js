@@ -29,6 +29,7 @@ router.post('/getPollingParts', assemblyDropdownController.getPollingParts);
 
 // Data extraction endpoints (now using Direct API)
 router.post('/getCaptcha', assemblyVoterController.getCaptcha);
+router.post('/extractVotersAsync', assemblyVoterController.extractVotersAsync);
 router.post('/extractVoters', assemblyVoterController.extractVoters);
 router.get('/extractionProgress/:progressId', (req, res) => {
     const progress = getExtractionProgress(req.params.progressId);

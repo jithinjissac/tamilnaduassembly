@@ -93,6 +93,44 @@ function cleanupProgress(progressId) {
     setTimeout(() => extractionProgress.delete(progressId), 5 * 60 * 1000);
 }
 
+function createExtractionError(message, statusCode = 500, details = null) {
+    const error = new Error(message);
+    error.statusCode = statusCode;
+    error.details = details;
+    return error;
+}
+
+function normalizeExtractionError(error) {
+    logger.error('Assembly: Error extracting voters:', error);
+    logger.error('Assembly: Error stack:', error.stack);
+
+    let statusCode = error.statusCode || 500;
+    let errorMessage = 'Failed to extract voter data';
+    let errorDetails = error.message;
+
+    if (error.message.includes('Captcha') || error.message.includes('captcha')) {
+        statusCode = statusCode || 400;
+        errorMessage = 'Invalid captcha. Please try again with correct captcha text.';
+    } else if (error.message.includes('PDF')) {
+        errorMessage = 'Failed to download or parse PDF files. Please try again.';
+    } else if (error.response) {
+        logger.error('Assembly: Error response:', error.response.data);
+        errorDetails = JSON.stringify(error.response.data);
+    } else if (error.statusCode && error.statusCode < 500) {
+        errorMessage = error.message;
+    }
+
+    return {
+        statusCode,
+        body: {
+            status: 'error',
+            message: errorMessage,
+            error: errorDetails,
+            details: error.details || error.response?.data || error.message
+        }
+    };
+}
+
 function createPreviewSession(payload) {
     const previewId = `asm_${Date.now()}_${crypto.randomUUID()}`;
     const expiresAt = Date.now() + PREVIEW_TTL_MS;
@@ -196,83 +234,64 @@ export const getCaptcha = async (req, res) => {
     }
 };
 
-/**
- * Extract voters using Direct ECI API
- */
-export const extractVoters = async (req, res) => {
-    try {
-        const {
-            stateCode,
-            year,
-            rollType,
-            district,
-            constituency,
-            language,
-            captcha,
-            captchaId,
-            selectedParts = [], // Array of part objects: [{partId, partNumber, partName}]
-            skipSlipGeneration = false, // Optional: Skip slip generation, return just voter data
-            createPreviewSession: shouldCreatePreviewSession = false,
-            candidate = { symbol: '', symbolName: '' },
-            districtLabel = '',
-            constituencyLabel = '',
-        } = req.body;
+async function runExtractionJob(body, progressId) {
+    const {
+        stateCode,
+        year,
+        rollType,
+        district,
+        constituency,
+        language,
+        captcha,
+        captchaId,
+        selectedParts = [],
+        skipSlipGeneration = false,
+        createPreviewSession: shouldCreatePreviewSession = false,
+        candidate = { symbol: '', symbolName: '' },
+        districtLabel = '',
+        constituencyLabel = '',
+    } = body;
 
-        // Validate required fields
-        if (!stateCode || !year || !rollType || !district || !constituency || !language || !captcha || !captchaId) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'All fields including captcha and captcha ID are required'
-            });
-        }
+    if (!stateCode || !year || !rollType || !district || !constituency || !language || !captcha || !captchaId) {
+        throw createExtractionError('All fields including captcha and captcha ID are required', 400);
+    }
 
-        // Captcha validation: check captchaId exists and is not expired
-        const captchaEntry = captchaStore.get(captchaId);
-        logger.info(`Captcha validation: receivedId=${captchaId}, receivedValue=${captcha}`);
-        if (!captchaEntry) {
-            logger.warn(`Captcha validation failed: captchaId not found or expired. receivedId=${captchaId}`);
-            return res.status(400).json({ status: 'error', message: 'Invalid captcha', error: 'Captcha mismatch or expired' });
-        }
-        // Remove captchaId after use
-        captchaStore.delete(captchaId);
+    const captchaEntry = captchaStore.get(captchaId);
+    logger.info(`Captcha validation: receivedId=${captchaId}, receivedValue=${captcha}`);
+    if (!captchaEntry) {
+        logger.warn(`Captcha validation failed: captchaId not found or expired. receivedId=${captchaId}`);
+        throw createExtractionError('Invalid captcha', 400, 'Captcha mismatch or expired');
+    }
+    captchaStore.delete(captchaId);
 
-        if (!selectedParts || selectedParts.length === 0) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'At least one polling part must be selected'
-            });
-        }
+    if (!selectedParts || selectedParts.length === 0) {
+        throw createExtractionError('At least one polling part must be selected', 400);
+    }
 
-        logger.info(`Assembly: Starting voter extraction for AC ${constituency}`);
-        logger.info(`Assembly: Request data - State: ${stateCode}, District: ${district}, AC: ${constituency}`);
-        logger.info(`Assembly: Roll Type: ${rollType}, Year: ${year}, Language: ${language}`);
-        logger.info(`Assembly: Captcha ID: ${captchaId}, Selected ${selectedParts.length} polling parts`);
-        logger.info(`Assembly: Selected parts: ${JSON.stringify(selectedParts).substring(0, 500)}`);
+    logger.info(`Assembly: Starting voter extraction for AC ${constituency}`);
+    logger.info(`Assembly: Request data - State: ${stateCode}, District: ${district}, AC: ${constituency}`);
+    logger.info(`Assembly: Roll Type: ${rollType}, Year: ${year}, Language: ${language}`);
+    logger.info(`Assembly: Captcha ID: ${captchaId}, Selected ${selectedParts.length} polling parts`);
+    logger.info(`Assembly: Selected parts: ${JSON.stringify(selectedParts).substring(0, 500)}`);
 
-        // Extract part numbers from selected parts (API needs partNumber, not partId)
-        const partNumbers = selectedParts.map(part => part.partNumber);
-        logger.info(`Assembly: Part Numbers: ${partNumbers.join(', ')}`);
+    const partNumbers = selectedParts.map(part => part.partNumber);
+    logger.info(`Assembly: Part Numbers: ${partNumbers.join(', ')}`);
 
-        // Initialize progress tracking (keyed by captchaId so frontend can poll)
-        const progressId = captchaId;
-        updateProgress(progressId, {
-            stage: 'generating',
-            stageLabel: 'Requesting PDFs from ECI...',
-            totalParts: selectedParts.length,
-            pdfDownloaded: 0,
-            pdfTotal: 0,
-            pdfSizeKB: 0,
-            votersExtracted: 0,
-            pagesProcessed: 0,
-            totalPages: 0,
-            percent: 5
-        });
+    updateProgress(progressId, {
+        status: 'running',
+        stage: 'generating',
+        stageLabel: 'Requesting PDFs from ECI...',
+        totalParts: selectedParts.length,
+        pdfDownloaded: 0,
+        pdfTotal: 0,
+        pdfSizeKB: 0,
+        votersExtracted: 0,
+        pagesProcessed: 0,
+        totalPages: 0,
+        percent: 5
+    });
 
-        // Send progressId immediately so frontend can start polling
-        // We'll use it in the response, but also need it accessible via query
-
-        // Step 1: Generate PDFs using direct API
-        logger.info('Assembly: Requesting PDF generation from ECI API...');
+    logger.info('Assembly: Requesting PDF generation from ECI API...');
         
         const pdfResult = await generatePublishedPDFs({
             stateCode,
@@ -554,55 +573,94 @@ export const extractVoters = async (req, res) => {
         });
         cleanupProgress(progressId);
 
-        const responseData = {
-            success: true,
-            status: 'success',
-            data: {
-                totalVoters: allVoterSnippets.length,
-                voters: shouldCreatePreviewSession ? [] : allVoterSnippets,
-                voterImages: allVoterSnippets.length,
-                pdfUrls: pdfResult.pdfUrls,
-                downloadedPdfPaths: downloadedPDFs,
-                slipFile: slipFileInfo?.fileName ? `/voter-slips/${slipFileInfo.fileName}` : null,
-                slipFileHtml: slipFileInfo?.htmlFileName ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
-                slipFilePdf: slipFileInfo?.pdfFileName ? `/voter-slips/${slipFileInfo.pdfFileName}` : null,
-                previewSlipFilePdf: previewSlipFileInfo?.pdfFileName ? `/voter-slips/${previewSlipFileInfo.pdfFileName}` : null,
-                selectedParts: selectedParts.length,
-                constituency,
-                district,
-                stateCode,
-                extractionMethod: 'image-snippet',
-                previewId: previewSessionInfo ? previewSessionInfo.previewId : null,
-                previewExpiresAt: previewSessionInfo ? previewSessionInfo.expiresAt : null
-            },
-            message: `Successfully extracted ${allVoterSnippets.length} voter images from ${downloadedPDFs.length} PDF(s)`
-        };
+    return {
+        success: true,
+        status: 'success',
+        data: {
+            totalVoters: allVoterSnippets.length,
+            voters: shouldCreatePreviewSession ? [] : allVoterSnippets,
+            voterImages: allVoterSnippets.length,
+            pdfUrls: pdfResult.pdfUrls,
+            downloadedPdfPaths: downloadedPDFs,
+            slipFile: slipFileInfo?.fileName ? `/voter-slips/${slipFileInfo.fileName}` : null,
+            slipFileHtml: slipFileInfo?.htmlFileName ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
+            slipFilePdf: slipFileInfo?.pdfFileName ? `/voter-slips/${slipFileInfo.pdfFileName}` : null,
+            previewSlipFilePdf: previewSlipFileInfo?.pdfFileName ? `/voter-slips/${previewSlipFileInfo.pdfFileName}` : null,
+            selectedParts: selectedParts.length,
+            constituency,
+            district,
+            stateCode,
+            extractionMethod: 'image-snippet',
+            previewId: previewSessionInfo ? previewSessionInfo.previewId : null,
+            previewExpiresAt: previewSessionInfo ? previewSessionInfo.expiresAt : null
+        },
+        message: `Successfully extracted ${allVoterSnippets.length} voter images from ${downloadedPDFs.length} PDF(s)`
+    };
+}
 
-        res.json(responseData);
-
+/**
+ * Extract voters using Direct ECI API
+ */
+export const extractVoters = async (req, res) => {
+    const progressId = req.body?.captchaId || `asm_${Date.now()}_${crypto.randomUUID()}`;
+    try {
+        const responseData = await runExtractionJob(req.body, progressId);
+        cleanupProgress(progressId);
+        return res.json(responseData);
     } catch (error) {
-        logger.error('Assembly: Error extracting voters:', error);
-        logger.error('Assembly: Error stack:', error.stack);
-        
-        let errorMessage = 'Failed to extract voter data';
-        let errorDetails = error.message;
-        
-        if (error.message.includes('Captcha') || error.message.includes('captcha')) {
-            errorMessage = 'Invalid captcha. Please try again with correct captcha text.';
-        } else if (error.message.includes('PDF')) {
-            errorMessage = 'Failed to download or parse PDF files. Please try again.';
-        } else if (error.response) {
-            logger.error('Assembly: Error response:', error.response.data);
-            errorDetails = JSON.stringify(error.response.data);
-        }
-        
-        res.status(500).json({
-            status: 'error',
-            message: errorMessage,
-            error: errorDetails,
-            details: error.response?.data || error.message
-        });
+        const normalized = normalizeExtractionError(error);
+        cleanupProgress(progressId);
+        return res.status(normalized.statusCode).json(normalized.body);
     }
+};
+
+export const extractVotersAsync = async (req, res) => {
+    const progressId = req.body?.captchaId || `asm_${Date.now()}_${crypto.randomUUID()}`;
+
+    updateProgress(progressId, {
+        status: 'queued',
+        stage: 'queued',
+        stageLabel: 'Preparing extraction job...',
+        percent: 1,
+        totalParts: Array.isArray(req.body?.selectedParts) ? req.body.selectedParts.length : 0,
+        votersExtracted: 0,
+        pdfDownloaded: 0,
+        pdfTotal: 0,
+        pdfSizeKB: 0
+    });
+
+    setImmediate(async () => {
+        try {
+            const responseData = await runExtractionJob(req.body, progressId);
+            updateProgress(progressId, {
+                status: 'complete',
+                stage: 'complete',
+                stageLabel: responseData.message,
+                votersExtracted: responseData.data?.totalVoters || 0,
+                percent: 100,
+                result: responseData
+            });
+        } catch (error) {
+            const normalized = normalizeExtractionError(error);
+            updateProgress(progressId, {
+                status: 'error',
+                stage: 'failed',
+                stageLabel: normalized.body.message,
+                errorMessage: normalized.body.message,
+                error: normalized.body.error,
+                details: normalized.body.details,
+                percent: 100
+            });
+        } finally {
+            cleanupProgress(progressId);
+        }
+    });
+
+    return res.status(202).json({
+        status: 'accepted',
+        progressId,
+        message: 'Extraction started'
+    });
 };
 
 /**

@@ -1574,7 +1574,7 @@
             }
         }
 
-        function startProgressTracker(numParts, captchaId) {
+        function startProgressTracker(numParts) {
             progressStartTime = Date.now();
             const estSecondsPerPart = 8;
             const baseTime = 12;
@@ -1603,18 +1603,42 @@
                     document.getElementById('timeRemaining').textContent = 'Almost done...';
                 }
             }, 500);
+        }
 
-            // Poll server for real-time progress
-            if (progressPollInterval) clearInterval(progressPollInterval);
-            progressPollInterval = setInterval(async () => {
+        async function waitForExtractionResult(progressId) {
+            const startedAt = Date.now();
+
+            while (true) {
                 try {
-                    const resp = await fetch(`${API_BASE}/extractionProgress/${encodeURIComponent(captchaId)}`);
-                    const result = await resp.json();
+                    const resp = await fetch(`${API_BASE}/extractionProgress/${encodeURIComponent(progressId)}`, {
+                        cache: 'no-store'
+                    });
+                    const result = await resp.json().catch(() => ({}));
+
                     if (result.status === 'ok' && result.progress) {
                         applyServerProgress(result.progress);
+
+                        if (result.progress.status === 'complete' && result.progress.result) {
+                            return result.progress.result;
+                        }
+
+                        if (result.progress.status === 'error') {
+                            throw new Error(result.progress.errorMessage || result.progress.error || 'Extraction failed');
+                        }
                     }
-                } catch (e) { /* ignore */ }
-            }, 700);
+
+                    if (result.status === 'not_found' && Date.now() - startedAt > 15000) {
+                        throw new Error('Extraction job not found. Please retry.');
+                    }
+                } catch (pollError) {
+                    if (pollError instanceof Error) {
+                        throw pollError;
+                    }
+                    throw new Error('Failed to fetch extraction progress');
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 1200));
+            }
         }
 
         function applyServerProgress(p) {
@@ -1703,11 +1727,10 @@
             document.getElementById('loading').classList.add('show');
             document.getElementById('loading').focus();
             document.getElementById('extract-btn').disabled = true;
-            startProgressTracker(state.selectedParts.length, state.captchaId);
             await requestWakeLock();
 
             try {
-                const response = await fetch(`${API_BASE}/extractVoters`, {
+                const response = await fetch(`${API_BASE}/extractVotersAsync`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1725,18 +1748,25 @@
                 });
 
                 const rawText = await response.text();
-                let data;
+                let jobStart;
                 try {
-                    data = JSON.parse(rawText);
+                    jobStart = JSON.parse(rawText);
                 } catch (parseErr) {
-                    // Server returned non-JSON (HTML error page, proxy timeout, etc.)
                     const snippet = rawText.substring(0, 200).replace(/<[^>]*>/g, '').trim();
                     throw new Error(`Server returned an unexpected response. ${snippet || '(no details)'}`);
                 }
 
                 if (!response.ok) {
-                    throw new Error(data.message || data.error || `Server error (${response.status})`);
+                    throw new Error(jobStart.message || jobStart.error || `Server error (${response.status})`);
                 }
+
+                if (!jobStart.progressId) {
+                    throw new Error('Failed to start extraction job');
+                }
+
+                startProgressTracker(state.selectedParts.length);
+
+                const data = await waitForExtractionResult(jobStart.progressId);
 
                 const isSuccess = data.success === true || data.status === 'success';
 
