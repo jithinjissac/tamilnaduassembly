@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assembly Election Voter Information Slips | EasySlip Kerala</title>
-    <meta name="description" content="Create professional voter information slips for Kerala Assembly Elections. All 140 constituencies. Preview slips and generate PDF.">
+    <title>Assembly Election Voter Information Slips | EasySlip Manipur</title>
+    <meta name="description" content="Create professional voter information slips for Manipur Assembly Elections. Preview slips and generate PDF.">
     
     <!-- Kerala Colors & Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -1035,8 +1035,8 @@
 
     <div class="container">
         <div class="page-title-wrap">
-            <h1 class="page-title"><i class="fas fa-landmark"></i> Assembly Election Voter Information Slips</h1>
-            <p class="page-subtitle">നിയമസഭാ തെരഞ്ഞെടുപ്പ് വോട്ടർ സ്ലിപ്പുകൾ</p>
+            <h1 class="page-title"><i class="fas fa-landmark"></i> Manipur Assembly Election Voter Information Slips</h1>
+            <p class="page-subtitle">Assembly election voter information slips (S22)</p>
         </div>
 
         <div class="form-container">
@@ -1102,9 +1102,9 @@
                 </div>
 
                 <form id="extraction-form">
-                    <input type="hidden" id="state" value="S11">
+                    <input type="hidden" id="state" value="S22">
                     <input type="hidden" id="year" value="2026">
-                    <input type="hidden" id="rollType" value="S11-2026-FIR-2">
+                    <input type="hidden" id="rollType" value="S22-2026-FIR">
                     <input type="hidden" id="language" value="en">
 
                     <div class="form-row">
@@ -1354,6 +1354,24 @@
         const MAX_SELECTED_PARTS = 2;
         const API_BASE = '/api/assembly';
 
+        function getExtractionConfig() {
+            return {
+                stateCode: document.getElementById('state').value,
+                year: document.getElementById('year').value,
+                rollType: document.getElementById('rollType').value,
+                language: document.getElementById('language').value || 'en'
+            };
+        }
+
+        function getStateNameByCode(stateCode) {
+            const names = {
+                S11: 'Kerala',
+                S22: 'Manipur',
+                S31: 'Tamil Nadu'
+            };
+            return names[stateCode] || stateCode;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             initSymbolPickerIntegration();
@@ -1401,7 +1419,12 @@
         // ─── Districts & Constituencies ─────────────────────────────────────
         async function loadDistricts() {
             try {
-                const response = await fetch('/api/dropdown/districts?state=S11');
+                const { stateCode } = getExtractionConfig();
+                const response = await fetch(`${API_BASE}/getDistricts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode })
+                });
                 const data = await response.json();
                 const select = document.getElementById('district');
                 select.innerHTML = '<option value="">Select District</option>';
@@ -1418,7 +1441,12 @@
 
         async function loadConstituencies(districtCode) {
             try {
-                const response = await fetch(`/api/dropdown/assembly-constituencies?state=S11&district=${districtCode}`);
+                const { stateCode, year, rollType } = getExtractionConfig();
+                const response = await fetch(`${API_BASE}/getConstituencies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stateCode, district: districtCode, year, rollType })
+                });
                 const data = await response.json();
                 const select = document.getElementById('constituency');
                 select.innerHTML = '<option value="">Select Constituency</option>';
@@ -1436,6 +1464,7 @@
 
         // ─── Polling Parts ──────────────────────────────────────────────────
         async function loadPollingParts() {
+            const { stateCode, year, rollType, language } = getExtractionConfig();
             const district = document.getElementById('district').value;
             const constituency = document.getElementById('constituency').value;
             if (!district || !constituency) { alert('Please select district and constituency first'); return; }
@@ -1443,7 +1472,7 @@
                 const response = await fetch('/api/assembly/getPollingParts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'S11-2026-FIR-2', district, constituency, language: 'en' })
+                    body: JSON.stringify({ stateCode, year, rollType, district, constituency, language })
                 });
                 const data = await response.json();
                 state.pollingParts = data.parts || [];
@@ -1502,13 +1531,14 @@
 
         // ─── Captcha ────────────────────────────────────────────────────────
         async function loadCaptcha() {
+            const { stateCode, year, rollType, language } = getExtractionConfig();
             const district = document.getElementById('district').value;
             const constituency = document.getElementById('constituency').value;
             try {
                 const response = await fetch('/api/assembly/getCaptcha', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'S11-2026-FIR-2', district, constituency, language: 'en' })
+                    body: JSON.stringify({ stateCode, year, rollType, district, constituency, language })
                 });
                 const data = await response.json();
                 state.captchaId = data.captchaId;
@@ -1727,6 +1757,7 @@
 
         // ─── Extract Voters ─────────────────────────────────────────────────
         async function extractVoters() {
+            const { stateCode, year, rollType, language } = getExtractionConfig();
             const districtEl = document.getElementById('district');
             const constituencyEl = document.getElementById('constituency');
             const district = districtEl.value;
@@ -1750,8 +1781,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        stateCode: 'S11', district, constituency, districtLabel, constituencyLabel,
-                        year: '2026', rollType: 'S11-2026-FIR-2', language: 'en',
+                        stateCode, district, constituency, districtLabel, constituencyLabel,
+                        year, rollType, language,
                         selectedParts: state.selectedParts,
                         captcha: captchaText, captchaId: state.captchaId,
                         useOCR: false,
@@ -1822,15 +1853,15 @@
                         },
                         body: JSON.stringify({
                             location: {
-                                state: 'Kerala',
-                                stateCode: 'S11',
+                                state: getStateNameByCode(stateCode),
+                                stateCode,
                                 district: districtSelect.options[districtSelect.selectedIndex]?.text || district,
                                 districtCode: district,
                                 constituency: constituencySelect.options[constituencySelect.selectedIndex]?.text || constituency,
                                 constituencyCode: constituency,
-                                year: '2026',
-                                rollType: 'S11-2026-FIR-2',
-                                language: 'en',
+                                year,
+                                rollType,
+                                language,
                                 selectedParts: state.selectedParts
                             },
                             voters: new Array(data.data.totalVoters), // Just pass length, images are in previewId

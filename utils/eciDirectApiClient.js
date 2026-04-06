@@ -9,15 +9,15 @@ import { logger } from './logger.js';
 
 const BASE_URL = 'https://gateway-voters.eci.gov.in';
 
-const DEFAULT_ROLL_TYPE_REF_ID = 'S11-2026-FIR-2';
+const DEFAULT_ROLL_TYPE_REF_ID = 'S11-2026-FIR';
 
 function normalizeRollTypeRefId(rollType, stateCode, year) {
-    if (typeof rollType === 'string' && /^S\d+-\d{4}-[A-Z]+-\d+$/i.test(rollType)) {
+    if (typeof rollType === 'string' && /^S\d+-\d{4}-[A-Z]+(?:-\d+)?$/i.test(rollType)) {
         return rollType;
     }
 
     if (rollType === 'SIR-FinalRoll' || rollType === 'FinalRoll') {
-        return `${stateCode}-${year}-FIR-2`;
+        return `${stateCode}-${year}-FIR`;
     }
 
     if (rollType === 'SupplementRoll') {
@@ -27,7 +27,7 @@ function normalizeRollTypeRefId(rollType, stateCode, year) {
     return rollType || DEFAULT_ROLL_TYPE_REF_ID;
 }
 
-function extractRevisionNo(rollTypeRefId, fallback = 2) {
+function extractRevisionNo(rollTypeRefId, fallback = 1) {
     const match = String(rollTypeRefId || '').match(/-(\d+)$/);
     return match ? Number(match[1]) : fallback;
 }

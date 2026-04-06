@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - EasySlip | Kerala Local Body Election Voter Information Slip Generator</title>
+    <title>Dashboard - EasySlip | Manipur Assembly Election Voter Information Slip Generator</title>
     
     <!-- Open Graph / WhatsApp -->
     <meta property="og:type" content="website">
@@ -691,19 +691,19 @@ s0.parentNode.insertBefore(s1,s0);
             <br>
             <div class="btn-group" id="actionButtons">
                 <!-- Local Body buttons (default) -->
-                <a href="create-slip.html" class="btn btn-create" id="btnLocalBody">
+                <a href="create-slip.html" class="btn btn-create" id="btnLocalBody" style="display: none;">
                     <i class="fas fa-plus"></i> Create New Slip
                     <span class="btn-label">ഒരു ചിഹ്നം മാത്രം</span>
                 </a>
-                <a href="create-multi-slip.html" class="btn btn-multi" id="btnMultiSymbol">
+                <a href="create-multi-slip.html" class="btn btn-multi" id="btnMultiSymbol" style="display: none;">
                     <i class="fas fa-layer-group"></i> Multi-Symbol Slip
                     <span class="btn-label">ഒരു സ്ലിപ്പിൽ മൂന്ന് ചിഹ്നം വരെ</span>
                     <span class="new-badge">NEW</span>
                 </a>
-                <!-- Assembly button (hidden by default) -->
-                <a href="assembly-slips.html" class="btn btn-create" id="btnAssembly" style="display: none;">
-                    <i class="fas fa-landmark"></i> Create Assembly Slip
-                    <span class="btn-label">നിയമസഭാ തിരഞ്ഞെടുപ്പ് സ്ലിപ്പ്</span>
+                <!-- Assembly button -->
+                <a href="assembly-slips.html" class="btn btn-create" id="btnAssembly">
+                    <i class="fas fa-landmark"></i> Create Manipur Assembly Slip
+                    <span class="btn-label">Assembly election slip</span>
                 </a>
                 <a href="payment-status.html" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
                     <i class="fas fa-search-dollar"></i> Verify Payment
@@ -794,7 +794,7 @@ s0.parentNode.insertBefore(s1,s0);
     <script>
         let allOrders = [];
         let currentFilter = 'all';
-        let primaryModule = 'local-body'; // default
+        let primaryModule = 'assembly';
 
         // Fetch primary election module setting
         async function loadElectionModule() {
@@ -802,11 +802,13 @@ s0.parentNode.insertBefore(s1,s0);
                 const response = await fetch('/api/settings/election-module');
                 if (response.ok) {
                     const data = await response.json();
-                    primaryModule = data.settings?.primaryElectionModule || 'local-body';
+                    primaryModule = data.settings?.primaryElectionModule || 'assembly';
                 }
             } catch (e) {
                 console.warn('Could not fetch election module setting, using default');
             }
+            // Tamil Nadu branch is assembly-only.
+            primaryModule = 'assembly';
             applyModuleUI();
         }
 

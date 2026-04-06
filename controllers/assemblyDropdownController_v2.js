@@ -221,6 +221,78 @@ export const getDistricts = async (req, res) => {
             cache.districts = districts;
             return res.json({ status: 'success', districts });
         }
+
+        // Tamil Nadu (S31) districts (ECI district code format: S31XX)
+        if (stateCode === 'S31') {
+            const districts = [
+                { value: 'S3101', text: 'ARIYALUR' },
+                { value: 'S3102', text: 'CHENGALPATTU' },
+                { value: 'S3103', text: 'CHENNAI' },
+                { value: 'S3104', text: 'COIMBATORE' },
+                { value: 'S3105', text: 'CUDDALORE' },
+                { value: 'S3106', text: 'DHARMAPURI' },
+                { value: 'S3107', text: 'DINDIGUL' },
+                { value: 'S3108', text: 'ERODE' },
+                { value: 'S3109', text: 'KALLAKURICHI' },
+                { value: 'S3110', text: 'KANCHIPURAM' },
+                { value: 'S3111', text: 'KANNIYAKUMARI' },
+                { value: 'S3112', text: 'KARUR' },
+                { value: 'S3113', text: 'KRISHNAGIRI' },
+                { value: 'S3114', text: 'MADURAI' },
+                { value: 'S3115', text: 'MAYILADUTHURAI' },
+                { value: 'S3116', text: 'NAGAPATTINAM' },
+                { value: 'S3117', text: 'NAMAKKAL' },
+                { value: 'S3118', text: 'NILGIRIS' },
+                { value: 'S3119', text: 'PERAMBALUR' },
+                { value: 'S3120', text: 'PUDUKKOTTAI' },
+                { value: 'S3121', text: 'RAMANATHAPURAM' },
+                { value: 'S3122', text: 'RANIPET' },
+                { value: 'S3123', text: 'SALEM' },
+                { value: 'S3124', text: 'SIVAGANGA' },
+                { value: 'S3125', text: 'TENKASI' },
+                { value: 'S3126', text: 'THANJAVUR' },
+                { value: 'S3127', text: 'THENI' },
+                { value: 'S3128', text: 'THOOTHUKUDI' },
+                { value: 'S3129', text: 'TIRUCHIRAPPALLI' },
+                { value: 'S3130', text: 'TIRUNELVELI' },
+                { value: 'S3131', text: 'TIRUPATHUR' },
+                { value: 'S3132', text: 'TIRUPPUR' },
+                { value: 'S3133', text: 'TIRUVALLUR' },
+                { value: 'S3134', text: 'TIRUVANNAMALAI' },
+                { value: 'S3135', text: 'TIRUVARUR' },
+                { value: 'S3136', text: 'VELLORE' },
+                { value: 'S3137', text: 'VILLUPURAM' },
+                { value: 'S3138', text: 'VIRUDHUNAGAR' }
+            ];
+
+            cache.districts = districts;
+            return res.json({ status: 'success', districts });
+        }
+
+        // Manipur (S22) districts
+        if (stateCode === 'S22') {
+            const districts = [
+                { value: 'S2201', text: 'BISHNUPUR' },
+                { value: 'S2202', text: 'CHANDEL' },
+                { value: 'S2203', text: 'CHURACHANDPUR' },
+                { value: 'S2204', text: 'IMPHAL EAST' },
+                { value: 'S2205', text: 'IMPHAL WEST' },
+                { value: 'S2206', text: 'JIRIBAM' },
+                { value: 'S2207', text: 'KAKCHING' },
+                { value: 'S2208', text: 'KAMJONG' },
+                { value: 'S2209', text: 'KANGPOKPI' },
+                { value: 'S2210', text: 'NONEY' },
+                { value: 'S2211', text: 'PHERZAWL' },
+                { value: 'S2212', text: 'SENAPATI' },
+                { value: 'S2213', text: 'TAMENGLONG' },
+                { value: 'S2214', text: 'TENGNOUPAL' },
+                { value: 'S2215', text: 'THOUBAL' },
+                { value: 'S2216', text: 'UKHRUL' }
+            ];
+
+            cache.districts = districts;
+            return res.json({ status: 'success', districts });
+        }
         
         // For other states, return error (need to implement)
         res.status(501).json({
@@ -442,6 +514,31 @@ export const getAssemblyConstituencies = async (req, res) => {
             ]
         };
         
+        // Tamil Nadu: provide full AC list (1..234). ECI API operations later use AC number.
+        if (stateCode === 'S31') {
+            const constituencies = Array.from({ length: 234 }, (_, idx) => {
+                const acNo = idx + 1;
+                return {
+                    value: String(acNo),
+                    text: `${acNo} - ASSEMBLY CONSTITUENCY ${acNo}`
+                };
+            });
+
+            return res.json({ status: 'success', constituencies });
+        }
+
+        if (stateCode === 'S22') {
+            const constituencies = Array.from({ length: 60 }, (_, idx) => {
+                const acNo = idx + 1;
+                return {
+                    value: String(acNo),
+                    text: `${acNo} - ASSEMBLY CONSTITUENCY ${acNo}`
+                };
+            });
+
+            return res.json({ status: 'success', constituencies });
+        }
+
         const constituencies = keralaConstituencies[district] || [];
         
         if (constituencies.length === 0) {
