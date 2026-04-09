@@ -216,6 +216,12 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         '';
     const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
     const showSymbol = Boolean(resolvedSymbolImage);
+    const rawCandidatePhoto =
+        candidate?.candidatePhoto ||
+        metadata?.candidatePhoto ||
+        '';
+    const resolvedCandidatePhoto = resolveSymbolImageSrc(rawCandidatePhoto);
+    const showPhotoTemplate = Boolean(resolvedCandidatePhoto);
 
     const toDisplayName = (value) => {
         const raw = (value || '').toString().trim();
@@ -242,9 +248,17 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
         const slipsHTML = pageSlips.map(voter => {
             const pollingStationText = voter.pollingStation || voter.partName || pollingStationInfo || '';
             const serialNo = voter.serialNo || voter.sl_no || '';
-
-            return `
-            <div class="voter-slip">
+            const leftSection = showPhotoTemplate
+                ? `
+                <div class="slip-left photo-template">
+                    <div class="candidate-photo-frame">
+                        <img src="${resolvedCandidatePhoto}" alt="Candidate" class="candidate-photo-image">
+                    </div>
+                    ${showSymbol
+                        ? `<div class="small-symbol-overlay"><img src="${resolvedSymbolImage}" alt="Symbol" class="small-symbol-image"></div>`
+                        : ''}
+                </div>`
+                : `
                 <div class="slip-left">
                     <div class="slip-left-content">
                         ${showSymbol
@@ -262,7 +276,11 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
                         <div style="font-size:10pt; font-weight:800;">${voter.partNumber || ''}</div>
                         </div>`}
                     </div>
-                </div>
+                </div>`;
+
+            return `
+            <div class="voter-slip">
+                ${leftSection}
                 <div class="slip-right">
                     <div class="voter-image-container">
                         <img src="${voter.snippetBase64}" alt="Voter ${serialNo}" class="voter-image">
@@ -346,6 +364,46 @@ ${slipsHTML}
             justify-content: center; 
             gap: 0.3mm;
             width: 100%; 
+        }
+
+        .slip-left.photo-template {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .candidate-photo-frame {
+            width: 100%;
+            height: 100%;
+        }
+
+        .candidate-photo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .small-symbol-overlay {
+            position: absolute;
+            right: 1.2mm;
+            bottom: 1.2mm;
+            width: 10mm;
+            height: 10mm;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 1mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8mm;
+        }
+
+        .small-symbol-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
         
         .serial-label { 
