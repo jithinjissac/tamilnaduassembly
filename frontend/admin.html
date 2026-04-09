@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Kerala SEC Voter Information Slips</title>
+    <title>Admin Dashboard - Tamil Nadu SEC Voter Information Slips</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
@@ -2712,7 +2712,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             <div class="settings-form-wrapper" style="margin-top: 1.5rem;">
                 <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
                     <p style="margin: 0; color: #856404;">
-                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> This popup is shown when the Kerala SEC website (sec.kerala.gov.in) is unavailable or returns an error. Customize the message to inform users about the situation.
+                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> This popup is shown when the Tamil Nadu SEC website (sec.kerala.gov.in) is unavailable or returns an error. Customize the message to inform users about the situation.
                     </p>
                 </div>
 
@@ -2734,7 +2734,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                             <h4 style="margin: 0 0 0.75rem 0; color: #0c4a6e;"><i class="fas fa-eye"></i> Preview</h4>
                             <div style="background: white; padding: 1.5rem; border-radius: 8px; border: 2px solid #0284c7;">
                                 <h3 style="margin: 0 0 1rem 0; color: #dc2626;" id="sec-error-preview-title">SEC Website Unavailable</h3>
-                                <p style="margin: 0; color: #333; white-space: pre-wrap;" id="sec-error-preview-message">The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.</p>
+                                <p style="margin: 0; color: #333; white-space: pre-wrap;" id="sec-error-preview-message">The Tamil Nadu State Election Commission website is currently experiencing technical difficulties. Please try again after some time.</p>
                             </div>
                         </div>
                     </div>
@@ -6234,14 +6234,14 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 .replace(/\{\{district\}\}/g, sampleOrder.district)
                 .replace(/\{\{localBody\}\}/g, sampleOrder.localBody);
 
-            // Kerala theme colors
+            // Tamil Nadu theme colors
             const keralaGreen = '#006D3B';
             const keralaGold = '#FFB81C';
             const keralaRed = '#E03A3E';
             const keralaCream = '#FFF8DC';
 
             document.getElementById('emailPreview').innerHTML = `
-                <!-- Kerala Border Pattern -->
+                <!-- Tamil Nadu Border Pattern -->
                 <div style="height: 8px; background: linear-gradient(to right, ${keralaGreen} 0%, ${keralaGreen} 33.33%, ${keralaGold} 33.33%, ${keralaGold} 66.66%, ${keralaRed} 66.66%, ${keralaRed} 100%);"></div>
                 
                 <!-- Header -->
@@ -6263,7 +6263,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 
                 <!-- Footer -->
                 <div style="background: ${keralaCream}; padding: 25px 20px; text-align: center; font-size: 13px; color: #555; font-family: 'Noto Sans Malayalam', Arial, sans-serif;">
-                    <p style="margin: 0 0 8px 0; font-weight: 600; color: ${keralaGreen};">EASYSLIP - Kerala Election Voter Information Slip Service</p>
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: ${keralaGreen};">EASYSLIP - Tamil Nadu Election Voter Information Slip Service</p>
                     <p style="margin: 0 0 8px 0;">🌐 <a href="https://easyslip.in" style="color: ${keralaGreen}; text-decoration: none;">https://easyslip.in</a></p>
                     <p style="margin: 0; color: #777;">&copy; 2025 EASYSLIP. All rights reserved.</p>
                 </div>
@@ -6930,7 +6930,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
                 const settings = await response.json();
                 
                 document.getElementById('sec-error-title').value = settings.title || 'SEC Website Unavailable';
-                document.getElementById('sec-error-message').value = settings.message || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
+                document.getElementById('sec-error-message').value = settings.message || 'The Tamil Nadu State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
                 
                 // Update preview
                 updateSECErrorPreview();
@@ -6945,7 +6945,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
             try {
                 const settings = {
                     title: document.getElementById('sec-error-title').value.trim() || 'SEC Website Unavailable',
-                    message: document.getElementById('sec-error-message').value.trim() || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.'
+                    message: document.getElementById('sec-error-message').value.trim() || 'The Tamil Nadu State Election Commission website is currently experiencing technical difficulties. Please try again after some time.'
                 };
 
                 const response = await fetch('/api/settings/secError', {
@@ -6970,7 +6970,7 @@ Login to https://easyslip.in to download your PDF.</textarea>
 
         function updateSECErrorPreview() {
             const title = document.getElementById('sec-error-title').value.trim() || 'SEC Website Unavailable';
-            const message = document.getElementById('sec-error-message').value.trim() || 'The Kerala State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
+            const message = document.getElementById('sec-error-message').value.trim() || 'The Tamil Nadu State Election Commission website is currently experiencing technical difficulties. Please try again after some time.';
             
             document.getElementById('sec-error-preview-title').textContent = title;
             document.getElementById('sec-error-preview-message').textContent = message;
