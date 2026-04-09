@@ -53,6 +53,31 @@ const PORT = process.env.PORT || 8080;
 console.log(`🚀 Starting server on port ${PORT}...`);
 console.log(`📍 Node environment: ${process.env.NODE_ENV || 'development'}`);
 
+// Health endpoints are registered first so platform probes never depend on heavy middleware/routes.
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    uptime: process.uptime(),
+    timestamp: Date.now()
+  });
+});
+
+app.get('/ready', (req, res) => {
+  const dbReady = mongoose.connection.readyState === 1;
+  if (dbReady) {
+    return res.status(200).json({
+      status: 'ready',
+      database: 'connected',
+      uptime: process.uptime()
+    });
+  }
+
+  return res.status(503).json({
+    status: 'not ready',
+    database: 'disconnected'
+  });
+});
+
 // Database connection moved to after server starts (non-blocking)
 
 // Log browser automation setup (completely non-blocking - deferred)
@@ -359,32 +384,6 @@ app.use('/api/assembly', assemblyRoutes);
 // Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-});
-
-// Optimized health check endpoint (no DB check for fast response)
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    uptime: process.uptime(),
-    timestamp: Date.now()
-  });
-});
-
-// Readiness check (includes DB status)
-app.get('/ready', (req, res) => {
-  const dbReady = mongoose.connection.readyState === 1;
-  if (dbReady) {
-    res.status(200).json({ 
-      status: 'ready', 
-      database: 'connected',
-      uptime: process.uptime() 
-    });
-  } else {
-    res.status(503).json({ 
-      status: 'not ready', 
-      database: 'disconnected' 
-    });
-  }
 });
 
 // Debug endpoint to check captcha directory status
