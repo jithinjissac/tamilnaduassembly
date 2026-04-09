@@ -2306,6 +2306,12 @@
                 hasPhoto: !!candidate.candidatePhoto,
                 photoLength: candidate.candidatePhoto ? candidate.candidatePhoto.length : 0
             });
+            console.log('🔍 CANDIDATE DETAILS:', {
+                symbol: candidate.symbol ? 'YES' : 'NO',
+                symbolName: candidate.symbolName,
+                candidatePhoto: candidate.candidatePhoto ? `YES (${candidate.candidatePhoto.substring(0, 50)}...)` : 'NO'
+            });
+            
             const paymentBtn = document.getElementById('paymentBtn');
             const payBtnText = document.getElementById('payBtnText');
             try {

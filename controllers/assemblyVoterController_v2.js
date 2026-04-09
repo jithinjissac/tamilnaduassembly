@@ -447,7 +447,15 @@ async function runExtractionJob(body, progressId) {
         constituencyLabel = '',
     } = body;
 
-    const resolvedDistrict = resolveDistrictCode(stateCode, constituency, district);
+    // DEBUG: Log what we received
+    logger.info('🎯 extractVotersAsync - Received candidate:', {
+        candidateKeys: candidate ? Object.keys(candidate) : 'null/undefined',
+        hasSymbol: !!candidate?.symbol,
+        hasSymbolName: !!candidate?.symbolName,
+        hasCandidatePhoto: !!candidate?.candidatePhoto,
+        candidatePhotoLength: candidate?.candidatePhoto ? candidate.candidatePhoto.length : 0,
+        candidatePhotoStart: candidate?.candidatePhoto ? candidate.candidatePhoto.substring(0, 50) : 'N/A'
+    });
 
     if (!stateCode || !year || !rollType || !constituency || !language || !captcha || !captchaId || !resolvedDistrict) {
         throw createExtractionError('All fields including captcha and captcha ID are required', 400);
@@ -779,6 +787,13 @@ async function runExtractionJob(body, progressId) {
         let previewSlipFileInfo = null;
         if (shouldCreatePreviewSession) {
             const previewVoters = allVoterSnippets.slice(0, 10);
+
+            // DEBUG: Log what will be stored in preview
+            logger.info('💾 Creating preview session with candidate:', {
+                candidateKeys: candidate ? Object.keys(candidate) : 'null',
+                hasCandidatePhoto: !!candidate?.candidatePhoto,
+                photoLength: candidate?.candidatePhoto ? candidate.candidatePhoto.length : 0
+            });
 
             previewSessionInfo = createPreviewSession({
                 orderId: `ASM-${Date.now()}`,

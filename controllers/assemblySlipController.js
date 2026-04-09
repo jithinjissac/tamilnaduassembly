@@ -61,6 +61,14 @@ export const generateSlipsWithCandidates = async (req, res) => {
                 });
             }
 
+            // DEBUG: Log what we retrieved from preview
+            logger.info('📦 Retrieved preview payload:', {
+                hasVoters: previewPayload.voters && previewPayload.voters.length > 0,
+                candidateKeys: previewPayload.candidate ? Object.keys(previewPayload.candidate) : 'null',
+                hasCandidatePhoto: !!previewPayload.candidate?.candidatePhoto,
+                photoLength: previewPayload.candidate?.candidatePhoto ? previewPayload.candidate.candidatePhoto.length : 0
+            });
+
             voters = Array.isArray(previewPayload.voters) ? previewPayload.voters : [];
             candidate = previewPayload.candidate || candidate;
 
