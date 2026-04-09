@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 // Connect to MongoDB
-await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas');
+await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
 
 // Define Order schema
 const orderSchema = new mongoose.Schema({});
@@ -19,7 +19,7 @@ try {
   console.log(`Found ${ordersWithoutOrderId.length} orders without orderId`);
 
   if (ordersWithoutOrderId.length === 0) {
-    console.log('✅ All orders have orderId field');
+    console.log('âœ… All orders have orderId field');
   } else {
     console.log('\n=== Migrating Orders ===');
     
@@ -41,11 +41,11 @@ try {
       order.orderId = generatedOrderId;
       await order.save();
       
-      console.log(`   ✅ Updated`);
+      console.log(`   âœ… Updated`);
     }
     
     console.log('\n=== Migration Complete ===');
-    console.log(`✅ Updated ${ordersWithoutOrderId.length} orders`);
+    console.log(`âœ… Updated ${ordersWithoutOrderId.length} orders`);
   }
 
   // Verify all orders now have orderId
@@ -62,6 +62,7 @@ try {
   console.error(error);
 } finally {
   await mongoose.disconnect();
-  console.log('\n✅ Disconnected from MongoDB');
+  console.log('\nâœ… Disconnected from MongoDB');
   process.exit(0);
 }
+

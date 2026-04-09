@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
  * Verification Script - Check if Download Will Work
@@ -24,10 +24,10 @@ const YELLOW = '\x1b[33m';
 const BLUE = '\x1b[34m';
 
 const log = {
-  ok: (msg) => console.log(`${GREEN}✅${RESET} ${msg}`),
-  err: (msg) => console.log(`${RED}❌${RESET} ${msg}`),
-  warn: (msg) => console.log(`${YELLOW}⚠️${RESET} ${msg}`),
-  info: (msg) => console.log(`${BLUE}ℹ️${RESET} ${msg}`),
+  ok: (msg) => console.log(`${GREEN}âœ…${RESET} ${msg}`),
+  err: (msg) => console.log(`${RED}âŒ${RESET} ${msg}`),
+  warn: (msg) => console.log(`${YELLOW}âš ï¸${RESET} ${msg}`),
+  info: (msg) => console.log(`${BLUE}â„¹ï¸${RESET} ${msg}`),
 };
 
 try {
@@ -35,7 +35,7 @@ try {
 
   // Connect to MongoDB
   log.info('Connecting to MongoDB...');
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas');
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
   log.ok('MongoDB connected\n');
 
   // Check order
@@ -145,3 +145,4 @@ try {
   await mongoose.disconnect();
   process.exit(0);
 }
+

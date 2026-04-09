@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 // Connect to MongoDB
-await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas');
+await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
 
 const orderSchema = new mongoose.Schema({}, { strict: false });
 const Order = mongoose.model('Order', orderSchema, 'orders');
@@ -22,11 +22,11 @@ try {
   const order = await Order.findOne({ orderId, userId }).lean();
   
   if (!order) {
-    console.log('  ❌ Order not found!');
+    console.log('  âŒ Order not found!');
     process.exit(1);
   }
   
-  console.log('  ✅ Order found');
+  console.log('  âœ… Order found');
   console.log(`  Total voters: ${order.totalVoters}`);
   console.log(`  Payment status: ${order.paymentStatus}`);
   console.log(`  Has customization: ${!!order.customization}`);
@@ -50,14 +50,14 @@ try {
     console.log(`  Location (search): ${order.location.search || 'MISSING'}`);
   }
   
-  console.log('\n✅ Order structure looks COMPLETE');
+  console.log('\nâœ… Order structure looks COMPLETE');
   console.log('\nStep 4: Now testing actual download endpoint...\n');
   
   // Test the download
   const fetch = (await import('node-fetch')).default;
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTBlNTc1YjVkNTQyYjU3ZjY4MmYzYmYiLCJpYXQiOjE3NjI3MTkxOTgsImV4cCI6MTc2NTMxMTE5OH0.PLuU54gG-Wg1VF_v1zNpBE5KyP36FAa3jloEpwJ1tJA';
   
-  console.log(`📡 Calling: GET /api/slips/download/${orderId}`);
+  console.log(`ðŸ“¡ Calling: GET /api/slips/download/${orderId}`);
   console.log(`   Token: ${token.substring(0, 20)}...`);
   
   const response = await fetch(`http://localhost:3000/api/slips/download/${orderId}`, {
@@ -68,30 +68,31 @@ try {
     timeout: 60000
   });
   
-  console.log(`\n📡 Response received:`);
+  console.log(`\nðŸ“¡ Response received:`);
   console.log(`   Status: ${response.status} ${response.statusText}`);
   console.log(`   Content-Type: ${response.headers.get('content-type')}`);
   console.log(`   Content-Length: ${response.headers.get('content-length')}`);
   
   if (response.ok) {
     const buffer = await response.buffer();
-    console.log(`\n✅ DOWNLOAD SUCCESSFUL!`);
+    console.log(`\nâœ… DOWNLOAD SUCCESSFUL!`);
     console.log(`   PDF Size: ${buffer.length} bytes`);
     console.log(`   PDF Signature: ${buffer.slice(0, 4).toString('ascii')}`);
     
     if (buffer.slice(0, 4).toString('ascii') === '%PDF') {
-      console.log(`   ✅ Valid PDF format`);
+      console.log(`   âœ… Valid PDF format`);
     }
   } else {
-    console.log(`\n❌ Download failed`);
+    console.log(`\nâŒ Download failed`);
     const text = await response.text();
     console.log(`   Response: ${text.substring(0, 500)}`);
   }
 
 } catch (error) {
-  console.error('\n❌ Error:', error.message);
+  console.error('\nâŒ Error:', error.message);
   console.error(error.stack);
 } finally {
   await mongoose.disconnect();
   process.exit(0);
 }
+

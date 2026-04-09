@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import User from './models/User.js';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/kerala-sec-api';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas';
 
 async function createTestUser() {
     try {
         await mongoose.connect(MONGODB_URI);
-        console.log('✅ Connected to MongoDB');
+        console.log('âœ… Connected to MongoDB');
 
         // Create a test user
         const testUser = new User({
@@ -20,8 +20,8 @@ async function createTestUser() {
         });
 
         await testUser.save();
-        console.log('✅ Test user created successfully!');
-        console.log('\n📋 Test User Credentials:');
+        console.log('âœ… Test user created successfully!');
+        console.log('\nðŸ“‹ Test User Credentials:');
         console.log('Email:    test@example.com');
         console.log('Password: test123');
         console.log('Role:     user');
@@ -29,15 +29,16 @@ async function createTestUser() {
         // Verify password
         const verifyUser = await User.findOne({ email: 'test@example.com' });
         const isMatch = await verifyUser.comparePassword('test123');
-        console.log(`\n🔐 Password verification: ${isMatch ? '✅ SUCCESS' : '❌ FAILED'}`);
+        console.log(`\nðŸ” Password verification: ${isMatch ? 'âœ… SUCCESS' : 'âŒ FAILED'}`);
 
         await mongoose.connection.close();
-        console.log('\n✅ Done!');
+        console.log('\nâœ… Done!');
         
     } catch (error) {
-        console.error('❌ Error:', error.message);
+        console.error('âŒ Error:', error.message);
         process.exit(1);
     }
 }
 
 createTestUser();
+

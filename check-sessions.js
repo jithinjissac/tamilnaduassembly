@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
 async function checkSessions() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/kerala-voter-db');
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
         console.log('Connected to MongoDB');
         
         const { default: UserSession } = await import('./models/UserSession.js');

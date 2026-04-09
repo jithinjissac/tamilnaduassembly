@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas');
+await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
 
 const orderSchema = new mongoose.Schema({}, { strict: false });
 const Order = mongoose.model('Order', orderSchema, 'orders');
@@ -33,9 +33,9 @@ try {
       .map(([field]) => field);
     
     if (missing.length === 0) {
-      console.log(`   ✅ COMPATIBLE - Can download`);
+      console.log(`   âœ… COMPATIBLE - Can download`);
     } else {
-      console.log(`   ❌ INCOMPLETE - Missing: ${missing.join(', ')}`);
+      console.log(`   âŒ INCOMPLETE - Missing: ${missing.join(', ')}`);
     }
     
     console.log(`   Voters: ${order.totalVoters || 0}`);
@@ -52,13 +52,13 @@ try {
   );
   
   console.log(`\n=== SUMMARY ===`);
-  console.log(`✅ ${compatible.length} orders can download`);
-  console.log(`❌ ${orders.length - compatible.length} orders missing data`);
+  console.log(`âœ… ${compatible.length} orders can download`);
+  console.log(`âŒ ${orders.length - compatible.length} orders missing data`);
   
   if (compatible.length === orders.length) {
-    console.log(`\n🎉 ALL orders are compatible with download feature!`);
+    console.log(`\nðŸŽ‰ ALL orders are compatible with download feature!`);
   } else {
-    console.log(`\n⚠️ Some orders may need data migration`);
+    console.log(`\nâš ï¸ Some orders may need data migration`);
   }
 
 } catch (error) {
@@ -67,3 +67,4 @@ try {
   await mongoose.disconnect();
   process.exit(0);
 }
+

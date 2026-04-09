@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 // Connect to MongoDB
-await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/voter-slip-saas');
+await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
 
 const orderSchema = new mongoose.Schema({}, { strict: false });
 const Order = mongoose.model('Order', orderSchema, 'orders');
@@ -30,3 +30,4 @@ try {
   await mongoose.disconnect();
   process.exit(0);
 }
+

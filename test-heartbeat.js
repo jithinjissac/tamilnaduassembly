@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+﻿import fetch from 'node-fetch';
 
 async function testHeartbeat() {
     try {
@@ -22,7 +22,7 @@ async function testHeartbeat() {
         console.log('Heartbeat response:', result);
         
         if (result.status === 'success') {
-            console.log('✅ Heartbeat sent successfully');
+            console.log('âœ… Heartbeat sent successfully');
             console.log(`Session ID: ${result.sessionId}`);
             
             // Wait a moment then check the session
@@ -30,7 +30,7 @@ async function testHeartbeat() {
                 console.log('\nChecking session after heartbeat...');
                 
                 const mongoose = await import('mongoose');
-                await mongoose.default.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/kerala-voter-db');
+                await mongoose.default.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tn-voter-slip-saas');
                 
                 const { default: UserSession } = await import('./models/UserSession.js');
                 const session = await UserSession.findById(result.sessionId).lean();
@@ -45,14 +45,14 @@ async function testHeartbeat() {
                     const heartbeatAge = Math.floor((now - new Date(session.lastHeartbeat)) / 1000);
                     console.log(`  Heartbeat age: ${heartbeatAge} seconds`);
                 } else {
-                    console.log('❌ Session not found');
+                    console.log('âŒ Session not found');
                 }
                 
                 await mongoose.default.connection.close();
                 process.exit(0);
             }, 1000);
         } else {
-            console.log('❌ Heartbeat failed:', result);
+            console.log('âŒ Heartbeat failed:', result);
             process.exit(1);
         }
         
