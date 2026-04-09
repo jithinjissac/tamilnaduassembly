@@ -2300,6 +2300,12 @@
         // ─── Download ────────────────────────────────────────────────────────
         async function downloadSlips() {
             const candidate = state.candidate || { symbol: '', symbolName: '' };
+            console.log('📤 Sending to backend:', { 
+                candidate, 
+                voterCount: state.voterData.length,
+                hasPhoto: !!candidate.candidatePhoto,
+                photoLength: candidate.candidatePhoto ? candidate.candidatePhoto.length : 0
+            });
             const paymentBtn = document.getElementById('paymentBtn');
             const payBtnText = document.getElementById('payBtnText');
             try {

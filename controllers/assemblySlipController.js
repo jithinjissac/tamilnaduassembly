@@ -43,6 +43,14 @@ export const generateSlipsWithCandidates = async (req, res) => {
 
         let { voters, candidate, metadata } = req.body || {};
 
+        // DEBUG: Log incoming data
+        logger.info(`🔍 Received generateSlipsWithCandidates request:`, {
+            hasCandidate: !!candidate,
+            candidateKeys: candidate ? Object.keys(candidate) : [],
+            hasCandidatePhoto: candidate && !!candidate.candidatePhoto,
+            candidatePhotoLength: candidate && candidate.candidatePhoto ? candidate.candidatePhoto.length : 0
+        });
+
         // Assembly preview flow sends previewId; resolve payload from server store.
         if ((!Array.isArray(voters) || voters.length === 0) && previewId) {
             const previewPayload = getPreviewPayloadById(previewId);
@@ -83,6 +91,13 @@ export const generateSlipsWithCandidates = async (req, res) => {
             symbolName: '',
             ...(candidate || {})
         };
+
+        // DEBUG: Log normalized candidate
+        logger.info(`✅ After normalization:`, {
+            normalizedCandidateKeys: Object.keys(normalizedCandidate),
+            hasCandidatePhoto: !!normalizedCandidate.candidatePhoto,
+            candidatePhotoLength: normalizedCandidate.candidatePhoto ? normalizedCandidate.candidatePhoto.length : 0
+        });
 
         // Null-safe metadata extraction
         const constituency = (metadata?.constituency || 'Assembly').toString().replace(/\s+/g, '');
@@ -279,6 +294,16 @@ function generateSlipsHTML(voters, candidate, metadata) {
     const rawCandidatePhoto = candidate?.candidatePhoto || '';
     const resolvedCandidatePhoto = resolveSymbolImageSrc(rawCandidatePhoto);
     const showPhotoTemplate = Boolean(resolvedCandidatePhoto);
+
+    // DEBUG: Log photo template decision
+    if (voters.length > 0) {
+        logger.info('🖼️ Photo Template Decision:', {
+            rawCandidatePhotoExists: !!rawCandidatePhoto,
+            rawCandidatePhotoLength: rawCandidatePhoto ? rawCandidatePhoto.length : 0,
+            resolvedCandidatePhotoExists: !!resolvedCandidatePhoto,
+            showPhotoTemplate
+        });
+    }
 
     const pages = [];
     for (let i = 0; i < voters.length; i += slipsPerPage) {
