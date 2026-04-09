@@ -44,6 +44,72 @@
 				"scripts\\run-dom-sample.cmd"
 			],
 			"isBackground": false
+		},
+		{
+			"label": "Commit frontend changes",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"-C",
+				"d:\\tamilnadu-assembly-portal",
+				"add",
+				"frontend/index.html",
+				"frontend/contact.html"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Commit frontend changes no-profile",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"git -C 'd:\\tamilnadu-assembly-portal' add 'frontend/index.html' 'frontend/contact.html'; git -C 'd:\\tamilnadu-assembly-portal' commit -m \"Fix Tamil text encoding in index and update contact page\"; git -C 'd:\\tamilnadu-assembly-portal' log --oneline -n 1"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Commit frontend changes via cmd",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				"git -C \"d:\\tamilnadu-assembly-portal\" add \"frontend/index.html\" \"frontend/contact.html\" & git -C \"d:\\tamilnadu-assembly-portal\" commit -m \"Fix Tamil text encoding in index and update contact page\" & git -C \"d:\\tamilnadu-assembly-portal\" log --oneline -n 1"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Git add frontend files",
+			"type": "shell",
+			"command": "git -C \"d:\\tamilnadu-assembly-portal\" add \"frontend/index.html\" \"frontend/contact.html\"",
+			"group": "build"
+		},
+		{
+			"label": "Git commit frontend files",
+			"type": "shell",
+			"command": "git -C \"d:\\tamilnadu-assembly-portal\" commit -m FixTamilEncodingAndContactUpdate",
+			"group": "build"
+		},
+		{
+			"label": "Git show latest commit",
+			"type": "shell",
+			"command": "git -C \"d:\\tamilnadu-assembly-portal\" log --oneline -n 1",
+			"group": "build"
+		},
+		{
+			"label": "Apply light-dark logo assets",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/d",
+				"/c",
+				"copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\darklogo.png\" \"d:\\tamilnadu-assembly-portal\\frontend\\logo.png\" && copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\darklogo.png\" \"d:\\tamilnadu-assembly-portal\\frontend\\logo-dark.png\" && copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\logolight.png\" \"d:\\tamilnadu-assembly-portal\\frontend\\logo-light.png\" && copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\darklogo.png\" \"d:\\tamilnadu-assembly-portal\\frontend-protected\\logo.png\" && copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\darklogo.png\" \"d:\\tamilnadu-assembly-portal\\frontend-protected\\logo-dark.png\" && copy /Y \"d:\\tamilnadu-assembly-portal\\frontend\\logolight.png\" \"d:\\tamilnadu-assembly-portal\\frontend-protected\\logo-light.png\""
+			],
+			"group": "build"
 		}
 	]
 }
