@@ -1,0 +1,2422 @@
+{
+  "generatedAt": "2026-04-06T22:58:55.805Z",
+  "source": "ECI gateway API (district grouping) + ECI DOM extraction (AC/district names)",
+  "stateCode": "S22",
+  "stateName": "Tamil Nadu",
+  "rollTypeRefId": "SIR-FinalRoll",
+  "year": 2026,
+  "districtCount": 38,
+  "totalConstituencies": 234,
+  "districts": [
+    {
+      "districtCode": "S2201",
+      "districtName": "Thiruvallur",
+      "constituencies": [
+        {
+          "value": "1",
+          "text": "1 - Gummidipoondi",
+          "acNumber": 1,
+          "acName": "Gummidipoondi",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 344
+        },
+        {
+          "value": "2",
+          "text": "2 - Ponneri",
+          "acNumber": 2,
+          "acName": "Ponneri",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 327
+        },
+        {
+          "value": "3",
+          "text": "3 - Tiruttani",
+          "acNumber": 3,
+          "acName": "Tiruttani",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 337
+        },
+        {
+          "value": "4",
+          "text": "4 - Thiruvallur",
+          "acNumber": 4,
+          "acName": "Thiruvallur",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 335
+        },
+        {
+          "value": "5",
+          "text": "5 - Poonamallee",
+          "acNumber": 5,
+          "acName": "Poonamallee",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 452
+        },
+        {
+          "value": "6",
+          "text": "6 - Avadi",
+          "acNumber": 6,
+          "acName": "Avadi",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 499
+        },
+        {
+          "value": "7",
+          "text": "7 - Maduravoyal",
+          "acNumber": 7,
+          "acName": "Maduravoyal",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 482
+        },
+        {
+          "value": "8",
+          "text": "8 - Ambattur",
+          "acNumber": 8,
+          "acName": "Ambattur",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 364
+        },
+        {
+          "value": "9",
+          "text": "9 - Madavaram",
+          "acNumber": 9,
+          "acName": "Madavaram",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 521
+        },
+        {
+          "value": "10",
+          "text": "10 - Thiruvottiyur",
+          "acNumber": 10,
+          "acName": "Thiruvottiyur",
+          "districtCode": "S2201",
+          "districtName": "Thiruvallur",
+          "partCount": 344
+        }
+      ],
+      "constituencyCount": 10,
+      "error": null
+    },
+    {
+      "districtCode": "S2202",
+      "districtName": "Chennai",
+      "constituencies": [
+        {
+          "value": "11",
+          "text": "11 - Dr. Radhakrishnan Nagar",
+          "acNumber": 11,
+          "acName": "Dr. Radhakrishnan Nagar",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 246
+        },
+        {
+          "value": "12",
+          "text": "12 - Perambur",
+          "acNumber": 12,
+          "acName": "Perambur",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 298
+        },
+        {
+          "value": "13",
+          "text": "13 - Kolathur",
+          "acNumber": 13,
+          "acName": "Kolathur",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 286
+        },
+        {
+          "value": "14",
+          "text": "14 - Villivakkam",
+          "acNumber": 14,
+          "acName": "Villivakkam",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 255
+        },
+        {
+          "value": "15",
+          "text": "15 - Thiru-Vi-Ka-Nagar",
+          "acNumber": 15,
+          "acName": "Thiru-Vi-Ka-Nagar",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 223
+        },
+        {
+          "value": "16",
+          "text": "16 - Egmore",
+          "acNumber": 16,
+          "acName": "Egmore",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 200
+        },
+        {
+          "value": "17",
+          "text": "17 - Royapuram",
+          "acNumber": 17,
+          "acName": "Royapuram",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 194
+        },
+        {
+          "value": "18",
+          "text": "18 - Harbour",
+          "acNumber": 18,
+          "acName": "Harbour",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 192
+        },
+        {
+          "value": "19",
+          "text": "19 - Chepauk-Thiruvallikeni",
+          "acNumber": 19,
+          "acName": "Chepauk-Thiruvallikeni",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 235
+        },
+        {
+          "value": "20",
+          "text": "20 - Thousand Lights",
+          "acNumber": 20,
+          "acName": "Thousand Lights",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 247
+        },
+        {
+          "value": "21",
+          "text": "21 - Anna Nagar",
+          "acNumber": 21,
+          "acName": "Anna Nagar",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 273
+        },
+        {
+          "value": "22",
+          "text": "22 - Virugampakkam",
+          "acNumber": 22,
+          "acName": "Virugampakkam",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 311
+        },
+        {
+          "value": "23",
+          "text": "23 - Saidapet",
+          "acNumber": 23,
+          "acName": "Saidapet",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 282
+        },
+        {
+          "value": "24",
+          "text": "24 - Thiyagarayanagar",
+          "acNumber": 24,
+          "acName": "Thiyagarayanagar",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 251
+        },
+        {
+          "value": "25",
+          "text": "25 - Mylapore",
+          "acNumber": 25,
+          "acName": "Mylapore",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 272
+        },
+        {
+          "value": "26",
+          "text": "26 - Velachery",
+          "acNumber": 26,
+          "acName": "Velachery",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 314
+        },
+        {
+          "value": "27",
+          "text": "27 - Sholinganallur",
+          "acNumber": 27,
+          "acName": "Sholinganallur",
+          "districtCode": "S2202",
+          "districtName": "Chennai",
+          "partCount": 700
+        }
+      ],
+      "constituencyCount": 17,
+      "error": null
+    },
+    {
+      "districtCode": "S2203",
+      "districtName": "Kancheepuram",
+      "constituencies": [
+        {
+          "value": "28",
+          "text": "28 - Alandur",
+          "acNumber": 28,
+          "acName": "Alandur",
+          "districtCode": "S2203",
+          "districtName": "Kancheepuram",
+          "partCount": 431
+        },
+        {
+          "value": "29",
+          "text": "29 - Sriperumbudur",
+          "acNumber": 29,
+          "acName": "Sriperumbudur",
+          "districtCode": "S2203",
+          "districtName": "Kancheepuram",
+          "partCount": 435
+        },
+        {
+          "value": "36",
+          "text": "36 - Uthiramerur",
+          "acNumber": 36,
+          "acName": "Uthiramerur",
+          "districtCode": "S2203",
+          "districtName": "Kancheepuram",
+          "partCount": 321
+        },
+        {
+          "value": "37",
+          "text": "37 - Kancheepuram",
+          "acNumber": 37,
+          "acName": "Kancheepuram",
+          "districtCode": "S2203",
+          "districtName": "Kancheepuram",
+          "partCount": 358
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2204",
+      "districtName": "Vellore",
+      "constituencies": [
+        {
+          "value": "40",
+          "text": "40 - Katpadi",
+          "acNumber": 40,
+          "acName": "Katpadi",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 280
+        },
+        {
+          "value": "42",
+          "text": "42 - Arcot",
+          "acNumber": 42,
+          "acName": "Arcot",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 318
+        },
+        {
+          "value": "43",
+          "text": "43 - Vellore",
+          "acNumber": 43,
+          "acName": "Vellore",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 268
+        },
+        {
+          "value": "44",
+          "text": "44 - Anaikattu",
+          "acNumber": 44,
+          "acName": "Anaikattu",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 295
+        },
+        {
+          "value": "45",
+          "text": "45 - Kilvaithinankuppam",
+          "acNumber": 45,
+          "acName": "Kilvaithinankuppam",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 265
+        },
+        {
+          "value": "46",
+          "text": "46 - Gudiyatham",
+          "acNumber": 46,
+          "acName": "Gudiyatham",
+          "districtCode": "S2204",
+          "districtName": "Vellore",
+          "partCount": 319
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2205",
+      "districtName": "Krishnagiri",
+      "constituencies": [
+        {
+          "value": "51",
+          "text": "51 - Uthangarai",
+          "acNumber": 51,
+          "acName": "Uthangarai",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 319
+        },
+        {
+          "value": "52",
+          "text": "52 - Bargur",
+          "acNumber": 52,
+          "acName": "Bargur",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 324
+        },
+        {
+          "value": "53",
+          "text": "53 - Krishnagiri",
+          "acNumber": 53,
+          "acName": "Krishnagiri",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 340
+        },
+        {
+          "value": "54",
+          "text": "54 - Veppanahalli",
+          "acNumber": 54,
+          "acName": "Veppanahalli",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 343
+        },
+        {
+          "value": "55",
+          "text": "55 - Hosur",
+          "acNumber": 55,
+          "acName": "Hosur",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 445
+        },
+        {
+          "value": "56",
+          "text": "56 - Thalli",
+          "acNumber": 56,
+          "acName": "Thalli",
+          "districtCode": "S2205",
+          "districtName": "Krishnagiri",
+          "partCount": 321
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2206",
+      "districtName": "Dharmapuri",
+      "constituencies": [
+        {
+          "value": "57",
+          "text": "57 - Palacode",
+          "acNumber": 57,
+          "acName": "Palacode",
+          "districtCode": "S2206",
+          "districtName": "Dharmapuri",
+          "partCount": 312
+        },
+        {
+          "value": "58",
+          "text": "58 - Pennagaram",
+          "acNumber": 58,
+          "acName": "Pennagaram",
+          "districtCode": "S2206",
+          "districtName": "Dharmapuri",
+          "partCount": 320
+        },
+        {
+          "value": "59",
+          "text": "59 - Dharmapuri",
+          "acNumber": 59,
+          "acName": "Dharmapuri",
+          "districtCode": "S2206",
+          "districtName": "Dharmapuri",
+          "partCount": 320
+        },
+        {
+          "value": "60",
+          "text": "60 - Pappireddippatti",
+          "acNumber": 60,
+          "acName": "Pappireddippatti",
+          "districtCode": "S2206",
+          "districtName": "Dharmapuri",
+          "partCount": 322
+        },
+        {
+          "value": "61",
+          "text": "61 - Harur",
+          "acNumber": 61,
+          "acName": "Harur",
+          "districtCode": "S2206",
+          "districtName": "Dharmapuri",
+          "partCount": 322
+        }
+      ],
+      "constituencyCount": 5,
+      "error": null
+    },
+    {
+      "districtCode": "S2207",
+      "districtName": "Tiruvannamalai",
+      "constituencies": [
+        {
+          "value": "62",
+          "text": "62 - Chengam",
+          "acNumber": 62,
+          "acName": "Chengam",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 341
+        },
+        {
+          "value": "63",
+          "text": "63 - Tiruvannamalai",
+          "acNumber": 63,
+          "acName": "Tiruvannamalai",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 318
+        },
+        {
+          "value": "64",
+          "text": "64 - Kilpennathur",
+          "acNumber": 64,
+          "acName": "Kilpennathur",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 307
+        },
+        {
+          "value": "65",
+          "text": "65 - Kalasapakkam",
+          "acNumber": 65,
+          "acName": "Kalasapakkam",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 301
+        },
+        {
+          "value": "66",
+          "text": "66 - Polur",
+          "acNumber": 66,
+          "acName": "Polur",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 299
+        },
+        {
+          "value": "67",
+          "text": "67 - Arani",
+          "acNumber": 67,
+          "acName": "Arani",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 323
+        },
+        {
+          "value": "68",
+          "text": "68 - Cheyyar",
+          "acNumber": 68,
+          "acName": "Cheyyar",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 334
+        },
+        {
+          "value": "69",
+          "text": "69 - Vandavasi",
+          "acNumber": 69,
+          "acName": "Vandavasi",
+          "districtCode": "S2207",
+          "districtName": "Tiruvannamalai",
+          "partCount": 293
+        }
+      ],
+      "constituencyCount": 8,
+      "error": null
+    },
+    {
+      "districtCode": "S2208",
+      "districtName": "Viluppuram",
+      "constituencies": [
+        {
+          "value": "70",
+          "text": "70 - Gingee",
+          "acNumber": 70,
+          "acName": "Gingee",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 320
+        },
+        {
+          "value": "71",
+          "text": "71 - Mailam",
+          "acNumber": 71,
+          "acName": "Mailam",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 277
+        },
+        {
+          "value": "72",
+          "text": "72 - Tindivanam",
+          "acNumber": 72,
+          "acName": "Tindivanam",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 293
+        },
+        {
+          "value": "73",
+          "text": "73 - Vanur",
+          "acNumber": 73,
+          "acName": "Vanur",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 299
+        },
+        {
+          "value": "74",
+          "text": "74 - Villupuram",
+          "acNumber": 74,
+          "acName": "Villupuram",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 337
+        },
+        {
+          "value": "75",
+          "text": "75 - Vikravandi",
+          "acNumber": 75,
+          "acName": "Vikravandi",
+          "districtCode": "S2208",
+          "districtName": "Viluppuram",
+          "partCount": 310
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2209",
+      "districtName": "Salem",
+      "constituencies": [
+        {
+          "value": "81",
+          "text": "81 - Gangavalli",
+          "acNumber": 81,
+          "acName": "Gangavalli",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 280
+        },
+        {
+          "value": "82",
+          "text": "82 - Attur",
+          "acNumber": 82,
+          "acName": "Attur",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 306
+        },
+        {
+          "value": "83",
+          "text": "83 - Yercaud",
+          "acNumber": 83,
+          "acName": "Yercaud",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 336
+        },
+        {
+          "value": "84",
+          "text": "84 - Omalur",
+          "acNumber": 84,
+          "acName": "Omalur",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 362
+        },
+        {
+          "value": "85",
+          "text": "85 - Mettur",
+          "acNumber": 85,
+          "acName": "Mettur",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 327
+        },
+        {
+          "value": "86",
+          "text": "86 - Edappadi",
+          "acNumber": 86,
+          "acName": "Edappadi",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 342
+        },
+        {
+          "value": "87",
+          "text": "87 - Sankari",
+          "acNumber": 87,
+          "acName": "Sankari",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 339
+        },
+        {
+          "value": "88",
+          "text": "88 - Salem (West)",
+          "acNumber": 88,
+          "acName": "Salem (West)",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 310
+        },
+        {
+          "value": "89",
+          "text": "89 - Salem (North)",
+          "acNumber": 89,
+          "acName": "Salem (North)",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 286
+        },
+        {
+          "value": "90",
+          "text": "90 - Salem (South)",
+          "acNumber": 90,
+          "acName": "Salem (South)",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 268
+        },
+        {
+          "value": "91",
+          "text": "91 - Veerapandi",
+          "acNumber": 91,
+          "acName": "Veerapandi",
+          "districtCode": "S2209",
+          "districtName": "Salem",
+          "partCount": 312
+        }
+      ],
+      "constituencyCount": 11,
+      "error": null
+    },
+    {
+      "districtCode": "S2210",
+      "districtName": "Namakkal",
+      "constituencies": [
+        {
+          "value": "92",
+          "text": "92 - Rasipuram",
+          "acNumber": 92,
+          "acName": "Rasipuram",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 285
+        },
+        {
+          "value": "93",
+          "text": "93 - Senthamangalam",
+          "acNumber": 93,
+          "acName": "Senthamangalam",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 304
+        },
+        {
+          "value": "94",
+          "text": "94 - Namakkal",
+          "acNumber": 94,
+          "acName": "Namakkal",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 310
+        },
+        {
+          "value": "95",
+          "text": "95 - Paramathi Velur",
+          "acNumber": 95,
+          "acName": "Paramathi Velur",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 268
+        },
+        {
+          "value": "96",
+          "text": "96 - Tiruchengodu",
+          "acNumber": 96,
+          "acName": "Tiruchengodu",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 289
+        },
+        {
+          "value": "97",
+          "text": "97 - Kumarapalayam",
+          "acNumber": 97,
+          "acName": "Kumarapalayam",
+          "districtCode": "S2210",
+          "districtName": "Namakkal",
+          "partCount": 324
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2211",
+      "districtName": "Erode",
+      "constituencies": [
+        {
+          "value": "98",
+          "text": "98 - Erode (East)",
+          "acNumber": 98,
+          "acName": "Erode (East)",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 259
+        },
+        {
+          "value": "99",
+          "text": "99 - Erode (West)",
+          "acNumber": 99,
+          "acName": "Erode (West)",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 325
+        },
+        {
+          "value": "100",
+          "text": "100 - Modakkurichi",
+          "acNumber": 100,
+          "acName": "Modakkurichi",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 290
+        },
+        {
+          "value": "102",
+          "text": "102 - Kangayam",
+          "acNumber": 102,
+          "acName": "Kangayam",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 318
+        },
+        {
+          "value": "104",
+          "text": "104 - Bhavani",
+          "acNumber": 104,
+          "acName": "Bhavani",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 306
+        },
+        {
+          "value": "105",
+          "text": "105 - Anthiyur",
+          "acNumber": 105,
+          "acName": "Anthiyur",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 271
+        },
+        {
+          "value": "106",
+          "text": "106 - Gobichettipalayam",
+          "acNumber": 106,
+          "acName": "Gobichettipalayam",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 309
+        },
+        {
+          "value": "107",
+          "text": "107 - Bhavanisagar",
+          "acNumber": 107,
+          "acName": "Bhavanisagar",
+          "districtCode": "S2211",
+          "districtName": "Erode",
+          "partCount": 327
+        }
+      ],
+      "constituencyCount": 8,
+      "error": null
+    },
+    {
+      "districtCode": "S2212",
+      "districtName": "The Nilgiris",
+      "constituencies": [
+        {
+          "value": "108",
+          "text": "108 - Udhagamandalam",
+          "acNumber": 108,
+          "acName": "Udhagamandalam",
+          "districtCode": "S2212",
+          "districtName": "The Nilgiris",
+          "partCount": 254
+        },
+        {
+          "value": "109",
+          "text": "109 - Gudalur",
+          "acNumber": 109,
+          "acName": "Gudalur",
+          "districtCode": "S2212",
+          "districtName": "The Nilgiris",
+          "partCount": 238
+        },
+        {
+          "value": "110",
+          "text": "110 - Coonoor",
+          "acNumber": 110,
+          "acName": "Coonoor",
+          "districtCode": "S2212",
+          "districtName": "The Nilgiris",
+          "partCount": 244
+        }
+      ],
+      "constituencyCount": 3,
+      "error": null
+    },
+    {
+      "districtCode": "S2213",
+      "districtName": "Coimbatore",
+      "constituencies": [
+        {
+          "value": "111",
+          "text": "111 - Mettupalayam",
+          "acNumber": 111,
+          "acName": "Mettupalayam",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 360
+        },
+        {
+          "value": "112",
+          "text": "112 - Avanashi",
+          "acNumber": 112,
+          "acName": "Avanashi",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 372
+        },
+        {
+          "value": "116",
+          "text": "116 - Sulur",
+          "acNumber": 116,
+          "acName": "Sulur",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 385
+        },
+        {
+          "value": "117",
+          "text": "117 - Kavundampalayam",
+          "acNumber": 117,
+          "acName": "Kavundampalayam",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 547
+        },
+        {
+          "value": "118",
+          "text": "118 - Coimbatore (North)",
+          "acNumber": 118,
+          "acName": "Coimbatore (North)",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 339
+        },
+        {
+          "value": "119",
+          "text": "119 - Thondamuthur",
+          "acNumber": 119,
+          "acName": "Thondamuthur",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 371
+        },
+        {
+          "value": "120",
+          "text": "120 - Coimbatore (South)",
+          "acNumber": 120,
+          "acName": "Coimbatore (South)",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 283
+        },
+        {
+          "value": "121",
+          "text": "121 - Singanallur",
+          "acNumber": 121,
+          "acName": "Singanallur",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 358
+        },
+        {
+          "value": "122",
+          "text": "122 - Kinathukadavu",
+          "acNumber": 122,
+          "acName": "Kinathukadavu",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 377
+        },
+        {
+          "value": "123",
+          "text": "123 - Pollachi",
+          "acNumber": 123,
+          "acName": "Pollachi",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 281
+        },
+        {
+          "value": "124",
+          "text": "124 - Valparai",
+          "acNumber": 124,
+          "acName": "Valparai",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 262
+        },
+        {
+          "value": "125",
+          "text": "125 - Udumalaipettai",
+          "acNumber": 125,
+          "acName": "Udumalaipettai",
+          "districtCode": "S2213",
+          "districtName": "Coimbatore",
+          "partCount": 307
+        }
+      ],
+      "constituencyCount": 12,
+      "error": null
+    },
+    {
+      "districtCode": "S2214",
+      "districtName": "Dindigul",
+      "constituencies": [
+        {
+          "value": "127",
+          "text": "127 - Palani",
+          "acNumber": 127,
+          "acName": "Palani",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 339
+        },
+        {
+          "value": "128",
+          "text": "128 - Oddanchatram",
+          "acNumber": 128,
+          "acName": "Oddanchatram",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 314
+        },
+        {
+          "value": "129",
+          "text": "129 - Athoor",
+          "acNumber": 129,
+          "acName": "Athoor",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 341
+        },
+        {
+          "value": "130",
+          "text": "130 - Nilakottai",
+          "acNumber": 130,
+          "acName": "Nilakottai",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 305
+        },
+        {
+          "value": "131",
+          "text": "131 - Natham",
+          "acNumber": 131,
+          "acName": "Natham",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 359
+        },
+        {
+          "value": "132",
+          "text": "132 - Dindigul",
+          "acNumber": 132,
+          "acName": "Dindigul",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 316
+        },
+        {
+          "value": "133",
+          "text": "133 - Vedasandur",
+          "acNumber": 133,
+          "acName": "Vedasandur",
+          "districtCode": "S2214",
+          "districtName": "Dindigul",
+          "partCount": 327
+        }
+      ],
+      "constituencyCount": 7,
+      "error": null
+    },
+    {
+      "districtCode": "S2215",
+      "districtName": "Karur",
+      "constituencies": [
+        {
+          "value": "134",
+          "text": "134 - Aravakurichi",
+          "acNumber": 134,
+          "acName": "Aravakurichi",
+          "districtCode": "S2215",
+          "districtName": "Karur",
+          "partCount": 267
+        },
+        {
+          "value": "135",
+          "text": "135 - Karur",
+          "acNumber": 135,
+          "acName": "Karur",
+          "districtCode": "S2215",
+          "districtName": "Karur",
+          "partCount": 283
+        },
+        {
+          "value": "136",
+          "text": "136 - Krishnarayapuram",
+          "acNumber": 136,
+          "acName": "Krishnarayapuram",
+          "districtCode": "S2215",
+          "districtName": "Karur",
+          "partCount": 275
+        },
+        {
+          "value": "137",
+          "text": "137 - Kulithalai",
+          "acNumber": 137,
+          "acName": "Kulithalai",
+          "districtCode": "S2215",
+          "districtName": "Karur",
+          "partCount": 286
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2216",
+      "districtName": "Tiruchirappalli",
+      "constituencies": [
+        {
+          "value": "138",
+          "text": "138 - Manapaarai",
+          "acNumber": 138,
+          "acName": "Manapaarai",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 346
+        },
+        {
+          "value": "139",
+          "text": "139 - Srirangam",
+          "acNumber": 139,
+          "acName": "Srirangam",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 366
+        },
+        {
+          "value": "140",
+          "text": "140 - Tiruchirappalli (West)",
+          "acNumber": 140,
+          "acName": "Tiruchirappalli (West)",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 305
+        },
+        {
+          "value": "141",
+          "text": "141 - Tiruchirappalli (East)",
+          "acNumber": 141,
+          "acName": "Tiruchirappalli (East)",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 304
+        },
+        {
+          "value": "142",
+          "text": "142 - Thiruverumbur",
+          "acNumber": 142,
+          "acName": "Thiruverumbur",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 312
+        },
+        {
+          "value": "143",
+          "text": "143 - Lalgudi",
+          "acNumber": 143,
+          "acName": "Lalgudi",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 276
+        },
+        {
+          "value": "144",
+          "text": "144 - Manachanallur",
+          "acNumber": 144,
+          "acName": "Manachanallur",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 296
+        },
+        {
+          "value": "145",
+          "text": "145 - Musiri",
+          "acNumber": 145,
+          "acName": "Musiri",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 283
+        },
+        {
+          "value": "146",
+          "text": "146 - Thuraiyur",
+          "acNumber": 146,
+          "acName": "Thuraiyur",
+          "districtCode": "S2216",
+          "districtName": "Tiruchirappalli",
+          "partCount": 297
+        }
+      ],
+      "constituencyCount": 9,
+      "error": null
+    },
+    {
+      "districtCode": "S2217",
+      "districtName": "Perambalur",
+      "constituencies": [
+        {
+          "value": "147",
+          "text": "147 - Perambalur",
+          "acNumber": 147,
+          "acName": "Perambalur",
+          "districtCode": "S2217",
+          "districtName": "Perambalur",
+          "partCount": 387
+        },
+        {
+          "value": "148",
+          "text": "148 - Kunnam",
+          "acNumber": 148,
+          "acName": "Kunnam",
+          "districtCode": "S2217",
+          "districtName": "Perambalur",
+          "partCount": 345
+        }
+      ],
+      "constituencyCount": 2,
+      "error": null
+    },
+    {
+      "districtCode": "S2218",
+      "districtName": "Cuddalore",
+      "constituencies": [
+        {
+          "value": "151",
+          "text": "151 - Tittakudi",
+          "acNumber": 151,
+          "acName": "Tittakudi",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 279
+        },
+        {
+          "value": "152",
+          "text": "152 - Virudhachalam",
+          "acNumber": 152,
+          "acName": "Virudhachalam",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 317
+        },
+        {
+          "value": "153",
+          "text": "153 - Neyveli",
+          "acNumber": 153,
+          "acName": "Neyveli",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 256
+        },
+        {
+          "value": "154",
+          "text": "154 - Panruti",
+          "acNumber": 154,
+          "acName": "Panruti",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 309
+        },
+        {
+          "value": "155",
+          "text": "155 - Cuddalore",
+          "acNumber": 155,
+          "acName": "Cuddalore",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 258
+        },
+        {
+          "value": "156",
+          "text": "156 - Kurinjipadi",
+          "acNumber": 156,
+          "acName": "Kurinjipadi",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 278
+        },
+        {
+          "value": "157",
+          "text": "157 - Bhuvanagiri",
+          "acNumber": 157,
+          "acName": "Bhuvanagiri",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 304
+        },
+        {
+          "value": "158",
+          "text": "158 - Chidambaram",
+          "acNumber": 158,
+          "acName": "Chidambaram",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 298
+        },
+        {
+          "value": "159",
+          "text": "159 - Kattumannarkoil",
+          "acNumber": 159,
+          "acName": "Kattumannarkoil",
+          "districtCode": "S2218",
+          "districtName": "Cuddalore",
+          "partCount": 291
+        }
+      ],
+      "constituencyCount": 9,
+      "error": null
+    },
+    {
+      "districtCode": "S2219",
+      "districtName": "Nagapattinam",
+      "constituencies": [
+        {
+          "value": "163",
+          "text": "163 - Nagapattinam",
+          "acNumber": 163,
+          "acName": "Nagapattinam",
+          "districtCode": "S2219",
+          "districtName": "Nagapattinam",
+          "partCount": 240
+        },
+        {
+          "value": "164",
+          "text": "164 - Kilvelur",
+          "acNumber": 164,
+          "acName": "Kilvelur",
+          "districtCode": "S2219",
+          "districtName": "Nagapattinam",
+          "partCount": 220
+        },
+        {
+          "value": "165",
+          "text": "165 - Vedaranyam",
+          "acNumber": 165,
+          "acName": "Vedaranyam",
+          "districtCode": "S2219",
+          "districtName": "Nagapattinam",
+          "partCount": 240
+        }
+      ],
+      "constituencyCount": 3,
+      "error": null
+    },
+    {
+      "districtCode": "S2220",
+      "districtName": "Thiruvarur",
+      "constituencies": [
+        {
+          "value": "166",
+          "text": "166 - Thiruthuraipoondi",
+          "acNumber": 166,
+          "acName": "Thiruthuraipoondi",
+          "districtCode": "S2220",
+          "districtName": "Thiruvarur",
+          "partCount": 293
+        },
+        {
+          "value": "167",
+          "text": "167 - Mannargudi",
+          "acNumber": 167,
+          "acName": "Mannargudi",
+          "districtCode": "S2220",
+          "districtName": "Thiruvarur",
+          "partCount": 307
+        },
+        {
+          "value": "168",
+          "text": "168 - Thiruvarur",
+          "acNumber": 168,
+          "acName": "Thiruvarur",
+          "districtCode": "S2220",
+          "districtName": "Thiruvarur",
+          "partCount": 327
+        },
+        {
+          "value": "169",
+          "text": "169 - Nannilam",
+          "acNumber": 169,
+          "acName": "Nannilam",
+          "districtCode": "S2220",
+          "districtName": "Thiruvarur",
+          "partCount": 344
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2221",
+      "districtName": "Thanjavur",
+      "constituencies": [
+        {
+          "value": "170",
+          "text": "170 - Thiruvidaimarudur",
+          "acNumber": 170,
+          "acName": "Thiruvidaimarudur",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 326
+        },
+        {
+          "value": "171",
+          "text": "171 - Kumbakonam",
+          "acNumber": 171,
+          "acName": "Kumbakonam",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 300
+        },
+        {
+          "value": "172",
+          "text": "172 - Papanasam",
+          "acNumber": 172,
+          "acName": "Papanasam",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 315
+        },
+        {
+          "value": "173",
+          "text": "173 - Thiruvaiyaru",
+          "acNumber": 173,
+          "acName": "Thiruvaiyaru",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 338
+        },
+        {
+          "value": "174",
+          "text": "174 - Thanjavur",
+          "acNumber": 174,
+          "acName": "Thanjavur",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 309
+        },
+        {
+          "value": "175",
+          "text": "175 - Orathanadu",
+          "acNumber": 175,
+          "acName": "Orathanadu",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 314
+        },
+        {
+          "value": "176",
+          "text": "176 - Pattukkottai",
+          "acNumber": 176,
+          "acName": "Pattukkottai",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 310
+        },
+        {
+          "value": "177",
+          "text": "177 - Peravurani",
+          "acNumber": 177,
+          "acName": "Peravurani",
+          "districtCode": "S2221",
+          "districtName": "Thanjavur",
+          "partCount": 284
+        }
+      ],
+      "constituencyCount": 8,
+      "error": null
+    },
+    {
+      "districtCode": "S2222",
+      "districtName": "Pudukkottai",
+      "constituencies": [
+        {
+          "value": "178",
+          "text": "178 - Gandarvakottai",
+          "acNumber": 178,
+          "acName": "Gandarvakottai",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 250
+        },
+        {
+          "value": "179",
+          "text": "179 - Viralimalai",
+          "acNumber": 179,
+          "acName": "Viralimalai",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 276
+        },
+        {
+          "value": "180",
+          "text": "180 - Pudukkottai",
+          "acNumber": 180,
+          "acName": "Pudukkottai",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 295
+        },
+        {
+          "value": "181",
+          "text": "181 - Thirumayam",
+          "acNumber": 181,
+          "acName": "Thirumayam",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 300
+        },
+        {
+          "value": "182",
+          "text": "182 - Alangudi",
+          "acNumber": 182,
+          "acName": "Alangudi",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 258
+        },
+        {
+          "value": "183",
+          "text": "183 - Aranthangi",
+          "acNumber": 183,
+          "acName": "Aranthangi",
+          "districtCode": "S2222",
+          "districtName": "Pudukkottai",
+          "partCount": 302
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2223",
+      "districtName": "Sivaganga",
+      "constituencies": [
+        {
+          "value": "184",
+          "text": "184 - Karaikudi",
+          "acNumber": 184,
+          "acName": "Karaikudi",
+          "districtCode": "S2223",
+          "districtName": "Sivaganga",
+          "partCount": 388
+        },
+        {
+          "value": "185",
+          "text": "185 - Tiruppattur",
+          "acNumber": 185,
+          "acName": "Tiruppattur",
+          "districtCode": "S2223",
+          "districtName": "Sivaganga",
+          "partCount": 368
+        },
+        {
+          "value": "186",
+          "text": "186 - Sivaganga",
+          "acNumber": 186,
+          "acName": "Sivaganga",
+          "districtCode": "S2223",
+          "districtName": "Sivaganga",
+          "partCount": 393
+        },
+        {
+          "value": "187",
+          "text": "187 - Manamadurai",
+          "acNumber": 187,
+          "acName": "Manamadurai",
+          "districtCode": "S2223",
+          "districtName": "Sivaganga",
+          "partCount": 369
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2224",
+      "districtName": "Madurai",
+      "constituencies": [
+        {
+          "value": "188",
+          "text": "188 - Melur",
+          "acNumber": 188,
+          "acName": "Melur",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 291
+        },
+        {
+          "value": "189",
+          "text": "189 - Madurai East",
+          "acNumber": 189,
+          "acName": "Madurai East",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 398
+        },
+        {
+          "value": "190",
+          "text": "190 - Sholavandan",
+          "acNumber": 190,
+          "acName": "Sholavandan",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 261
+        },
+        {
+          "value": "191",
+          "text": "191 - Madurai North",
+          "acNumber": 191,
+          "acName": "Madurai North",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 266
+        },
+        {
+          "value": "192",
+          "text": "192 - Madurai South",
+          "acNumber": 192,
+          "acName": "Madurai South",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 236
+        },
+        {
+          "value": "193",
+          "text": "193 - Madurai Central",
+          "acNumber": 193,
+          "acName": "Madurai Central",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 253
+        },
+        {
+          "value": "194",
+          "text": "194 - Madurai West",
+          "acNumber": 194,
+          "acName": "Madurai West",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 327
+        },
+        {
+          "value": "195",
+          "text": "195 - Thiruparankundram",
+          "acNumber": 195,
+          "acName": "Thiruparankundram",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 352
+        },
+        {
+          "value": "196",
+          "text": "196 - Thirumangalam",
+          "acNumber": 196,
+          "acName": "Thirumangalam",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 350
+        },
+        {
+          "value": "197",
+          "text": "197 - Usilampatti",
+          "acNumber": 197,
+          "acName": "Usilampatti",
+          "districtCode": "S2224",
+          "districtName": "Madurai",
+          "partCount": 342
+        }
+      ],
+      "constituencyCount": 10,
+      "error": null
+    },
+    {
+      "districtCode": "S2225",
+      "districtName": "Theni",
+      "constituencies": [
+        {
+          "value": "198",
+          "text": "198 - Andipatti",
+          "acNumber": 198,
+          "acName": "Andipatti",
+          "districtCode": "S2225",
+          "districtName": "Theni",
+          "partCount": 344
+        },
+        {
+          "value": "199",
+          "text": "199 - Periyakulam",
+          "acNumber": 199,
+          "acName": "Periyakulam",
+          "districtCode": "S2225",
+          "districtName": "Theni",
+          "partCount": 359
+        },
+        {
+          "value": "200",
+          "text": "200 - Bodinayakanur",
+          "acNumber": 200,
+          "acName": "Bodinayakanur",
+          "districtCode": "S2225",
+          "districtName": "Theni",
+          "partCount": 346
+        },
+        {
+          "value": "201",
+          "text": "201 - Cumbum",
+          "acNumber": 201,
+          "acName": "Cumbum",
+          "districtCode": "S2225",
+          "districtName": "Theni",
+          "partCount": 345
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2226",
+      "districtName": "Virudhunagar",
+      "constituencies": [
+        {
+          "value": "202",
+          "text": "202 - Rajapalayam",
+          "acNumber": 202,
+          "acName": "Rajapalayam",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 269
+        },
+        {
+          "value": "203",
+          "text": "203 - Srivilliputhur",
+          "acNumber": 203,
+          "acName": "Srivilliputhur",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 308
+        },
+        {
+          "value": "204",
+          "text": "204 - Sattur",
+          "acNumber": 204,
+          "acName": "Sattur",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 291
+        },
+        {
+          "value": "205",
+          "text": "205 - Sivakasi",
+          "acNumber": 205,
+          "acName": "Sivakasi",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 288
+        },
+        {
+          "value": "206",
+          "text": "206 - Virudhunagar",
+          "acNumber": 206,
+          "acName": "Virudhunagar",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 281
+        },
+        {
+          "value": "207",
+          "text": "207 - Aruppukkottai",
+          "acNumber": 207,
+          "acName": "Aruppukkottai",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 270
+        },
+        {
+          "value": "208",
+          "text": "208 - Tiruchuli",
+          "acNumber": 208,
+          "acName": "Tiruchuli",
+          "districtCode": "S2226",
+          "districtName": "Virudhunagar",
+          "partCount": 292
+        }
+      ],
+      "constituencyCount": 7,
+      "error": null
+    },
+    {
+      "districtCode": "S2227",
+      "districtName": "Ramanathapuram",
+      "constituencies": [
+        {
+          "value": "209",
+          "text": "209 - Paramakudi",
+          "acNumber": 209,
+          "acName": "Paramakudi",
+          "districtCode": "S2227",
+          "districtName": "Ramanathapuram",
+          "partCount": 323
+        },
+        {
+          "value": "210",
+          "text": "210 - Tiruvadanai",
+          "acNumber": 210,
+          "acName": "Tiruvadanai",
+          "districtCode": "S2227",
+          "districtName": "Ramanathapuram",
+          "partCount": 378
+        },
+        {
+          "value": "211",
+          "text": "211 - Ramanathapuram",
+          "acNumber": 211,
+          "acName": "Ramanathapuram",
+          "districtCode": "S2227",
+          "districtName": "Ramanathapuram",
+          "partCount": 399
+        },
+        {
+          "value": "212",
+          "text": "212 - Mudhukulathur",
+          "acNumber": 212,
+          "acName": "Mudhukulathur",
+          "districtCode": "S2227",
+          "districtName": "Ramanathapuram",
+          "partCount": 414
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2228",
+      "districtName": "Thoothukudi",
+      "constituencies": [
+        {
+          "value": "213",
+          "text": "213 - Vilathikulam",
+          "acNumber": 213,
+          "acName": "Vilathikulam",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 274
+        },
+        {
+          "value": "214",
+          "text": "214 - Thoothukkudi",
+          "acNumber": 214,
+          "acName": "Thoothukkudi",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 360
+        },
+        {
+          "value": "215",
+          "text": "215 - Tiruchendur",
+          "acNumber": 215,
+          "acName": "Tiruchendur",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 307
+        },
+        {
+          "value": "216",
+          "text": "216 - Srivaikuntam",
+          "acNumber": 216,
+          "acName": "Srivaikuntam",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 293
+        },
+        {
+          "value": "217",
+          "text": "217 - Ottapidaram",
+          "acNumber": 217,
+          "acName": "Ottapidaram",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 315
+        },
+        {
+          "value": "218",
+          "text": "218 - Kovilpatti",
+          "acNumber": 218,
+          "acName": "Kovilpatti",
+          "districtCode": "S2228",
+          "districtName": "Thoothukudi",
+          "partCount": 315
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2229",
+      "districtName": "Tirunelveli",
+      "constituencies": [
+        {
+          "value": "224",
+          "text": "224 - Tirunelveli",
+          "acNumber": 224,
+          "acName": "Tirunelveli",
+          "districtCode": "S2229",
+          "districtName": "Tirunelveli",
+          "partCount": 386
+        },
+        {
+          "value": "225",
+          "text": "225 - Ambasamudram",
+          "acNumber": 225,
+          "acName": "Ambasamudram",
+          "districtCode": "S2229",
+          "districtName": "Tirunelveli",
+          "partCount": 321
+        },
+        {
+          "value": "226",
+          "text": "226 - Palayamkottai",
+          "acNumber": 226,
+          "acName": "Palayamkottai",
+          "districtCode": "S2229",
+          "districtName": "Tirunelveli",
+          "partCount": 296
+        },
+        {
+          "value": "227",
+          "text": "227 - Nanguneri",
+          "acNumber": 227,
+          "acName": "Nanguneri",
+          "districtCode": "S2229",
+          "districtName": "Tirunelveli",
+          "partCount": 349
+        },
+        {
+          "value": "228",
+          "text": "228 - Radhapuram",
+          "acNumber": 228,
+          "acName": "Radhapuram",
+          "districtCode": "S2229",
+          "districtName": "Tirunelveli",
+          "partCount": 326
+        }
+      ],
+      "constituencyCount": 5,
+      "error": null
+    },
+    {
+      "districtCode": "S2230",
+      "districtName": "Kanniyakumari",
+      "constituencies": [
+        {
+          "value": "229",
+          "text": "229 - Kanniyakumari",
+          "acNumber": 229,
+          "acName": "Kanniyakumari",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 363
+        },
+        {
+          "value": "230",
+          "text": "230 - Nagercoil",
+          "acNumber": 230,
+          "acName": "Nagercoil",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 322
+        },
+        {
+          "value": "231",
+          "text": "231 - Colachal",
+          "acNumber": 231,
+          "acName": "Colachal",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 316
+        },
+        {
+          "value": "232",
+          "text": "232 - Padmanabhapuram",
+          "acNumber": 232,
+          "acName": "Padmanabhapuram",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 312
+        },
+        {
+          "value": "233",
+          "text": "233 - Vilavancode",
+          "acNumber": 233,
+          "acName": "Vilavancode",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 300
+        },
+        {
+          "value": "234",
+          "text": "234 - Killiyoor",
+          "acNumber": 234,
+          "acName": "Killiyoor",
+          "districtCode": "S2230",
+          "districtName": "Kanniyakumari",
+          "partCount": 301
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2231",
+      "districtName": "Ariyalur",
+      "constituencies": [
+        {
+          "value": "149",
+          "text": "149 - Ariyalur",
+          "acNumber": 149,
+          "acName": "Ariyalur",
+          "districtCode": "S2231",
+          "districtName": "Ariyalur",
+          "partCount": 330
+        },
+        {
+          "value": "150",
+          "text": "150 - Jayankondam",
+          "acNumber": 150,
+          "acName": "Jayankondam",
+          "districtCode": "S2231",
+          "districtName": "Ariyalur",
+          "partCount": 320
+        }
+      ],
+      "constituencyCount": 2,
+      "error": null
+    },
+    {
+      "districtCode": "S2232",
+      "districtName": "Tiruppur",
+      "constituencies": [
+        {
+          "value": "101",
+          "text": "101 - Dharapuram",
+          "acNumber": 101,
+          "acName": "Dharapuram",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 320
+        },
+        {
+          "value": "103",
+          "text": "103 - Perundurai",
+          "acNumber": 103,
+          "acName": "Perundurai",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 292
+        },
+        {
+          "value": "113",
+          "text": "113 - Tiruppur (North)",
+          "acNumber": 113,
+          "acName": "Tiruppur (North)",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 442
+        },
+        {
+          "value": "114",
+          "text": "114 - Tiruppur (South)",
+          "acNumber": 114,
+          "acName": "Tiruppur (South)",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 289
+        },
+        {
+          "value": "115",
+          "text": "115 - Palladam",
+          "acNumber": 115,
+          "acName": "Palladam",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 480
+        },
+        {
+          "value": "126",
+          "text": "126 - Madathukulam",
+          "acNumber": 126,
+          "acName": "Madathukulam",
+          "districtCode": "S2232",
+          "districtName": "Tiruppur",
+          "partCount": 294
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2233",
+      "districtName": "Kallakurichi",
+      "constituencies": [
+        {
+          "value": "76",
+          "text": "76 - Tirukkoyilur",
+          "acNumber": 76,
+          "acName": "Tirukkoyilur",
+          "districtCode": "S2233",
+          "districtName": "Kallakurichi",
+          "partCount": 330
+        },
+        {
+          "value": "77",
+          "text": "77 - Ulundurpettai",
+          "acNumber": 77,
+          "acName": "Ulundurpettai",
+          "districtCode": "S2233",
+          "districtName": "Kallakurichi",
+          "partCount": 375
+        },
+        {
+          "value": "78",
+          "text": "78 - Rishivandiyam",
+          "acNumber": 78,
+          "acName": "Rishivandiyam",
+          "districtCode": "S2233",
+          "districtName": "Kallakurichi",
+          "partCount": 350
+        },
+        {
+          "value": "79",
+          "text": "79 - Sankarapuram",
+          "acNumber": 79,
+          "acName": "Sankarapuram",
+          "districtCode": "S2233",
+          "districtName": "Kallakurichi",
+          "partCount": 340
+        },
+        {
+          "value": "80",
+          "text": "80 - Kallakurichi",
+          "acNumber": 80,
+          "acName": "Kallakurichi",
+          "districtCode": "S2233",
+          "districtName": "Kallakurichi",
+          "partCount": 370
+        }
+      ],
+      "constituencyCount": 5,
+      "error": null
+    },
+    {
+      "districtCode": "S2234",
+      "districtName": "Tenkasi",
+      "constituencies": [
+        {
+          "value": "219",
+          "text": "219 - Sankarankovil",
+          "acNumber": 219,
+          "acName": "Sankarankovil",
+          "districtCode": "S2234",
+          "districtName": "Tenkasi",
+          "partCount": 315
+        },
+        {
+          "value": "220",
+          "text": "220 - Vasudevanallur",
+          "acNumber": 220,
+          "acName": "Vasudevanallur",
+          "districtCode": "S2234",
+          "districtName": "Tenkasi",
+          "partCount": 310
+        },
+        {
+          "value": "221",
+          "text": "221 - Kadayanallur",
+          "acNumber": 221,
+          "acName": "Kadayanallur",
+          "districtCode": "S2234",
+          "districtName": "Tenkasi",
+          "partCount": 364
+        },
+        {
+          "value": "222",
+          "text": "222 - Tenkasi",
+          "acNumber": 222,
+          "acName": "Tenkasi",
+          "districtCode": "S2234",
+          "districtName": "Tenkasi",
+          "partCount": 359
+        },
+        {
+          "value": "223",
+          "text": "223 - Alangulam",
+          "acNumber": 223,
+          "acName": "Alangulam",
+          "districtCode": "S2234",
+          "districtName": "Tenkasi",
+          "partCount": 332
+        }
+      ],
+      "constituencyCount": 5,
+      "error": null
+    },
+    {
+      "districtCode": "S2235",
+      "districtName": "Chengalpattu",
+      "constituencies": [
+        {
+          "value": "30",
+          "text": "30 - Pallavaram",
+          "acNumber": 30,
+          "acName": "Pallavaram",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 468
+        },
+        {
+          "value": "31",
+          "text": "31 - Tambaram",
+          "acNumber": 31,
+          "acName": "Tambaram",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 465
+        },
+        {
+          "value": "32",
+          "text": "32 - Chengalpattu",
+          "acNumber": 32,
+          "acName": "Chengalpattu",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 496
+        },
+        {
+          "value": "33",
+          "text": "33 - Thiruporur",
+          "acNumber": 33,
+          "acName": "Thiruporur",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 369
+        },
+        {
+          "value": "34",
+          "text": "34 - Cheyyur",
+          "acNumber": 34,
+          "acName": "Cheyyur",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 287
+        },
+        {
+          "value": "35",
+          "text": "35 - Madurantakam",
+          "acNumber": 35,
+          "acName": "Madurantakam",
+          "districtCode": "S2235",
+          "districtName": "Chengalpattu",
+          "partCount": 285
+        }
+      ],
+      "constituencyCount": 6,
+      "error": null
+    },
+    {
+      "districtCode": "S2236",
+      "districtName": "Tirupathur",
+      "constituencies": [
+        {
+          "value": "47",
+          "text": "47 - Vaniyambadi",
+          "acNumber": 47,
+          "acName": "Vaniyambadi",
+          "districtCode": "S2236",
+          "districtName": "Tirupathur",
+          "partCount": 312
+        },
+        {
+          "value": "48",
+          "text": "48 - Ambur",
+          "acNumber": 48,
+          "acName": "Ambur",
+          "districtCode": "S2236",
+          "districtName": "Tirupathur",
+          "partCount": 300
+        },
+        {
+          "value": "49",
+          "text": "49 - Jolarpet",
+          "acNumber": 49,
+          "acName": "Jolarpet",
+          "districtCode": "S2236",
+          "districtName": "Tirupathur",
+          "partCount": 287
+        },
+        {
+          "value": "50",
+          "text": "50 - Tiruppattur",
+          "acNumber": 50,
+          "acName": "Tiruppattur",
+          "districtCode": "S2236",
+          "districtName": "Tirupathur",
+          "partCount": 303
+        }
+      ],
+      "constituencyCount": 4,
+      "error": null
+    },
+    {
+      "districtCode": "S2237",
+      "districtName": "Ranipet",
+      "constituencies": [
+        {
+          "value": "38",
+          "text": "38 - Arakkonam",
+          "acNumber": 38,
+          "acName": "Arakkonam",
+          "districtCode": "S2237",
+          "districtName": "Ranipet",
+          "partCount": 284
+        },
+        {
+          "value": "39",
+          "text": "39 - Sholingur",
+          "acNumber": 39,
+          "acName": "Sholingur",
+          "districtCode": "S2237",
+          "districtName": "Ranipet",
+          "partCount": 341
+        },
+        {
+          "value": "41",
+          "text": "41 - Ranipet",
+          "acNumber": 41,
+          "acName": "Ranipet",
+          "districtCode": "S2237",
+          "districtName": "Ranipet",
+          "partCount": 304
+        }
+      ],
+      "constituencyCount": 3,
+      "error": null
+    },
+    {
+      "districtCode": "S2238",
+      "districtName": "Mayiladuthurai",
+      "constituencies": [
+        {
+          "value": "160",
+          "text": "160 - Sirkazhi",
+          "acNumber": 160,
+          "acName": "Sirkazhi",
+          "districtCode": "S2238",
+          "districtName": "Mayiladuthurai",
+          "partCount": 305
+        },
+        {
+          "value": "161",
+          "text": "161 - Mayiladuthurai",
+          "acNumber": 161,
+          "acName": "Mayiladuthurai",
+          "districtCode": "S2238",
+          "districtName": "Mayiladuthurai",
+          "partCount": 303
+        },
+        {
+          "value": "162",
+          "text": "162 - Poompuhar",
+          "acNumber": 162,
+          "acName": "Poompuhar",
+          "districtCode": "S2238",
+          "districtName": "Mayiladuthurai",
+          "partCount": 342
+        }
+      ],
+      "constituencyCount": 3,
+      "error": null
+    }
+  ]
+}

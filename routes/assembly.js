@@ -24,6 +24,7 @@ router.post('/getYears', assemblyDropdownController.getYears);
 router.post('/getRollTypes', assemblyDropdownController.getRollTypes);
 router.post('/getDistricts', assemblyDropdownController.getDistricts);
 router.post('/getConstituencies', assemblyDropdownController.getAssemblyConstituencies);
+router.post('/getConstituenciesFromMapping', assemblyDropdownController.getS22ConstituenciesFromMapping);
 router.post('/getLanguages', assemblyDropdownController.getLanguages);
 router.post('/getPollingParts', assemblyDropdownController.getPollingParts);
 

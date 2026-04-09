@@ -25,6 +25,200 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const TAMIL_NADU_S22_MAPPING_FILE = path.join(
+    process.cwd(),
+    'data',
+    'eci',
+    'S22-user-mapping.json'
+);
+
+const TAMIL_NADU_DISTRICT_CODE_MAP = {
+    'THIRUVALLUR': 'S2201',
+    'CHENNAI': 'S2202',
+    'KANCHEEPURAM': 'S2203',
+    'VELLORE': 'S2204',
+    'KRISHNAGIRI': 'S2205',
+    'DHARMAPURI': 'S2206',
+    'TIRUVANNAMALAI': 'S2207',
+    'VILUPPURAM': 'S2208',
+    'SALEM': 'S2209',
+    'NAMAKKAL': 'S2210',
+    'ERODE': 'S2211',
+    'THE NILGIRIS': 'S2212',
+    'COIMBATORE': 'S2213',
+    'DINDIGUL': 'S2214',
+    'KARUR': 'S2215',
+    'TIRUCHIRAPPALLI': 'S2216',
+    'PERAMBALUR': 'S2217',
+    'CUDDALORE': 'S2218',
+    'NAGAPATTINAM': 'S2219',
+    'THIRUVARUR': 'S2220',
+    'THANJAVUR': 'S2221',
+    'PUDUKKOTTAI': 'S2222',
+    'SIVAGANGA': 'S2223',
+    'MADURAI': 'S2224',
+    'THENI': 'S2225',
+    'VIRUDHUNAGAR': 'S2226',
+    'RAMANATHAPURAM': 'S2227',
+    'THOOTHUKUDI': 'S2228',
+    'TIRUNELVELI': 'S2229',
+    'KANNIYAKUMARI': 'S2230',
+    'ARIYALUR': 'S2231',
+    'TIRUPPUR': 'S2232',
+    'KALLAKURICHI': 'S2233',
+    'TENKASI': 'S2234',
+    'CHENGALPATTU': 'S2235',
+    'TIRUPATHUR': 'S2236',
+    'RANIPET': 'S2237',
+    'MAYILADUTHURAI': 'S2238'
+};
+
+function stripBom(raw) {
+    if (typeof raw !== 'string') return raw;
+    return raw.charCodeAt(0) === 0xFEFF ? raw.slice(1) : raw;
+}
+
+function normalizeTamilNaduS22Mapping(parsed) {
+    if (!parsed) return null;
+
+    if (Array.isArray(parsed.districts)) {
+        return parsed;
+    }
+
+    const sourceDistricts = parsed.districts && typeof parsed.districts === 'object'
+        ? parsed.districts
+        : (parsed && typeof parsed === 'object' ? parsed : null);
+
+    if (sourceDistricts && typeof sourceDistricts === 'object') {
+        let acNumber = 1;
+        const districts = Object.entries(sourceDistricts).map(([districtName, districtEntries], districtIndex) => {
+            const normalizedDistrictName = String(districtName || '').trim();
+            const districtCode = TAMIL_NADU_DISTRICT_CODE_MAP[normalizedDistrictName.toUpperCase()] || `S22${String(districtIndex + 1).padStart(2, '0')}`;
+            const rows = Array.isArray(districtEntries) ? districtEntries : [];
+            const hasObjectRows = rows.some((item) => item && typeof item === 'object');
+
+            let constituencies = [];
+
+            if (hasObjectRows) {
+                constituencies = rows
+                    .filter((item) => item && typeof item === 'object')
+                    .map((item) => {
+                        const acNum = Number.parseInt(item.ac_no, 10);
+                        const acName = String(item.ac_name || '').trim();
+                        const label = String(item.label || '').trim();
+
+                        if (!Number.isInteger(acNum)) {
+                            return null;
+                        }
+
+                        return {
+                            value: String(acNum),
+                            text: label || `${acNum} - ${acName}`,
+                            acNumber: acNum,
+                            acName,
+                            label,
+                            districtCode,
+                            districtName: normalizedDistrictName
+                        };
+                    })
+                    .filter(Boolean)
+                    .sort((a, b) => a.acNumber - b.acNumber);
+            } else {
+                constituencies = rows.map((name) => {
+                    const acName = String(name || '').trim();
+                    const row = {
+                        value: String(acNumber),
+                        text: `${acNumber} - ${acName}`,
+                        acNumber,
+                        acName,
+                        districtCode,
+                        districtName: normalizedDistrictName
+                    };
+                    acNumber += 1;
+                    return row;
+                });
+            }
+
+            return {
+                districtCode,
+                districtName: normalizedDistrictName,
+                constituencies,
+                constituencyCount: constituencies.length,
+                error: null
+            };
+        });
+
+        return {
+            generatedAt: new Date().toISOString(),
+            source: 'User provided Tamil Nadu mapping',
+            stateCode: 'S22',
+            stateName: 'Tamil Nadu',
+            year: Number(parsed.year || new Date().getFullYear()),
+            districtCount: districts.length,
+            totalConstituencies: districts.reduce((sum, d) => sum + d.constituencyCount, 0),
+            districts
+        };
+    }
+
+    return null;
+}
+
+const KERALA_CONSTITUENCY_RANGES = [
+    { districtCode: 'S1101', start: 1, end: 5 },
+    { districtCode: 'S1102', start: 6, end: 16 },
+    { districtCode: 'S1103', start: 17, end: 19 },
+    { districtCode: 'S1104', start: 20, end: 32 },
+    { districtCode: 'S1105', start: 33, end: 48 },
+    { districtCode: 'S1106', start: 49, end: 60 },
+    { districtCode: 'S1107', start: 61, end: 73 },
+    { districtCode: 'S1108', start: 74, end: 87 },
+    { districtCode: 'S1109', start: 88, end: 92 },
+    { districtCode: 'S1110', start: 93, end: 101 },
+    { districtCode: 'S1111', start: 102, end: 110 },
+    { districtCode: 'S1112', start: 111, end: 115 },
+    { districtCode: 'S1113', start: 116, end: 126 },
+    { districtCode: 'S1114', start: 127, end: 140 }
+];
+
+function loadTamilNaduS22Mapping() {
+    try {
+        const raw = fs.readFileSync(TAMIL_NADU_S22_MAPPING_FILE, 'utf8');
+        const parsed = JSON.parse(stripBom(raw));
+        return normalizeTamilNaduS22Mapping(parsed);
+    } catch (error) {
+        logger.error(`Assembly: Failed to load S22 mapping: ${error.message}`);
+        return null;
+    }
+}
+
+function resolveDistrictCode(stateCode, constituency, district) {
+    if (district) {
+        return district;
+    }
+
+    const acNumber = Number.parseInt(constituency, 10);
+    if (!Number.isInteger(acNumber)) {
+        return '';
+    }
+
+    if (stateCode === 'S11') {
+        return KERALA_CONSTITUENCY_RANGES.find((entry) => acNumber >= entry.start && acNumber <= entry.end)?.districtCode || '';
+    }
+
+    if (stateCode === 'S22') {
+        const mapping = loadTamilNaduS22Mapping();
+        if (!mapping) {
+            return '';
+        }
+
+        return mapping.districts.find((entry) =>
+            (entry.constituencies || []).some((item) => Number(item.acNumber) === acNumber)
+        )?.districtCode || '';
+    }
+
+    return '';
+}
+
 const PREVIEW_TTL_MS = 30 * 60 * 1000;
 const assemblyPreviewSessions = new Map();
 
@@ -173,8 +367,9 @@ export const healthCheck = (req, res) => {
 export const getCaptcha = async (req, res) => {
     try {
         const { stateCode, year, rollType, district, constituency, language } = req.body;
+        const resolvedDistrict = resolveDistrictCode(stateCode, constituency, district);
 
-        if (!stateCode || !year || !rollType || !district || !constituency || !language) {
+        if (!stateCode || !year || !rollType || !constituency || !language || !resolvedDistrict) {
             return res.status(400).json({
                 status: 'error',
                 message: 'All form fields are required'
@@ -184,8 +379,8 @@ export const getCaptcha = async (req, res) => {
         logger.info(`Assembly: Generating captcha for AC ${constituency}...`);
 
         // Step 1: Fetch polling parts using direct API
-        logger.info(`Assembly: Fetching polling parts for district ${district}, AC ${constituency}...`);
-        const pollingParts = await getPollingPartsList(stateCode, district, constituency, rollType, year);
+        logger.info(`Assembly: Fetching polling parts for district ${resolvedDistrict}, AC ${constituency}...`);
+        const pollingParts = await getPollingPartsList(stateCode, resolvedDistrict, constituency, rollType, year);
         logger.info(`Assembly: Found ${pollingParts.length} polling parts`);
 
         // Step 2: Generate captcha using direct API
@@ -252,7 +447,9 @@ async function runExtractionJob(body, progressId) {
         constituencyLabel = '',
     } = body;
 
-    if (!stateCode || !year || !rollType || !district || !constituency || !language || !captcha || !captchaId) {
+    const resolvedDistrict = resolveDistrictCode(stateCode, constituency, district);
+
+    if (!stateCode || !year || !rollType || !constituency || !language || !captcha || !captchaId || !resolvedDistrict) {
         throw createExtractionError('All fields including captcha and captcha ID are required', 400);
     }
 
@@ -269,7 +466,7 @@ async function runExtractionJob(body, progressId) {
     }
 
     logger.info(`Assembly: Starting voter extraction for AC ${constituency}`);
-    logger.info(`Assembly: Request data - State: ${stateCode}, District: ${district}, AC: ${constituency}`);
+    logger.info(`Assembly: Request data - State: ${stateCode}, District: ${resolvedDistrict}, AC: ${constituency}`);
     logger.info(`Assembly: Roll Type: ${rollType}, Year: ${year}, Language: ${language}`);
     logger.info(`Assembly: Captcha ID: ${captchaId}, Selected ${selectedParts.length} polling parts`);
     logger.info(`Assembly: Selected parts: ${JSON.stringify(selectedParts).substring(0, 500)}`);
@@ -292,10 +489,10 @@ async function runExtractionJob(body, progressId) {
     });
 
     logger.info('Assembly: Requesting PDF generation from ECI API...');
-        
-        const pdfResult = await generatePublishedPDFs({
+
+        let pdfResult = await generatePublishedPDFs({
             stateCode,
-            districtCode: district,
+            districtCode: resolvedDistrict,
             acNumber: constituency,
             rollType,
             year,
@@ -325,9 +522,10 @@ async function runExtractionJob(body, progressId) {
         }
 
         const downloadedPDFs = [];
+        let refreshedPdfUrls = false;
         
         for (let i = 0; i < pdfResult.pdfUrls.length; i++) {
-            const pdfUrl = pdfResult.pdfUrls[i];
+            let pdfUrl = pdfResult.pdfUrls[i];
             const pdfFileName = `voter-list-${constituency}-${Date.now()}-${i + 1}.pdf`;
             const pdfPath = path.join(pdfDir, pdfFileName);
 
@@ -338,25 +536,56 @@ async function runExtractionJob(body, progressId) {
             while (!pdfDownloaded && downloadAttempts < maxAttempts) {
                 downloadAttempts++;
                 try {
-                    logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts}) from ${pdfUrl}...`);
+                    const candidateUrls = (() => {
+                        const urls = [pdfUrl];
+                        try {
+                            const parsed = new URL(pdfUrl);
+                            const p = parsed.pathname || '';
+                            const nakedPath = p.startsWith('/eroll/') ? p.slice('/eroll'.length) : p;
+                            const erollPath = p.startsWith('/eroll/') ? p : `/eroll${p.startsWith('/') ? p : `/${p}`}`;
 
-                    const response = await axios.get(pdfUrl, {
-                        responseType: 'arraybuffer',
-                        timeout: 60000, // 60 second timeout
-                        headers: {
-                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                            'Accept-Language': 'en-US,en;q=0.9',
-                            'Accept-Encoding': 'gzip, deflate, br',
-                            'Referer': 'https://voters.eci.gov.in/',
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                            'Connection': 'keep-alive',
-                            'Upgrade-Insecure-Requests': '1',
-                            'sec-fetch-dest': 'document',
-                            'sec-fetch-mode': 'navigate',
-                            'sec-fetch-site': 'none',
-                            'sec-fetch-user': '?1'
+                            ['voters.eci.gov.in', 'gateway-voters.eci.gov.in'].forEach((host) => {
+                                urls.push(`${parsed.protocol}//${host}${erollPath}`);
+                                urls.push(`${parsed.protocol}//${host}${nakedPath.startsWith('/') ? nakedPath : `/${nakedPath}`}`);
+                            });
+                        } catch (_error) {
+                            // Keep original URL if parsing fails.
                         }
-                    });
+                        return Array.from(new Set(urls.filter(Boolean)));
+                    })();
+
+                    let response = null;
+                    let lastCandidateError = null;
+                    for (const candidateUrl of candidateUrls) {
+                        try {
+                            logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts}) from ${candidateUrl}...`);
+                            response = await axios.get(candidateUrl, {
+                                responseType: 'arraybuffer',
+                                timeout: 60000,
+                                headers: {
+                                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                                    'Accept-Language': 'en-US,en;q=0.9',
+                                    'Accept-Encoding': 'gzip, deflate, br',
+                                    'Referer': 'https://voters.eci.gov.in/',
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                                    'Connection': 'keep-alive',
+                                    'Upgrade-Insecure-Requests': '1',
+                                    'sec-fetch-dest': 'document',
+                                    'sec-fetch-mode': 'navigate',
+                                    'sec-fetch-site': 'none',
+                                    'sec-fetch-user': '?1'
+                                }
+                            });
+                            pdfUrl = candidateUrl;
+                            break;
+                        } catch (candidateError) {
+                            lastCandidateError = candidateError;
+                        }
+                    }
+
+                    if (!response) {
+                        throw lastCandidateError || new Error('PDF download failed for all candidate URLs');
+                    }
 
                     fs.writeFileSync(pdfPath, response.data);
                     
@@ -383,6 +612,33 @@ async function runExtractionJob(body, progressId) {
                     logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
                 } catch (downloadError) {
                     logger.error(`Assembly: Failed to download PDF ${i + 1} on attempt ${downloadAttempts}:`, downloadError.message);
+
+                    const statusCode = downloadError?.response?.status;
+                    const is404 = statusCode === 404;
+                    if (is404 && !refreshedPdfUrls) {
+                        try {
+                            logger.info('Assembly: PDF URL returned 404. Refreshing PDF URLs from ECI and retrying...');
+                            pdfResult = await generatePublishedPDFs({
+                                stateCode,
+                                districtCode: resolvedDistrict,
+                                acNumber: constituency,
+                                rollType,
+                                year,
+                                language,
+                                partNumbers,
+                                captcha,
+                                captchaId
+                            });
+                            if (Array.isArray(pdfResult?.pdfUrls) && pdfResult.pdfUrls[i]) {
+                                pdfUrl = pdfResult.pdfUrls[i];
+                                refreshedPdfUrls = true;
+                                continue;
+                            }
+                        } catch (refreshError) {
+                            logger.error(`Assembly: Failed to refresh PDF URLs: ${refreshError.message}`);
+                        }
+                    }
+
                     if (downloadAttempts < maxAttempts) {
                         const delayMs = downloadAttempts * 2500; // 2.5s, 5s delay
                         logger.info(`Assembly: Waiting ${delayMs}ms before retrying...`);

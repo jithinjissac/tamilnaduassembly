@@ -15,6 +15,35 @@
 			"command": "npm start",
 			"isBackground": true,
 			"group": "build"
+		},
+		{
+			"label": "Run ECI DOM extractor sample",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"scripts/export-eci-dom-constituencies.mjs"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run ECI DOM extractor sample via cmd",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"set ECI_STATE=S11&& set ECI_YEAR=2026&& set ECI_DISTRICT=S1101&& set ECI_HEADLESS=1&& set ECI_OUT_FILE=data\\eci\\dom-s11-s1101.json&& node scripts\\export-eci-dom-constituencies.mjs"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run DOM sample batch",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"scripts\\run-dom-sample.cmd"
+			],
+			"isBackground": false
 		}
 	]
 }

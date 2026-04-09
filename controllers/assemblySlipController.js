@@ -339,17 +339,17 @@ function generateSlipsHTML(voters, candidate, metadata) {
                 <div class="slip-left">
                     <div class="slip-left-content">
                         ${showSymbol 
-                            ? `<div class="symbol-header">നമ്മുടെ<br>ചിഹ്നം</div>
+                            ? `<div class="symbol-header">நமது<br>சின்னம்</div>
                                <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
                                ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
                             : `<div style="text-align:center; width:100%; line-height:1.2;">
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ജില്ല</div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">மாவட்டம்</div>
                         <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${districtDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">നിയോജകമണ്ഡലം</div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">சட்டமன்றத் தொகுதி</div>
                         <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituencyDisplay}</div>
                         <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">ഭാഗം നമ്പർ</div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">பகுதி எண்</div>
                         <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
                         </div>`
                         }
@@ -362,7 +362,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
                             : `<div class="snippet-fallback">${fallbackInfo || 'No snippet available'}</div>`
                         }
                     </div>
-                    <div class="polling-station-footer">പോളിംഗ് സ്റ്റേഷൻ: ${pollingStation !== '-' ? pollingStation : ''}</div>
+                    <div class="polling-station-footer">வாக்குச்சாவடி: ${pollingStation !== '-' ? pollingStation : ''}</div>
                 </div>
             </div>`;
         }).join('\n');
@@ -371,16 +371,16 @@ function generateSlipsHTML(voters, candidate, metadata) {
     }).join('\n');
 
     return `<!DOCTYPE html>
-<html lang="ml">
+<html lang="ta">
 <head>
     <meta charset="UTF-8">
     <title>Assembly Voter Information Slips - ${constituency}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
+        body { font-family: 'Noto Sans Tamil', 'Noto Sans', Arial, sans-serif; background: #fff; }
 
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; align-items: center; page-break-after: always; }
         .page:last-child { page-break-after: auto; }

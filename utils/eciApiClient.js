@@ -5,6 +5,45 @@ import { logger } from './logger.js';
 // Base URL for ECI portal
 const ECI_BASE_URL = 'https://voters.eci.gov.in';
 
+const getDownloadErollUrl = (stateCode) => {
+    if (stateCode) {
+        return `${ECI_BASE_URL}/download-eroll?stateCode=${encodeURIComponent(stateCode)}`;
+    }
+
+    return `${ECI_BASE_URL}/download-eroll`;
+};
+
+const DISTRICT_SELECTORS = [
+    'select[aria-label="District"]',
+    'select[aria-label="Select District"]',
+    'select[name="district"]',
+    'select[id*="district"]',
+];
+
+const getDistrictsFromPage = async (page) => {
+    return page.evaluate((selectors) => {
+        for (const selector of selectors) {
+            const districtSelect = document.querySelector(selector);
+            if (!districtSelect) {
+                continue;
+            }
+
+            const districts = Array.from(districtSelect.querySelectorAll('option'))
+                .filter((option) => option.value && option.value !== '')
+                .map((option) => ({
+                    value: option.value,
+                    text: option.textContent.trim(),
+                }));
+
+            if (districts.length > 0) {
+                return districts;
+            }
+        }
+
+        return [];
+    }, DISTRICT_SELECTORS);
+};
+
 // Cache for discovered API endpoints
 const apiEndpoints = {
     discovered: false,
@@ -219,27 +258,21 @@ export const fetchDistrictsFromECI = async (stateCode) => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
-        await page.goto(`${ECI_BASE_URL}/download-eroll`, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.goto(getDownloadErollUrl(stateCode), { waitUntil: 'networkidle', timeout: 30000 });
         await page.waitForTimeout(2000);
 
         // Select state
-        await page.selectOption('select[aria-label="Select State"]', stateCode);
-        await page.waitForTimeout(2000);
+        const stateSelect = await page.$('select[aria-label="State"], select[aria-label="Select State"], select[name="stateCode"]');
+        if (stateSelect) {
+            await stateSelect.selectOption(stateCode);
+            await page.waitForTimeout(2000);
+        }
 
-        // Extract districts
-        const districts = await page.evaluate(() => {
-            const districtSelect = document.querySelector('select[aria-label="Select District"]');
-            if (!districtSelect) return [];
-            
-            return Array.from(districtSelect.querySelectorAll('option'))
-                .filter(opt => opt.value && opt.value !== '')
-                .map(opt => ({
-                    value: opt.value,
-                    text: opt.textContent.trim()
-                }));
-        });
+        const districts = await getDistrictsFromPage(page);
 
         await browser.close();
+
+        logger.info(`ECI API: Scraped ${districts.length} districts for ${stateCode}`);
         return districts;
     } catch (error) {
         logger.error('ECI API: Error fetching districts:', error);
@@ -252,118 +285,124 @@ export const fetchDistrictsFromECI = async (stateCode) => {
  */
 export const fetchConstituenciesFromECI = async (stateCode, district) => {
     try {
+        logger.info(`ECI API: fetchConstituenciesFromECI start state=${stateCode}, district=${district}`);
         const browser = await chromium.launch({ headless: true });
         const context = await browser.newContext();
         const page = await context.newPage();
 
-        await page.goto(`${ECI_BASE_URL}/download-eroll`, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.goto(getDownloadErollUrl(stateCode), { waitUntil: 'networkidle', timeout: 30000 });
+        logger.info('ECI API: download-eroll page loaded');
         await page.waitForTimeout(2000);
 
-        // Select state
-        await page.selectOption('select[aria-label="Select State"]', stateCode);
-        await page.waitForTimeout(1000);
+        await page.waitForSelector('select[aria-label="Year Of Revision"], select[aria-label="Select Year of Revision"], select[name="revyear"]', { timeout: 10000 });
+
+        // Select state (if selector is present and enabled)
+        const stateSelect = await page.$('select[aria-label="State"], select[aria-label="Select State"], select[name="stateCode"]');
+        if (stateSelect) {
+            try {
+                await stateSelect.selectOption(stateCode);
+                await page.waitForTimeout(1000);
+            } catch (error) {
+                logger.warn(`ECI API: Could not change state dropdown (${error.message})`);
+            }
+        }
 
         // Get any year to enable district dropdown
         const yearValue = await page.evaluate(() => {
-            const yearSelect = document.querySelector('select[aria-label="Select Year of Revision"]');
+            const yearSelect = document.querySelector('select[aria-label="Year Of Revision"], select[aria-label="Select Year of Revision"], select[name="revyear"]');
             const options = yearSelect ? Array.from(yearSelect.querySelectorAll('option')) : [];
             const validOption = options.find(opt => opt.value && opt.value !== '');
             return validOption ? validOption.value : null;
         });
 
         if (yearValue) {
-            await page.selectOption('select[aria-label="Select Year of Revision"]', yearValue);
+            await page.selectOption('select[aria-label="Year Of Revision"], select[aria-label="Select Year of Revision"], select[name="revyear"]', yearValue);
             await page.waitForTimeout(1500);
+            logger.info(`ECI API: year selected ${yearValue}`);
+        }
+
+        // Select roll type to enable district/constituency flow
+        const rollTypeValue = await page.evaluate(() => {
+            const rollTypeSelect = document.querySelector('select[aria-label="Roll Type"], select[aria-label="Select Roll Type"], select[name="roleType"]');
+            if (!rollTypeSelect) return null;
+            const options = Array.from(rollTypeSelect.querySelectorAll('option'));
+            const preferred = options.find((opt) => opt.value && String(opt.value).includes('-FIR'));
+            if (preferred) return preferred.value;
+            const fallback = options.find((opt) => opt.value && opt.value !== '');
+            return fallback ? fallback.value : null;
+        });
+
+        if (rollTypeValue) {
+            await page.selectOption('select[aria-label="Roll Type"], select[aria-label="Select Roll Type"], select[name="roleType"]', rollTypeValue);
+            await page.waitForTimeout(1500);
+            logger.info(`ECI API: roll type selected ${rollTypeValue}`);
         }
 
         // Select district
-        await page.selectOption('select[aria-label="Select District"]', district);
+        await page.waitForSelector('select[aria-label="District"], select[aria-label="Select District"], select[name="district"]', { timeout: 10000 });
+        await page.selectOption('select[aria-label="District"], select[aria-label="Select District"], select[name="district"]', district);
         await page.waitForTimeout(2000);
 
         logger.info(`ECI API: Selected district ${district}, waiting for constituencies to load...`);
 
-        // Find and interact with constituency autocomplete field
-        const constituencyInput = await page.$('input[aria-label*="Constituency"], input[placeholder*="Constituency"], input[aria-label*="Assembly"]');
-        
+        // Open the React-select constituency dropdown and scrape option HTML
+        await page.waitForSelector('input[role="combobox"][id^="react-select-"][id$="-input"], input[aria-label*="Constituency"], input[placeholder*="Constituency"], input[aria-label*="Assembly"]', { timeout: 10000 });
+        const constituencyInput = await page.$('input[role="combobox"][id^="react-select-"][id$="-input"], input[aria-label*="Constituency"], input[placeholder*="Constituency"], input[aria-label*="Assembly"]');
         if (!constituencyInput) {
-            logger.error('ECI API: Constituency input field not found');
+            logger.error('ECI API: Constituency combobox input not found');
             await browser.close();
             return [];
         }
 
-        // Focus and clear the input
         await constituencyInput.click();
-        await page.waitForTimeout(500);
-        
-        // Try typing a space or empty string to trigger dropdown
-        await constituencyInput.fill('');
-        await page.waitForTimeout(500);
-        
-        // Press ArrowDown to open dropdown
+        await page.waitForTimeout(400);
         await constituencyInput.press('ArrowDown');
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(1200);
+        logger.info('ECI API: constituency dropdown interaction triggered');
 
-        // Alternative: trigger all possible events
-        await page.evaluate(() => {
-            const input = document.querySelector('input[aria-label*="Constituency"], input[placeholder*="Constituency"], input[aria-label*="Assembly"]');
-            if (input) {
-                input.focus();
-                input.click();
-                input.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-                input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-            }
+        const dropdownSnapshot = await page.evaluate(() => {
+            const listbox = document.querySelector('[id^="react-select-"][id$="-listbox"], [role="listbox"]');
+            return {
+                hasListbox: !!listbox,
+                html: listbox ? listbox.innerHTML : '',
+                optionCount: listbox ? listbox.querySelectorAll('[role="option"], div').length : 0,
+            };
         });
 
-        await page.waitForTimeout(2000);
-
-        // Wait for autocomplete dropdown to appear
-        try {
-            await page.waitForSelector('[role="listbox"], [role="option"], .MuiAutocomplete-listbox, .MuiAutocomplete-option', { timeout: 5000 });
-        } catch (e) {
-            logger.warn('ECI API: Autocomplete dropdown did not appear, trying to extract visible options');
+        if (dropdownSnapshot.hasListbox) {
+            logger.info(`ECI API: Constituency dropdown opened with ${dropdownSnapshot.optionCount} raw nodes`);
+        } else {
+            logger.warn('ECI API: Constituency listbox not detected after opening dropdown');
         }
 
-        // Extract constituency suggestions with multiple selectors
         const constituencies = await page.evaluate(() => {
-            // Try multiple possible selectors for Material-UI autocomplete
-            const selectors = [
-                '[role="listbox"] [role="option"]',
-                '.MuiAutocomplete-option',
-                'li[data-option-index]',
-                '[role="option"]',
-                '.autocomplete-item',
-                'ul[role="listbox"] li'
-            ];
-
-            let results = [];
-            
-            for (const selector of selectors) {
-                const items = document.querySelectorAll(selector);
-                if (items.length > 0) {
-                    items.forEach(item => {
-                        const text = item.textContent.trim();
-                        // Filter out empty, "no option", or duplicate entries
-                        if (text && 
-                            text.length > 0 && 
-                            !text.toLowerCase().includes('no option') &&
-                            !text.toLowerCase().includes('loading') &&
-                            !results.find(r => r.text === text)) {
-                            results.push({
-                                value: text,
-                                text: text
-                            });
-                        }
-                    });
-                    
-                    if (results.length > 0) {
-                        break; // Found results with this selector
-                    }
-                }
+            const listbox = document.querySelector('[id^="react-select-"][id$="-listbox"], [role="listbox"]');
+            if (!listbox) {
+                return [];
             }
-            
-            return results;
+
+            const optionNodes = listbox.querySelectorAll('[role="option"], .css-tr4s17-option, [id^="react-select-"][id*="-option-"]');
+            const seen = new Set();
+            const rows = [];
+
+            optionNodes.forEach((node) => {
+                const text = (node.textContent || '').trim();
+                if (!text) return;
+                const lower = text.toLowerCase();
+                if (lower.includes('select ac') || lower.includes('no options') || lower.includes('loading')) return;
+                if (seen.has(text)) return;
+                seen.add(text);
+
+                const match = text.match(/^(\d+)\s*[-:]\s*(.+)$/);
+                rows.push({
+                    value: match ? match[1] : text,
+                    text,
+                    acNumber: match ? Number(match[1]) : null,
+                    acName: match ? match[2].trim() : text,
+                });
+            });
+
+            return rows;
         });
 
         logger.info(`ECI API: Found ${constituencies.length} constituencies for district ${district}`);
@@ -376,10 +415,10 @@ export const fetchConstituenciesFromECI = async (stateCode, district) => {
             // Log page information for debugging
             const debugInfo = await page.evaluate(() => {
                 return {
-                    hasInput: !!document.querySelector('input[aria-label*="Constituency"]'),
+                    hasInput: !!document.querySelector('input[role="combobox"][id^="react-select-"][id$="-input"], input[aria-label*="Constituency"]'),
                     hasListbox: !!document.querySelector('[role="listbox"]'),
                     hasOptions: document.querySelectorAll('[role="option"]').length,
-                    inputValue: document.querySelector('input[aria-label*="Constituency"]')?.value || 'not found'
+                    inputValue: document.querySelector('input[role="combobox"][id^="react-select-"][id$="-input"], input[aria-label*="Constituency"]')?.value || 'not found'
                 };
             });
             logger.warn('ECI API: Debug info:', debugInfo);

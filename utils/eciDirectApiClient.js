@@ -230,46 +230,100 @@ export const generatePublishedPDFs = async (payload) => {
         logger.info(`   Part Numbers: ${partNumbers.join(', ')}`);
         
         const publishedRollId = normalizeRollTypeRefId(rollType, stateCode, year);
-        
-        // Language code mapping - For Kerala (S11), use MAL
-        // ECI accepts specific language codes per state
-        let langCode = 'MAL';  // Default to Malayalam for Kerala
-        
-        if (language === 'en' && stateCode === 'S11') {
-            langCode = 'MAL';  // Kerala only accepts MAL
-        } else if (language === 'ml' || language === 'mal') {
-            langCode = 'MAL';
-        } else {
-            // Other states might have different codes
-            const langCodeMap = {
-                'hi': 'HIN',
-                'ta': 'TAM',
-                'te': 'TEL',
-                'kn': 'KAN',
-                'ur': 'URD'
-            };
-            langCode = langCodeMap[language] || 'MAL';
-        }
-        
-        const requestBody = {
-            stateCd: stateCode,
-            acNumber: parseInt(acNumber),
-            partNumberList: partNumbers,  // Correct field name
-            districtCd: "",                // Empty string
-            captcha: captcha,
-            captchaId: captchaId,
-            langCd: langCode,              // Use uppercase language code
-            publishedRollId: publishedRollId  // Format: S11-2026-FIR
+
+        const languageKey = String(language || '').toLowerCase();
+        const langCodeMap = {
+            en: 'ENG',
+            hi: 'HIN',
+            ta: 'TAM',
+            te: 'TEL',
+            kn: 'KAN',
+            ur: 'URD',
+            ml: 'MAL',
+            mal: 'MAL'
         };
-        
-        logger.info(`   Published Roll ID: ${publishedRollId}, Lang Code: ${langCode}`);
-        logger.info(`📤 Request body: ${JSON.stringify(requestBody)}`);
-        
-        const response = await axios.post(
-            `${BASE_URL}/api/v1/printing-publish/generate-published-pdfs`,
-            requestBody,
-            { headers: getHeaders() }
-        );
+
+        // State-specific defaults validated from ECI behavior.
+        let langCode = stateCode === 'S22'
+            ? 'TAM'
+            : (stateCode === 'S11' ? 'MAL' : (langCodeMap[languageKey] || 'ENG'));
+
+        const postGenerateRequest = async (effectiveLangCode) => {
+            const requestBody = {
+                stateCd: stateCode,
+                acNumber: parseInt(acNumber, 10),
+                partNumberList: partNumbers,
+                districtCd: districtCode || "",
+                captcha,
+                captchaId,
+                langCd: effectiveLangCode,
+                publishedRollId
+            };
+
+            logger.info(`   Published Roll ID: ${publishedRollId}, Lang Code: ${effectiveLangCode}`);
+            logger.info(`📤 Request body: ${JSON.stringify(requestBody)}`);
+
+            return axios.post(
+                `${BASE_URL}/api/v1/printing-publish/generate-published-pdfs`,
+                requestBody,
+                { headers: getHeaders() }
+            );
+        };
+
+        let response;
+        try {
+            response = await postGenerateRequest(langCode);
+        } catch (error) {
+            const eciMessage = String(error?.response?.data?.message || '');
+            const isLangError = error?.response?.status === 400 && /language code/i.test(eciMessage);
+
+            if (!isLangError) {
+                throw error;
+            }
+
+            logger.warn(`⚠️ ECI rejected language code '${langCode}'. Fetching valid language codes for AC ${acNumber}...`);
+
+            const langResponse = await axios.post(
+                `${BASE_URL}/api/v1/printing-publish/get-ac-languages`,
+                {
+                    stateCd: stateCode,
+                    acNumber: parseInt(acNumber, 10),
+                    rollTypeRefId: publishedRollId,
+                    pdfGenType: 'EROLLGEN'
+                },
+                { headers: getHeaders() }
+            );
+
+            const payload = langResponse?.data?.payload;
+            let availableCodes = [];
+            if (Array.isArray(payload)) {
+                availableCodes = payload
+                    .map((row) => row?.langCd || row?.code || row?.id)
+                    .filter(Boolean)
+                    .map((code) => String(code).toUpperCase());
+            } else if (payload && typeof payload === 'object') {
+                availableCodes = Object.keys(payload).map((code) => String(code).toUpperCase());
+            }
+
+            availableCodes = Array.from(new Set(availableCodes));
+            if (availableCodes.length === 0) {
+                throw error;
+            }
+
+            const desiredCode = (langCodeMap[languageKey] || '').toUpperCase();
+            const fallbackCandidates = [
+                desiredCode,
+                stateCode === 'S22' ? 'TAM' : '',
+                stateCode === 'S11' ? 'MAL' : '',
+                'ENG'
+            ].filter(Boolean);
+
+            const fallbackLangCode = fallbackCandidates.find((candidate) => availableCodes.includes(candidate)) || availableCodes[0];
+
+            logger.info(`🔁 Retrying generate-published-pdfs with language code ${fallbackLangCode} (available: ${availableCodes.join(', ')})`);
+            response = await postGenerateRequest(fallbackLangCode);
+            langCode = fallbackLangCode;
+        }
         
         logger.info(`📥 Response status: ${response.data?.status}`);
         logger.info(`📥 Full Response: ${JSON.stringify(response.data)}`);

@@ -748,22 +748,16 @@
                 <input type="hidden" id="year" value="2026">
                 <input type="hidden" id="rollType" value="S11-2026-FIR-2">
                 <input type="hidden" id="language" value="en">
+                <input type="hidden" id="district" value="">
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="district"><i class="fas fa-map-marked-alt"></i> District <span style="color: var(--kerala-red);">*</span></label>
-                        <select id="district" required>
-                            <option value="">Loading districts...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label for="constituency"><i class="fas fa-landmark"></i> Assembly Constituency <span style="color: var(--kerala-red);">*</span></label>
                         <select id="constituency" required disabled>
-                            <option value="">Select District First</option>
+                            <option value="">Loading constituencies...</option>
                         </select>
                         <small style="color: #666; display: block; margin-top: 0.5rem;">
-                            <i class="fas fa-info-circle"></i> Note: On ECI portal, this is an autocomplete field. Type to search.
+                            <i class="fas fa-info-circle"></i> Select constituency directly. District will be assigned automatically.
                         </small>
                     </div>
 
@@ -902,26 +896,19 @@
         document.addEventListener('DOMContentLoaded', async () => {
             // Initialize with fixed values - no need to load states/years/rollTypes/languages
             // State: Kerala (S11), Year: 2026, Roll Type: S11-2026-FIR-2, Language: Malayalam
-            await loadDistricts('S11');
+            await loadConstituencies();
             setupEventListeners();
         });
 
         function setupEventListeners() {
-            const districtSelect = document.getElementById('district');
             const constituencySelect = document.getElementById('constituency');
             const loadCaptchaBtn = document.getElementById('load-captcha-btn');
-
-            // District change - load constituencies for selected district
-            districtSelect.addEventListener('change', async (e) => {
-                if (e.target.value) {
-                    await loadConstituencies(e.target.value);
-                    constituencySelect.disabled = false;
-                }
-            });
 
             // Constituency change - trigger captcha auto-load
             constituencySelect.addEventListener('change', async (e) => {
                 if (e.target.value) {
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    document.getElementById('district').value = selectedOption?.dataset?.district || '';
                     checkFormCompletion();
                 }
             });
@@ -940,32 +927,7 @@
 
         // Roll type is fixed to S11-2026-FIR-2 - no need to load
 
-        async function loadDistricts(stateCode) {
-            try {
-                const response = await fetch(`${API_BASE}/getDistricts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode })
-                });
-                const data = await response.json();
-                
-                const districtSelect = document.getElementById('district');
-                districtSelect.innerHTML = '<option value="">Select District</option>';
-                
-                data.districts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.value;
-                    option.textContent = district.text;
-                    districtSelect.appendChild(option);
-                });
-
-                districtSelect.disabled = false;
-            } catch (error) {
-                showAlert('Error loading districts: ' + error.message, 'error');
-            }
-        }
-
-        async function loadConstituencies(district) {
+        async function loadConstituencies() {
             try {
                 const constituencySelect = document.getElementById('constituency');
                 constituencySelect.innerHTML = '<option value="">Loading from ECI...</option>';
@@ -975,7 +937,7 @@
                 const response = await fetch(`${API_BASE}/getConstituencies`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode: 'S11', district, year: '2026', rollType: 'S11-2026-FIR-2' })
+                    body: JSON.stringify({ stateCode: 'S11', year: '2026', rollType: 'S11-2026-FIR-2' })
                 });
                 const data = await response.json();
                 
@@ -989,6 +951,7 @@
                     const option = document.createElement('option');
                     option.value = ac.value;
                     option.textContent = ac.text;
+                    option.dataset.district = ac.districtCode || '';
                     constituencySelect.appendChild(option);
                 });
                 
@@ -1003,11 +966,10 @@
             const state = document.getElementById('state').value;
             const year = document.getElementById('year').value;
             const rollType = document.getElementById('rollType').value;
-            const district = document.getElementById('district').value;
             const constituency = document.getElementById('constituency').value;
             const language = document.getElementById('language').value;
 
-            if (state && year && rollType && district && constituency && language) {
+            if (state && year && rollType && constituency && language) {
                 document.getElementById('load-captcha-btn').disabled = false;
                 // Auto-load captcha when all fields are selected
                 loadCaptcha();

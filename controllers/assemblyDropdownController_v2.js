@@ -4,12 +4,224 @@
  */
 
 import { logger } from '../utils/logger.js';
+import fs from 'fs';
+import path from 'path';
 import {
     getRollTypes,
     getACLanguages,
     getPollingPartsList,
     getConstituencyData
 } from '../utils/eciDirectApiClient.js';
+
+const TAMIL_NADU_S22_MAPPING_FILE = path.join(
+    process.cwd(),
+    'data',
+    'eci',
+    'S22-user-mapping.json'
+);
+
+const TAMIL_NADU_DISTRICT_CODE_MAP = {
+    'THIRUVALLUR': 'S2201',
+    'CHENNAI': 'S2202',
+    'KANCHEEPURAM': 'S2203',
+    'VELLORE': 'S2204',
+    'KRISHNAGIRI': 'S2205',
+    'DHARMAPURI': 'S2206',
+    'TIRUVANNAMALAI': 'S2207',
+    'VILUPPURAM': 'S2208',
+    'SALEM': 'S2209',
+    'NAMAKKAL': 'S2210',
+    'ERODE': 'S2211',
+    'THE NILGIRIS': 'S2212',
+    'COIMBATORE': 'S2213',
+    'DINDIGUL': 'S2214',
+    'KARUR': 'S2215',
+    'TIRUCHIRAPPALLI': 'S2216',
+    'PERAMBALUR': 'S2217',
+    'CUDDALORE': 'S2218',
+    'NAGAPATTINAM': 'S2219',
+    'THIRUVARUR': 'S2220',
+    'THANJAVUR': 'S2221',
+    'PUDUKKOTTAI': 'S2222',
+    'SIVAGANGA': 'S2223',
+    'MADURAI': 'S2224',
+    'THENI': 'S2225',
+    'VIRUDHUNAGAR': 'S2226',
+    'RAMANATHAPURAM': 'S2227',
+    'THOOTHUKUDI': 'S2228',
+    'TIRUNELVELI': 'S2229',
+    'KANNIYAKUMARI': 'S2230',
+    'ARIYALUR': 'S2231',
+    'TIRUPPUR': 'S2232',
+    'KALLAKURICHI': 'S2233',
+    'TENKASI': 'S2234',
+    'CHENGALPATTU': 'S2235',
+    'TIRUPATHUR': 'S2236',
+    'RANIPET': 'S2237',
+    'MAYILADUTHURAI': 'S2238'
+};
+
+function stripBom(raw) {
+    if (typeof raw !== 'string') return raw;
+    return raw.charCodeAt(0) === 0xFEFF ? raw.slice(1) : raw;
+}
+
+function normalizeTamilNaduS22Mapping(parsed) {
+    if (!parsed) return null;
+
+    if (Array.isArray(parsed.districts)) {
+        return parsed;
+    }
+
+    const sourceDistricts = parsed.districts && typeof parsed.districts === 'object'
+        ? parsed.districts
+        : (parsed && typeof parsed === 'object' ? parsed : null);
+
+    if (sourceDistricts && typeof sourceDistricts === 'object') {
+        let acNumber = 1;
+        const districts = Object.entries(sourceDistricts).map(([districtName, districtEntries], districtIndex) => {
+            const normalizedDistrictName = String(districtName || '').trim();
+            const districtCode = TAMIL_NADU_DISTRICT_CODE_MAP[normalizedDistrictName.toUpperCase()] || `S22${String(districtIndex + 1).padStart(2, '0')}`;
+            const rows = Array.isArray(districtEntries) ? districtEntries : [];
+            const hasObjectRows = rows.some((item) => item && typeof item === 'object');
+
+            let constituencies = [];
+
+            if (hasObjectRows) {
+                constituencies = rows
+                    .filter((item) => item && typeof item === 'object')
+                    .map((item) => {
+                        const acNum = Number.parseInt(item.ac_no, 10);
+                        const acName = String(item.ac_name || '').trim();
+                        const label = String(item.label || '').trim();
+
+                        if (!Number.isInteger(acNum)) {
+                            return null;
+                        }
+
+                        return {
+                            value: String(acNum),
+                            text: label || `${acNum} - ${acName}`,
+                            acNumber: acNum,
+                            acName,
+                            label,
+                            districtCode,
+                            districtName: normalizedDistrictName
+                        };
+                    })
+                    .filter(Boolean)
+                    .sort((a, b) => a.acNumber - b.acNumber);
+            } else {
+                constituencies = rows.map((name) => {
+                    const acName = String(name || '').trim();
+                    const row = {
+                        value: String(acNumber),
+                        text: `${acNumber} - ${acName}`,
+                        acNumber,
+                        acName,
+                        districtCode,
+                        districtName: normalizedDistrictName
+                    };
+                    acNumber += 1;
+                    return row;
+                });
+            }
+
+            return {
+                districtCode,
+                districtName: normalizedDistrictName,
+                constituencies,
+                constituencyCount: constituencies.length,
+                error: null
+            };
+        });
+
+        return {
+            generatedAt: new Date().toISOString(),
+            source: 'User provided Tamil Nadu mapping',
+            stateCode: 'S22',
+            stateName: 'Tamil Nadu',
+            year: Number(parsed.year || new Date().getFullYear()),
+            districtCount: districts.length,
+            totalConstituencies: districts.reduce((sum, d) => sum + d.constituencyCount, 0),
+            districts
+        };
+    }
+
+    return null;
+}
+
+const loadTamilNaduS22Mapping = () => {
+    try {
+        const raw = fs.readFileSync(TAMIL_NADU_S22_MAPPING_FILE, 'utf8');
+        const parsed = JSON.parse(stripBom(raw));
+        return normalizeTamilNaduS22Mapping(parsed);
+    } catch (error) {
+        logger.error(`Assembly: Failed to load S22 Tamil Nadu mapping: ${error.message}`);
+        return null;
+    }
+};
+
+function getTamilNaduConstituenciesFromMapping(district = '') {
+    const mapping = loadTamilNaduS22Mapping();
+
+    if (!mapping) {
+        return {
+            ok: false,
+            statusCode: 500,
+            message: 'S22 mapping file is missing or invalid',
+            constituencies: []
+        };
+    }
+
+    const sourceDistricts = district
+        ? mapping.districts.filter((item) => item.districtCode === district)
+        : mapping.districts;
+
+    if (sourceDistricts.length === 0) {
+        return {
+            ok: false,
+            statusCode: 404,
+            message: `No constituencies found for district ${district}`,
+            constituencies: []
+        };
+    }
+
+    const constituencies = sourceDistricts
+        .flatMap((districtEntry) =>
+            (districtEntry.constituencies || []).map((item) => ({
+                value: String(item.value ?? item.acNumber),
+                text: item.label || item.text || `${item.acNumber} - ${item.acName}`,
+                districtCode: districtEntry.districtCode,
+                districtName: districtEntry.districtName
+            }))
+        )
+        .sort((a, b) => Number(a.value) - Number(b.value));
+
+    return {
+        ok: true,
+        statusCode: 200,
+        message: 'success',
+        constituencies
+    };
+}
+
+const KERALA_CONSTITUENCY_RANGES = [
+    { districtCode: 'S1101', start: 1, end: 5 },
+    { districtCode: 'S1102', start: 6, end: 16 },
+    { districtCode: 'S1103', start: 17, end: 19 },
+    { districtCode: 'S1104', start: 20, end: 32 },
+    { districtCode: 'S1105', start: 33, end: 48 },
+    { districtCode: 'S1106', start: 49, end: 60 },
+    { districtCode: 'S1107', start: 61, end: 73 },
+    { districtCode: 'S1108', start: 74, end: 87 },
+    { districtCode: 'S1109', start: 88, end: 92 },
+    { districtCode: 'S1110', start: 93, end: 101 },
+    { districtCode: 'S1111', start: 102, end: 110 },
+    { districtCode: 'S1112', start: 111, end: 115 },
+    { districtCode: 'S1113', start: 116, end: 126 },
+    { districtCode: 'S1114', start: 127, end: 140 }
+];
 
 // Cache for dropdown data
 const cache = {
@@ -61,7 +273,7 @@ export const getStates = async (req, res) => {
             { value: 'S19', text: 'LAKSHADWEEP' },
             { value: 'S20', text: 'MADHYA PRADESH' },
             { value: 'S21', text: 'MAHARASHTRA' },
-            { value: 'S22', text: 'MANIPUR' },
+            { value: 'S22', text: 'TAMIL NADU' },
             { value: 'S23', text: 'MEGHALAYA' },
             { value: 'S24', text: 'MIZORAM' },
             { value: 'S25', text: 'NAGALAND' },
@@ -70,7 +282,6 @@ export const getStates = async (req, res) => {
             { value: 'S28', text: 'PUNJAB' },
             { value: 'S29', text: 'RAJASTHAN' },
             { value: 'S30', text: 'SIKKIM' },
-            { value: 'S31', text: 'TAMIL NADU' },
             { value: 'S32', text: 'TELANGANA' },
             { value: 'S33', text: 'TRIPURA' },
             { value: 'S34', text: 'UTTAR PRADESH' },
@@ -222,73 +433,21 @@ export const getDistricts = async (req, res) => {
             return res.json({ status: 'success', districts });
         }
 
-        // Tamil Nadu (S31) districts (ECI district code format: S31XX)
-        if (stateCode === 'S31') {
-            const districts = [
-                { value: 'S3101', text: 'ARIYALUR' },
-                { value: 'S3102', text: 'CHENGALPATTU' },
-                { value: 'S3103', text: 'CHENNAI' },
-                { value: 'S3104', text: 'COIMBATORE' },
-                { value: 'S3105', text: 'CUDDALORE' },
-                { value: 'S3106', text: 'DHARMAPURI' },
-                { value: 'S3107', text: 'DINDIGUL' },
-                { value: 'S3108', text: 'ERODE' },
-                { value: 'S3109', text: 'KALLAKURICHI' },
-                { value: 'S3110', text: 'KANCHIPURAM' },
-                { value: 'S3111', text: 'KANNIYAKUMARI' },
-                { value: 'S3112', text: 'KARUR' },
-                { value: 'S3113', text: 'KRISHNAGIRI' },
-                { value: 'S3114', text: 'MADURAI' },
-                { value: 'S3115', text: 'MAYILADUTHURAI' },
-                { value: 'S3116', text: 'NAGAPATTINAM' },
-                { value: 'S3117', text: 'NAMAKKAL' },
-                { value: 'S3118', text: 'NILGIRIS' },
-                { value: 'S3119', text: 'PERAMBALUR' },
-                { value: 'S3120', text: 'PUDUKKOTTAI' },
-                { value: 'S3121', text: 'RAMANATHAPURAM' },
-                { value: 'S3122', text: 'RANIPET' },
-                { value: 'S3123', text: 'SALEM' },
-                { value: 'S3124', text: 'SIVAGANGA' },
-                { value: 'S3125', text: 'TENKASI' },
-                { value: 'S3126', text: 'THANJAVUR' },
-                { value: 'S3127', text: 'THENI' },
-                { value: 'S3128', text: 'THOOTHUKUDI' },
-                { value: 'S3129', text: 'TIRUCHIRAPPALLI' },
-                { value: 'S3130', text: 'TIRUNELVELI' },
-                { value: 'S3131', text: 'TIRUPATHUR' },
-                { value: 'S3132', text: 'TIRUPPUR' },
-                { value: 'S3133', text: 'TIRUVALLUR' },
-                { value: 'S3134', text: 'TIRUVANNAMALAI' },
-                { value: 'S3135', text: 'TIRUVARUR' },
-                { value: 'S3136', text: 'VELLORE' },
-                { value: 'S3137', text: 'VILLUPURAM' },
-                { value: 'S3138', text: 'VIRUDHUNAGAR' }
-            ];
-
-            cache.districts = districts;
-            return res.json({ status: 'success', districts });
-        }
-
-        // Manipur (S22) districts
+        // Tamil Nadu districts from custom JSON mapping
         if (stateCode === 'S22') {
-            const districts = [
-                { value: 'S2201', text: 'BISHNUPUR' },
-                { value: 'S2202', text: 'CHANDEL' },
-                { value: 'S2203', text: 'CHURACHANDPUR' },
-                { value: 'S2204', text: 'IMPHAL EAST' },
-                { value: 'S2205', text: 'IMPHAL WEST' },
-                { value: 'S2206', text: 'JIRIBAM' },
-                { value: 'S2207', text: 'KAKCHING' },
-                { value: 'S2208', text: 'KAMJONG' },
-                { value: 'S2209', text: 'KANGPOKPI' },
-                { value: 'S2210', text: 'NONEY' },
-                { value: 'S2211', text: 'PHERZAWL' },
-                { value: 'S2212', text: 'SENAPATI' },
-                { value: 'S2213', text: 'TAMENGLONG' },
-                { value: 'S2214', text: 'TENGNOUPAL' },
-                { value: 'S2215', text: 'THOUBAL' },
-                { value: 'S2216', text: 'UKHRUL' }
-            ];
+            const mapping = loadTamilNaduS22Mapping();
+
+            if (!mapping) {
+                return res.status(500).json({
+                    status: 'error',
+                    message: 'S22 mapping file is missing or invalid'
+                });
+            }
+
+            const districts = mapping.districts.map((districtEntry) => ({
+                value: districtEntry.districtCode,
+                text: String(districtEntry.districtName || '')
+            }));
 
             cache.districts = districts;
             return res.json({ status: 'success', districts });
@@ -297,7 +456,7 @@ export const getDistricts = async (req, res) => {
         // For other states, return error (need to implement)
         res.status(501).json({
             status: 'error',
-            message: `Districts for state ${stateCode} not yet implemented. Currently only Kerala (S11) is supported.`
+            message: `Districts for state ${stateCode} not yet implemented.`
         });
         
     } catch (error) {
@@ -318,14 +477,14 @@ export const getAssemblyConstituencies = async (req, res) => {
     try {
         const { stateCode, district, year, rollType } = req.body;
         
-        if (!stateCode || !district || !year || !rollType) {
+        if (!stateCode || !year || !rollType) {
             return res.status(400).json({
                 status: 'error',
-                message: 'State code, district, year, and roll type are required'
+                message: 'State code, year, and roll type are required'
             });
         }
         
-        logger.info(`Assembly: Fetching constituencies for district ${district}...`);
+        logger.info(`Assembly: Fetching constituencies${district ? ` for district ${district}` : ''}...`);
         
         // 🔥 VERIFIED ECI DATA - Extracted directly from ECI portal (2026-03-02)
         // All 140 Kerala Assembly Constituencies with correct names and district mappings
@@ -514,32 +673,26 @@ export const getAssemblyConstituencies = async (req, res) => {
             ]
         };
         
-        // Tamil Nadu: provide full AC list (1..234). ECI API operations later use AC number.
-        if (stateCode === 'S31') {
-            const constituencies = Array.from({ length: 234 }, (_, idx) => {
-                const acNo = idx + 1;
-                return {
-                    value: String(acNo),
-                    text: `${acNo} - ASSEMBLY CONSTITUENCY ${acNo}`
-                };
-            });
-
-            return res.json({ status: 'success', constituencies });
-        }
-
+        // Tamil Nadu constituencies from custom JSON mapping
         if (stateCode === 'S22') {
-            const constituencies = Array.from({ length: 60 }, (_, idx) => {
-                const acNo = idx + 1;
-                return {
-                    value: String(acNo),
-                    text: `${acNo} - ASSEMBLY CONSTITUENCY ${acNo}`
-                };
-            });
+            const result = getTamilNaduConstituenciesFromMapping(district);
+            if (!result.ok) {
+                return res.status(result.statusCode).json({
+                    status: 'error',
+                    message: result.message
+                });
+            }
 
-            return res.json({ status: 'success', constituencies });
+            return res.json({ status: 'success', constituencies: result.constituencies });
         }
 
-        const constituencies = keralaConstituencies[district] || [];
+        const sourceDistrictCodes = district ? [district] : Object.keys(keralaConstituencies);
+        const constituencies = sourceDistrictCodes.flatMap((districtCode) =>
+            (keralaConstituencies[districtCode] || []).map((item) => ({
+                ...item,
+                districtCode
+            }))
+        );
         
         if (constituencies.length === 0) {
             return res.status(404).json({
@@ -556,6 +709,33 @@ export const getAssemblyConstituencies = async (req, res) => {
         res.status(500).json({
             status: 'error',
             message: 'Failed to fetch constituencies',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Force S22 constituency list from local JSON mapping.
+ * This bypasses any runtime source that may emit generic placeholder labels.
+ */
+export const getS22ConstituenciesFromMapping = async (req, res) => {
+    try {
+        const { district } = req.body || {};
+        const result = getTamilNaduConstituenciesFromMapping(district);
+
+        if (!result.ok) {
+            return res.status(result.statusCode).json({
+                status: 'error',
+                message: result.message
+            });
+        }
+
+        return res.json({ status: 'success', constituencies: result.constituencies });
+    } catch (error) {
+        logger.error('Assembly: Error fetching S22 mapped constituencies:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch S22 mapped constituencies',
             error: error.message
         });
     }
@@ -665,6 +845,7 @@ export default {
     getRollTypes: getRollTypesController,
     getDistricts,
     getAssemblyConstituencies,
+    getS22ConstituenciesFromMapping,
     getLanguages,
     getPollingParts
 };

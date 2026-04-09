@@ -214,6 +214,59 @@ function filterSnippetsByPageDensity(snippets, minValidSnippetsPerPage = 15) {
     return { filtered: kept, droppedPages };
 }
 
+function dropSparseLeadingPage(snippets, expectedStartPage, minSnippets = 4) {
+    if (!Array.isArray(snippets) || snippets.length === 0) {
+        return snippets;
+    }
+
+    const normalizePage = (value) => {
+        const parsed = Number.parseInt(String(value ?? ''), 10);
+        return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const byPage = new Map();
+    for (const snippet of snippets) {
+        const pageKey = normalizePage(snippet.page);
+        if (pageKey == null) continue;
+        if (!byPage.has(pageKey)) byPage.set(pageKey, []);
+        byPage.get(pageKey).push(snippet);
+    }
+
+    const leadingPageSnippets = byPage.get(expectedStartPage) || [];
+    if (leadingPageSnippets.length >= minSnippets) {
+        return snippets;
+    }
+
+    if (leadingPageSnippets.length > 0) {
+        logger.info(
+            `Dropping sparse leading page ${expectedStartPage} (${leadingPageSnippets.length} snippets) and continuing from next page`
+        );
+    }
+
+    return snippets.filter((snippet) => normalizePage(snippet.page) !== expectedStartPage);
+}
+
+function dropSparseSpecificPage(snippets, pageNumber, minSnippets) {
+    if (!Array.isArray(snippets) || snippets.length === 0) {
+        return snippets;
+    }
+
+    const normalizePage = (value) => {
+        const parsed = Number.parseInt(String(value ?? ''), 10);
+        return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const pageSnippets = snippets.filter((snippet) => normalizePage(snippet.page) === pageNumber);
+    if (pageSnippets.length === 0 || pageSnippets.length >= minSnippets) {
+        return snippets;
+    }
+
+    logger.info(
+        `Dropping page ${pageNumber} snippets because count is ${pageSnippets.length} (< ${minSnippets})`
+    );
+    return snippets.filter((snippet) => normalizePage(snippet.page) !== pageNumber);
+}
+
 function runCommand(command, args = []) {
     return new Promise((resolve) => {
         const proc = spawn(command, args, { shell: false });
@@ -236,6 +289,54 @@ function runCommand(command, args = []) {
             resolve({ code: -1, stdout, stderr: `${stderr}\n${err.message}` });
         });
     });
+}
+
+async function shouldSkipFirstThreePages(pdfPath, pageNum = 2) {
+    try {
+        const pngPages = await pdfToPng(pdfPath, {
+            disableFontFace: false,
+            useSystemFonts: false,
+            viewportScale: 1.0,
+            pagesToProcess: [pageNum],
+            strictPagesToProcess: false,
+            verbosityLevel: 0
+        });
+
+        if (!pngPages || pngPages.length === 0) {
+            return false;
+        }
+
+        const image = await Jimp.read(pngPages[0].content);
+        const { data, width, height } = image.bitmap;
+        const totalPixels = Math.max(width * height, 1);
+
+        let inkPixels = 0;
+        // Sample every 2nd pixel for speed; enough for whitespace heuristic.
+        for (let y = 0; y < height; y += 2) {
+            const rowOffset = y * width * 4;
+            for (let x = 0; x < width; x += 2) {
+                const idx = rowOffset + x * 4;
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+                if (luma < 245) inkPixels++;
+            }
+        }
+
+        const sampledTotal = Math.max(Math.ceil(totalPixels / 4), 1);
+        const inkRatio = inkPixels / sampledTotal;
+        const shouldSkip = inkRatio <= 0.08;
+
+        logger.info(
+            `Page ${pageNum} overflow check: inkRatio=${inkRatio.toFixed(4)} => ${shouldSkip ? 'skip first 3 pages' : 'use normal start page'}`
+        );
+
+        return shouldSkip;
+    } catch (error) {
+        logger.warn(`Overflow page detection failed: ${error.message}`);
+        return false;
+    }
 }
 
 async function tryPythonBoxExtractor(pdfPath, startPage, endPage, outputDir, dpi = 450, threads = 4, pngCompression = 1) {
@@ -304,7 +405,9 @@ async function tryPythonBoxExtractor(pdfPath, startPage, endPage, outputDir, dpi
     }
 
     // Keep remainder pages (often 1-7 voters on second-last/last page) from Python output.
-    const { filtered, droppedPages } = filterSnippetsByPageDensity(snippets, 1);
+    const withoutSparseLeadingPage = dropSparseLeadingPage(snippets, startPage, 3);
+    const withoutSparsePage3 = dropSparseSpecificPage(withoutSparseLeadingPage, 3, 3);
+    const { filtered, droppedPages } = filterSnippetsByPageDensity(withoutSparsePage3, 1);
     if (droppedPages > 0) {
         logger.info(`Python extractor dropped ${droppedPages} low-density page(s)`);
     }
@@ -347,7 +450,18 @@ export async function extractVoterSnippets(pdfPath, options = {}) {
             ? options.onPageProgress
             : null;
 
-        const startPage = options.startPage || 3; // Skip header pages
+        const configuredStartPage = options.startPage || 3; // Skip header pages
+        const autoAdjustStartPage = options.autoAdjustStartPage !== false;
+        let startPage = configuredStartPage;
+
+        // Some PDFs have page-1 overflow into page 2; in those files voter pages start from page 4.
+        if (autoAdjustStartPage && configuredStartPage === 3 && pdfInfo.pages >= 4) {
+            const skipThree = await shouldSkipFirstThreePages(pdfPath, 2);
+            if (skipThree) {
+                startPage = 4;
+            }
+        }
+
         const maxPages = Number.isFinite(options.maxPages) ? options.maxPages : null;
         const skipLastPage = options.skipLastPage === true;
         const lastProcessablePage = skipLastPage
@@ -419,8 +533,9 @@ export async function extractVoterSnippets(pdfPath, options = {}) {
                         });
                     }
                 }
-                logger.info(`Using Python contour extractor output: ${pythonSnippets.length} snippets`);
-                return pythonSnippets;
+                const normalizedSnippets = dropSparseSpecificPage(pythonSnippets, 3, 3);
+                logger.info(`Using Python contour extractor output: ${normalizedSnippets.length} snippets`);
+                return normalizedSnippets;
             }
 
             if (!allowJsFallback) {
@@ -581,9 +696,10 @@ export async function extractVoterSnippets(pdfPath, options = {}) {
             logger.info(`Filtered ${filteredLowContent} blank/non-voter snippets during JS extraction`);
         }
         
-        logger.info(`Total voter snippets extracted: ${allVoterSnippets.length}`);
+        const normalizedSnippets = dropSparseSpecificPage(allVoterSnippets, 3, 3);
+        logger.info(`Total voter snippets extracted: ${normalizedSnippets.length}`);
         
-        return allVoterSnippets;
+        return normalizedSnippets;
         
     } catch (error) {
         logger.error('Snippet extraction failed:', error);

@@ -1,0 +1,205 @@
+{
+  "title": "Home Page",
+  "url": "https://voters.eci.gov.in/download-eroll?stateCode=S22",
+  "textSnippet": "   |\nAB  \nA_B  \nA__B\n  |\nA-  \nA  \nA+\nECINet\n  \n \n \nमतदाता सेवा पोर्टल\nVOTERS’ SERVICE PORTAL\nElectoral Roll\nState *\nSelect State\nAndaman & Nicobar Islands\nAndhra Pradesh\nArunachal Pradesh\nAssam\nBihar\nChandigarh\nChhattisgarh\nDadra & Nagar Haveli and Daman & Diu\nGoa\nGujarat\nHaryana\nHimachal Pradesh\nJammu and Kashmir\nJharkhand\nKarnataka\nKerala\nLadakh\nLakshadweep\nMadhya Pradesh\nMaharashtra\nManipur\nMeghalaya\nMizoram\nNagaland\nNCT OF Delhi\nOdisha\nPuducherry\nPunjab\nRajasthan\nSikkim\nTamil Nadu\nTelangana\nTripura\nUttar Pradesh\nUttarakhand\nWest Bengal\nYear Of Revision *\n2026\n2025\n2024\nRoll Type *\nSelect Roll\nSIR FinalRoll - 2026\nSIR DraftRoll - 2026\nDistrict\nSelect District\nAriyalur\nChengalpattu\nChennai\nCoimbatore\nCuddalore\nDharmapuri\nDindigul\nErode\nKallakurichi\nKancheepuram\nKanniyakumari\nKarur\nKrishnagiri\nMadurai\nMayiladuthurai\nNagapattinam\nNamakkal\nPerambalur\nPudukkottai\nRamanathapuram\nRanipet\nSalem\nSivaganga\nTenkasi\nThanjavur\nThe Nilgiris\nTheni\nThiruvallur\nThiruvarur\nThoothukudi\nTiruchirappalli\nTirunelveli\nTirupathur\nTiruppur\nTiruvannamalai\nVellore\nViluppuram\nVirudhunagar\nAssembly Constituency *\nSelect AC\nSelect Language *\nSelect Language\nDownload SIR Draft Roll for full AC\nDownload Selected PDFs\nECI Updates\nContact Directory\nCopyright ECI 2025. All Rights Reserved.\n \nPrivacy Policy\n  ",
+  "selectCount": 5,
+  "inputCount": 2,
+  "selects": [
+    {
+      "name": "stateCode",
+      "id": null,
+      "ariaLabel": "State",
+      "disabled": true,
+      "value": "S22",
+      "optionCount": 37,
+      "options": [
+        {
+          "value": "",
+          "text": "Select State"
+        },
+        {
+          "value": "U01",
+          "text": "Andaman & Nicobar Islands"
+        },
+        {
+          "value": "S01",
+          "text": "Andhra Pradesh"
+        },
+        {
+          "value": "S02",
+          "text": "Arunachal Pradesh"
+        },
+        {
+          "value": "S03",
+          "text": "Assam"
+        },
+        {
+          "value": "S04",
+          "text": "Bihar"
+        },
+        {
+          "value": "U02",
+          "text": "Chandigarh"
+        },
+        {
+          "value": "S26",
+          "text": "Chhattisgarh"
+        },
+        {
+          "value": "U03",
+          "text": "Dadra & Nagar Haveli and Daman & Diu"
+        },
+        {
+          "value": "S05",
+          "text": "Goa"
+        },
+        {
+          "value": "S06",
+          "text": "Gujarat"
+        },
+        {
+          "value": "S07",
+          "text": "Haryana"
+        }
+      ]
+    },
+    {
+      "name": "revyear",
+      "id": null,
+      "ariaLabel": "Year Of Revision",
+      "disabled": false,
+      "value": "2026",
+      "optionCount": 3,
+      "options": [
+        {
+          "value": "2026",
+          "text": "2026"
+        },
+        {
+          "value": "2025",
+          "text": "2025"
+        },
+        {
+          "value": "2024",
+          "text": "2024"
+        }
+      ]
+    },
+    {
+      "name": "roleType",
+      "id": null,
+      "ariaLabel": "Roll Type",
+      "disabled": false,
+      "value": "S22-2026-FIR",
+      "optionCount": 3,
+      "options": [
+        {
+          "value": "",
+          "text": "Select Roll"
+        },
+        {
+          "value": "S22-2026-FIR",
+          "text": "SIR FinalRoll - 2026"
+        },
+        {
+          "value": "S22-2026-DR",
+          "text": "SIR DraftRoll - 2026"
+        }
+      ]
+    },
+    {
+      "name": "district",
+      "id": null,
+      "ariaLabel": "District",
+      "disabled": false,
+      "value": "",
+      "optionCount": 39,
+      "options": [
+        {
+          "value": "",
+          "text": "Select District"
+        },
+        {
+          "value": "S2231",
+          "text": "Ariyalur"
+        },
+        {
+          "value": "S2235",
+          "text": "Chengalpattu"
+        },
+        {
+          "value": "S2202",
+          "text": "Chennai"
+        },
+        {
+          "value": "S2213",
+          "text": "Coimbatore"
+        },
+        {
+          "value": "S2218",
+          "text": "Cuddalore"
+        },
+        {
+          "value": "S2206",
+          "text": "Dharmapuri"
+        },
+        {
+          "value": "S2214",
+          "text": "Dindigul"
+        },
+        {
+          "value": "S2211",
+          "text": "Erode"
+        },
+        {
+          "value": "S2233",
+          "text": "Kallakurichi"
+        },
+        {
+          "value": "S2203",
+          "text": "Kancheepuram"
+        },
+        {
+          "value": "S2230",
+          "text": "Kanniyakumari"
+        }
+      ]
+    },
+    {
+      "name": "langCd",
+      "id": null,
+      "ariaLabel": "Select Language",
+      "disabled": false,
+      "value": "",
+      "optionCount": 1,
+      "options": [
+        {
+          "value": "",
+          "text": "Select Language"
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "name": null,
+      "id": "react-select-2-input",
+      "type": "text",
+      "role": "combobox",
+      "ariaLabel": null,
+      "placeholder": null,
+      "value": "",
+      "disabled": false
+    },
+    {
+      "name": "constituency",
+      "id": null,
+      "type": "hidden",
+      "role": null,
+      "ariaLabel": null,
+      "placeholder": null,
+      "value": "",
+      "disabled": false
+    }
+  ]
+}

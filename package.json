@@ -17,6 +17,8 @@
     "build:dev": "webpack --mode=development",
     "protect": "node build-scripts/obfuscate-inline.cjs",
     "protect:safe": "node build-scripts/obfuscate-safe.cjs",
+    "extract:eci-dom": "node scripts/export-eci-dom-constituencies.mjs",
+    "extract:eci-static": "node scripts/export-eci-static-data.mjs",
     "serve:protected": "npm run protect:safe && cross-env USE_PROTECTED=true node server.js",
     "verify:deployment": "node verify-deployment.js",
     "postinstall": "playwright install chromium --with-deps",

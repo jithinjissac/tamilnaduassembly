@@ -1105,20 +1105,33 @@
                     <input type="hidden" id="state" value="S22">
                     <input type="hidden" id="year" value="2026">
                     <input type="hidden" id="rollType" value="S22-2026-FIR">
-                    <input type="hidden" id="language" value="en">
+                    <input type="hidden" id="district" value="">
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fas fa-map-marker-alt"></i> District *</label>
-                            <select id="district" required>
-                                <option value="">Loading...</option>
+                            <label><i class="fas fa-map-marker-alt"></i> District</label>
+                            <select id="district-select" disabled>
+                                <option value="">Loading districts...</option>
                             </select>
+                            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Optional: choose a district to filter constituencies.
+                            </small>
                         </div>
 
                         <div class="form-group">
                             <label><i class="fas fa-landmark"></i> Assembly Constituency *</label>
                             <select id="constituency" required disabled>
-                                <option value="">Select District First</option>
+                                <option value="">Loading constituencies...</option>
+                            </select>
+                            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Select constituency directly. District will be mapped automatically.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-language"></i> Select Language *</label>
+                            <select id="language" required disabled>
+                                <option value="">Select Language</option>
                             </select>
                         </div>
                     </div>
@@ -1359,15 +1372,14 @@
                 stateCode: document.getElementById('state').value,
                 year: document.getElementById('year').value,
                 rollType: document.getElementById('rollType').value,
-                language: document.getElementById('language').value || 'en'
+                language: document.getElementById('language').value
             };
         }
 
         function getStateNameByCode(stateCode) {
             const names = {
                 S11: 'Kerala',
-                S22: 'Manipur',
-                S31: 'Tamil Nadu'
+                S22: 'Tamil Nadu'
             };
             return names[stateCode] || stateCode;
         }
@@ -1376,6 +1388,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             initSymbolPickerIntegration();
             await loadDistricts();
+            await loadConstituencies();
             setupEventListeners();
             updateProgressBar(1);
         });
@@ -1416,49 +1429,158 @@
             };
         }
 
-        // ─── Districts & Constituencies ─────────────────────────────────────
+        // ─── Constituencies ──────────────────────────────────────────────────
         async function loadDistricts() {
             try {
                 const { stateCode } = getExtractionConfig();
-                const response = await fetch(`${API_BASE}/getDistricts`, {
+                const districtSelect = document.getElementById('district-select');
+
+                districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+                districtSelect.disabled = true;
+
+                const response = await fetch(`${API_BASE}/getDistricts?t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-store',
                     body: JSON.stringify({ stateCode })
                 });
+
                 const data = await response.json();
-                const select = document.getElementById('district');
-                select.innerHTML = '<option value="">Select District</option>';
-                data.districts.forEach(d => {
+                const rows = Array.isArray(data.districts) ? data.districts : [];
+
+                districtSelect.innerHTML = '<option value="">All Districts</option>';
+                rows.forEach((d) => {
                     const opt = document.createElement('option');
-                    opt.value = d.value;
-                    opt.textContent = d.label;
-                    select.appendChild(opt);
+                    opt.value = String(d.value || '').trim();
+                    opt.textContent = String(d.text || '').trim();
+                    districtSelect.appendChild(opt);
                 });
+
+                districtSelect.disabled = false;
             } catch (error) {
                 console.error('Failed to load districts:', error);
             }
         }
 
-        async function loadConstituencies(districtCode) {
+        async function loadConstituencies() {
             try {
                 const { stateCode, year, rollType } = getExtractionConfig();
-                const response = await fetch(`${API_BASE}/getConstituencies`, {
+                const districtInput = document.getElementById('district');
+                const districtSelect = document.getElementById('district-select');
+                const select = document.getElementById('constituency');
+                const languageSelect = document.getElementById('language');
+                const district = districtSelect?.value || '';
+                select.innerHTML = '<option value="">Loading constituencies...</option>';
+                select.disabled = true;
+                languageSelect.innerHTML = '<option value="">Select Language</option>';
+                languageSelect.disabled = true;
+                const endpoint = stateCode === 'S22'
+                    ? `${API_BASE}/getConstituenciesFromMapping?t=${Date.now()}`
+                    : `${API_BASE}/getConstituencies?t=${Date.now()}`;
+
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ stateCode, district: districtCode, year, rollType })
+                    cache: 'no-store',
+                    body: stateCode === 'S22'
+                        ? JSON.stringify({ district })
+                        : JSON.stringify({ stateCode, year, rollType, district })
                 });
                 const data = await response.json();
-                const select = document.getElementById('constituency');
                 select.innerHTML = '<option value="">Select Constituency</option>';
                 select.disabled = false;
-                data.constituencies.forEach(c => {
+                const rows = Array.isArray(data.constituencies) ? data.constituencies : [];
+                const isPlaceholder = (value) => /^\d+\s*-\s*assembly\s+constituency\s+\d+$/i.test(String(value || '').trim());
+
+                let sanitizedRows = rows.filter((c) => {
+                    const text = String(c.label || c.text || '').trim();
+                    return text && !isPlaceholder(text);
+                });
+
+                if (stateCode === 'S22' && sanitizedRows.length === 0) {
+                    try {
+                        const fallback = await fetch(`${API_BASE}/getConstituenciesFromMapping?t=${Date.now()}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            cache: 'no-store',
+                            body: JSON.stringify({ district })
+                        });
+                        const fallbackData = await fallback.json();
+                        const fallbackRows = Array.isArray(fallbackData.constituencies) ? fallbackData.constituencies : [];
+                        sanitizedRows = fallbackRows.filter((c) => {
+                            const text = String(c.label || c.text || '').trim();
+                            return text && !isPlaceholder(text);
+                        });
+                    } catch (fallbackErr) {
+                        console.error('Mapping fallback failed:', fallbackErr);
+                    }
+                }
+
+                sanitizedRows.forEach(c => {
+                    const value = String(c.value ?? c.ac_no ?? '').trim();
+                    if (!value) return;
+
+                    const label = String(c.label || '').trim();
+                    const acName = String(c.ac_name || c.acName || '').trim();
+                    const text = String(c.text || '').trim();
+                    const displayText = label || text || (acName ? `${value} - ${acName}` : '');
+                    if (!displayText) return;
                     const opt = document.createElement('option');
-                    opt.value = c.value;
-                    opt.textContent = c.label;
+                    opt.value = value;
+                    opt.textContent = displayText;
+                    opt.dataset.district = c.districtCode || '';
+                    opt.dataset.districtName = c.districtName || '';
                     select.appendChild(opt);
                 });
+                districtInput.value = district;
             } catch (error) {
                 console.error('Failed to load constituencies:', error);
+            }
+        }
+
+        async function loadLanguages() {
+            try {
+                const { stateCode, year, rollType } = getExtractionConfig();
+                const district = document.getElementById('district').value;
+                const constituency = document.getElementById('constituency').value;
+                const languageSelect = document.getElementById('language');
+
+                languageSelect.innerHTML = '<option value="">Loading languages...</option>';
+                languageSelect.disabled = true;
+
+                if (!district || !constituency) {
+                    languageSelect.innerHTML = '<option value="">Select Language</option>';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/getLanguages?t=${Date.now()}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-store',
+                    body: JSON.stringify({ stateCode, district, constituency, rollType, year })
+                });
+                const data = await response.json();
+                const languages = Array.isArray(data.languages) ? data.languages : [];
+
+                languageSelect.innerHTML = '<option value="">Select Language</option>';
+                languages.forEach((lang) => {
+                    const opt = document.createElement('option');
+                    opt.value = String(lang.value || '').trim();
+                    opt.textContent = String(lang.text || lang.value || '').trim();
+                    languageSelect.appendChild(opt);
+                });
+
+                if (languages.length === 1) {
+                    languageSelect.value = String(languages[0].value || '').trim();
+                }
+
+                languageSelect.disabled = languages.length === 0;
+                document.getElementById('select-parts-btn').disabled = !document.getElementById('constituency').value || !languageSelect.value;
+            } catch (error) {
+                console.error('Failed to load languages:', error);
+                const languageSelect = document.getElementById('language');
+                languageSelect.innerHTML = '<option value="">Select Language</option>';
+                languageSelect.disabled = true;
             }
         }
 
@@ -1467,7 +1589,7 @@
             const { stateCode, year, rollType, language } = getExtractionConfig();
             const district = document.getElementById('district').value;
             const constituency = document.getElementById('constituency').value;
-            if (!district || !constituency) { alert('Please select district and constituency first'); return; }
+            if (!constituency) { alert('Please select constituency first'); return; }
             try {
                 const response = await fetch('/api/assembly/getPollingParts', {
                     method: 'POST',
@@ -1560,23 +1682,29 @@
                 goToStep(2);
             });
 
-            // Step 2: district → constituencies
-            document.getElementById('district').addEventListener('change', (e) => {
-                if (e.target.value) {
-                    loadConstituencies(e.target.value);
-                    document.getElementById('select-parts-btn').disabled = true;
-                    document.getElementById('captcha-section').style.display = 'none';
-                    document.getElementById('extract-btn').disabled = true;
-                }
+            // Step 2: constituency → enable parts button
+            document.getElementById('district-select').addEventListener('change', async (e) => {
+                document.getElementById('district').value = e.target.value || '';
+                document.getElementById('select-parts-btn').disabled = true;
+                document.getElementById('captcha-section').style.display = 'none';
+                document.getElementById('extract-btn').disabled = true;
+                await loadConstituencies();
             });
 
-            // Step 2: constituency → enable parts button
-            document.getElementById('constituency').addEventListener('change', (e) => {
-                document.getElementById('select-parts-btn').disabled = !e.target.value;
+            document.getElementById('constituency').addEventListener('change', async (e) => {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                document.getElementById('district').value = selectedOption?.dataset?.district || '';
+                document.getElementById('select-parts-btn').disabled = true;
                 if (!e.target.value) {
                     document.getElementById('captcha-section').style.display = 'none';
                     document.getElementById('extract-btn').disabled = true;
                 }
+                await loadLanguages();
+            });
+
+            document.getElementById('language').addEventListener('change', (e) => {
+                const hasConstituency = !!document.getElementById('constituency').value;
+                document.getElementById('select-parts-btn').disabled = !(hasConstituency && !!e.target.value);
             });
 
             document.getElementById('select-parts-btn').addEventListener('click', loadPollingParts);
@@ -1762,11 +1890,12 @@
             const constituencyEl = document.getElementById('constituency');
             const district = districtEl.value;
             const constituency = constituencyEl.value;
-            const districtLabel = districtEl.options[districtEl.selectedIndex]?.text || district;
+            const selectedConstituencyOption = constituencyEl.options[constituencyEl.selectedIndex];
+            const districtLabel = selectedConstituencyOption?.dataset?.districtName || district;
             const constituencyLabel = constituencyEl.options[constituencyEl.selectedIndex]?.text || constituency;
             const captchaText = document.getElementById('captcha-text').value.trim();
 
-            if (!district || !constituency) { alert('Please select district and constituency'); return; }
+            if (!constituency) { alert('Please select constituency'); return; }
             if (state.selectedParts.length === 0) { alert('Please select polling parts'); return; }
             if (!captchaText) { alert('Please enter captcha text'); return; }
             if (!state.captchaId) { alert('Captcha ID missing. Please refresh.'); return; }
@@ -1842,8 +1971,8 @@
                         return;
                     }
 
-                    const districtSelect = document.getElementById('district');
                     const constituencySelect = document.getElementById('constituency');
+                    const selectedConstituency = constituencySelect.options[constituencySelect.selectedIndex];
 
                     const orderResponse = await fetch('/api/assembly/orders/create', {
                         method: 'POST',
@@ -1855,7 +1984,7 @@
                             location: {
                                 state: getStateNameByCode(stateCode),
                                 stateCode,
-                                district: districtSelect.options[districtSelect.selectedIndex]?.text || district,
+                                district: selectedConstituency?.dataset?.districtName || district,
                                 districtCode: district,
                                 constituency: constituencySelect.options[constituencySelect.selectedIndex]?.text || constituency,
                                 constituencyCode: constituency,
@@ -1956,13 +2085,13 @@
                 const serialNo = voter.serialNo || voter.sl_no || (index + 1);
                 const snippetSrc = voter.snippetBase64 || '';
                 const showSymbol = Boolean(candidate.symbol);
-                const symbolLabel = candidate.symbolName || 'ചിഹ്നം';
+                const symbolLabel = candidate.symbolName || 'சின்னம்';
                 const pollingStation = voter.partName || voter.pollingStation || '-';
 
                 const leftSection = showSymbol
                     ? `
                     <div class="preview-slip-left">
-                        <div class="preview-symbol-header">നമ്മുടെ ചിഹ്നം</div>
+                        <div class="preview-symbol-header">நமது சின்னம்</div>
                         <img src="${candidate.symbol}" alt="Symbol" class="preview-symbol-image">
                         <div class="preview-symbol-name">${symbolLabel}</div>
                     </div>`
@@ -1981,7 +2110,7 @@
                                 : `<div class="preview-snippet-fallback">No snippet available</div>`
                             }
                         </div>
-                        <div class="preview-candidate-footer">പോളിംഗ് സ്റ്റേഷൻ: ${pollingStation}</div>
+                        <div class="preview-candidate-footer">வாக்குச்சாவடி: ${pollingStation}</div>
                     </div>
                 </div>`;
             }).join('');
