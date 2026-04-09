@@ -1,19 +1,27 @@
 /* Kerala Theme - Shared Styles for EasySlip.in */
 
 :root {
-    /* Kerala Color Palette */
-    --kerala-green: #006D3B;
-    --kerala-gold: #FFB81C;
-    --kerala-red: #E03A3E;
-    --kerala-cream: #FFF8DC;
+    /* Tamil Nadu Palette */
+    --tn-maroon: #6b1f2a;
+    --tn-maroon-dark: #4a1620;
+    --tn-saffron: #c9922e;
+    --tn-ivory: #f7f2e7;
+    --tn-indigo: #1f2a5a;
+    --tn-ink: #1e1a18;
+
+    /* Backward-compatible aliases used by existing pages */
+    --kerala-green: var(--tn-maroon);
+    --kerala-gold: var(--tn-saffron);
+    --kerala-red: #8a2c3a;
+    --kerala-cream: var(--tn-ivory);
     --kerala-white: #FFFFFF;
-    --kerala-dark: #1A1A1A;
-    --kerala-earth: #8B4513;
+    --kerala-dark: var(--tn-ink);
+    --kerala-earth: #5a3c24;
     
     /* Gradients */
-    --kerala-gradient: linear-gradient(135deg, #006D3B 0%, #00A550 100%);
-    --kathakali-gradient: linear-gradient(135deg, #E03A3E 0%, #FFB81C 100%);
-    --coconut-gradient: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    --kerala-gradient: linear-gradient(135deg, var(--tn-maroon) 0%, var(--tn-maroon-dark) 100%);
+    --kathakali-gradient: linear-gradient(135deg, var(--tn-maroon) 0%, var(--tn-saffron) 100%);
+    --coconut-gradient: linear-gradient(135deg, var(--tn-indigo) 0%, var(--tn-maroon-dark) 100%);
 }
 
 * {
@@ -34,6 +42,14 @@ body {
     background: var(--kerala-cream);
 }
 
+a {
+    color: var(--tn-indigo);
+}
+
+a:hover {
+    color: var(--kerala-gold);
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 10px;
@@ -49,7 +65,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #004D2B;
+    background: var(--tn-maroon-dark);
 }
 
 /* Kerala Header */
@@ -57,7 +73,7 @@ body {
     background: var(--kerala-gradient);
     color: var(--kerala-white);
     padding: 1.2rem 2rem;
-    box-shadow: 0 4px 20px rgba(0, 109, 59, 0.3);
+    box-shadow: 0 4px 20px rgba(107, 31, 42, 0.28);
     border-bottom: 4px solid var(--kerala-gold);
 }
 
@@ -143,12 +159,12 @@ body {
 .btn-kerala-primary {
     background: var(--kerala-gold);
     color: var(--kerala-dark);
-    box-shadow: 0 4px 15px rgba(255, 184, 28, 0.4);
+    box-shadow: 0 4px 15px rgba(201, 146, 46, 0.35);
 }
 
 .btn-kerala-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(255, 184, 28, 0.6);
+    box-shadow: 0 6px 25px rgba(201, 146, 46, 0.5);
 }
 
 .btn-kerala-secondary {
@@ -159,18 +175,18 @@ body {
 
 .btn-kerala-secondary:hover {
     background: var(--kerala-white);
-    color: var(--kerala-green);
+    color: var(--tn-indigo);
 }
 
 .btn-kerala-green {
     background: var(--kerala-gradient);
     color: var(--kerala-white);
-    box-shadow: 0 4px 15px rgba(0, 109, 59, 0.4);
+    box-shadow: 0 4px 15px rgba(107, 31, 42, 0.35);
 }
 
 .btn-kerala-green:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0, 109, 59, 0.6);
+    box-shadow: 0 6px 25px rgba(107, 31, 42, 0.5);
 }
 
 /* Kerala Cards */
@@ -201,21 +217,21 @@ body {
 
 .kerala-input:focus {
     outline: none;
-    border-color: var(--kerala-green);
-    box-shadow: 0 0 0 3px rgba(0, 109, 59, 0.1);
+    border-color: var(--tn-indigo);
+    box-shadow: 0 0 0 3px rgba(31, 42, 90, 0.12);
 }
 
 /* Kerala Pattern Background */
 .kerala-pattern-bg {
     background-image: 
-        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(0,109,59,0.02) 35px, rgba(0,109,59,0.02) 70px),
-        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(0,109,59,0.02) 35px, rgba(0,109,59,0.02) 70px);
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(107,31,42,0.02) 35px, rgba(107,31,42,0.02) 70px),
+    repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(31,42,90,0.02) 35px, rgba(31,42,90,0.02) 70px);
 }
 
 /* Kerala Page Container */
 .kerala-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(0, 109, 59, 0.05) 0%, rgba(255, 184, 28, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(107, 31, 42, 0.05) 0%, rgba(201, 146, 46, 0.06) 100%);
 }
 
 /* Kerala Footer */

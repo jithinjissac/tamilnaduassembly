@@ -1,14 +1,15 @@
 :root {
-    --primary-color: #2563eb;
-    --primary-dark: #1e40af;
+    --primary-color: #6b1f2a;
+    --primary-dark: #4a1620;
     --success-color: #10b981;
-    --error-color: #ef4444;
-    --warning-color: #f59e0b;
-    --bg-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-primary: #1e293b;
+    --error-color: #8a2c3a;
+    --warning-color: #c9922e;
+    --bg-color: #f7f2e7;
+    --card-bg: #fffdf7;
+    --text-primary: #1e1a18;
     --text-secondary: #64748b;
-    --border-color: #e2e8f0;
+    --border-color: #d4ccbc;
+    --secondary-color: #1f2a5a;
     --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
@@ -81,7 +82,7 @@ header h1 {
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(107, 31, 42, 0.12);
 }
 
 .form-group select:disabled {
