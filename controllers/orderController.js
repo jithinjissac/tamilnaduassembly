@@ -41,8 +41,8 @@ export const createOrder = [
             const errors = validationResult(req);
             let validationErrors = errors.array();
             
-            // Skip symbol validation for symbolFree or multiSymbol mode
-            if (!customization?.symbolFree && !customization?.multiSymbol) {
+            // Skip symbol validation for symbolFree, multiSymbol, or photoSlip mode
+            if (!customization?.symbolFree && !customization?.multiSymbol && !customization?.isPhotoSlip) {
                 if (!customization?.symbolImage) {
                     validationErrors.push({
                         msg: 'Symbol image is required',

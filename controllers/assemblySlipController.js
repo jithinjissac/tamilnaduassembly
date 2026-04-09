@@ -271,11 +271,14 @@ function generateSlipsHTML(voters, candidate, metadata) {
     const districtDisplay = toDisplayName(district);
     const constituencyDisplay = toDisplayName(constituency);
 
-      // Determine if a symbol should be displayed
-      const rawSymbolImage = candidate?.symbol || '';
-      const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
-      const showSymbol = Boolean(resolvedSymbolImage);
-      const rawSymbolNameMalayalam = candidate?.symbolNameMalayalam || candidate?.symbolName || '';
+    // Determine if a symbol should be displayed
+    const rawSymbolImage = candidate?.symbol || '';
+    const resolvedSymbolImage = resolveSymbolImageSrc(rawSymbolImage);
+    const showSymbol = Boolean(resolvedSymbolImage);
+    const rawSymbolNameMalayalam = candidate?.symbolNameMalayalam || candidate?.symbolName || '';
+    const rawCandidatePhoto = candidate?.candidatePhoto || '';
+    const resolvedCandidatePhoto = resolveSymbolImageSrc(rawCandidatePhoto);
+    const showPhotoTemplate = Boolean(resolvedCandidatePhoto);
 
     const pages = [];
     for (let i = 0; i < voters.length; i += slipsPerPage) {
@@ -294,6 +297,37 @@ function generateSlipsHTML(voters, candidate, metadata) {
                 .join(' | ');
 
             const pollingStation = voter.pollingStation || voter.partName || pollingStationInfo || '-';
+            const leftSection = showPhotoTemplate
+                ? `
+                <div class="slip-left photo-template">
+                    <div class="candidate-photo-frame">
+                        <img src="${resolvedCandidatePhoto}" alt="Candidate" class="candidate-photo-image">
+                    </div>
+                    ${showSymbol
+                        ? `<div class="small-symbol-overlay"><img src="${resolvedSymbolImage}" alt="Symbol" class="small-symbol-image"></div>`
+                        : ''
+                    }
+                </div>`
+                : `
+                <div class="slip-left">
+                    <div class="slip-left-content">
+                        ${showSymbol
+                            ? `<div class="symbol-header">நமது<br>சின்னம்</div>
+                               <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
+                               ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
+                            : `<div style="text-align:center; width:100%; line-height:1.2;">
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">மாவட்டம்</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${districtDisplay}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">சட்டமன்றத் தொகுதி</div>
+                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituencyDisplay}</div>
+                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
+                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">பகுதி எண்</div>
+                        <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
+                        </div>`
+                        }
+                    </div>
+                </div>`;
             if (isLastSlipInPreview) {
                 return `
             <div class="voter-slip preview-payment-slip">
@@ -336,25 +370,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
 
             return `
             <div class="voter-slip">
-                <div class="slip-left">
-                    <div class="slip-left-content">
-                        ${showSymbol 
-                            ? `<div class="symbol-header">நமது<br>சின்னம்</div>
-                               <div class="symbol-image-wrap"><img src="${resolvedSymbolImage}" alt="Symbol" class="symbol-image"></div>
-                               ${rawSymbolNameMalayalam ? `<div class="symbol-name">${rawSymbolNameMalayalam}</div>` : ''}`
-                            : `<div style="text-align:center; width:100%; line-height:1.2;">
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">மாவட்டம்</div>
-                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${districtDisplay}</div>
-                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">சட்டமன்றத் தொகுதி</div>
-                        <div style="font-size:6pt; font-weight:600; color:#1e3a5f; margin-bottom:0.8mm; word-break:break-word;">${constituencyDisplay}</div>
-                        <div style="width:85%; height:0.4mm; background:#bbb; margin:0 auto 0.8mm;"></div>
-                        <div style="font-weight:700; font-size:7pt; margin-bottom:0.4mm;">பகுதி எண்</div>
-                        <div style="font-size:9pt; font-weight:800;">${voter.partNumber || ''}</div>
-                        </div>`
-                        }
-                    </div>
-                </div>
+                ${leftSection}
                 <div class="slip-right">
                     <div class="voter-image-container">
                         ${snippetSrc
@@ -393,6 +409,25 @@ function generateSlipsHTML(voters, candidate, metadata) {
 
         .slip-left { display: flex !important; width: 38mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
         .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3mm; width: 100%; }
+
+        .slip-left.photo-template { position: relative; padding: 0; overflow: hidden; }
+        .candidate-photo-frame { width: 100%; height: 100%; }
+        .candidate-photo-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .small-symbol-overlay {
+            position: absolute;
+            right: 1.2mm;
+            bottom: 1.2mm;
+            width: 10mm;
+            height: 10mm;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 1mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8mm;
+        }
+        .small-symbol-image { width: 100%; height: 100%; object-fit: contain; display: block; }
         
         .symbol-header { font-size: 8.5pt; font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 0.2mm; white-space: normal; word-break: keep-all; }
         .symbol-image-wrap { width: 100%; height: 18mm; display: flex; align-items: center; justify-content: center; }

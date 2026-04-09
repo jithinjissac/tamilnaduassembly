@@ -64,6 +64,13 @@ const OrderSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
+        isPhotoSlip: {
+            type: Boolean,
+            default: false
+        },
+        candidatePhoto: {
+            type: String // base64 data URL of candidate photo
+        },
         // Legacy fields for backward compatibility
         partyLogo: {
             type: String

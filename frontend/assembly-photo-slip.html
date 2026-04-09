@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assembly Election Voter Information Slips | EasySlip Tamil Nadu</title>
-    <meta name="description" content="Create professional voter information slips for Tamil Nadu Assembly Elections. Preview slips and generate PDF.">
+    <title>Assembly Photo + Symbol Voter Slips | EasySlip Tamil Nadu</title>
+    <meta name="description" content="Create Tamil Nadu Assembly voter information slips with candidate photo and election symbol. Preview slips and generate PDF.">
     
     <!-- Tamil Nadu Colors & Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -1039,7 +1039,7 @@
     <div class="container">
         <div class="page-title-wrap">
             <h1 class="page-title"><i class="fas fa-landmark"></i> Tamil Nadu Assembly Election Voter Information Slips</h1>
-            <p class="page-subtitle">Assembly election voter information slips (S22)</p>
+            <p class="page-subtitle">Assembly photo + symbol voter information slips (S22)</p>
         </div>
 
         <div class="form-container">
@@ -1061,11 +1061,11 @@
 
             <!-- Step 1: Select Symbol & Candidate -->
             <div class="form-section active" id="step1">
-                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Slip</h2>
-                <p class="form-subtitle">Upload your symbol customization (optional)</p>
+                <h2 class="form-title"><i class="fas fa-palette"></i> Customize Your Photo Slip</h2>
+                <p class="form-subtitle">Select symbol and upload candidate photo (both required)</p>
 
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> Choose your election symbol first or continue without symbol.
+                    <i class="fas fa-info-circle"></i> Choose your election symbol and upload candidate photo before continuing.
                 </div>
 
                 <div class="form-group">
@@ -1083,7 +1083,7 @@
                             <i class="fas fa-hand-pointer"></i> SELECT YOUR SYMBOL
                         </button>
                             <div style="margin-top: 0.75rem;">
-                            <a href="#" id="continueWithoutSymbol" style="color: var(--kerala-green); font-size: 0.9rem;">Continue without symbol</a>
+                            <a href="#" id="continueWithoutSymbol" style="display: none;">Continue without symbol</a>
                         </div>
                     </div>
                 </div>
@@ -1433,14 +1433,12 @@
             });
 
             // Continue without symbol - move to next step
-            document.getElementById('continueWithoutSymbol').addEventListener('click', (e) => {
-                e.preventDefault();
-                state.symbolFreeMode = true;
-                state.candidate = buildCandidate(null, '');
-                document.getElementById('symbolPreview').style.display = 'none';
-                document.getElementById('selectSymbolBtn').style.display = 'block';
-                goToStep(2);  // Move to next step immediately
-            });
+            const continueWithoutSymbol = document.getElementById('continueWithoutSymbol');
+            if (continueWithoutSymbol) {
+                continueWithoutSymbol.addEventListener('click', (e) => {
+                    e.preventDefault();
+                });
+            }
         }
 
         function applySymbol(src, name) {
@@ -1845,7 +1843,14 @@
         function setupEventListeners() {
             // Step 1 → Step 2
             document.getElementById('next-to-step2').addEventListener('click', () => {
-                if (!state.candidate) state.candidate = buildCandidate(null, '');
+                if (!state.candidate || !state.candidate.symbol) {
+                    alert('Please select election symbol');
+                    return;
+                }
+                if (!state.candidate.candidatePhoto) {
+                    alert('Please upload and crop candidate photo');
+                    return;
+                }
                 goToStep(2);
             });
 

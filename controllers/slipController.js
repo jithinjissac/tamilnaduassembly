@@ -191,9 +191,10 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     // CRITICAL: Custom poster mode COMPLETELY overrides multi-symbol mode
     // When isCustomPoster is true, we NEVER use multi-symbol layout regardless of any other flags
     const isCustomPoster = order.customization.isCustomPoster === true || order.customization.isCustomUpload === true;
+    const isPhotoSlip = order.customization.isPhotoSlip === true;
     let isMultiSymbol = false; // Default to false
     
-    if (!isCustomPoster && !order.customization.symbolFree) {
+    if (!isCustomPoster && !isPhotoSlip && !order.customization.symbolFree) {
         // Only enable multi-symbol if NOT custom poster and NOT symbol-free
         isMultiSymbol = order.customization.multiSymbol === true;
     }
@@ -203,6 +204,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     console.log(`   isCustomPoster: ${isCustomPoster}`);
     console.log(`   customization.isCustomPoster: ${order.customization.isCustomPoster}`);
     console.log(`   customization.isCustomUpload: ${order.customization.isCustomUpload}`);
+    console.log(`   customization.isPhotoSlip: ${order.customization.isPhotoSlip}`);
     console.log(`   customization.multiSymbol: ${order.customization.multiSymbol}`);
     console.log(`   isMultiSymbol (final): ${isMultiSymbol}`);
     console.log(`   symbolFree: ${order.customization.symbolFree}`);
@@ -244,6 +246,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
     
     // Convert symbol(s) to base64
     let symbolUrl = '';
+    let candidatePhotoUrl = '';
     let symbolUrlMap = new Map(); // localBodyType -> base64URL (for multi-symbol)
     let symbolsArray = []; // For multi-symbol: array of {name, url}
     let displaySymbolName = 'Symbol'; // default
@@ -376,6 +379,13 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         displaySymbolName = symbolNameMalayalam || symbolNameEnglish || 'Symbol';
     }
     
+    if (isPhotoSlip) {
+        const candidatePhoto = order.customization.candidatePhoto || '';
+        if (typeof candidatePhoto === 'string' && candidatePhoto.trim()) {
+            candidatePhotoUrl = candidatePhoto.trim();
+        }
+    }
+
     // Load font settings from database
     let fontSize, fontSizeFree, fontSizeMulti;
     try {
@@ -582,7 +592,7 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans Malayalam', 'Noto Sans', Arial, sans-serif; background: #fff; }
         
-        ${isCustomPoster ? `:root { --poster-image: url('${symbolUrl}'); }` : isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : `:root { --symbol-image: url('${symbolUrl}'); }`}
+        ${isCustomPoster ? `:root { --poster-image: url('${symbolUrl}'); }` : isMultiSymbol ? '/* Multi-symbol mode: symbols set per voter via inline styles */' : isPhotoSlip ? `:root { --candidate-photo-image: url('${candidatePhotoUrl}'); --symbol-image: url('${symbolUrl}'); }` : `:root { --symbol-image: url('${symbolUrl}'); }`}
         
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
@@ -596,6 +606,9 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
         .slip-left { width: 38mm; border-right: 2px dotted; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5mm; margin-right: 2.5mm; text-align: center; flex-shrink: 0; }
         .slip-left.custom-poster { padding: 0; background: #ffffff; border-right: 2px dotted; overflow: hidden; display: flex; align-items: stretch; justify-content: stretch; }
         .poster-image { width: 100%; height: 100%; background-image: var(--poster-image); background-size: cover; background-repeat: no-repeat; background-position: center center; display: block; }
+        .slip-left.photo-slip { position: relative; padding: 0; background: #ffffff; border-right: 2px dotted; overflow: hidden; }
+        .candidate-photo { width: 100%; height: 100%; background-image: var(--candidate-photo-image); background-size: cover; background-repeat: no-repeat; background-position: center center; display: block; }
+        .small-symbol-overlay { position: absolute; right: 2mm; bottom: 2mm; width: 10mm; height: 10mm; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #fff; border: 1px solid #111; border-radius: 1mm; }
         .symbol-header { font-size: ${fontSize.symbolHeader}; font-weight: bold; margin-bottom: 0.8mm; line-height: 1.1; }
         .symbol-image { width: ${fontSize.symbolImage}; height: ${fontSize.symbolImage}; margin-bottom: 0.8mm; flex-shrink: 0; background-image: var(--symbol-image); background-size: contain; background-repeat: no-repeat; background-position: center; }
         .symbol-name { font-size: ${fontSize.symbolName}; font-weight: bold; line-height: 1.15; word-wrap: break-word; max-width: 36mm; }
@@ -803,6 +816,12 @@ export const generateSlipHTML = async (order, startIndex = 0, endIndex = null) =
                 leftSectionHTML = `
                 <div class="slip-left custom-poster">
                     <div class="poster-image" role="img" aria-label="Candidate Poster"></div>
+                </div>`;
+            } else if (isPhotoSlip) {
+                leftSectionHTML = `
+                <div class="slip-left photo-slip">
+                    <div class="candidate-photo" role="img" aria-label="Candidate Photo"></div>
+                    ${symbolUrl ? '<div class="small-symbol-overlay" role="img" aria-label="Symbol"></div>' : ''}
                 </div>`;
             } else if (order.customization.symbolFree) {
                 // PRIORITY 2: Symbol-free mode - show serial number
