@@ -297,10 +297,18 @@ function generateSlipsHTML(voters, candidate, metadata) {
 
     // DEBUG: Log photo template decision
     if (voters.length > 0) {
+        logger.info('🖼️ generateSlipsHTML - Candidate Object:', {
+            candidateKeys: candidate ? Object.keys(candidate) : 'no candidate',
+            candidateSymbol: !!candidate?.symbol,
+            candidateSymbolName: !!candidate?.symbolName,
+            candidatePhoto: candidate?.candidatePhoto ? `PRESENT (${candidate.candidatePhoto.substring(0, 80)}...)` : 'MISSING'
+        });
         logger.info('🖼️ Photo Template Decision:', {
             rawCandidatePhotoExists: !!rawCandidatePhoto,
             rawCandidatePhotoLength: rawCandidatePhoto ? rawCandidatePhoto.length : 0,
+            rawCandidatePhotoStart: rawCandidatePhoto ? rawCandidatePhoto.substring(0, 80) : 'empty',
             resolvedCandidatePhotoExists: !!resolvedCandidatePhoto,
+            resolveResult: resolvedCandidatePhoto ? `YES (${resolvedCandidatePhoto.substring(0, 80)}...)` : 'NO',
             showPhotoTemplate
         });
     }
