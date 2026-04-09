@@ -75,11 +75,11 @@ export const createOrder = async (req, res) => {
             amount,
             pricePerVoter,
             customization: {
-                partyName: candidate?.symbolName || '',
-                partyNameMalayalam: candidate?.symbolNameMalayalam || '',
+                partyName: '',
+                partyNameMalayalam: '',
                 partyLogo: candidate?.symbol || '',
-                candidateName: candidate?.candidateName || '',
-                candidateNameMalayalam: candidate?.candidateNameMalayalam || '',
+                candidateName: '',
+                candidateNameMalayalam: '',
                 candidatePhoto: candidate?.candidatePhoto || ''
             },
             paymentStatus: amount === 0 ? 'completed' : 'pending',

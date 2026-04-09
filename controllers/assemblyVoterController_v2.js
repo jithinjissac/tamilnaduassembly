@@ -447,6 +447,8 @@ async function runExtractionJob(body, progressId) {
         constituencyLabel = '',
     } = body;
 
+    const resolvedDistrict = resolveDistrictCode(stateCode, constituency, district);
+
     // DEBUG: Log what we received
     logger.info('🎯 extractVotersAsync - Received candidate:', {
         candidateKeys: candidate ? Object.keys(candidate) : 'null/undefined',
