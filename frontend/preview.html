@@ -1498,8 +1498,32 @@ s0.parentNode.insertBefore(s1,s0);
                     downloadBtn.className = 'btn btn-payment';
                     downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Full PDF';
                     downloadBtn.style.background = 'var(--kerala-green)';
-                    downloadBtn.onclick = downloadFullPDF;
+                    // Prefer Google Drive link if available, fallback to direct PDF
+                    const driveLink = orderData.googleDriveLink;
+                    const pdfPath = orderData.pdfPath;
+                    downloadBtn.onclick = function() {
+                        if (driveLink) {
+                            window.open(driveLink, '_blank');
+                        } else if (pdfPath) {
+                            window.open(pdfPath, '_blank');
+                        } else {
+                            alert('No download link available.');
+                        }
+                    };
                     document.getElementById('paymentBtn').parentNode.insertBefore(downloadBtn, document.getElementById('paymentBtn'));
+
+                    // Show both links if Drive is available
+                    if (driveLink && pdfPath) {
+                        const altDownload = document.createElement('div');
+                        altDownload.style.marginTop = '1rem';
+                        altDownload.innerHTML = `
+                            <button class="btn btn-payment" style="background:#f59e42; margin-bottom:0.5rem;" onclick="window.open('${pdfPath}','_blank')">
+                                <i class="fas fa-download"></i> Direct Download (Fallback)
+                            </button>
+                            <div style="font-size:0.95rem; color:#666;">If Google Drive is slow or blocked, use Direct Download.</div>
+                        `;
+                        document.getElementById('paymentBtn').parentNode.insertBefore(altDownload, document.getElementById('paymentBtn'));
+                    }
 
                     if (orderData.paidAt) {
                         const paidDate = new Date(orderData.paidAt);
