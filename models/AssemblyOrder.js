@@ -142,6 +142,10 @@ const AssemblyOrderSchema = new mongoose.Schema({
         default: false
     },
     pdfPath: String,
+    googleDriveLink: {
+        type: String,
+        default: null
+    },
     pdfGeneratedAt: Date,
     downloadCount: {
         type: Number,

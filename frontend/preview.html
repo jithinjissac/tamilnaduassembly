@@ -1422,7 +1422,14 @@ s0.parentNode.insertBefore(s1,s0);
 
                 // Display order info
                 document.getElementById('displayOrderId').textContent = orderData.orderId || '-';
-                document.getElementById('displayPartyName').textContent = orderData.customization?.partyName || orderData.customization?.partyLogo || orderData.candidate?.symbolName || '-';
+                const assemblySymbolLabel =
+                    orderData.customization?.partyNameMalayalam ||
+                    orderData.customization?.symbolTextMalayalam ||
+                    orderData.customization?.partyName ||
+                    orderData.customization?.symbolText ||
+                    orderData.candidate?.symbolName ||
+                    (orderData.customization?.partyLogo ? 'Selected Symbol' : '-');
+                document.getElementById('displayPartyName').textContent = assemblySymbolLabel;
                 document.getElementById('displayDistrict').textContent = orderData.district || '-';
                 document.getElementById('displayLocalBody').textContent = orderData.constituency || '-';
                 const partCount = orderData.selectedParts?.length || 0;
@@ -3142,20 +3149,32 @@ s0.parentNode.insertBefore(s1,s0);
         async function fetchGoogleDriveLink(orderId) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
+                const endpoint = isAssemblyOrder
+                    ? `/api/assembly/orders/${orderId}`
+                    : `/api/slips/pdf-status/${orderId}`;
+
+                const response = await fetch(endpoint, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.googleDriveLink) {
-                        currentDownloadGoogleDriveLink = data.googleDriveLink;
+                    const driveLink = isAssemblyOrder
+                        ? (data?.order?.googleDriveLink || null)
+                        : (data?.googleDriveLink || null);
+
+                    if (driveLink) {
+                        currentDownloadGoogleDriveLink = driveLink;
+                        return driveLink;
                     }
                 }
             } catch (error) {
                 console.error('Error fetching Google Drive link:', error);
             }
+
+            return null;
         }
 
         // Download from Google Drive
@@ -3315,6 +3334,22 @@ s0.parentNode.insertBefore(s1,s0);
 
             } catch (error) {
                 console.error('Download error:', error);
+
+                // Automatic Google Drive fallback when direct download fails.
+                try {
+                    if (!currentDownloadGoogleDriveLink && orderData?.orderId) {
+                        await fetchGoogleDriveLink(orderData.orderId);
+                    }
+
+                    if (currentDownloadGoogleDriveLink) {
+                        showMessage('info', 'Direct Download Failed', 'Opening Google Drive fallback link...');
+                        window.open(currentDownloadGoogleDriveLink, '_blank');
+                        return;
+                    }
+                } catch (fallbackError) {
+                    console.error('Google Drive fallback failed:', fallbackError);
+                }
+
                 showMessage('error', 'Download Failed', error.message || 'Please try again or contact support.');
             }
         }

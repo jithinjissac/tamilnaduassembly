@@ -211,16 +211,42 @@ export const generateSlipsWithCandidates = async (req, res) => {
 
         logger.info(`✅ Assembly slips PDF saved: ${pdfFullPath}`);
 
+        let assemblyGoogleDriveLink = null;
+        try {
+            const { uploadToGoogleDrive, isGoogleDriveConfigured } = await import('../utils/googleDrive.js');
+            if (isGoogleDriveConfigured()) {
+                logger.info(`📤 Assembly: Uploading generated PDF to Google Drive (${pdfFileName})...`);
+                assemblyGoogleDriveLink = await uploadToGoogleDrive(pdfFullPath, baseName);
+                if (assemblyGoogleDriveLink) {
+                    logger.info(`✅ Assembly: Google Drive upload successful: ${assemblyGoogleDriveLink}`);
+                } else {
+                    logger.warn('⚠️ Assembly: Google Drive upload returned empty link');
+                }
+            } else {
+                logger.info('ℹ️ Assembly: Google Drive not configured, skipping upload');
+            }
+        } catch (driveError) {
+            logger.error(`❌ Assembly: Google Drive upload failed: ${driveError.message}`);
+        }
+
         // Update order in DB with the generated PDF path (if this was from a preview session)
         if (previewId && !previewOnly) {
             try {
                 const updated = await AssemblyOrder.findOneAndUpdate(
                     { previewId },
-                    { pdfPath: `/voter-slips/${pdfFileName}`, pdfGenerated: true, pdfGeneratedAt: new Date() },
+                    {
+                        pdfPath: `/voter-slips/${pdfFileName}`,
+                        pdfGenerated: true,
+                        pdfGeneratedAt: new Date(),
+                        ...(assemblyGoogleDriveLink ? { googleDriveLink: assemblyGoogleDriveLink } : {})
+                    },
                     { new: true }
                 );
                 if (updated) {
                     logger.info(`✅ Updated order ${updated.orderId} pdfPath → /voter-slips/${pdfFileName}`);
+                    if (assemblyGoogleDriveLink) {
+                        logger.info(`✅ Updated order ${updated.orderId} googleDriveLink → ${assemblyGoogleDriveLink}`);
+                    }
                 }
             } catch (dbErr) {
                 logger.warn(`⚠️ Could not update order pdfPath: ${dbErr.message}`);

@@ -9,6 +9,35 @@ import { saveVoterSnippetSlipsToFile } from '../utils/imageSlipGenerator.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+async function ensureAssemblyGoogleDriveUpload(order, pdfFullPath) {
+    if (!order || !pdfFullPath || order.googleDriveLink) {
+        return order?.googleDriveLink || null;
+    }
+
+    try {
+        const { uploadToGoogleDrive, isGoogleDriveConfigured } = await import('../utils/googleDrive.js');
+        if (!isGoogleDriveConfigured()) {
+            console.log('ℹ️ Assembly: Google Drive not configured, skipping upload');
+            return null;
+        }
+
+        console.log(`📤 Assembly: Uploading ${order.orderId} PDF to Google Drive...`);
+        const driveLink = await uploadToGoogleDrive(pdfFullPath, order.orderId);
+        if (driveLink) {
+            order.googleDriveLink = driveLink;
+            await order.save();
+            console.log(`✅ Assembly: Google Drive upload successful: ${driveLink}`);
+            return driveLink;
+        }
+
+        console.warn(`⚠️ Assembly: Google Drive upload returned empty link for ${order.orderId}`);
+        return null;
+    } catch (driveError) {
+        console.error(`❌ Assembly: Google Drive upload error for ${order.orderId}:`, driveError.message);
+        return null;
+    }
+}
+
 // Generate unique assembly order ID
 const generateOrderId = () => {
     const date = new Date();
@@ -75,9 +104,11 @@ export const createOrder = async (req, res) => {
             amount,
             pricePerVoter,
             customization: {
-                partyName: '',
-                partyNameMalayalam: '',
+                partyName: candidate?.symbolName || '',
+                partyNameMalayalam: candidate?.symbolNameMalayalam || candidate?.symbolName || '',
                 partyLogo: candidate?.symbol || '',
+                symbolText: candidate?.symbolName || '',
+                symbolTextMalayalam: candidate?.symbolNameMalayalam || candidate?.symbolName || '',
                 candidateName: '',
                 candidateNameMalayalam: '',
                 candidatePhoto: candidate?.candidatePhoto || ''
@@ -381,6 +412,9 @@ export const downloadPDF = async (req, res) => {
         if (!fs.existsSync(pdfFullPath)) {
             return res.status(404).json({ status: 'error', message: 'PDF file not found on server' });
         }
+
+        // Upload once to Google Drive (if configured) and persist link on assembly order.
+        await ensureAssemblyGoogleDriveUpload(order, pdfFullPath);
 
         // Update download stats
         order.downloadCount = (order.downloadCount || 0) + 1;
