@@ -35,15 +35,17 @@ function extractRevisionNo(rollTypeRefId, fallback = 1) {
 // Common headers required by ECI API (verified from working curl command)
 const getHeaders = () => ({
     'Accept': '*/*',
-    'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
     'Content-Type': 'application/json',
     'Origin': 'https://voters.eci.gov.in',
-    'Referer': 'https://voters.eci.gov.in/',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
+    'Pragma': 'no-cache',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
     'applicationname': 'VSP',
     'channelidobo': 'VSP',
     'platform-type': 'ECIWEB',
-    'sec-ch-ua': '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
+    'sec-ch-ua': '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
     'Sec-Fetch-Dest': 'empty',
@@ -329,6 +331,18 @@ export const generatePublishedPDFs = async (payload) => {
         logger.info(`📥 Full Response: ${JSON.stringify(response.data)}`);
         
         if (response.data && response.data.status === 'Success') {
+            const setCookieHeader = response?.headers?.['set-cookie'];
+            const cookieHeader = Array.isArray(setCookieHeader)
+                ? setCookieHeader
+                    .map((cookieValue) => String(cookieValue || '').split(';')[0].trim())
+                    .filter(Boolean)
+                    .join('; ')
+                : '';
+
+            if (cookieHeader) {
+                logger.info('🍪 Captured ECI session cookies for PDF download request');
+            }
+
             // Try different response structures
             let pdfPaths = response.data.payload || response.data.response?.pdfPaths || response.data.file || [];
             
@@ -382,7 +396,10 @@ export const generatePublishedPDFs = async (payload) => {
                 status: 'success',
                 refId: response.data.refId,
                 pdfUrls,
-                pdfPaths
+                pdfPaths,
+                downloadContext: {
+                    cookieHeader
+                }
             };
         }
         
