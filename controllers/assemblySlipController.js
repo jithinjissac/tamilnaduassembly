@@ -412,6 +412,9 @@ function generateSlipsHTML(voters, candidate, metadata) {
             return `
             <div class="voter-slip">
                 ${leftSection}
+                <div class="cut-separator" aria-hidden="true">
+                    <span class="cut-scissor">✂</span>
+                </div>
                 <div class="slip-right">
                     <div class="voter-image-container">
                         ${snippetSrc
@@ -442,31 +445,35 @@ function generateSlipsHTML(voters, candidate, metadata) {
         .page { width: 210mm; height: 297mm; padding: 5mm 10mm; display: flex; flex-direction: column; align-items: center; page-break-after: always; }
         .page:last-child { page-break-after: auto; }
 
-        .voter-slip { width: 100%; height: ${slipHeight}; border: 1.2px solid #000; display: grid; grid-template-columns: 38mm 1fr; gap: 0; padding: 1.5mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
+        .voter-slip { width: 100%; height: ${slipHeight}; border: 1.2px solid #000; display: grid; grid-template-columns: 44mm 6mm 1fr; gap: 0; padding: 1.5mm; position: relative; flex-shrink: 0; margin-bottom: ${slipGap}; }
         .voter-slip::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2mm; height: 0; border-bottom: 2px dashed #999; }
         .voter-slip:last-child { margin-bottom: 0; }
         .voter-slip:last-child::after { display: none; }
         .voter-slip > * { overflow: hidden; }
 
-        .slip-left { display: flex !important; width: 38mm; border-right: 1.2px solid #000; background: #fff; margin-right: 0; padding: 1.5mm; }
+        .slip-left { display: flex !important; width: 100%; background: #fff; margin-right: 0; padding: 1.2mm; }
         .slip-left-content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3mm; width: 100%; }
+
+        .cut-separator { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; }
+        .cut-separator::before { content: ''; position: absolute; top: 1mm; bottom: 1mm; left: 50%; transform: translateX(-50%); border-left: 1.4px dotted #6b7280; }
+        .cut-scissor { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 4.2mm; height: 4.2mm; background: #fff; color: #374151; font-size: 10pt; line-height: 1; }
 
         .slip-left.photo-template { position: relative; padding: 0; overflow: hidden; }
         .candidate-photo-frame { width: 100%; height: 100%; }
         .candidate-photo-image { width: 100%; height: 100%; object-fit: cover; display: block; }
         .small-symbol-overlay {
             position: absolute;
-            right: 1.2mm;
-            bottom: 1.2mm;
-            width: 10mm;
-            height: 10mm;
+            right: 0.7mm;
+            bottom: 0.7mm;
+            width: 13mm;
+            height: 13mm;
             background: #fff;
             border: 1px solid #000;
             border-radius: 1mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.8mm;
+            padding: 0.9mm;
         }
         .small-symbol-image { width: 100%; height: 100%; object-fit: contain; display: block; }
         
@@ -478,7 +485,7 @@ function generateSlipsHTML(voters, candidate, metadata) {
         .serial-label { font-size: 10pt; font-weight: 700; color: #000; margin-bottom: 0.8mm; text-align: center; line-height: 1.1; }
         .serial-value { font-size: 16pt; font-weight: 800; color: #000; text-align: center; line-height: 1; }
 
-        .slip-right { flex: 1; margin-left: 0; padding: 1mm 2mm; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+        .slip-right { flex: 1; margin-left: 0; padding: 1mm 1.5mm 1mm 2.5mm; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
         .voter-image-container { flex: 1; overflow: hidden; display: flex; align-items: flex-start; justify-content: flex-start; min-height: 0; }
         .voter-image { width: auto; height: 100%; max-width: 100%; object-fit: contain; display: block; filter: contrast(1.2); }

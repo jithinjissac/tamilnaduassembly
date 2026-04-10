@@ -281,6 +281,9 @@ function generateImageSlipsHTML(voterSnippets, metadata) {
             return `
             <div class="voter-slip">
                 ${leftSection}
+                <div class="cut-separator" aria-hidden="true">
+                    <span class="cut-scissor">✂</span>
+                </div>
                 <div class="slip-right">
                     <div class="voter-image-container">
                         <img src="${voter.snippetBase64}" alt="Voter ${serialNo}" class="voter-image">
@@ -328,7 +331,7 @@ ${slipsHTML}
             height: ${slipHeight}; 
             border: 1.2px solid #000; 
             display: grid; 
-            grid-template-columns: 38mm 1fr; 
+            grid-template-columns: 44mm 6mm 1fr; 
             gap: 0; 
             padding: 1.5mm; 
             position: relative; 
@@ -350,11 +353,42 @@ ${slipsHTML}
         
         .slip-left { 
             display: flex !important; 
-            width: 38mm; 
-            border-right: 1.2px solid #000; 
+            width: 100%; 
             background: #fff; 
             margin-right: 0; 
-            padding: 1.5mm; 
+            padding: 1.2mm; 
+        }
+
+        .cut-separator {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .cut-separator::before {
+            content: '';
+            position: absolute;
+            top: 1mm;
+            bottom: 1mm;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 1.4px dotted #6b7280;
+        }
+
+        .cut-scissor {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4.2mm;
+            height: 4.2mm;
+            background: #fff;
+            color: #374151;
+            font-size: 10pt;
+            line-height: 1;
         }
         
         .slip-left-content { 
@@ -386,17 +420,17 @@ ${slipsHTML}
 
         .small-symbol-overlay {
             position: absolute;
-            right: 1.2mm;
-            bottom: 1.2mm;
-            width: 10mm;
-            height: 10mm;
+            right: 0.7mm;
+            bottom: 0.7mm;
+            width: 13mm;
+            height: 13mm;
             background: #fff;
             border: 1px solid #000;
             border-radius: 1mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.8mm;
+            padding: 0.9mm;
         }
 
         .small-symbol-image {
@@ -466,7 +500,7 @@ ${slipsHTML}
         .slip-right {
             flex: 1;
             margin-left: 0;
-            padding: 1mm 2mm;
+            padding: 1mm 1.5mm 1mm 2.5mm;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
