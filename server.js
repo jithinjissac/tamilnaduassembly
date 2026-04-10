@@ -8,11 +8,14 @@ import { fileURLToPath } from 'url';
 
 console.log('✅ Core imports loaded');
 
+
 import dropdownRoutes from './controllers/dropdownController.js';
 import voterRoutes from './controllers/voterController.js';
 import captchaRoutes from './controllers/captchaController.js';
 import manualSlipRoutes from './controllers/manualSlipController.js';
 import dropdownRoutesNew from './routes/dropdown.js';
+
+
 
 console.log('✅ Controller imports loaded');
 
@@ -47,8 +50,13 @@ console.log('✅ Environment variables initialized');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+// Google Drive upload API (must be after app is initialized)
+import driveRoutes from './controllers/driveController.js';
+app.use('/api/drive', driveRoutes);
 
 console.log(`🚀 Starting server on port ${PORT}...`);
 console.log(`📍 Node environment: ${process.env.NODE_ENV || 'development'}`);

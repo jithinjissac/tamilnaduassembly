@@ -161,6 +161,36 @@ export async function saveVoterSnippetSlipsToFile(voterSnippets, metadata = {}) 
             logger.error(`❌ PDF generation failed (HTML still available): ${pdfErr.message}`);
         }
 
+
+        // Cleanup only the python-boxes-N folder created for this order (created by pdfSnippetExtractor)
+        try {
+            // Try to find the python-boxes-N folder for this order
+            // The folder is created as path.join(outputDir, `python-boxes-${Date.now()}`) in pdfSnippetExtractor
+            // We can pass the folder name via metadata if available, otherwise try to infer
+            let pythonBoxesDir = metadata.pythonBoxesDir;
+            if (!pythonBoxesDir && metadata._pythonBoxesDir) pythonBoxesDir = metadata._pythonBoxesDir;
+            if (!pythonBoxesDir && metadata.lastPythonBoxesDir) pythonBoxesDir = metadata.lastPythonBoxesDir;
+            // Fallback: try to find the most recent python-boxes-* folder in the parent dir
+            if (!pythonBoxesDir) {
+                const parentDir = path.dirname(outputDir);
+                if (fs.existsSync(parentDir)) {
+                    const files = fs.readdirSync(parentDir)
+                        .filter(f => /^python-boxes-\d+$/.test(f))
+                        .map(f => ({ name: f, mtime: fs.statSync(path.join(parentDir, f)).mtime }))
+                        .sort((a, b) => b.mtime - a.mtime);
+                    if (files.length > 0) {
+                        pythonBoxesDir = path.join(parentDir, files[0].name);
+                    }
+                }
+            }
+            if (pythonBoxesDir && fs.existsSync(pythonBoxesDir)) {
+                fs.rmSync(pythonBoxesDir, { recursive: true, force: true });
+                logger.info(`🗑️ Cleaned up python-boxes folder: ${pythonBoxesDir}`);
+            }
+        } catch (cleanupErr) {
+            logger.warn(`⚠️ Could not delete python-boxes folder: ${cleanupErr.message}`);
+        }
+
         return {
             fileName: htmlArtifactSaved ? htmlFileName : (pdfGenerated ? pdfFileName : null),
             fullPath: htmlArtifactSaved ? htmlFullPath : (pdfGenerated ? pdfFullPath : null),

@@ -501,6 +501,11 @@ export async function extractVoterSnippets(pdfPath, options = {}) {
             const pythonOutputDir = path.join(outputDir, `python-boxes-${Date.now()}`);
             fs.mkdirSync(pythonOutputDir, { recursive: true });
 
+            // Attach the pythonOutputDir to options for downstream consumers (e.g., imageSlipGenerator)
+            if (options && typeof options === 'object') {
+                options.pythonBoxesDir = pythonOutputDir;
+            }
+
             const pythonSnippets = await tryPythonBoxExtractor(
                 pdfPath,
                 startPage,
