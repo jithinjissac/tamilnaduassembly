@@ -9,9 +9,7 @@
     <!-- Tamil Nadu Colors & Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="symbol-picker.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <!--Start of Tawk.to Script-->
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -1088,32 +1086,6 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="candidatePhotoInput"><i class="fas fa-camera"></i> Candidate Photo</label>
-                    <input type="file" id="candidatePhotoInput" accept="image/png,image/jpeg,image/jpg" onchange="handleCandidatePhotoUpload(event)">
-                    <small style="color: #666; display: block; margin-top: 0.5rem;">
-                        Upload JPG/PNG (max 5MB). You can crop the image in a square ratio to match the symbol area.
-                    </small>
-                    <div id="candidatePhotoPreviewWrap" style="margin-top: 1rem; display: none;">
-                        <img id="candidatePhotoPreview" src="" alt="Candidate Photo Preview" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0; background: #fff;">
-                    </div>
-                    <div id="candidatePhotoError" class="error-message" style="margin-top: 0.5rem;"></div>
-                </div>
-
-                <div id="candidatePhotoCropModal" style="display: none; position: fixed; inset: 0; z-index: 12000; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; padding: 1rem;">
-                    <div style="background: #fff; width: min(720px, 96vw); border-radius: 12px; padding: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
-                        <h3 style="margin: 0 0 0.4rem 0; color: #1f2937;">Crop Candidate Photo</h3>
-                        <p style="margin: 0 0 0.8rem 0; color: #6b7280; font-size: 0.9rem;">Crop in a square ratio so it fits the symbol area in slip layout.</p>
-                        <div style="width: 100%; max-height: 62vh; overflow: hidden; background: #f3f4f6; border-radius: 10px; border: 1px solid #e5e7eb;">
-                            <img id="candidatePhotoCropImage" src="" alt="Crop candidate photo" style="max-width: 100%; display: block;">
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.9rem;">
-                            <button type="button" class="btn" onclick="closeCandidatePhotoCropper()" style="background: #e5e7eb; color: #111827;">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="applyCroppedCandidatePhoto()"><i class="fas fa-check"></i> Apply Crop</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="form-actions">
                     <button type="button" id="next-to-step2" class="btn btn-primary">
                         <i class="fas fa-arrow-right"></i> Next: Extract Voters
@@ -1454,146 +1426,8 @@
         function buildCandidate(symbolSrc, symbolName) {
             return {
                 symbol: symbolSrc || '',
-                symbolName: symbolName || (state.candidate && state.candidate.symbolName) || '',
-                candidatePhoto: (state.candidate && state.candidate.candidatePhoto) || ''
+                symbolName: symbolName || (state.candidate && state.candidate.symbolName) || ''
             };
-        }
-
-        let candidatePhotoCropper = null;
-        let pendingCandidatePhotoInput = null;
-
-        function applyCandidatePhotoBase64(base64) {
-            const previewWrap = document.getElementById('candidatePhotoPreviewWrap');
-            const previewImg = document.getElementById('candidatePhotoPreview');
-            if (!state.candidate) state.candidate = buildCandidate(null, '');
-            state.candidate.candidatePhoto = base64;
-            if (previewImg) previewImg.src = base64;
-            if (previewWrap) previewWrap.style.display = 'block';
-        }
-
-        function openCandidatePhotoCropper(base64, inputEl) {
-            const modal = document.getElementById('candidatePhotoCropModal');
-            const cropImage = document.getElementById('candidatePhotoCropImage');
-            const errorEl = document.getElementById('candidatePhotoError');
-
-            pendingCandidatePhotoInput = inputEl || null;
-            if (errorEl) errorEl.textContent = '';
-
-            if (!modal || !cropImage) {
-                applyCandidatePhotoBase64(base64);
-                return;
-            }
-
-            modal.style.display = 'flex';
-            cropImage.src = base64;
-
-            if (candidatePhotoCropper) {
-                candidatePhotoCropper.destroy();
-                candidatePhotoCropper = null;
-            }
-
-            cropImage.onload = () => {
-                if (typeof Cropper !== 'function') {
-                    applyCandidatePhotoBase64(base64);
-                    return;
-                }
-                candidatePhotoCropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    autoCropArea: 1,
-                    background: false,
-                    responsive: true,
-                    movable: true,
-                    zoomable: true,
-                    scalable: false,
-                    rotatable: false
-                });
-            };
-        }
-
-        function closeCandidatePhotoCropper() {
-            const modal = document.getElementById('candidatePhotoCropModal');
-            if (candidatePhotoCropper) {
-                candidatePhotoCropper.destroy();
-                candidatePhotoCropper = null;
-            }
-            if (modal) modal.style.display = 'none';
-            if (pendingCandidatePhotoInput) pendingCandidatePhotoInput.value = '';
-            pendingCandidatePhotoInput = null;
-        }
-
-        function applyCroppedCandidatePhoto() {
-            const errorEl = document.getElementById('candidatePhotoError');
-            try {
-                if (!candidatePhotoCropper) {
-                    if (errorEl) errorEl.textContent = 'Crop tool is not ready. Please try again.';
-                    return;
-                }
-                const canvas = candidatePhotoCropper.getCroppedCanvas({
-                    width: 500,
-                    height: 500,
-                    imageSmoothingEnabled: true,
-                    imageSmoothingQuality: 'high'
-                });
-                if (!canvas) {
-                    if (errorEl) errorEl.textContent = 'Unable to crop image. Please try again.';
-                    return;
-                }
-
-                const base64 = canvas.toDataURL('image/jpeg', 0.92);
-                applyCandidatePhotoBase64(base64);
-
-                const modal = document.getElementById('candidatePhotoCropModal');
-                if (candidatePhotoCropper) {
-                    candidatePhotoCropper.destroy();
-                    candidatePhotoCropper = null;
-                }
-                if (modal) modal.style.display = 'none';
-                pendingCandidatePhotoInput = null;
-            } catch (err) {
-                if (errorEl) errorEl.textContent = 'Crop failed. Please try a different image.';
-            }
-        }
-
-        function handleCandidatePhotoUpload(event) {
-            const input = event.target;
-            const file = input && input.files ? input.files[0] : null;
-            const errorEl = document.getElementById('candidatePhotoError');
-            const previewWrap = document.getElementById('candidatePhotoPreviewWrap');
-            const previewImg = document.getElementById('candidatePhotoPreview');
-
-            if (errorEl) errorEl.textContent = '';
-
-            if (!file) {
-                if (state.candidate) state.candidate.candidatePhoto = '';
-                if (previewWrap) previewWrap.style.display = 'none';
-                if (previewImg) previewImg.src = '';
-                return;
-            }
-
-            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-            if (!allowedTypes.includes(file.type)) {
-                if (errorEl) errorEl.textContent = 'Please upload a PNG or JPG image.';
-                input.value = '';
-                return;
-            }
-
-            const maxBytes = 5 * 1024 * 1024;
-            if (file.size > maxBytes) {
-                if (errorEl) errorEl.textContent = 'Photo must be 5MB or smaller.';
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target && e.target.result ? String(e.target.result) : '';
-                if (previewWrap) previewWrap.style.display = 'none';
-                if (previewImg) previewImg.src = '';
-                openCandidatePhotoCropper(base64, input);
-            };
-            reader.readAsDataURL(file);
         }
 
         // ─── Constituencies ──────────────────────────────────────────────────
