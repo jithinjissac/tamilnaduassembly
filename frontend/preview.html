@@ -3154,13 +3154,35 @@ s0.parentNode.insertBefore(s1,s0);
         // Store order data for download modal
         let currentDownloadGoogleDriveLink = null;
 
-        // Show download modal
-        function showDownloadModal() {
-            // Fetch Google Drive link if available
-            if (orderData && orderData.orderId) {
-                fetchGoogleDriveLink(orderData.orderId);
+
+        // Show download modal with Drive button state
+        async function showDownloadModal() {
+            // Disable Drive button and show loading
+            const driveBtn = document.querySelector('#downloadModal .download-option-btn.google-drive');
+            if (driveBtn) {
+                driveBtn.disabled = true;
+                driveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
             }
             document.getElementById('downloadModal').style.display = 'flex';
+            // Fetch Google Drive link if available
+            if (orderData && orderData.orderId) {
+                const link = await fetchGoogleDriveLink(orderData.orderId);
+                if (driveBtn) {
+                    if (link) {
+                        driveBtn.disabled = false;
+                        driveBtn.innerHTML = `
+                            <i class=\"fab fa-google-drive\" style=\"font-size: 1.5rem;\"></i>
+                            <div style=\"text-align: left;\">
+                                <div>Google Drive</div>
+                                <div style=\"font-size: 0.85rem; font-weight: 400; opacity: 0.9;\">Best for in-app browsers (Instagram, Facebook)</div>
+                            </div>
+                        `;
+                    } else {
+                        driveBtn.disabled = true;
+                        driveBtn.innerHTML = '<i class=\"fab fa-google-drive\"></i> Not Available';
+                    }
+                }
+            }
         }
 
         // Close download modal
@@ -3401,7 +3423,7 @@ s0.parentNode.insertBefore(s1,s0);
                 </button>
 
                 <!-- Google Drive Download Button -->
-                <button onclick="downloadFromDrive()" class="download-option-btn" style="background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                <button onclick="downloadFromDrive()" class="download-option-btn google-drive" style="background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1.25rem 2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
                     <i class="fab fa-google-drive" style="font-size: 1.5rem;"></i>
                     <div style="text-align: left;">
                         <div>Google Drive</div>

@@ -274,19 +274,15 @@ const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
 const mountedBucketPath = railwayVolume || process.env.GCS_MOUNT_PATH || '/slipsdata';
 if (fs.existsSync(mountedBucketPath)) {
   console.log(`☁️ [SERVER] Serving mounted bucket from: ${mountedBucketPath}`);
-}
   app.use('/slipsdata', (req, res, next) => {
     console.log(`[BUCKET ACCESS] Request: ${req.path} from ${req.ip}`);
-    
     // CORS and no-cache headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    
     next();
   });
-  
   app.use('/slipsdata', express.static(mountedBucketPath, {
     maxAge: 0,
     etag: false,
