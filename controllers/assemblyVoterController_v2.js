@@ -622,6 +622,7 @@ async function runExtractionJob(body, progressId) {
 
         const downloadedPDFs = [];
         let refreshedPdfUrls = false;
+        let rollNotFoundOnECI = false;
         
         for (let i = 0; i < pdfResult.pdfUrls.length; i++) {
             let pdfUrl = pdfResult.pdfUrls[i];
@@ -642,10 +643,9 @@ async function runExtractionJob(body, progressId) {
                         const nakedPath = p.startsWith('/eroll/') ? p.slice('/eroll'.length) : p;
                         const erollPath = p.startsWith('/eroll/') ? p : `/eroll${p.startsWith('/') ? p : `/${p}`}`;
 
-                        ['voters.eci.gov.in', 'gateway-voters.eci.gov.in'].forEach((host) => {
-                            urls.push(`${parsed.protocol}//${host}${erollPath}`);
-                            urls.push(`${parsed.protocol}//${host}${nakedPath.startsWith('/') ? nakedPath : `/${nakedPath}`}`);
-                        });
+                        // Keep URL candidates aligned with the direct public ECI PDF host.
+                        urls.push(`${parsed.protocol}//voters.eci.gov.in${erollPath}`);
+                        urls.push(`${parsed.protocol}//voters.eci.gov.in${nakedPath.startsWith('/') ? nakedPath : `/${nakedPath}`}`);
                     } catch (_error) {
                         // Keep original URL if parsing fails.
                     }
@@ -654,43 +654,6 @@ async function runExtractionJob(body, progressId) {
 
                 try {
                     const eciCookieHeader = pdfResult?.downloadContext?.cookieHeader || '';
-                    const shouldTryBrowserFirst = candidateUrls.some((url) =>
-                        typeof url === 'string' && (url.includes('voters.eci.gov.in') || url.includes('gateway-voters.eci.gov.in'))
-                    );
-
-                    if (shouldTryBrowserFirst) {
-                        try {
-                            logger.info(`Assembly: Trying browser-session download first for PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts})...`);
-                            const browserFirstResult = await downloadPdfWithPlaywright(
-                                candidateUrls,
-                                pdfPath,
-                                stateCode,
-                                eciCookieHeader
-                            );
-
-                            const stats = fs.statSync(pdfPath);
-                            if (!stats.size) {
-                                throw new Error('Browser-first download returned empty PDF');
-                            }
-
-                            logger.info(`Assembly: Browser-first download succeeded from ${browserFirstResult.sourceUrl} - ${(stats.size / 1024).toFixed(2)} KB`);
-                            downloadedPDFs.push(pdfPath);
-
-                            updateProgress(progressId, {
-                                pdfDownloaded: downloadedPDFs.length,
-                                pdfSizeKB: Math.round(stats.size / 1024),
-                                stageLabel: `Downloaded PDF ${downloadedPDFs.length}/${pdfResult.pdfUrls.length} (${(stats.size / 1024).toFixed(0)} KB)`,
-                                percent: 15 + Math.round((downloadedPDFs.length / pdfResult.pdfUrls.length) * 25)
-                            });
-
-                            pdfDownloaded = true;
-                            logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
-                            continue;
-                        } catch (browserFirstError) {
-                            logger.warn(`Assembly: Browser-first download failed, falling back to Axios: ${browserFirstError.message}`);
-                        }
-                    }
-
                     let response = null;
                     let lastCandidateError = null;
                     for (const candidateUrl of candidateUrls) {
@@ -766,6 +729,42 @@ async function runExtractionJob(body, progressId) {
 
                     const statusCode = downloadError?.response?.status;
                     const is404 = statusCode === 404;
+                    if (is404) {
+                        rollNotFoundOnECI = true;
+                    }
+
+                    if (statusCode === 401 || statusCode === 403 || !statusCode) {
+                        try {
+                            logger.warn(`Assembly: Axios failed with status ${statusCode || 'unknown'}. Trying browser-session fallback...`);
+                            const fallbackResult = await downloadPdfWithPlaywright(
+                                candidateUrls,
+                                pdfPath,
+                                stateCode,
+                                pdfResult?.downloadContext?.cookieHeader || ''
+                            );
+
+                            const stats = fs.statSync(pdfPath);
+                            if (!stats.size) {
+                                throw new Error('Browser fallback downloaded empty PDF');
+                            }
+
+                            logger.info(`Assembly: Browser fallback succeeded from ${fallbackResult.sourceUrl} - ${(stats.size / 1024).toFixed(2)} KB`);
+                            downloadedPDFs.push(pdfPath);
+
+                            updateProgress(progressId, {
+                                pdfDownloaded: downloadedPDFs.length,
+                                pdfSizeKB: Math.round(stats.size / 1024),
+                                stageLabel: `Downloaded PDF ${downloadedPDFs.length}/${pdfResult.pdfUrls.length} (${(stats.size / 1024).toFixed(0)} KB)`,
+                                percent: 15 + Math.round((downloadedPDFs.length / pdfResult.pdfUrls.length) * 25)
+                            });
+
+                            pdfDownloaded = true;
+                            logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
+                            continue;
+                        } catch (browserFallbackError) {
+                            logger.error(`Assembly: Browser fallback failed: ${browserFallbackError.message}`);
+                        }
+                    }
 
                     if (is404 && !refreshedPdfUrls) {
                         try {
@@ -801,6 +800,9 @@ async function runExtractionJob(body, progressId) {
         }
 
         if (downloadedPDFs.length === 0) {
+            if (rollNotFoundOnECI) {
+                throw createExtractionError('Electoral Roll Not Found in ECI website Please try again later.', 404);
+            }
             throw new Error('Failed to download any PDFs');
         }
 
