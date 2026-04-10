@@ -21,6 +21,7 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { chromium } from 'playwright';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,6 +73,94 @@ const TAMIL_NADU_DISTRICT_CODE_MAP = {
     'RANIPET': 'S2237',
     'MAYILADUTHURAI': 'S2238'
 };
+
+function parseCookieHeader(cookieHeader = '') {
+    return String(cookieHeader)
+        .split(';')
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+        .map((entry) => {
+            const separatorIndex = entry.indexOf('=');
+            if (separatorIndex <= 0) {
+                return null;
+            }
+
+            return {
+                name: entry.slice(0, separatorIndex),
+                value: entry.slice(separatorIndex + 1),
+                domain: '.eci.gov.in',
+                path: '/',
+                secure: true
+            };
+        })
+        .filter(Boolean);
+}
+
+async function downloadPdfWithPlaywright(candidateUrls, targetPath, stateCode, cookieHeader = '') {
+    const browser = await chromium.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+
+    try {
+        const context = await browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36'
+        });
+
+        const cookies = parseCookieHeader(cookieHeader);
+        if (cookies.length > 0) {
+            await context.addCookies(cookies);
+        }
+
+        const page = await context.newPage();
+        const stateParam = encodeURIComponent(String(stateCode || '').toUpperCase());
+        await page.goto(`https://voters.eci.gov.in/download-eroll?stateCode=${stateParam}`, {
+            waitUntil: 'domcontentloaded',
+            timeout: 45000
+        });
+
+        let lastError = null;
+        for (const candidateUrl of candidateUrls) {
+            try {
+                logger.info(`Assembly: Browser fallback downloading from ${candidateUrl}`);
+                const response = await page.goto(candidateUrl, {
+                    waitUntil: 'networkidle',
+                    timeout: 60000
+                });
+
+                if (!response) {
+                    continue;
+                }
+
+                const status = response.status();
+                const contentType = String(response.headers()['content-type'] || '').toLowerCase();
+                if (status >= 200 && status < 300 && contentType.includes('application/pdf')) {
+                    const pdfBuffer = await response.body();
+                    if (!pdfBuffer || pdfBuffer.length === 0) {
+                        continue;
+                    }
+
+                    const pdfHeader = Buffer.from(pdfBuffer).subarray(0, 5).toString('ascii');
+                    if (pdfHeader !== '%PDF-') {
+                        lastError = new Error(`Unexpected browser payload at ${candidateUrl}: content-type ${contentType || 'unknown'}, header ${pdfHeader || 'empty'}`);
+                        continue;
+                    }
+
+                    fs.writeFileSync(targetPath, pdfBuffer);
+                    return { sourceUrl: candidateUrl, bytes: pdfBuffer.length };
+                }
+
+                lastError = new Error(`Unexpected browser response: status ${status}, content-type ${contentType || 'unknown'}`);
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('Browser fallback failed for all PDF URLs');
+    } finally {
+        await browser.close();
+    }
+}
 
 function stripBom(raw) {
     if (typeof raw !== 'string') return raw;
@@ -545,24 +634,62 @@ async function runExtractionJob(body, progressId) {
 
             while (!pdfDownloaded && downloadAttempts < maxAttempts) {
                 downloadAttempts++;
-                try {
-                    const candidateUrls = (() => {
-                        const urls = [pdfUrl];
-                        try {
-                            const parsed = new URL(pdfUrl);
-                            const p = parsed.pathname || '';
-                            const nakedPath = p.startsWith('/eroll/') ? p.slice('/eroll'.length) : p;
-                            const erollPath = p.startsWith('/eroll/') ? p : `/eroll${p.startsWith('/') ? p : `/${p}`}`;
+                const candidateUrls = (() => {
+                    const urls = [pdfUrl];
+                    try {
+                        const parsed = new URL(pdfUrl);
+                        const p = parsed.pathname || '';
+                        const nakedPath = p.startsWith('/eroll/') ? p.slice('/eroll'.length) : p;
+                        const erollPath = p.startsWith('/eroll/') ? p : `/eroll${p.startsWith('/') ? p : `/${p}`}`;
 
-                            ['voters.eci.gov.in', 'gateway-voters.eci.gov.in'].forEach((host) => {
-                                urls.push(`${parsed.protocol}//${host}${erollPath}`);
-                                urls.push(`${parsed.protocol}//${host}${nakedPath.startsWith('/') ? nakedPath : `/${nakedPath}`}`);
+                        ['voters.eci.gov.in', 'gateway-voters.eci.gov.in'].forEach((host) => {
+                            urls.push(`${parsed.protocol}//${host}${erollPath}`);
+                            urls.push(`${parsed.protocol}//${host}${nakedPath.startsWith('/') ? nakedPath : `/${nakedPath}`}`);
+                        });
+                    } catch (_error) {
+                        // Keep original URL if parsing fails.
+                    }
+                    return Array.from(new Set(urls.filter(Boolean)));
+                })();
+
+                try {
+                    const eciCookieHeader = pdfResult?.downloadContext?.cookieHeader || '';
+                    const shouldTryBrowserFirst = candidateUrls.some((url) =>
+                        typeof url === 'string' && (url.includes('voters.eci.gov.in') || url.includes('gateway-voters.eci.gov.in'))
+                    );
+
+                    if (shouldTryBrowserFirst) {
+                        try {
+                            logger.info(`Assembly: Trying browser-session download first for PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts})...`);
+                            const browserFirstResult = await downloadPdfWithPlaywright(
+                                candidateUrls,
+                                pdfPath,
+                                stateCode,
+                                eciCookieHeader
+                            );
+
+                            const stats = fs.statSync(pdfPath);
+                            if (!stats.size) {
+                                throw new Error('Browser-first download returned empty PDF');
+                            }
+
+                            logger.info(`Assembly: Browser-first download succeeded from ${browserFirstResult.sourceUrl} - ${(stats.size / 1024).toFixed(2)} KB`);
+                            downloadedPDFs.push(pdfPath);
+
+                            updateProgress(progressId, {
+                                pdfDownloaded: downloadedPDFs.length,
+                                pdfSizeKB: Math.round(stats.size / 1024),
+                                stageLabel: `Downloaded PDF ${downloadedPDFs.length}/${pdfResult.pdfUrls.length} (${(stats.size / 1024).toFixed(0)} KB)`,
+                                percent: 15 + Math.round((downloadedPDFs.length / pdfResult.pdfUrls.length) * 25)
                             });
-                        } catch (_error) {
-                            // Keep original URL if parsing fails.
+
+                            pdfDownloaded = true;
+                            logger.info(`Assembly: ✅ PDF available at: file:///${pdfPath.replace(/\\/g, '/')}`);
+                            continue;
+                        } catch (browserFirstError) {
+                            logger.warn(`Assembly: Browser-first download failed, falling back to Axios: ${browserFirstError.message}`);
                         }
-                        return Array.from(new Set(urls.filter(Boolean)));
-                    })();
+                    }
 
                     let response = null;
                     let lastCandidateError = null;
@@ -571,7 +698,6 @@ async function runExtractionJob(body, progressId) {
                             logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts}) from ${candidateUrl}...`);
                             const stateParam = encodeURIComponent(String(stateCode || '').toUpperCase());
                             const downloadPageUrl = `https://voters.eci.gov.in/download-eroll?stateCode=${stateParam}`;
-                            const eciCookieHeader = pdfResult?.downloadContext?.cookieHeader || '';
                             response = await axios.get(candidateUrl, {
                                 responseType: 'arraybuffer',
                                 timeout: 60000,
@@ -592,6 +718,15 @@ async function runExtractionJob(body, progressId) {
                                     ...(eciCookieHeader ? { 'Cookie': eciCookieHeader } : {})
                                 }
                             });
+
+                            const payloadBuffer = Buffer.from(response.data);
+                            const pdfHeader = payloadBuffer.subarray(0, 5).toString('ascii');
+                            const contentType = String(response?.headers?.['content-type'] || '').toLowerCase();
+                            if (!contentType.includes('application/pdf') || pdfHeader !== '%PDF-') {
+                                throw new Error(`Non-PDF payload received (content-type: ${contentType || 'unknown'}, header: ${pdfHeader || 'empty'})`);
+                            }
+
+                            response.data = payloadBuffer;
                             pdfUrl = candidateUrl;
                             break;
                         } catch (candidateError) {
@@ -631,6 +766,7 @@ async function runExtractionJob(body, progressId) {
 
                     const statusCode = downloadError?.response?.status;
                     const is404 = statusCode === 404;
+
                     if (is404 && !refreshedPdfUrls) {
                         try {
                             logger.info('Assembly: PDF URL returned 404. Refreshing PDF URLs from ECI and retrying...');
