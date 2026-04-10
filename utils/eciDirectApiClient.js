@@ -9,7 +9,7 @@ import { logger } from './logger.js';
 
 const BASE_URL = 'https://gateway-voters.eci.gov.in';
 
-const DEFAULT_ROLL_TYPE_REF_ID = 'S11-2026-FIR';
+const DEFAULT_ROLL_TYPE_REF_ID = 'S11-2026-FIR-2';
 
 function normalizeRollTypeRefId(rollType, stateCode, year) {
     if (typeof rollType === 'string' && /^S\d+-\d{4}-[A-Z]+(?:-\d+)?$/i.test(rollType)) {
@@ -17,7 +17,7 @@ function normalizeRollTypeRefId(rollType, stateCode, year) {
     }
 
     if (rollType === 'SIR-FinalRoll' || rollType === 'FinalRoll') {
-        return `${stateCode}-${year}-FIR`;
+        return `${stateCode}-${year}-FIR-2`;
     }
 
     if (rollType === 'SupplementRoll') {
