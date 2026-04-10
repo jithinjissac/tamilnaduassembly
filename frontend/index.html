@@ -535,6 +535,71 @@
             border-radius: 24px;
         }
 
+        .sample-preview-stack {
+            position: relative;
+            width: min(520px, 100%);
+            margin: 0 auto;
+            min-height: 360px;
+        }
+
+        .sample-preview-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            will-change: transform, opacity;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .sample-preview-card img {
+            box-shadow: var(--shadow-2xl);
+            border-radius: 24px;
+        }
+
+        .sample-preview-card.front {
+            animation: sampleFrontCycle 6s ease-in-out infinite;
+        }
+
+        .sample-preview-card.back {
+            animation: sampleBackCycle 6s ease-in-out infinite;
+        }
+
+        @keyframes sampleFrontCycle {
+            0%, 40% {
+                transform: translateY(18px) rotate(-2deg) scale(0.97);
+                opacity: 0.93;
+                z-index: 1;
+            }
+            50%, 90% {
+                transform: translateY(0) rotate(-2deg) scale(1);
+                opacity: 1;
+                z-index: 3;
+            }
+            100% {
+                transform: translateY(18px) rotate(-2deg) scale(0.97);
+                opacity: 0.93;
+                z-index: 1;
+            }
+        }
+
+        @keyframes sampleBackCycle {
+            0%, 40% {
+                transform: translateY(0) rotate(4deg) scale(1);
+                opacity: 1;
+                z-index: 3;
+            }
+            50%, 90% {
+                transform: translateY(18px) rotate(4deg) scale(0.97);
+                opacity: 0.93;
+                z-index: 1;
+            }
+            100% {
+                transform: translateY(0) rotate(4deg) scale(1);
+                opacity: 1;
+                z-index: 3;
+            }
+        }
+
         .split-content ul {
             list-style: none;
             margin-top: 2rem;
@@ -959,6 +1024,16 @@
                 top: 20px !important;
                 right: 0 !important;
             }
+
+            .sample-preview-stack {
+                min-height: 260px;
+            }
+
+            .sample-preview-card.back {
+                width: 78%;
+                left: auto;
+                right: 0;
+            }
             
             .comp-cell {
                 padding: 1.25rem;
@@ -1236,11 +1311,16 @@
                     style="position:absolute; bottom:0; left:0; width:200px; height:200px; background:#bae6fd; border-radius:50%; filter:blur(50px); z-index:-1;">
                 </div>
 
-                <img src="sample.png" alt="Slip Preview" style="box-shadow:var(--shadow-2xl); transform:rotate(-2deg);"
-                    onerror="this.src='https://placehold.co/600x400/ffffff/0284c7?text=Slip+Front'">
-                <img src="sample1.png" alt="Slip Back"
-                    style="box-shadow:var(--shadow-2xl); transform:rotate(4deg); position:absolute; top:40px; right:10px; z-index:-1;"
-                    onerror="this.style.display='none'">
+                <div class="sample-preview-stack" aria-label="Animated slip preview stack">
+                    <div class="sample-preview-card front">
+                        <img src="sample.png" alt="Slip Preview"
+                            onerror="this.src='https://placehold.co/600x400/ffffff/0284c7?text=Slip+Front'">
+                    </div>
+                    <div class="sample-preview-card back">
+                        <img src="sample1.png" alt="Slip Back"
+                            onerror="this.parentElement.style.display='none'">
+                    </div>
+                </div>
             </div>
         </div>
     </section>
