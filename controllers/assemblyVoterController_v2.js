@@ -569,21 +569,27 @@ async function runExtractionJob(body, progressId) {
                     for (const candidateUrl of candidateUrls) {
                         try {
                             logger.info(`Assembly: Downloading PDF ${i + 1}/${pdfResult.pdfUrls.length} (Attempt ${downloadAttempts}) from ${candidateUrl}...`);
+                            const stateParam = encodeURIComponent(String(stateCode || '').toUpperCase());
+                            const downloadPageUrl = `https://voters.eci.gov.in/download-eroll?stateCode=${stateParam}`;
+                            const eciCookieHeader = pdfResult?.downloadContext?.cookieHeader || '';
                             response = await axios.get(candidateUrl, {
                                 responseType: 'arraybuffer',
                                 timeout: 60000,
                                 headers: {
-                                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                                    'Accept': '*/*',
                                     'Accept-Language': 'en-US,en;q=0.9',
                                     'Accept-Encoding': 'gzip, deflate, br',
-                                    'Referer': 'https://voters.eci.gov.in/',
+                                    'Referer': downloadPageUrl,
+                                    'Origin': 'https://voters.eci.gov.in',
                                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
                                     'Connection': 'keep-alive',
-                                    'Upgrade-Insecure-Requests': '1',
-                                    'sec-fetch-dest': 'document',
-                                    'sec-fetch-mode': 'navigate',
-                                    'sec-fetch-site': 'none',
-                                    'sec-fetch-user': '?1'
+                                    'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+                                    'sec-ch-ua-mobile': '?0',
+                                    'sec-ch-ua-platform': '"Windows"',
+                                    'sec-fetch-dest': 'empty',
+                                    'sec-fetch-mode': 'cors',
+                                    'sec-fetch-site': 'same-origin',
+                                    ...(eciCookieHeader ? { 'Cookie': eciCookieHeader } : {})
                                 }
                             });
                             pdfUrl = candidateUrl;
