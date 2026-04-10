@@ -1132,8 +1132,10 @@ s0.parentNode.insertBefore(s1,s0);
         // Regular download
         async function downloadRegular() {
             const orderId = currentDownloadOrderId;
-            if (!orderId) return;
-            
+            if (!orderId) {
+                alert('Order ID missing. Cannot download. Please refresh the page and try again.');
+                return;
+            }
             // Show loading on button
             const regularBtn = event.target.closest('.download-option-btn');
             const originalHTML = regularBtn ? regularBtn.innerHTML : '';
