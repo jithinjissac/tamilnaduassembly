@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - EasySlip | Tamil Nadu Local Body Election Voter Information Slip Generator</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <link rel="stylesheet" href="kerala-theme.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="activity-tracker.js"></script>
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.onLoad = function(){
+    Tawk_API.minimize();
+};
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6915d6142af5c119557c9226/1j9ukognh';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Malayalam', Arial, sans-serif;
+            background: var(--kerala-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+            border-top: 6px solid var(--kerala-gold);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        .success-icon lottie-player {
+            width: 100%;
+            height: 100%;
+        }
+
+        .success-icon.emoji {
+            width: 100px;
+            height: 100px;
+            background: var(--kerala-gradient);
+            border-radius: 50%;
+            font-size: 4rem;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            color: var(--kerala-green);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .order-details {
+            background: var(--kerala-cream);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: left;
+            border: 2px solid var(--kerala-gold);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed,
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-default {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .order-id-highlight {
+            background: var(--kerala-gradient);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--kerala-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 109, 59, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .download-info {
+            background: rgba(255, 248, 220, 0.5);
+            border: 2px solid var(--kerala-gold);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .download-info h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .download-info p {
+            color: #718096;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--kerala-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .success-container {
+                padding: 1.5rem;
+            }
+
+            .success-title {
+                font-size: 1.75rem;
+            }
+
+            .success-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-label, .detail-value {
+                font-size: 0.9rem;
+            }
+
+            #messageBox {
+                margin: 1rem auto !important;
+                padding: 1rem !important;
+            }
+
+            #messageText {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .success-icon {
+                width: 150px;
+                height: 150px;
+            }
+
+            .success-icon.emoji {
+                width: 80px;
+                height: 80px;
+                font-size: 3rem;
+            }
+
+            .success-title {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .in-app-browser-content {
+                padding: 1.5rem;
+            }
+
+            .browser-instructions {
+                padding: 1rem;
+            }
+
+            .browser-instructions h3 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- In-App Browser Warning Overlay -->
+
+    <div class="success-container">
+        <div class="success-icon">
+            <lottie-player 
+                src="/lottie/Sucesso.json"
+                background="transparent"
+                speed="1"
+                loop
+                autoplay>
+            </lottie-player>
+        </div>
+        
+        <h1 class="success-title">Payment Successful!</h1>
+        <p class="success-subtitle">Your order is ready</p>
+
+        <!-- Error/Warning Message Display -->
+        <div id="messageBox" style="display: none; margin: 2rem auto; padding: 1.5rem; border-radius: 12px; max-width: 500px; text-align: center;">
+            <div id="messageIcon" style="font-size: 3rem; margin-bottom: 1rem;"></div>
+            <h3 id="messageTitle" style="margin: 0 0 0.5rem 0;"></h3>
+            <p id="messageText" style="margin: 0 0 1rem 0; color: #666;"></p>
+            <div id="messageAction"></div>
+        </div>
+
+        <div class="order-id-highlight" id="orderIdDisplay">
+            Loading order...
+        </div>
+
+        <div class="order-details" id="orderDetails" style="display: none;">
+            <div class="detail-row">
+                <span class="detail-label">Symbol</span>
+                <span class="detail-value" id="partyName">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">District</span>
+                <span class="detail-value" id="orderDistrict">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Constituency</span>
+                <span class="detail-value" id="orderConstituency">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total Voters</span>
+                <span class="detail-value" id="voterCount">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total Pages</span>
+                <span class="detail-value" id="totalPages">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Amount</span>
+                <span class="detail-value" id="paidAmount">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Order Status</span>
+                <span class="detail-value"><span id="orderStatusBadge" class="status-badge status-default">-</span></span>
+            </div>
+            <div class="detail-row" id="paymentIdRow" style="display: none;">
+                <span class="detail-label">Payment ID</span>
+                <span class="detail-value" id="paymentId" style="font-size: 0.85rem; font-family: monospace;">-</span>
+            </div>
+            <div class="detail-row" id="paymentDateRow" style="display: none;">
+                <span class="detail-label">Payment Date</span>
+                <span class="detail-value" id="paymentDate">-</span>
+            </div>
+        </div>
+
+        <div class="download-info">
+            <h3><i class="fas fa-download"></i> Your File is Ready to Download</h3>
+            <p>Download the complete voter information slips PDF now</p>
+            <p><strong>Print directly on A4 paper</strong></p>
+        </div>
+
+        <div class="loading" id="downloadLoading">
+            <div class="spinner"></div>
+            <p>Downloading PDF...</p>
+        </div>
+
+        <div class="loading" id="pdfGeneratingStatus" style="background: #fef3c7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+            <div class="spinner" style="border-top-color: #f59e0b;"></div>
+            <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">Preparing your PDF...</p>
+            <p style="color: #78350f; font-size: 0.9rem;" id="generationMessage">This will take 20-50 seconds</p>
+            <div style="background: #fde68a; border-radius: 4px; height: 8px; margin-top: 0.5rem; overflow: hidden;">
+                <div id="progressBar" style="background: #f59e0b; height: 100%; width: 10%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <!-- Google Drive download button (shown when available for in-app browsers) -->
+            <button class="btn" onclick="downloadFromGoogleDrive()" id="googleDriveBtn" style="display: none; background: linear-gradient(135deg, #4285F4 0%, #34A853 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); margin-left: 0.5rem;">
+                <i class="fab fa-google-drive"></i> Download from Google Drive
+            </button>
+            <button class="btn" onclick="downloadInvoice()" id="invoiceBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 185, 129, 0.3); margin-left: 0.5rem;">
+                <i class="fas fa-file-invoice"></i> Download Invoice
+            </button>
+        </div>
+
+        <div class="download-note" id="downloadNote">
+            <i class="fas fa-info-circle"></i>
+            <strong>Download Tip:</strong> If download doesn't start, tap the 3 dots in the top corner and select 'Open in External Browser' or open the website in Google Chrome / Safari or other browser to download the PDF file.
+        </div>
+        
+        <!-- Google Drive help note (shown when Google Drive link is available) -->
+        <div class="download-note" id="googleDriveNote" style="display: none; background: #e3f2fd; border-left-color: #2196F3;">
+            <i class="fab fa-google-drive"></i>
+            <strong>Using In-App Browser?</strong> If the regular download doesn't work in Instagram/Facebook browser, use the "Download from Google Drive" button above for guaranteed access.
+        </div>
+
+        <!-- PDF Generation Wait Notice -->
+        <div class="download-note" style="background: #FEF3C7; border-left-color: #F59E0B;">
+            <i class="fas fa-clock"></i>
+            <div>
+                <strong>⏱️ Please Wait:</strong> PDF generation may take up to 1 minute. If you don't receive the PDF after waiting, please contact us using the WhatsApp button below with your order details.
+            </div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <a href="dashboard.html" class="btn btn-secondary" style="width: 100%; display: block;">
+                <i class="fas fa-th-large"></i> Go to Dashboard
+            </a>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <a href="#" 
+               id="whatsappSupportLink"
+               target="_blank" 
+               class="btn" 
+               style="width: 100%; display: block; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; text-decoration: none;">
+                <i class="fab fa-whatsapp"></i> Contact Support on WhatsApp
+            </a>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <a href="create-slip.html" id="createAnotherSlipLink" class="btn" style="width: 100%; display: block; background: linear-gradient(135deg, #006d3b 0%, #004d2a 100%); color: white;">
+                <i class="fas fa-plus-circle"></i> Create Another Slip
+            </a>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-infinity"></i></div>
+                <div class="feature-text">Unlimited<br>Downloads</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-print"></i></div>
+                <div class="feature-text">A4 Print Ready<br>5 slips/page</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-scissors"></i></div>
+                <div class="feature-text">Cutting Guide<br>Lines Included</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                <div class="feature-text">Saved in<br>Dashboard</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: #718096; font-size: 0.9rem;">
+            <p>Thank you! We appreciate your business <i class="fas fa-heart"></i></p>
+        </div>
+    </div>
+
+    <script src="console-control.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        const token = localStorage.getItem('token');
+        const SUPPORT_WHATSAPP = '447435111412';
+
+        if (!orderId || !token) {
+            if (!token) {
+                // Save the intended destination with query params before redirecting to login
+                sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = '/dashboard.html';
+            }
+        }
+
+        let orderData = null;
+        let downloadInProgress = false;
+
+        function getOrderStatusInfo(data) {
+            const rawStatus = (data?.status || data?.paymentStatus || 'unknown').toString().toLowerCase();
+
+            if (rawStatus.includes('complete') || rawStatus === 'paid') {
+                return { label: 'Completed', className: 'status-completed' };
+            }
+            if (rawStatus.includes('pending') || rawStatus.includes('processing')) {
+                return { label: 'Pending', className: 'status-pending' };
+            }
+            if (rawStatus.includes('failed') || rawStatus.includes('cancel')) {
+                return { label: 'Failed', className: 'status-failed' };
+            }
+
+            return {
+                label: rawStatus.replace(/_/g, ' '),
+                className: 'status-default'
+            };
+        }
+
+        function applyOrderTypeUI() {
+            const isAssemblyOrder = Boolean(orderId && orderId.startsWith('ASM-'));
+            const createAnotherSlipLink = document.getElementById('createAnotherSlipLink');
+            const invoiceBtn = document.getElementById('invoiceBtn');
+            const whatsappSupportLink = document.getElementById('whatsappSupportLink');
+            const downloadInfoTitle = document.querySelector('.download-info h3');
+            const downloadInfoPara = document.querySelector('.download-info p');
+            const successSubtitle = document.querySelector('.success-subtitle');
+
+            if (isAssemblyOrder) {
+                document.title = 'Payment Successful - EasySlip | Tamil Nadu Assembly Election Voter Information Slip Generator';
+
+                if (successSubtitle) {
+                    successSubtitle.textContent = 'Your assembly order is ready';
+                }
+
+                if (downloadInfoTitle) {
+                    downloadInfoTitle.innerHTML = '<i class="fas fa-download"></i> Your Assembly Slips Are Ready to Download';
+                }
+                if (downloadInfoPara) {
+                    downloadInfoPara.textContent = 'Download the complete Assembly voter information slips PDF now';
+                }
+
+                if (createAnotherSlipLink) {
+                    createAnotherSlipLink.href = 'assembly-slips.html';
+                    createAnotherSlipLink.innerHTML = '<i class="fas fa-plus-circle"></i> Create Another Assembly Slip';
+                }
+
+                if (invoiceBtn) {
+                    invoiceBtn.style.display = 'none';
+                }
+            }
+
+            if (whatsappSupportLink) {
+                const defaultMessage = encodeURIComponent('Hello, I need support with my order.');
+                whatsappSupportLink.href = `https://wa.me/${SUPPORT_WHATSAPP}?text=${defaultMessage}`;
+                if (isAssemblyOrder) {
+                    whatsappSupportLink.innerHTML = '<i class="fab fa-whatsapp"></i> Contact Assembly Support on WhatsApp';
+                }
+            }
+        }
+
+        // Apply order-type specific button visibility as early as possible.
+        applyOrderTypeUI();
+
+        // Function to check authentication and order ownership
+        async function verifyOrderAccess() {
+            try {
+                const profileResponse = await fetch('/api/auth/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!profileResponse.ok) {
+                    throw new Error('Authentication failed');
+                }
+
+                const profileData = await profileResponse.json();
+                const currentUserId = profileData.user._id;
+                const isAdmin = profileData.user.role === 'admin';
+
+                const orderEndpoint = orderId.startsWith('ASM-') 
+                    ? `/api/assembly/orders/${orderId}` 
+                    : `/api/orders/${orderId}`;
+                const orderResponse = await fetch(orderEndpoint, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!orderResponse.ok) {
+                    if (orderResponse.status === 404) {
+                        // Admins can see all pages, regular users get denied
+                        if (!isAdmin) {
+                            throw new Error('UNAUTHORIZED');
+                        }
+                        // For admin, order truly doesn't exist
+                        throw new Error('Order not found');
+                    }
+                    throw new Error('Failed to verify order access');
+                }
+
+                const orderResult = await orderResponse.json();
+                const order = orderResult.order || orderResult;
+
+                // Debug logging for access verification
+                console.log('🔍 Access Verification:');
+                console.log('   Current User ID:', currentUserId, typeof currentUserId);
+                console.log('   Order User ID:', order.userId, typeof order.userId);
+                console.log('   Is Admin:', isAdmin);
+                console.log('   String(order.userId):', String(order.userId));
+                console.log('   String(currentUserId):', String(currentUserId));
+                console.log('   Match:', String(order.userId) === String(currentUserId));
+
+                // Convert both to strings to handle ObjectId vs string comparison
+                if (String(order.userId) !== String(currentUserId) && !isAdmin) {
+                    console.error('❌ Access denied - userId mismatch');
+                    throw new Error('UNAUTHORIZED');
+                }
+                
+                console.log('✅ Access verification passed');
+
+                return true;
+            } catch (error) {
+                console.error('Order access verification error:', error.message);
+                
+                // Check specific error types
+                if (error.message === 'UNAUTHORIZED') {
+                    // User is authenticated but not authorized
+                    const iconClass = 'fa-lock';
+                    const title = 'Access Denied';
+                    const message = 'You are not authorized to access this page.';
+                    const buttonHtml = `<button onclick="window.location.href='/dashboard.html'" style="background: white; color: #FF9933; padding: 1rem 2rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-arrow-left"></i> Go to Dashboard
+                    </button>`;
+
+                    // Create overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        backdrop-filter: blur(10px);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 2rem;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: #138808; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 3px solid white;">
+                            <i class="fas ${iconClass}" style="font-size: 4rem; color: white; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${title}</h2>
+                            <p style="color: white; margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${message}</p>
+                            ${buttonHtml}
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(overlay);
+                    return false;
+                } else if (error.message === 'Order not found') {
+                    // Admin trying to access non-existent order - show error but don't block
+                    alert('Order not found. This order may have been deleted.');
+                    window.location.href = '/admin.html';
+                    return false;
+                } else {
+                    // Authentication failed - not logged in
+                    const iconClass = 'fa-exclamation-circle';
+                    const title = 'Authentication Required';
+                    const message = 'Please login to access this page.';
+                    const buttonHtml = `<button onclick="localStorage.removeItem('token'); window.location.href='/login.html'" style="background: white; color: #FF9933; padding: 1rem 2rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </button>`;
+
+                    // Create overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        backdrop-filter: blur(10px);
+                        z-index: 9999;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 2rem;
+                    `;
+                    
+                    overlay.innerHTML = `
+                        <div style="background: #138808; padding: 3rem; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; max-width: 500px; border: 3px solid white;">
+                            <i class="fas ${iconClass}" style="font-size: 4rem; color: white; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>
+                            <h2 style="color: white; margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${title}</h2>
+                            <p style="color: white; margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${message}</p>
+                            ${buttonHtml}
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(overlay);
+                    return false;
+                }
+            }
+        }
+
+        // Function to show messages on page
+        function showMessage(type, title, text, redirectUrl = null, delay = 3000) {
+            const messageBox = document.getElementById('messageBox');
+            const messageIcon = document.getElementById('messageIcon');
+            const messageTitle = document.getElementById('messageTitle');
+            const messageText = document.getElementById('messageText');
+            const messageAction = document.getElementById('messageAction');
+
+            // Hide order details when showing error/warning
+            if (type === 'error' || type === 'warning') {
+                document.getElementById('orderDetails').style.display = 'none';
+            }
+
+            // Set colors and icons based on type
+            if (type === 'error') {
+                messageBox.style.background = '#fee';
+                messageBox.style.border = '2px solid #c33';
+                messageIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                messageIcon.style.color = '#c33';
+            } else if (type === 'warning') {
+                messageBox.style.background = '#fff4e5';
+                messageBox.style.border = '2px solid #ff9800';
+                messageIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                messageIcon.style.color = '#ff9800';
+            } else if (type === 'info') {
+                messageBox.style.background = '#e3f2fd';
+                messageBox.style.border = '2px solid #2196f3';
+                messageIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                messageIcon.style.color = '#2196f3';
+            } else if (type === 'success') {
+                messageBox.style.background = '#e8f5e9';
+                messageBox.style.border = '2px solid #4caf50';
+                messageIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                messageIcon.style.color = '#4caf50';
+            }
+
+            messageTitle.textContent = title;
+            messageText.textContent = text;
+            messageBox.style.display = 'block';
+
+            // If redirect URL is provided, add countdown and redirect
+            if (redirectUrl) {
+                let countdown = Math.floor(delay / 1000);
+                messageAction.innerHTML = `<p style="color: #666; font-size: 0.9rem;">Please wait... Redirecting in ${countdown} seconds</p>`;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        messageAction.innerHTML = `<p style="color: #666; font-size: 0.9rem;">Please wait... Redirecting in ${countdown} seconds</p>`;
+                    }
+                }, 1000);
+
+                setTimeout(() => {
+                    clearInterval(countdownInterval);
+                    window.location.href = redirectUrl;
+                }, delay);
+            } else {
+                messageAction.innerHTML = '';
+            }
+        }
+
+        // Function to display order details (extracted for reuse)
+        function displayOrderDetails(data) {
+            if (!data) return;
+
+            // CRITICAL: Verify payment is completed
+            if (data.paymentStatus !== 'completed') {
+                console.error('Payment not completed:', data.paymentStatus);
+                
+                // Update page title and icon for unpaid status
+                const successIcon = document.querySelector('.success-icon');
+                successIcon.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size: 4rem;"></i>';
+                successIcon.classList.add('emoji');
+                successIcon.style.background = 'linear-gradient(135deg, #fff4e5 0%, #ffe0b2 100%)';
+                document.querySelector('.success-title').textContent = 'Payment Not Completed';
+                document.querySelector('.success-subtitle').textContent = 'Please complete payment to proceed';
+                
+                // Hide success container and show payment required message
+                document.getElementById('orderIdDisplay').style.display = 'none';
+                document.getElementById('orderDetails').style.display = 'none';
+                document.querySelector('.download-info').style.display = 'none';
+                document.querySelector('.action-buttons').style.display = 'none';
+                document.querySelector('.features-grid').style.display = 'none';
+                
+                showMessage(
+                    'warning',
+                    'Payment Required',
+                    `Order #${data.orderId} has been created, but payment is not completed. Please complete the payment to download the PDF.`
+                );
+                
+                // Add payment button
+                const messageAction = document.getElementById('messageAction');
+                
+                // Check if this order has Cashfree session (pending payment verification)
+                if (data.cashfreeSessionId) {
+                    messageAction.innerHTML = `
+                        <button onclick="manualVerifyCashfreePayment()" 
+                                id="verifyPaymentBtn"
+                                style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;
+                                       margin-right: 1rem;">
+                            <i class="fas fa-check-circle"></i> Verify Cashfree Payment
+                        </button>
+                        <button onclick="window.location.href='preview.html?orderId=${orderId}'" 
+                                style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;">
+                                <i class="fas fa-credit-card"></i> Make Payment
+                        </button>
+                    `;
+                } else {
+                    messageAction.innerHTML = `
+                        <button onclick="window.location.href='preview.html?orderId=${orderId}'" 
+                                style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); 
+                                       color: white; 
+                                       border: none; 
+                                       padding: 1rem 2rem; 
+                                       border-radius: 8px; 
+                                       font-size: 1rem; 
+                                       font-weight: 600; 
+                                       cursor: pointer;
+                                       margin-top: 1rem;">
+                                <i class="fas fa-credit-card"></i> Make Payment
+                        </button>
+                    `;
+                }
+                
+                return; // Exit early for unpaid orders
+            }
+
+            // Debug: Log the data to see what we're receiving
+            console.log('Order Data:', data);
+            console.log('Party Name:', data.customization?.partyName);
+            console.log('Symbol Name:', data.customization?.symbolName);
+            console.log('Total Voters:', data.totalVoters);
+            console.log('Amount:', data.amount);
+
+            // Display order details
+            document.getElementById('orderIdDisplay').textContent = `Order #${data.orderId || 'N/A'}`;
+            
+            // Handle multi-symbol display
+            let displayName;
+            if (data.customization?.multiSymbol && data.customization?.symbols && data.customization.symbols.length > 0) {
+                // Multi-symbol mode: show count and names
+                const symbolNames = data.customization.symbols
+                    .map(s => s.symbolNameMalayalam || s.symbolName)
+                    .filter(name => name)
+                    .join(', ');
+                displayName = `${data.customization.symbolCount} Symbols: ${symbolNames}`;
+            } else if (data.customization?.symbolFree) {
+                // Symbol-free mode
+                displayName = 'No Symbol (Symbol Free)';
+            } else {
+                // Single symbol mode - Use Malayalam symbol name first, then English as fallback
+                displayName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            }
+            document.getElementById('partyName').textContent = displayName;
+
+            // Always map location values directly from DB response.
+            document.getElementById('orderDistrict').textContent =
+                data.district || data.location?.districtName || data.location?.district || '-';
+            document.getElementById('orderConstituency').textContent =
+                data.constituency || data.location?.localBodyName || data.location?.localBody || '-';
+            
+            const voterCount = data.totalVoters || 0;
+            document.getElementById('voterCount').textContent = voterCount;
+            
+            const totalPages = Math.ceil(voterCount / 5);
+            document.getElementById('totalPages').textContent = totalPages;
+            
+            const amount = data.amount || 0;
+            document.getElementById('paidAmount').textContent = `₹${amount.toFixed(2)}`;
+
+            const statusBadge = document.getElementById('orderStatusBadge');
+            if (statusBadge) {
+                const statusInfo = getOrderStatusInfo(data);
+                statusBadge.textContent = statusInfo.label;
+                statusBadge.className = `status-badge ${statusInfo.className}`;
+            }
+            
+            // Show payment ID if available
+            if (data.razorpayPaymentId) {
+                document.getElementById('paymentId').textContent = data.razorpayPaymentId;
+                document.getElementById('paymentIdRow').style.display = 'flex';
+            }
+            
+            // Show payment date if available (optimized formatting)
+            if (data.paidAt) {
+                const paidDate = new Date(data.paidAt);
+                // Use faster toLocaleDateString with minimal options
+                const dateStr = paidDate.toLocaleDateString('en-IN', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric'
+                });
+                const timeStr = paidDate.toLocaleTimeString('en-IN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                document.getElementById('paymentDate').textContent = `${dateStr} ${timeStr}`;
+                document.getElementById('paymentDateRow').style.display = 'flex';
+            }
+            
+            document.getElementById('orderDetails').style.display = 'block';
+            
+            // Update WhatsApp link with order details
+            updateWhatsAppLink(data);
+        }
+        
+        // Update WhatsApp support link with order details
+        function updateWhatsAppLink(data) {
+            const whatsappLink = document.getElementById('whatsappSupportLink');
+            if (!whatsappLink || !data) return;
+
+            const isAssemblyOrder = Boolean(data.orderId && data.orderId.startsWith('ASM-'));
+            const location = isAssemblyOrder
+                ? `${data.constituency || ''}, ${data.district || ''}`.replace(/^,\s*|,\s*$/g, '')
+                : `${data.location?.wardName || data.location?.ward || ''}, ${data.location?.localBodyName || data.location?.localBody || ''}`.replace(/^,\s*|,\s*$/g, '');
+            const partyName = data.customization?.symbolNameMalayalam || data.customization?.symbolName || data.customization?.partyName || 'N/A';
+            const previewUrl = `${window.location.origin}/preview.html?orderId=${data.orderId}`;
+            const statusInfo = getOrderStatusInfo(data);
+            
+            const message = `Hello, I need help with my order
+            
+Order ID: ${data.orderId}
+Order Status: ${statusInfo.label}
+Party/Symbol: ${partyName}
+Location: ${location}
+Total Voters: ${data.totalVoters || 0}
+Amount Paid: ₹${(data.amount || 0).toFixed(2)}
+
+Preview Link: ${previewUrl}
+
+Please assist me.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            whatsappLink.href = `https://wa.me/${SUPPORT_WHATSAPP}?text=${encodedMessage}`;
+        }
+
+        // Verify Cashfree payment after redirect
+        async function verifyCashfreePayment() {
+            try {
+                console.log('💳 Verifying Cashfree payment for order:', orderId);
+                
+                const response = await fetch('/api/payment/cashfree/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId
+                    })
+                });
+
+                const result = await response.json();
+                console.log('✅ Cashfree verification result:', result);
+
+                if (!response.ok) {
+                    // 400 "Payment already verified" means the order IS completed (webhook beat us to it)
+                    if (response.status === 400 && result.message && result.message.toLowerCase().includes('already verified')) {
+                        console.log('✅ Payment already verified by webhook, treating as success');
+                        return true;
+                    }
+                    console.error('❌ Cashfree verification failed:', result.message);
+                    return false;
+                }
+
+                // Check actual payment status, not just API success
+                if (result.status === 'success' && result.order && result.order.paymentStatus === 'completed') {
+                    console.log('✅ Cashfree payment verified successfully');
+                    return true;
+                }
+
+                console.log('⚠️ Payment not completed yet:', result.order?.paymentStatus || 'unknown');
+                return false;
+
+            } catch (error) {
+                console.error('❌ Cashfree verification error:', error);
+                // Don't throw - let the page load anyway
+                return false;
+            }
+        }
+
+        // Manual verification function triggered by button
+        async function manualVerifyCashfreePayment() {
+            const btn = document.getElementById('verifyPaymentBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            }
+
+            const verified = await verifyCashfreePayment();
+            
+            if (verified) {
+                showMessage('success', 'Payment Verified!', 'Your payment has been confirmed. Reloading...', null, 2000);
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showMessage('error', 'Verification Failed', 'Could not verify payment. Please try again or contact support.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify Cashfree Payment';
+                }
+            }
+        }
+
+        async function loadOrderDetails() {
+            try {
+                // Verify order access first
+                const hasAccess = await verifyOrderAccess();
+                if (!hasAccess) return; // Access denied, UI already updated
+
+                console.log('Loading order details for orderId:', orderId);
+                console.log('Token present:', !!token);
+                
+                // Add cache-busting to ensure fresh data after payment
+                const orderApiPath = orderId.startsWith('ASM-') ? `/api/assembly/orders/${orderId}` : `/api/orders/${orderId}`;
+                const response = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                console.log('API Response status:', response.status);
+
+                if (!response.ok) {
+                    let errorMessage = 'Failed to load order';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorMessage;
+                        console.error('API Error (JSON):', errorData);
+                    } catch (e) {
+                        const errorText = await response.text();
+                        console.error('API Error (Text):', errorText);
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log('API Result:', result);
+                
+                orderData = result.order || result;
+                console.log('Order Data extracted:', orderData);
+
+                if (!orderData) {
+                    throw new Error('No order data received from API');
+                }
+
+                // If order is pending and has a Cashfree session, attempt verification.
+                // Always reload after the attempt so that webhook-completed orders are also reflected.
+                if (orderData.cashfreeSessionId && orderData.paymentStatus === 'pending') {
+                    console.log('🔄 Order has Cashfree session and is pending, attempting verification...');
+                    await verifyCashfreePayment();
+                    // Always reload — order may have been completed by webhook or by the verify call above
+                    console.log('🔄 Reloading order data after verify attempt...');
+                    const reloadResponse = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache'
+                        }
+                    });
+                    if (reloadResponse.ok) {
+                        const reloadResult = await reloadResponse.json();
+                        orderData = reloadResult.order || reloadResult;
+                        console.log('✅ Order data reloaded:', orderData);
+                    }
+                }
+
+                // If order is still pending and has a Razorpay order ID, the verify already ran in
+                // preview.html but the DB write may not have propagated yet. Poll a few times.
+                if (orderData.razorpayOrderId && orderData.paymentStatus === 'pending') {
+                    console.log('🔄 Razorpay order still pending, polling DB for status update...');
+                    const MAX_POLLS = 5;
+                    const POLL_INTERVAL_MS = 1500;
+                    for (let attempt = 1; attempt <= MAX_POLLS; attempt++) {
+                        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                        console.log(`🔄 Poll attempt ${attempt}/${MAX_POLLS}...`);
+                        const pollRes = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache'
+                            }
+                        });
+                        if (pollRes.ok) {
+                            const pollResult = await pollRes.json();
+                            const polled = pollResult.order || pollResult;
+                            if (polled.paymentStatus === 'completed') {
+                                console.log('✅ Razorpay order now completed after poll', attempt);
+                                orderData = polled;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Display order details
+                displayOrderDetails(orderData);
+
+                // For ASM orders, PDF is already generated - just enable download
+                if (orderId.startsWith('ASM-')) {
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    if (orderData.pdfPath && orderData.pdfGenerated) {
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    } else {
+                        downloadBtn.disabled = true;
+                        downloadBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> PDF Not Available';
+                    }
+                } else {
+                    // Start checking PDF generation status (local body only)
+                    checkPDFStatus();
+                }
+
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showMessage(
+                    'error',
+                    'Failed to Load Order',
+                    error.message || 'Could not load order details. Redirecting back to dashboard...',
+                    'dashboard.html',
+                    5000
+                );
+            }
+        }
+
+        let statusCheckInterval = null;
+        let statusCheckCount = 0;
+        const MAX_STATUS_CHECKS = 5; // 5 checks * 2 seconds = 10 seconds
+
+        async function checkPDFStatus() {
+            try {
+                console.log('[PDF STATUS] Checking PDF generation status...');
+                statusCheckCount++;
+                
+                const response = await fetch(`/api/slips/pdf-status/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('[PDF STATUS] Failed to check status:', response.status);
+                    return;
+                }
+
+                const status = await response.json();
+                console.log('[PDF STATUS] Status:', status);
+
+                const generatingStatus = document.getElementById('pdfGeneratingStatus');
+                const downloadBtn = document.getElementById('downloadBtn');
+                const progressBar = document.getElementById('progressBar');
+                const generationMessage = document.getElementById('generationMessage');
+
+                if (status.pdfReady) {
+                    // PDF is ready - hide progress, show download button
+                    console.log('[PDF STATUS] PDF is ready!');
+                    generatingStatus.classList.remove('show');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    
+                    // Always show Google Drive button when PDF is ready
+                    const googleDriveBtn = document.getElementById('googleDriveBtn');
+                    const googleDriveNote = document.getElementById('googleDriveNote');
+                    const downloadNote = document.getElementById('downloadNote');
+                    
+                    // Show Google Drive button and set link if available
+                    if (googleDriveBtn) {
+                        googleDriveBtn.style.display = 'inline-block';
+                        if (status.googleDriveLink) {
+                            googleDriveBtn.setAttribute('data-drive-link', status.googleDriveLink);
+                            console.log('✅ Google Drive download option enabled:', status.googleDriveLink);
+                        }
+                    }
+                    
+                    // Show Google Drive note
+                    if (googleDriveNote) {
+                        googleDriveNote.style.display = 'block';
+                    }
+                    
+                    // Hide the regular download note when Google Drive is shown
+                    if (downloadNote) {
+                        downloadNote.style.display = 'none';
+                    }
+                    
+                    // Stop checking
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                } else if (status.status === 'generating' || status.status === 'pending') {
+                    // Check if we've been waiting too long
+                    if (statusCheckCount >= MAX_STATUS_CHECKS) {
+                        console.log('[PDF STATUS] Timeout reached, enabling on-demand generation');
+                        generatingStatus.classList.remove('show');
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF (Generate Now)';
+                        
+                        // Stop checking
+                        if (statusCheckInterval) {
+                            clearInterval(statusCheckInterval);
+                            statusCheckInterval = null;
+                        }
+                        return;
+                    }
+                    
+                    // PDF is being generated - show progress
+                    console.log('[PDF STATUS] PDF is being generated...', status.progress);
+                    generatingStatus.classList.add('show');
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing PDF...';
+                    
+                    // Update progress bar
+                    if (status.progress) {
+                        progressBar.style.width = `${status.progress}%`;
+                    }
+                    
+                    // Update message
+                    if (status.estimatedTime) {
+                        generationMessage.textContent = `Estimated time: ${status.estimatedTime}`;
+                    }
+                    
+                    // Continue checking every 2 seconds
+                    if (!statusCheckInterval) {
+                        statusCheckInterval = setInterval(checkPDFStatus, 2000);
+                    }
+                } else if (status.status === 'failed') {
+                    // Generation failed - allow download (will generate on-demand)
+                    console.log('[PDF STATUS] Generation failed, will generate on-demand');
+                    generatingStatus.classList.remove('show');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    
+                    // Stop checking
+                    if (statusCheckInterval) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+                }
+
+            } catch (error) {
+                console.error('[PDF STATUS] Error checking status:', error);
+                // On error, just enable download button (fallback to on-demand generation)
+                document.getElementById('pdfGeneratingStatus').classList.remove('show');
+                document.getElementById('downloadBtn').disabled = false;
+            }
+        }
+
+        async function downloadPDF() {
+            if (!orderData) {
+                showMessage('info', 'Please Wait', 'Loading order details...');
+                return;
+            }
+
+            // Always re-validate payment status against server just before download.
+            // This prevents URL tampering / stale page state from bypassing checks.
+            const isPaidNow = await ensurePaidOrderBeforeDownload();
+            if (!isPaidNow) {
+                return;
+            }
+
+            // CRITICAL: Double-check payment status before allowing download
+            if (orderData.paymentStatus !== 'completed') {
+                console.error('Download blocked - payment not completed:', orderData.paymentStatus);
+                showMessage(
+                    'error',
+                    'Download Not Allowed',
+                    'You can only download after completing the payment.'
+                );
+                // Redirect to payment page
+                setTimeout(() => {
+                    window.location.href = `preview.html?orderId=${orderId}`;
+                }, 2000);
+                return;
+            }
+
+            // Prevent multiple simultaneous downloads
+            if (downloadInProgress) {
+                return;
+            }
+
+            try {
+                downloadInProgress = true;
+                const downloadBtn = document.getElementById('downloadBtn');
+                const downloadLoading = document.getElementById('downloadLoading');
+                
+                // Show loading state on button
+                const originalHTML = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
+                downloadBtn.disabled = true;
+                downloadLoading.classList.add('show');
+
+                // Start the download request
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
+
+                let response;
+                if (orderId.startsWith('ASM-')) {
+                    // Assembly order: download pre-generated PDF directly
+                    response = await fetch(`/api/assembly/orders/${orderId}/download`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        signal: controller.signal
+                    });
+                } else {
+                    response = await fetch(`/api/slips/download/${orderId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        signal: controller.signal
+                    });
+                }
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    // Try to get error message from JSON response
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Download failed');
+                    }
+                    throw new Error('Download failed');
+                }
+
+                // Verify we got a PDF
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/pdf')) {
+                    throw new Error('Received incorrect file type from server');
+                }
+
+                // Get file size for progress indication
+                const contentLength = response.headers.get('content-length');
+                const total = parseInt(contentLength, 10);
+                
+                // Read the response as blob (more efficient than arrayBuffer for large files)
+                const blob = await response.blob();
+                
+                // Use createObjectURL for immediate download (more efficient)
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `voter-slips-${orderId}.pdf`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup after a short delay
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 100);
+
+                // Show success message
+                downloadBtn.innerHTML = '<i class="fas fa-check-circle"></i> Download Complete!';
+                setTimeout(() => {
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Again';
+                    downloadBtn.disabled = false;
+                    downloadInProgress = false;
+                }, 3000);
+
+            } catch (error) {
+                console.error('Download error:', error);
+                downloadInProgress = false;
+                
+                const downloadBtn = document.getElementById('downloadBtn');
+                
+                if (error.name === 'AbortError') {
+                    showMessage('error', 'Download Timeout', 'Download is taking too long. Please try again.');
+                } else {
+                    showMessage('error', 'Download Failed', error.message || 'Please try again or contact support.');
+                }
+                
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Try Again';
+                downloadBtn.disabled = false;
+            } finally {
+                document.getElementById('downloadLoading').classList.remove('show');
+            }
+        }
+
+        async function ensurePaidOrderBeforeDownload() {
+            try {
+                const orderApiPath = orderId.startsWith('ASM-')
+                    ? `/api/assembly/orders/${orderId}`
+                    : `/api/orders/${orderId}`;
+
+                const response = await fetch(`${orderApiPath}?_t=${Date.now()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                if (!response.ok) {
+                    showMessage('error', 'Order Validation Failed', 'Could not verify order status. Please try again.');
+                    return false;
+                }
+
+                const result = await response.json();
+                const freshOrder = result.order || result;
+
+                if (!freshOrder || freshOrder.paymentStatus !== 'completed') {
+                    showMessage(
+                        'error',
+                        'Download Not Allowed',
+                        'Payment is not completed for this order. Please complete payment first.'
+                    );
+                    return false;
+                }
+
+                // Keep local state synced with authoritative server state.
+                orderData = freshOrder;
+                return true;
+            } catch (error) {
+                console.error('Pre-download payment validation failed:', error);
+                showMessage('error', 'Validation Error', 'Unable to verify payment status. Please try again.');
+                return false;
+            }
+        }
+        
+        // Regenerate PDF if download fails
+        async function regeneratePDF() {
+            try {
+                console.log('🔄 Attempting to regenerate PDF for order:', orderId);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Regenerating PDF...';
+                downloadBtn.disabled = true;
+                
+                // Call the regenerate endpoint
+                const response = await fetch(`/api/slips/regenerate/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ PDF regeneration initiated:', result);
+                    
+                    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+                    
+                    // Wait a bit for PDF to generate
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // Try download again
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                    downloadBtn.disabled = false;
+                    
+                    showMessage('success', 'PDF Regenerated', 'Please click Download PDF again to get your file.');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Regeneration failed');
+                }
+            } catch (error) {
+                console.error('❌ PDF regeneration error:', error);
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download PDF';
+                downloadBtn.disabled = false;
+                
+                showMessage('error', 'Regeneration Failed', 'Please contact support for assistance.');
+            }
+        }
+        
+        // Download from Google Drive (for in-app browsers)
+        function downloadFromGoogleDrive() {
+            const googleDriveBtn = document.getElementById('googleDriveBtn');
+            const driveLink = googleDriveBtn ? googleDriveBtn.getAttribute('data-drive-link') : null;
+            
+            if (!driveLink) {
+                showMessage('error', 'Error', 'Google Drive link not available yet. Please wait a moment and try again.');
+                return;
+            }
+            
+            console.log('Opening Google Drive download:', driveLink);
+            
+            // Show feedback
+            const originalHTML = googleDriveBtn.innerHTML;
+            googleDriveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening Drive...';
+            googleDriveBtn.disabled = true;
+            
+            // Open in new window/tab
+            window.open(driveLink, '_blank');
+            
+            // Reset button after short delay
+            setTimeout(() => {
+                googleDriveBtn.innerHTML = originalHTML;
+                googleDriveBtn.disabled = false;
+                showMessage('success', 'Opening Google Drive', 'Your download should start automatically from Google Drive');
+            }, 2000);
+        }
+
+
+        // Download Invoice
+        async function downloadInvoice() {
+            try {
+                const invoiceBtn = document.getElementById('invoiceBtn');
+                const originalHTML = invoiceBtn.innerHTML;
+                
+                // Disable button and show loading
+                invoiceBtn.disabled = true;
+                invoiceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Invoice...';
+
+                console.log('📄 Downloading invoice for:', orderId);
+
+                const response = await fetch(`/api/orders/${orderId}/invoice`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to download invoice');
+                }
+
+                // Get the PDF blob
+                const blob = await response.blob();
+                
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+
+                console.log('✅ Invoice downloaded successfully');
+                
+                // Reset button
+                invoiceBtn.innerHTML = '<i class="fas fa-check"></i> Invoice Downloaded!';
+                setTimeout(() => {
+                    invoiceBtn.innerHTML = originalHTML;
+                    invoiceBtn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('Invoice download error:', error);
+                showMessage('error', 'Invoice Download Failed', error.message);
+                
+                const invoiceBtn = document.getElementById('invoiceBtn');
+                invoiceBtn.innerHTML = '<i class="fas fa-file-invoice"></i> Download Invoice';
+                invoiceBtn.disabled = false;
+            }
+        }
+
+        // PRIORITY: Initialize page and load order data FIRST
+        // This ensures order details are fetched immediately when page loads
+        (function init() {
+            console.log('=== ORDER SUCCESS PAGE INITIALIZATION ===');
+            console.log('🚀 Loading order data first (highest priority)...');
+            console.log('Order ID from URL:', orderId);
+            console.log('Token available:', !!token);
+            console.log('Token length:', token ? token.length : 0);
+            console.log('🔍 ALL URL PARAMS:', window.location.search);
+            console.log('🔍 URL Params object:', Object.fromEntries(urlParams));
+            
+            // Check if orderId exists
+            if (!orderId) {
+                console.error('No order ID provided in URL');
+                showMessage('error', 'Order ID Not Found', 'Redirecting back to dashboard...', 'dashboard.html', 3000);
+                return;
+            }
+
+            // Remove any stale one-time cache; success page must render from DB response.
+            const cacheKey = `order-success:${orderId}`;
+            sessionStorage.removeItem(cacheKey);
+
+            // Always refresh from API to ensure authoritative payment/order state.
+            console.log('Loading order details from API...');
+            loadOrderDetails();
+        })();
+
+        // Auto-trigger confetti effect (optional)
+        window.addEventListener('load', () => {
+            // You can add confetti library here if desired
+            console.log('Payment successful!');
+        });
+
+        // Cleanup interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+        });
+    </script>
+</body>
+</body>
+    <!-- Popup Modal System -->
+    <div id="welcome-popup-overlay" style="display: none;"></div>
+    <div id="welcome-popup-modal" style="display: none;"></div>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        async function loadAndShowPopup() {
+            try {
+                const response = await fetch(`${API_BASE}/settings/popup`);
+                if (!response.ok) return;
+                const result = await response.json();
+                const settings = result.settings || result;
+                if (!settings.enabled) return;
+                if (settings.showOnce) {
+                    const hasShown = localStorage.getItem('popup-shown');
+                    if (hasShown) return;
+                }
+                const delay = settings.delay || 1000;
+                setTimeout(() => { showPopup(settings); }, delay);
+            } catch (error) { console.error('Error loading popup:', error); }
+        }
+        function showPopup(settings) {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.cssText = `position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0, 0, 0, 0.7);z-index: 9998;display: block;animation: fadeIn 0.3s ease;`;
+            modal.innerHTML = `<div style=\"position: relative;\"><button onclick=\"closePopup()\" style=\"position: absolute;top: -15px;right: -15px;background: white;border: 2px solid #ddd;color: #666;width: 40px;height: 40px;border-radius: 50%;cursor: pointer;font-size: 24px;line-height: 1;transition: all 0.3s ease;box-shadow: 0 2px 10px rgba(0,0,0,0.2);z-index: 10001;\" onmouseover=\"this.style.background='#f44336'; this.style.color='white'; this.style.borderColor='#f44336';\" onmouseout=\"this.style.background='white'; this.style.color='#666'; this.style.borderColor='#ddd';\">×</button><div style=\"background: white;border-radius: 12px;max-width: 600px;width: 90%;max-height: 80vh;overflow-y: auto;box-shadow: 0 20px 60px rgba(0,0,0,0.3);position: relative;animation: slideIn 0.3s ease;\"><div style=\"background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%);color: white;padding: 20px;border-radius: 12px 12px 0 0;\"><h2 style=\"margin: 0; font-size: 24px;\">${settings.title || 'Announcement'}</h2></div><div style=\"padding: 30px;\">${settings.content || ''}</div></div></div>`;
+            modal.style.cssText = `position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 10000;display: block;`;
+            const responsiveStyle = `@media (max-width: 640px) {#welcome-popup-modal > div > div {width: 95% !important;max-height: 90vh !important;}#welcome-popup-modal > div > div > div:first-child {padding: 15px !important;}#welcome-popup-modal > div > div > div:first-child h2 {font-size: 18px !important;}#welcome-popup-modal > div > div > div:last-child {padding: 20px !important;}#welcome-popup-modal > div > button {width: 35px !important;height: 35px !important;font-size: 20px !important;top: -12px !important;right: -12px !important;}}`;
+            if (!document.querySelector('#popup-responsive-styles')) {
+                const styleElem = document.createElement('style');
+                styleElem.id = 'popup-responsive-styles';
+                styleElem.textContent = responsiveStyle;
+                document.head.appendChild(styleElem);
+            }
+            overlay.onclick = closePopup;
+            if (settings.showOnce) { localStorage.setItem('popup-shown', 'true'); }
+            if (!document.querySelector('#popup-animations')) {
+                const style = document.createElement('style');
+                style.id = 'popup-animations';
+                style.textContent = `@keyframes fadeIn {from { opacity: 0; }to { opacity: 1; }}@keyframes slideIn {from {opacity: 0;transform: translateY(-30px);}to {opacity: 1;transform: translateY(0);}}`;
+                document.head.appendChild(style);
+            }
+        }
+        function closePopup() {
+            const overlay = document.getElementById('welcome-popup-overlay');
+            const modal = document.getElementById('welcome-popup-modal');
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadAndShowPopup);
+        } else {
+            loadAndShowPopup();
+        }
+    </script>
+
+    <!-- In-App Browser Detection -->
+    <script>
+    </script>
+</html>
