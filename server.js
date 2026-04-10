@@ -268,10 +268,13 @@ app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha
 
 // Serve mounted Cloud Storage bucket (Cloud Run volume mount)
 // If bucket is mounted at /slipsdata, serve captcha files from there
-const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
+// Prefer Railway Volume for persistent storage if available
+// Use /data/slips as the preferred persistent volume mount path for Railway
+const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+const mountedBucketPath = railwayVolume || process.env.GCS_MOUNT_PATH || '/slipsdata';
 if (fs.existsSync(mountedBucketPath)) {
   console.log(`☁️ [SERVER] Serving mounted bucket from: ${mountedBucketPath}`);
-  
+}
   app.use('/slipsdata', (req, res, next) => {
     console.log(`[BUCKET ACCESS] Request: ${req.path} from ${req.ip}`);
     
@@ -384,6 +387,7 @@ const voterSlipsDir = fs.existsSync(mountedBucketPath)
 if (!fs.existsSync(voterSlipsDir)) {
   fs.mkdirSync(voterSlipsDir, { recursive: true });
 }
+console.log(`[SERVER] voterSlipsDir resolved to: ${voterSlipsDir}`);
 app.use('/voter-slips', express.static(voterSlipsDir));
 
 // Assembly Election Routes (ECI Portal)
