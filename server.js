@@ -271,9 +271,8 @@ app.use('/captcha-cache', express.static(path.join(__dirname, 'public', 'captcha
 // Prefer Railway Volume for persistent storage if available
 // Use /data/slips as the preferred persistent volume mount path for Railway
 const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
-const mountedBucketPath = railwayVolume || process.env.GCS_MOUNT_PATH || '/slipsdata';
-if (fs.existsSync(mountedBucketPath)) {
-  console.log(`☁️ [SERVER] Serving mounted bucket from: ${mountedBucketPath}`);
+if (fs.existsSync(railwayVolume)) {
+  console.log(`☁️ [SERVER] Serving Railway volume from: ${railwayVolume}`);
   app.use('/slipsdata', (req, res, next) => {
     console.log(`[BUCKET ACCESS] Request: ${req.path} from ${req.ip}`);
     // CORS and no-cache headers
@@ -283,7 +282,7 @@ if (fs.existsSync(mountedBucketPath)) {
     res.setHeader('Expires', '0');
     next();
   });
-  app.use('/slipsdata', express.static(mountedBucketPath, {
+  app.use('/slipsdata', express.static(railwayVolume, {
     maxAge: 0,
     etag: false,
     lastModified: false

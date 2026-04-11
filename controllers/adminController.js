@@ -32,14 +32,6 @@ function getSymbolsUploadConfig() {
         };
     }
 
-    const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
-    if (fs.existsSync(mountedBucketPath)) {
-        return {
-            dir: path.join(mountedBucketPath, 'symbols'),
-            urlPrefix: '/slipsdata/symbols'
-        };
-    }
-
     return {
         dir: path.join(__dirname, '..', 'public', 'symbols'),
         urlPrefix: '/symbols'
@@ -51,9 +43,7 @@ function getSymbolAbsolutePathFromUrl(imageUrl) {
 
     if (imageUrl.startsWith('/slipsdata/')) {
         const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
-        const storageBase = fs.existsSync(railwayVolume)
-            ? railwayVolume
-            : (process.env.GCS_MOUNT_PATH || '/slipsdata');
+        const storageBase = railwayVolume;
         const relative = imageUrl.replace('/slipsdata/', '');
         return path.join(storageBase, relative);
     }
