@@ -1076,7 +1076,11 @@ export const downloadOrderPDF = async (req, res) => {
                 return res.status(404).json({ status: 'error', message: 'PDF not available for this assembly order' });
             }
 
-            const pdfFullPath = path.join(__dirname, '..', order.pdfPath);
+            const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+            const voterSlipsDir = fs.existsSync(railwayVolume)
+                ? path.join(railwayVolume, 'voter-slips')
+                : path.join(__dirname, '..', 'voter-slips');
+            const pdfFullPath = path.join(voterSlipsDir, path.basename(order.pdfPath));
             if (!fs.existsSync(pdfFullPath)) {
                 return res.status(404).json({ status: 'error', message: 'PDF file not found on server' });
             }

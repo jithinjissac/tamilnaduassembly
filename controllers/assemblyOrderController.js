@@ -406,8 +406,12 @@ export const downloadPDF = async (req, res) => {
             }
         }
 
-        // pdfPath is stored as "/voter-slips/filename.pdf", resolve to absolute
-        const pdfFullPath = path.join(__dirname, '..', order.pdfPath);
+        // pdfPath is stored as "/voter-slips/filename.pdf", resolve to absolute via Railway volume
+        const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+        const voterSlipsDir = fs.existsSync(railwayVolume)
+            ? path.join(railwayVolume, 'voter-slips')
+            : path.join(__dirname, '..', 'voter-slips');
+        const pdfFullPath = path.join(voterSlipsDir, path.basename(order.pdfPath));
 
         if (!fs.existsSync(pdfFullPath)) {
             return res.status(404).json({ status: 'error', message: 'PDF file not found on server' });
