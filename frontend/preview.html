@@ -7,6 +7,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="icon" href="/favicon/favicon.ico">
     <link rel="manifest" href="/favicon/site.webmanifest">
     
     <!-- Console Control - MUST load first to control all console logs -->
@@ -3256,11 +3257,12 @@ s0.parentNode.insertBefore(s1,s0);
                 regularBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
                 regularBtn.disabled = true;
             }
-            
             closeDownloadModal();
-            
             try {
                 await performDirectDownload();
+                showMessage('success', 'Download Started', 'Your PDF download has started!');
+            } catch (e) {
+                showMessage('error', 'Download Failed', e?.message || 'Please try again or contact support.');
             } finally {
                 if (regularBtn) {
                     regularBtn.innerHTML = originalHTML;
@@ -3274,115 +3276,51 @@ s0.parentNode.insertBefore(s1,s0);
                 showMessage('info', 'Please Wait', 'Loading order details...');
                 return;
             }
-
-            // Check payment status
             if (orderData.paymentStatus !== 'completed') {
-                console.error('Download blocked - payment not completed:', orderData.paymentStatus);
-                showMessage(
-                    'error',
-                    'Download Not Allowed',
-                    'Please complete the payment first.'
-                );
+                showMessage('error', 'Download Not Allowed', 'Please complete the payment first.');
                 return;
             }
-
-            // Show loading on button if triggered by button click
-            const downloadBtn = event && event.target ? event.target.closest('.btn-payment, .btn') : null;
-            if (downloadBtn) {
-                const originalHTML = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Options...';
-                downloadBtn.disabled = true;
-                
-                setTimeout(() => {
-                    if (downloadBtn) {
-                        downloadBtn.innerHTML = originalHTML;
-                        downloadBtn.disabled = false;
-                    }
-                }, 500);
-            }
-
-            // Show download modal instead of direct download
             showDownloadModal();
         }
 
         // Internal function for actual download
         async function performDirectDownload() {
-            if (!orderData) {
-                showMessage('info', 'Please Wait', 'Loading order details...');
-                return;
-            }
-
-            // Check payment status
-            if (orderData.paymentStatus !== 'completed') {
-                console.error('Download blocked - payment not completed:', orderData.paymentStatus);
-                showMessage(
-                    'error',
-                    'Download Not Allowed',
-                    'Please complete the payment first.'
-                );
-                return;
-            }
-
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    showMessage('error', 'Authentication Required', 'Please login to download.');
-                    setTimeout(() => window.location.href = 'login.html', 2000);
-                    return;
+            if (!orderData) throw new Error('Order data not loaded');
+            if (orderData.paymentStatus !== 'completed') throw new Error('Payment not completed');
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('Please login to download.');
+            let blob;
+            if (isAssemblyOrder) {
+                const response = await fetch(`/api/assembly/orders/${orderData.orderId}/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to download assembly PDF');
                 }
-
-                showMessage('info', 'Preparing Download', 'Your PDF is being prepared...');
-
-                let blob;
-                if (isAssemblyOrder) {
-                    // Assembly orders: download the pre-generated full PDF directly
-                    const response = await fetch(`/api/assembly/orders/${orderData.orderId}/download`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'Failed to download assembly PDF');
+                blob = await response.blob();
+            } else {
+                const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Download failed');
                     }
-
-                    blob = await response.blob();
-                } else {
-                    const response = await fetch(`/api/slips/download/${orderData.orderId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        const contentType = response.headers.get('content-type');
-                        if (contentType && contentType.includes('application/json')) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.message || 'Download failed');
-                        }
-                        throw new Error('Download failed');
-                    }
-
-                    blob = await response.blob();
+                    throw new Error('Download failed');
                 }
-
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `voter-slips-${orderData.orderId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-                showMessage('success', 'Download Started', 'Your PDF download has started!');
-
-            } catch (error) {
-                console.error('Download error:', error);
-
-                showMessage('error', 'Download Failed', error.message || 'Please try again or contact support.');
+                blob = await response.blob();
             }
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voter-slips-${orderData.orderId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         }
 
         window.updateSlipsPerPage = updateSlipsPerPage;
@@ -3423,7 +3361,6 @@ s0.parentNode.insertBefore(s1,s0);
             </p>
         </div>
     </div>
-</body>
 </body>
     <!-- Popup Modal System -->
     <div id="welcome-popup-overlay" style="display: none;"></div>
