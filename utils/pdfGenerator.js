@@ -7,6 +7,15 @@ import { optimizePdfLossless } from './pdfOptimizer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Resolve persistent PDF storage dir — prefers Railway volume over ephemeral public/
+function getPermanentPdfDir() {
+    const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+    if (fs.existsSync(railwayVolume)) {
+        return path.join(railwayVolume, 'permanent-pdfs');
+    }
+    return path.join(__dirname, '..', 'public', 'permanent-pdfs');
+}
+
 // Single canonical pdfGenerator implementation.
 // Responsibilities:
 // - maintain an in-memory pdfJobs map
@@ -277,7 +286,7 @@ export const generatePDFBackground = async (order, orderId) => {
             }
         }
 
-        const permanentPdfDir = path.join(__dirname, '..', 'public', 'permanent-pdfs');
+        const permanentPdfDir = getPermanentPdfDir();
         if (!fs.existsSync(permanentPdfDir)) fs.mkdirSync(permanentPdfDir, { recursive: true });
         const filePath = path.join(permanentPdfDir, `${orderId}.pdf`);
         const optimizedPdf = await optimizePdfLossless(pdf, `order:${orderId}`);
@@ -362,7 +371,7 @@ export const getPDFFilePath = (orderId) => {
     }
     
     // Check filesystem for permanent PDF
-    const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${orderId}.pdf`);
+    const permanentPdfPath = path.join(getPermanentPdfDir(), `${orderId}.pdf`);
     console.log(`[getPDFFilePath] Checking filesystem: ${permanentPdfPath}`);
     
     if (fs.existsSync(permanentPdfPath)) {

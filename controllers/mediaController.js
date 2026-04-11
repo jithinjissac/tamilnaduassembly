@@ -16,8 +16,12 @@ const getTempPDFDirectory = () => {
     return path.join(process.cwd(), 'public', 'temp-pdfs');
 };
 
-// Resolve voter-slips directory (GCS mount or local)
+// Resolve voter-slips directory (Railway volume > GCS mount > local)
 const getVoterSlipsDirectory = () => {
+    const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+    if (fs.existsSync(railwayVolume)) {
+        return path.join(railwayVolume, 'voter-slips');
+    }
     const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
     if (fs.existsSync(mountedBucketPath)) {
         return path.join(mountedBucketPath, 'voter-slips');

@@ -54,6 +54,10 @@ function ensureDir(dirPath) {
 }
 
 function resolveVoterSlipsDir() {
+    const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+    if (fs.existsSync(railwayVolume)) {
+        return path.join(railwayVolume, 'voter-slips');
+    }
     const mountedBucketPath = process.env.GCS_MOUNT_PATH || '/slipsdata';
     if (fs.existsSync(mountedBucketPath)) {
         return path.join(mountedBucketPath, 'voter-slips');

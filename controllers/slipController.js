@@ -10,6 +10,15 @@ import { getPDFFilePath, getPDFJobStatus, clearPDFCache, createFreshBrowser, reg
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Resolve persistent PDF storage dir — prefers Railway volume over ephemeral public/
+function getPermanentPdfDir() {
+    const railwayVolume = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+    if (fs.existsSync(railwayVolume)) {
+        return path.join(railwayVolume, 'permanent-pdfs');
+    }
+    return path.join(__dirname, '..', 'public', 'permanent-pdfs');
+}
+
 // Persistent browser instance for better performance
 let browserInstance = null;
 
@@ -1613,7 +1622,7 @@ export const downloadSlip = async (req, res) => {
 
         // ✅ DOUBLE-CHECK: Verify permanent PDF doesn't exist on disk before generating
         // (getPDFFilePath might return null if pdfJobs cache was cleared but file still exists)
-        const permanentPdfDir = path.join(__dirname, '..', 'public', 'permanent-pdfs');
+        const permanentPdfDir = getPermanentPdfDir();
         const permanentPdfPath = path.join(permanentPdfDir, `${orderId}.pdf`);
         
         if (fs.existsSync(permanentPdfPath)) {
@@ -2016,7 +2025,7 @@ export const getPDFStatus = async (req, res) => {
         console.log(`[PDF STATUS] Job status:`, jobStatus);
 
         // Check if permanent PDF exists on disk
-        const permanentPdfPath = path.join(__dirname, '..', 'public', 'permanent-pdfs', `${orderId}.pdf`);
+        const permanentPdfPath = path.join(getPermanentPdfDir(), `${orderId}.pdf`);
         const pdfExists = fs.existsSync(permanentPdfPath);
         console.log(`[PDF STATUS] PDF exists on disk: ${pdfExists}, path: ${permanentPdfPath}`);
 
