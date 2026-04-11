@@ -1594,20 +1594,51 @@ s0.parentNode.insertBefore(s1,s0);
                 }
 
                 if (!pdfBlobUrl) {
+                    // 3) On-demand regenerate preview from previewId (session persisted to Railway volume)
+                    if (orderData.previewId) {
+                        previewContainer.innerHTML = `
+                            <div class="loading-preview">
+                                <div class="spinner"></div>
+                                <p>Generating preview of your assembly slips...</p>
+                            </div>
+                        `;
+                        try {
+                            const genResponse = await fetch('/api/assembly/generateSlipsWithCandidates', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ previewId: orderData.previewId, previewOnly: true })
+                            });
+                            if (genResponse.ok) {
+                                const genData = await genResponse.json();
+                                if (genData.success && genData.pdfUrl) {
+                                    const pdfResponse = await fetch(genData.pdfUrl);
+                                    if (pdfResponse.ok) {
+                                        const pdfBlob = await pdfResponse.blob();
+                                        pdfBlobUrl = URL.createObjectURL(pdfBlob);
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Failed to regenerate assembly preview:', e);
+                        }
+                    }
+                }
+
+                if (!pdfBlobUrl) {
                     console.warn('Assembly preview PDF unavailable for this order. Keeping page active with payment/details.');
                     previewContainer.innerHTML = `
                         <div style="text-align: center; padding: 2.5rem 1.5rem;">
                             <i class="fas fa-file-pdf" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i>
                             <h3 style="margin: 0 0 0.5rem 0; color: #2d3748;">Preview Not Available</h3>
                             <p style="margin: 0; color: #64748b; line-height: 1.6;">
-                                This order is saved and active. You can still complete payment and download the full PDF after payment.
+                                Preview session has expired. Your order is still active — complete payment to download the full PDF.
                             </p>
                         </div>
                     `;
 
                     const previewNote = document.getElementById('previewNote');
                     if (previewNote) {
-                        previewNote.innerHTML = `<strong>Note:</strong> Preview file is unavailable for this older order, but order details and payment are still active.`;
+                        previewNote.innerHTML = `<strong>Note:</strong> Preview has expired. Your order details and payment are still active.`;
                     }
                 } else {
                     window.currentPdfBlobUrl = pdfBlobUrl;
