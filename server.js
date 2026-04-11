@@ -377,14 +377,14 @@ import playwrightStationsRoutes from './controllers/playwrightStationsController
 app.use('/api', playwrightStationsRoutes);
 
 // Serve voter information slips directory (prefer persistent mounted storage when available)
-const voterSlipsDir = fs.existsSync(mountedBucketPath)
-  ? path.join(mountedBucketPath, 'voter-slips')
-  : path.join(__dirname, 'voter-slips');
-if (!fs.existsSync(voterSlipsDir)) {
-  fs.mkdirSync(voterSlipsDir, { recursive: true });
-}
-console.log(`[SERVER] voterSlipsDir resolved to: ${voterSlipsDir}`);
-app.use('/voter-slips', express.static(voterSlipsDir));
+// Resolved lazily per-request to handle late-mounted Railway volumes
+app.use('/voter-slips', (req, res, next) => {
+  const rv = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data/slips';
+  const dir = fs.existsSync(rv)
+    ? path.join(rv, 'voter-slips')
+    : path.join(__dirname, 'voter-slips');
+  express.static(dir)(req, res, next);
+});
 
 // Assembly Election Routes (ECI Portal)
 app.use('/api/assembly', assemblyRoutes);
