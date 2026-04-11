@@ -55,7 +55,8 @@ export const createOrder = async (req, res) => {
             candidate,
             previewId,
             slipFilePdf,
-            previewSlipFilePdf
+            previewSlipFilePdf,
+            slipFilePdfDriveLink
         } = req.body;
 
         const userId = req.userId;
@@ -119,7 +120,8 @@ export const createOrder = async (req, res) => {
             previewPdfPath: previewSlipFilePdf || slipFilePdf || null,
             pdfPath: slipFilePdf || null,
             pdfGenerated: !!slipFilePdf,
-            pdfGeneratedAt: slipFilePdf ? new Date() : null
+            pdfGeneratedAt: slipFilePdf ? new Date() : null,
+            googleDriveLink: slipFilePdfDriveLink || null
         });
 
         await order.save();

@@ -909,6 +909,27 @@ async function runExtractionJob(body, progressId) {
                         : ''
                 });
                 logger.info(`Assembly: voter information slips generated: ${slipFileInfo.htmlFileName || 'no-html'} and ${slipFileInfo.pdfFileName || 'no-pdf'}`);
+
+                // Upload full PDF to Google Drive immediately so link is ready when order is paid
+                if (slipFileInfo?.pdfFullPath) {
+                    try {
+                        const { uploadToGoogleDrive, isGoogleDriveConfigured } = await import('../utils/googleDrive.js');
+                        if (isGoogleDriveConfigured()) {
+                            logger.info(`📤 Assembly: Uploading full PDF to Google Drive: ${slipFileInfo.pdfFileName}`);
+                            const driveLink = await uploadToGoogleDrive(slipFileInfo.pdfFullPath, slipFileInfo.pdfFileName?.replace('.pdf', ''));
+                            if (driveLink) {
+                                logger.info(`✅ Assembly: Google Drive upload successful: ${driveLink}`);
+                                slipFileInfo.googleDriveLink = driveLink;
+                            } else {
+                                logger.warn('⚠️ Assembly: Google Drive upload returned no link');
+                            }
+                        } else {
+                            logger.info('ℹ️ Assembly: Google Drive not configured, skipping upload');
+                        }
+                    } catch (driveErr) {
+                        logger.warn(`⚠️ Assembly: Google Drive upload failed: ${driveErr.message}`);
+                    }
+                }
             } catch (slipError) {
                 logger.error('Assembly: Failed to generate slips:', slipError.message);
                 // Continue even if slip generation fails
@@ -1002,6 +1023,7 @@ async function runExtractionJob(body, progressId) {
             slipFile: slipFileInfo?.fileName ? `/voter-slips/${slipFileInfo.fileName}` : null,
             slipFileHtml: slipFileInfo?.htmlFileName ? `/voter-slips/${slipFileInfo.htmlFileName}` : null,
             slipFilePdf: slipFileInfo?.pdfFileName ? `/voter-slips/${slipFileInfo.pdfFileName}` : null,
+            slipFilePdfDriveLink: slipFileInfo?.googleDriveLink || null,
             previewSlipFilePdf: previewSlipFileInfo?.pdfFileName ? `/voter-slips/${previewSlipFileInfo.pdfFileName}` : null,
             selectedParts: selectedParts.length,
             constituency,
