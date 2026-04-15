@@ -5,7 +5,73 @@
  */
 
 import axios from 'axios';
+import { webcrypto } from 'crypto';
 import { logger } from './logger.js';
+
+// RSA-2048 public key (SPKI/DER base64) from ECI portal JS bundle.
+// Verified April 2026. Re-run check-eci-api-changes.js if 400 errors recur.
+const ECI_RSA_PUBLIC_KEY_B64 =
+    'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArb7++BxL/YN8OIln+6FL9Gnw5DNmQ/V' +
+    'FZXss+J+TuQyJc891JbqbijxYQNEin2c2u+CnpXpoGQ/1gUSzDMJeNS3sNSlIUykp2dt7xIm/cm' +
+    'V4sZ/c769vCxVRosMfRaZJnBAah+m1X26lEhnOo0wpAB9Txr8RIyBe6h7PiQWykeJeh6UacOBBX' +
+    '28kgkq7+vJhW8HgB38lt32XRocznRYwS9LqR7ZweFmQhTr1+EGrqiEKCOCxMYgHR2SQckb96hZ9' +
+    'kWzfzeun4bUO5oXKJciLkiS1IgKieADEvYLgu129ZIpn1H+8H+8ikNNVETqEDDMtqcQcQmWppJv' +
+    'cWHaXAs+f8QIDAQAB';
+
+let _cachedRsaKey = null;
+
+async function importECIPublicKey() {
+    if (_cachedRsaKey) return _cachedRsaKey;
+    const keyData = Buffer.from(ECI_RSA_PUBLIC_KEY_B64.replace(/\s+/g, ''), 'base64');
+    _cachedRsaKey = await webcrypto.subtle.importKey(
+        'spki',
+        keyData,
+        { name: 'RSA-OAEP', hash: 'SHA-256' },
+        false,
+        ['encrypt']
+    );
+    return _cachedRsaKey;
+}
+
+/**
+ * Encrypt a plain JS object for ECI API POST body.
+ * Algorithm mirrors ECI frontend JS (AES-256-GCM payload + RSA-OAEP encrypted key).
+ * @returns {{ encryptedPayload: string, encryptedKey: string, iv: string }}
+ */
+async function encryptRequestBody(plainObj) {
+    const rsaKey = await importECIPublicKey();
+
+    // 32-byte AES-256 key, 12-byte GCM nonce
+    const aesKeyBytes = webcrypto.getRandomValues(new Uint8Array(32));
+    const iv = webcrypto.getRandomValues(new Uint8Array(12));
+
+    const aesKey = await webcrypto.subtle.importKey('raw', aesKeyBytes, 'AES-GCM', false, ['encrypt']);
+
+    // Encrypt body with AES-GCM (auth tag appended automatically by WebCrypto)
+    const bodyBytes = new TextEncoder().encode(JSON.stringify(plainObj));
+    const encryptedBody = await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, bodyBytes);
+
+    // Encrypt AES key with RSA-OAEP-SHA256
+    const encryptedKey = await webcrypto.subtle.encrypt({ name: 'RSA-OAEP' }, rsaKey, aesKeyBytes);
+
+    return {
+        encryptedPayload: Buffer.from(encryptedBody).toString('base64'),
+        encryptedKey: Buffer.from(encryptedKey).toString('base64'),
+        iv: Buffer.from(iv).toString('base64'),
+    };
+}
+
+/**
+ * Convert full rollTypeRefId (e.g. "S22-2026-FIR-2") to the short form
+ * expected by get-ac-languages (e.g. "SIR-FinalRoll").
+ */
+function toShortRollType(rollTypeRefId) {
+    const s = String(rollTypeRefId || '').toUpperCase();
+    if (s.includes('FIR') || s.includes('FINAL')) return 'SIR-FinalRoll';
+    if (s.includes('DR')  || s.includes('DRAFT')) return 'SIR-DraftRoll';
+    if (s.includes('SUP'))                        return 'SIR-SupplementRoll';
+    return rollTypeRefId;
+}
 
 const BASE_URL = 'https://gateway-voters.eci.gov.in';
 
@@ -32,7 +98,7 @@ function extractRevisionNo(rollTypeRefId, fallback = 1) {
     return match ? Number(match[1]) : fallback;
 }
 
-// Common headers required by ECI API (verified from working curl command)
+// Common headers required by ECI API (verified from live browser capture Apr 2026)
 const getHeaders = () => ({
     'Accept': '*/*',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -40,17 +106,26 @@ const getHeaders = () => ({
     'Connection': 'keep-alive',
     'Content-Type': 'application/json',
     'Origin': 'https://voters.eci.gov.in',
+    'Referer': 'https://voters.eci.gov.in/',
     'Pragma': 'no-cache',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
     'applicationname': 'VSP',
+    'appname': 'VSP',
     'channelidobo': 'VSP',
     'platform-type': 'ECIWEB',
+    'currentrole': 'citizen',
+    'atkn_bnd': 'null',
+    'rtkn_bnd': 'null',
     'sec-ch-ua': '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-site'
+    'Sec-Fetch-Site': 'same-site',
+    // NOTE: accept_yek / accept_rotcev are dynamic per-request HMAC tokens generated
+    // by ECI frontend JS. They cannot be hardcoded. The Playwright browser flow
+    // (eciPlaywright.js) handles them automatically. If direct Axios calls start
+    // returning 403/401, switch to the Playwright-based captureECICaptcha flow.
 });
 
 /**
@@ -122,29 +197,35 @@ export const getRollTypes = async (stateCode, year) => {
 /**
  * Get languages for assembly constituency
  * POST /api/v1/printing-publish/get-ac-languages
- * Body should contain: { stateCd, districtCd, acNumber, rollType, year }
+ * Updated body format verified from live browser capture Apr 2026.
  */
 export const getACLanguages = async (stateCode, districtCode, acNumber, rollType, year) => {
     try {
         logger.info(`🗣️  Fetching languages for AC ${acNumber}...`);
-        
+
+        const rollTypeRefId = normalizeRollTypeRefId(rollType, stateCode, year);
+
         const response = await axios.post(
             `${BASE_URL}/api/v1/printing-publish/get-ac-languages`,
             {
                 stateCd: stateCode,
-                districtCd: districtCode,
                 acNumber: parseInt(acNumber),
-                rollType,
-                year: parseInt(year)
+                rollTypeRefId: toShortRollType(rollTypeRefId),
+                pdfGenType: 'FC-EROLLGEN',
             },
             { headers: getHeaders() }
         );
         
         if (response.data && response.data.status === 'Success') {
-            const languages = Object.entries(response.data.payload).map(([code, name]) => ({
-                code,
-                name
-            }));
+            let languages;
+            if (typeof response.data.payload === 'object' && !Array.isArray(response.data.payload)) {
+                languages = Object.entries(response.data.payload).map(([code, name]) => ({ code, name }));
+            } else {
+                languages = (response.data.payload || []).map(item => ({
+                    code: item.langCd || item.code || item,
+                    name: item.langName || item.name || item,
+                }));
+            }
             
             logger.info(`✅ Found ${languages.length} languages`);
             return languages;
@@ -168,16 +249,18 @@ export const getPollingPartsList = async (stateCode, districtCode, acNumber, rol
         const rollTypeRefId = normalizeRollTypeRefId(rollType, stateCode, year);
         const revisionNo = extractRevisionNo(rollTypeRefId);
         
-        const requestBody = {
+        const plainBody = {
             stateCd: stateCode,
             acNumber: parseInt(acNumber),
             rollTypeRefId,
-            pdfGenType: 'EROLLGEN',
+            pdfGenType: 'FC-EROLLGEN',
             revisionNo,
             year: parseInt(year)
         };
-        
-        logger.info(`📤 Request body: ${JSON.stringify(requestBody)}`);
+
+        logger.info(`📤 Plain body (pre-encrypt): ${JSON.stringify(plainBody)}`);
+        const requestBody = await encryptRequestBody(plainBody);
+        logger.info(`📤 Encrypted body ready (iv: ${requestBody.iv})`);
         
         const response = await axios.post(
             `${BASE_URL}/api/v1/printing-publish/get-publish-part-list`,
@@ -251,7 +334,7 @@ export const generatePublishedPDFs = async (payload) => {
             : (stateCode === 'S11' ? 'MAL' : (langCodeMap[languageKey] || 'ENG'));
 
         const postGenerateRequest = async (effectiveLangCode) => {
-            const requestBody = {
+            const plainBody = {
                 stateCd: stateCode,
                 acNumber: parseInt(acNumber, 10),
                 partNumberList: partNumbers,
@@ -263,7 +346,8 @@ export const generatePublishedPDFs = async (payload) => {
             };
 
             logger.info(`   Published Roll ID: ${publishedRollId}, Lang Code: ${effectiveLangCode}`);
-            logger.info(`📤 Request body: ${JSON.stringify(requestBody)}`);
+            logger.info(`📤 Plain body (pre-encrypt): ${JSON.stringify(plainBody)}`);
+            const requestBody = await encryptRequestBody(plainBody);
 
             return axios.post(
                 `${BASE_URL}/api/v1/printing-publish/generate-published-pdfs`,
@@ -290,8 +374,8 @@ export const generatePublishedPDFs = async (payload) => {
                 {
                     stateCd: stateCode,
                     acNumber: parseInt(acNumber, 10),
-                    rollTypeRefId: publishedRollId,
-                    pdfGenType: 'EROLLGEN'
+                    rollTypeRefId: toShortRollType(publishedRollId),
+                    pdfGenType: 'FC-EROLLGEN',
                 },
                 { headers: getHeaders() }
             );
